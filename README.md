@@ -1,0 +1,1 @@
+Projekt gry komputerowej tworzonej na własnym silniku, na potrzeby ZTGK.
