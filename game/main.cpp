@@ -15,6 +15,9 @@
 
 #include "Shader.h"
 
+#include <ft2build.h>
+#include FT_FREETYPE_H 
+
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
@@ -45,6 +48,13 @@ int main(void)
     }
 
     glEnable(GL_DEPTH_TEST);
+	
+	FT_Library ft;
+	if(FT_Init_FreeType(&ft))
+	{
+		std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+		return -3;
+	}
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
