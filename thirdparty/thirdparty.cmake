@@ -117,16 +117,3 @@ if((NOT RAPIDJSON_LIBRARY) OR (NOT RAPIDJSON_INCLUDE_DIR))
 	set(RAPIDJSON_LIBRARY "rapidjson" "${FREETYPE_LIBRARIES}")
 	set(RAPIDJSON_INCLUDE_DIR "${RAPIDJSON_DIR}/include")
 endif()
-
-if((NOT RAPIDJSON_LIBRARY) OR (NOT RAPIDJSON_INCLUDE_DIR))
-	set(RAPIDJSON_DIR "${THIRDPARTY_DIR}/rapidjson")
-
-	message("Unable to find RapidJSON, cloning...")
-    execute_process(COMMAND git submodule update --init ${RAPIDJSON_DIR}
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-
-    add_subdirectory("${RAPIDJSON_DIR}")
-
-	set(RAPIDJSON_LIBRARY "rapidjson" "${FREETYPE_LIBRARIES}")
-	set(RAPIDJSON_INCLUDE_DIR "${RAPIDJSON_DIR}/include")
-endif()
