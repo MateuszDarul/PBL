@@ -112,6 +112,12 @@ if((NOT RAPIDJSON_LIBRARY) OR (NOT RAPIDJSON_INCLUDE_DIR))
     execute_process(COMMAND git submodule update --init ${RAPIDJSON_DIR}
                     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
+	option(RAPIDJSON_BUILD_DOC "Build rapidjson documentation." OFF)
+	option(RAPIDJSON_BUILD_EXAMPLES "Build rapidjson examples." OFF)
+	option(RAPIDJSON_BUILD_TESTS "Build rapidjson perftests and unittests." OFF)
+	option(RAPIDJSON_BUILD_CXX11 "Build rapidjson with C++11" OFF)
+	option(RAPIDJSON_BUILD_CXX17 "Build rapidjson with C++17" ON)
+
     add_subdirectory("${RAPIDJSON_DIR}")
 
 	set(RAPIDJSON_LIBRARY "rapidjson" "${FREETYPE_LIBRARIES}")
