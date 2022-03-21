@@ -13,7 +13,7 @@
 class MouseInputManager
 {
 private:
-    GLFWwindow *window; //<! Okno, z ktorego przyjmujemy zdarzenia.
+    GLFWwindow* window; //<! Okno, z ktorego przyjmujemy zdarzenia.
     std::vector<glm::vec2> buttons; //!< Aktualny stan przyciskow myszy.
 
 public:
@@ -26,7 +26,7 @@ public:
      */
     MouseInputManager(GLFWwindow *window);
 
-    /** @brief Domyślny destruktor.
+    /** @brief Domyslny destruktor.
      */
     ~MouseInputManager();
     

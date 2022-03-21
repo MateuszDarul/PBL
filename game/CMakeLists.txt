@@ -1,5 +1,7 @@
 file(GLOB_RECURSE SOURCE_FILES
 	src/System/MouseInputManager.cpp
+	src/System/KeyboardInputManager.cpp
+	src/System/InputManager.cpp
 
 	src/Shader.cpp
 
@@ -12,6 +14,9 @@ file(GLOB_RECURSE SOURCE_FILES
 file(GLOB_RECURSE HEADER_FILES 
 	include/System/MouseInputManager.h
 	include/System/MouseButtons.h
+	include/System/KeyboardInputManager.h
+	include/System/KeyboardKeys.h
+	include/System/InputManager.h
 
 	src/Shader.h
 

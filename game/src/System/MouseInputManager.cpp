@@ -79,6 +79,7 @@ bool MouseInputManager::OnReleased(MouseButton button)
     else if(glfwGetMouseButton(window, button) == GLFW_RELEASE)
     {
         this->buttons[button].x = false;
+        return false;
     }
 
     if(!this->buttons[button].x && this->buttons[button].y)
