@@ -3,6 +3,11 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/System/KeyboardInputManager.cpp
 	src/System/InputManager.cpp
 
+	src/GameObject/GameObject.cpp
+	src/GameObject/Components/Component.cpp
+	src/GameObject/Components/NameComponent.cpp
+	src/GameObject/Components/ListComponent.cpp
+
 	src/Shader.cpp
 
 	main.cpp
@@ -18,6 +23,11 @@ file(GLOB_RECURSE HEADER_FILES
 	include/System/KeyboardKeys.h
 	include/System/InputManager.h
 
+	include/GameObject/GameObject.h
+	include/GameObject/Components/Component.h
+	include/GameObject/Components/NameComponent.h
+	include/GameObject/Components/ListComponent.h
+
 	src/Shader.h
 
 	ImGui/include/*.h
@@ -26,6 +36,8 @@ file(GLOB_RECURSE HEADER_FILES
 
 include_directories(include)
 include_directories(include/System)
+include_directories(include/GameObject)
+include_directories(include/GameObject/Components)
 include_directories(ImGui/include)
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
