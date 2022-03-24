@@ -34,5 +34,8 @@
 # Other
 *.ini
 *.json
+
+# Directiries
 build
 Build
+thirdparty/openal-soft

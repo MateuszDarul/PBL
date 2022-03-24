@@ -21,6 +21,8 @@
 #include "rapidjson/stringbuffer.h"
 namespace rj = rapidjson;
 
+#include <AL/al.h>
+#include <AL/alc.h>
 
 #include "Shader.h"
 #include "InputManager.h"
@@ -30,6 +32,13 @@ void processInput(GLFWwindow *window);
 
 int main(void)
 {    
+    ALCdevice *device;
+    device = alcOpenDevice(NULL);
+    if(!device)
+    {
+        return -7;
+    }
+
 	// 1. Parse a JSON string into DOM.
     const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
     rj::Document d;

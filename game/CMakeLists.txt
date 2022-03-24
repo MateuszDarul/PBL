@@ -52,6 +52,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${IMGUI_INCLUDE_DIR}")
 target_include_directories(${PROJECT_NAME} PUBLIC "${STB_IMAGE_INCLUDE_DIR}")
 target_include_directories(${PROJECT_NAME} PUBLIC "${FREETYPE_INCLUDE_DIR}")
 target_include_directories(${PROJECT_NAME} PUBLIC "${RAPIDJSON_INCLUDE_DIR}")
+target_include_directories(${PROJECT_NAME} PUBLIC "${OPENAL_SOFT_INCLUDE_DIR}")
 
 target_link_libraries(${PROJECT_NAME} "${OPENGL_LIBRARY}")
 target_link_libraries(${PROJECT_NAME} "${ASSIMP_LIBRARY}")
@@ -60,11 +61,34 @@ target_link_libraries(${PROJECT_NAME} "${GLAD_LIBRARY}"      "${CMAKE_DL_LIBS}")
 target_link_libraries(${PROJECT_NAME} "${IMGUI_LIBRARY}"     "${CMAKE_DL_LIBS}")
 target_link_libraries(${PROJECT_NAME} "${STB_IMAGE_LIBRARY}" "${CMAKE_DL_LIBS}")
 target_link_libraries(${PROJECT_NAME} "${FREETYPE_LIBRARY}")
+target_link_libraries(${PROJECT_NAME} "${OPENAL_SOFT_LIBRARY}")
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE GLFW_INCLUDE_NONE)
 target_compile_definitions(${PROJECT_NAME} PRIVATE LIBRARY_SUFFIX="")
 
-add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
-				   COMMAND ${CMAKE_COMMAND} -E copy_directory
-						   ${CMAKE_SOURCE_DIR}/Resources
-						   ${CMAKE_CURRENT_BINARY_DIR}/Resources)
+
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+
+	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
+					   COMMAND ${CMAKE_COMMAND} -E copy_directory
+							   ${CMAKE_SOURCE_DIR}/Resources
+							   ${CMAKE_CURRENT_BINARY_DIR}/Resources)
+
+	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
+						COMMAND ${CMAKE_COMMAND} -E copy
+								${OPENAL_SOFT_DIR}/build/OpenAL32.dll
+								${CMAKE_CURRENT_BINARY_DIR})
+							
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+
+	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
+					   COMMAND ${CMAKE_COMMAND} -E copy_directory
+							   ${CMAKE_SOURCE_DIR}/Resources
+							   ${CMAKE_CURRENT_BINARY_DIR}/Debug/Resources)
+
+	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
+						COMMAND ${CMAKE_COMMAND} -E copy
+								${OPENAL_SOFT_DIR}/build/Debug/OpenAL32.dll
+								${CMAKE_CURRENT_BINARY_DIR}/Debug/)
+endif()
