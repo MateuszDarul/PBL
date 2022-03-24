@@ -1,18 +1,31 @@
-file(GLOB_RECURSE SOURCE_FILES 
-	 *.c
-	 *.cpp
-	 ImGui/src/*.c
-	 ImGui/src/*.cpp
-	 )
+file(GLOB_RECURSE SOURCE_FILES
+	src/System/MouseInputManager.cpp
+	src/System/KeyboardInputManager.cpp
+	src/System/InputManager.cpp
+
+	src/Shader.cpp
+
+	main.cpp
+
+	ImGui/src/*.c
+	ImGui/src/*.cpp
+)
 	
 file(GLOB_RECURSE HEADER_FILES 
-	 *.h
-	 *.hpp
-	 ImGui/include/*.h
-	 ImGui/include/*.hpp
-	 )
+	include/System/MouseInputManager.h
+	include/System/MouseButtons.h
+	include/System/KeyboardInputManager.h
+	include/System/KeyboardKeys.h
+	include/System/InputManager.h
+
+	src/Shader.h
+
+	ImGui/include/*.h
+	ImGui/include/*.hpp
+)
 
 include_directories(include)
+include_directories(include/System)
 include_directories(ImGui/include)
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
