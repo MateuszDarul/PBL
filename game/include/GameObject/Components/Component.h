@@ -21,7 +21,4 @@ public:
     uint32_t GetClassUUID();
 };
 
-#include "NameComponent.h"
-#include "ListComponent.h"
-
 #endif // __COMPONENT_H__

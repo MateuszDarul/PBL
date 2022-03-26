@@ -27,6 +27,10 @@ namespace rj = rapidjson;
 #include "Shader.h"
 #include "InputManager.h"
 
+#include "GameObject.h"
+
+#include "Components.h"
+
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
@@ -100,7 +104,22 @@ int main(void)
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
+    Mesh mesh;
+    mesh.Load("Resources/models/Crate/Crate.obj");
+
+    Material material;
+    material.Load("Resources/models/Crate/Crate.mtl");
+
+    ModelComponent mc;
+    mc.Create(&mesh, &material);
+
     Shader *shader = new Shader("Resources/shaders/default.vert", "Resources/shaders/default.frag");
+
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)800 / (float)600, 0.1f, 100.0f);
+    float radius = 10.0f;
+    float camX = 0, camZ = 0;
+    glm::mat4 view;
+    glm::mat4 transform;
 
     while(!glfwWindowShouldClose(window))
     {
@@ -109,10 +128,18 @@ int main(void)
             std::cout << "...\n";
         }
 
+        camX = sin(glfwGetTime()) * radius;
+        camZ = cos(glfwGetTime()) * radius;
+        view = glm::lookAt(glm::vec3(camX, 5.f, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+        transform = projection * view * glm::mat4(1.f);
         processInput(window);
 
         glClearColor(0.08f, 0.2f, 0.08f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        shader->use();
+        shader->setMat4("transform", transform);
+        mc.Draw(shader);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();

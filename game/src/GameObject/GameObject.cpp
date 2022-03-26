@@ -13,20 +13,6 @@ bool GameObject::AddComponent(Component *component)
     return true;
 }
 
-template<typename T>
-T* GameObject::GetComponent()
-{
-    T tmp;
-    for(int i=0; i<components.size(); i++)
-    {
-        if(components[i]->GetClassUUID() == tmp.GetClassUUID())
-        {
-            return (T*)components[i];
-        }
-    }
-    return nullptr;
-}
-
 bool GameObject::RemoveComponent(Component *component)
 {
     for(int i=0; i<components.size(); i++)
@@ -55,10 +41,26 @@ bool GameObject::RemoveComponent()
     return false;
 }
 
+template<typename T>
+T* GameObject::GetComponent()
+{
+    T tmp;
+    for(int i=0; i<components.size(); i++)
+    {
+        if(components[i]->GetClassUUID() == tmp.GetClassUUID())
+        {
+            return (T*)components[i];
+        }
+    }
+    return nullptr;
+}
+
 ///***
 
 template NameComponent* GameObject::GetComponent<NameComponent>();
 template ListComponent* GameObject::GetComponent<ListComponent>();
+template ModelComponent* GameObject::GetComponent<ModelComponent>();
 
 template bool GameObject::RemoveComponent<NameComponent>();
 template bool GameObject::RemoveComponent<ListComponent>();
+template bool GameObject::RemoveComponent<ModelComponent>();

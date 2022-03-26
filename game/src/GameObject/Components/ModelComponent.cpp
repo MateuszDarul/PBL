@@ -1,0 +1,85 @@
+#include "ModelComponent.h"
+
+ModelComponent::ModelComponent()
+    :Component(3)
+{
+    ;
+}
+
+ModelComponent::~ModelComponent()
+{
+    ;
+}
+
+bool ModelComponent::Create(Mesh* mesh, Material* material)
+{
+    if(mesh == nullptr)
+    {
+        return false;
+    }
+
+    this->mesh = mesh;
+    this->material = material;
+
+    glGenVertexArrays(1, &this->VAO);
+    glGenBuffers(1, &this->VBO);
+
+    glBindVertexArray(this->VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
+
+    glBufferData(GL_ARRAY_BUFFER, this->mesh->vertices.size() * sizeof(Mesh::Vertex), &this->mesh->vertices[0], GL_STATIC_DRAW);  
+
+    glEnableVertexAttribArray(0);	
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Mesh::Vertex), (void*)0);
+
+    glEnableVertexAttribArray(1);	
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Mesh::Vertex), (void*)offsetof(Mesh::Vertex, normal));
+
+    glEnableVertexAttribArray(2);	
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Mesh::Vertex), (void*)offsetof(Mesh::Vertex, texCoords));
+
+    glBindVertexArray(0);
+
+    return true;
+}
+
+void ModelComponent::Clear()
+{
+    glDeleteVertexArrays(1, &this->VAO);
+    glDeleteBuffers(1, &this->VBO);
+
+    this->mesh = nullptr;
+    this->material = nullptr;
+}
+
+bool ModelComponent::Draw(Shader* shader) 
+{
+    if(this->mesh == nullptr || shader == nullptr)
+    {
+        return false;
+    }
+
+    shader->use();
+
+    if(this->material != nullptr)
+    {
+        shader->setInt("diffuseMapData", 0);
+        shader->setInt("specularMapData", 1);
+        shader->setInt("normalMapData", 2);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, this->material->diffuse_texture_id);
+        glActiveTexture(GL_TEXTURE1);       
+        glBindTexture(GL_TEXTURE_2D, this->material->specular_texture_id);
+        glActiveTexture(GL_TEXTURE2);       
+        glBindTexture(GL_TEXTURE_2D, this->material->normal_texture_id);
+    }
+
+    glBindVertexArray(this->VAO);
+    glDrawArrays(GL_TRIANGLES, 0, this->mesh->vertices.size());
+
+    glBindVertexArray(0);
+    glActiveTexture(GL_TEXTURE0);
+
+    return true;
+}

@@ -7,6 +7,10 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/Component.cpp
 	src/GameObject/Components/NameComponent.cpp
 	src/GameObject/Components/ListComponent.cpp
+	src/GameObject/Components/ModelComponent.cpp
+
+	src/GameObject/Mesh.cpp
+	src/GameObject/Material.cpp
 
 	src/Shader.cpp
 
@@ -24,9 +28,14 @@ file(GLOB_RECURSE HEADER_FILES
 	include/System/InputManager.h
 
 	include/GameObject/GameObject.h
+	include/GameObject/Components/Components.h
 	include/GameObject/Components/Component.h
 	include/GameObject/Components/NameComponent.h
 	include/GameObject/Components/ListComponent.h
+	include/GameObject/Components/ModelComponent.h
+
+	include/GameObject/Mesh.h
+	include/GameObject/Material.h
 
 	src/Shader.h
 

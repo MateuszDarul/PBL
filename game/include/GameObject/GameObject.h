@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 
-#include "Component.h"
+#include "Components.h"
 
 class GameObject
 {
