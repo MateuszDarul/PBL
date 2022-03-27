@@ -9,7 +9,13 @@ Material::Material()
 
 Material::~Material()
 {
-    ;
+    glDeleteTextures(1, &this->diffuse_texture_id);
+    glDeleteTextures(1, &this->specular_texture_id);
+    glDeleteTextures(1, &this->normal_texture_id);
+
+    this->diffuse_texture_id = 0;
+    this->specular_texture_id = 0;
+    this->normal_texture_id = 0;
 }
 
 bool Material::Load(const std::string& mtlPath)
@@ -54,11 +60,6 @@ bool Material::Load(const std::string& mtlPath)
     return true;
 }
 
-bool Material::Load(const std::string& diffusePath, const std::string& specularPath, const std::string& normalPath)
-{
-    return false;
-}
-
 void Material::LoadTexture(unsigned int &id, const std::string& path)
 {
     glGenTextures(1, &id);
@@ -74,7 +75,7 @@ void Material::LoadTexture(unsigned int &id, const std::string& path)
     unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
     if(data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, nrComponents, width, height, 0, nrComponents, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else

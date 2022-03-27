@@ -110,12 +110,13 @@ int main(void)
     Material material;
     material.Load("Resources/models/Crate/Crate.mtl");
 
-    ModelComponent mc;
-    mc.Create(&mesh, &material);
+    ModelInstancedComponent mc;
+    mc.Create(10, &mesh, &material);
 
-    Shader *shader = new Shader("Resources/shaders/default.vert", "Resources/shaders/default.frag");
+    //Shader *shader = new Shader("Resources/shaders/default.vert", "Resources/shaders/default.frag");
+    Shader *shader = new Shader("Resources/shaders/inst.vert", "Resources/shaders/inst.frag");
 
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)800 / (float)600, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)800 / (float)600, 0.1f, 1000.0f);
     float radius = 10.0f;
     float camX = 0, camZ = 0;
     glm::mat4 view;

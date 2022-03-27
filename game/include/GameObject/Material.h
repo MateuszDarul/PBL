@@ -27,7 +27,6 @@ public:
     ~Material();
 
     bool Load(const std::string& mtlPath);
-    bool Load(const std::string& diffusePath, const std::string& specularPath, const std::string& normalPath);
 };
 
 #endif // __MATERIAL_H__
