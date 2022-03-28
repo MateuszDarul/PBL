@@ -74,12 +74,17 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 					   COMMAND ${CMAKE_COMMAND} -E copy_directory
 							   ${CMAKE_SOURCE_DIR}/Resources
 							   ${CMAKE_CURRENT_BINARY_DIR}/Resources)
-
+   if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
+						COMMAND ${CMAKE_COMMAND} -E copy
+								${OPENAL_SOFT_DIR}/build/libopenal.so
+								${CMAKE_CURRENT_BINARY_DIR}/../thirdparty)
+   else()	
 	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
 						COMMAND ${CMAKE_COMMAND} -E copy
 								${OPENAL_SOFT_DIR}/build/OpenAL32.dll
 								${CMAKE_CURRENT_BINARY_DIR})
-							
+   endif()						
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 
 	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
