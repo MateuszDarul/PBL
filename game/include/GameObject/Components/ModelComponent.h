@@ -10,7 +10,7 @@
 
 class ModelComponent :public Component
 {
-private:
+protected:
     unsigned int VAO;
     unsigned int VBO;
 

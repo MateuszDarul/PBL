@@ -4,17 +4,15 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Component.h"
+#include "ModelComponent.h"
 #include "Shader.h"
 #include "Mesh.h"
 #include "Material.h"
 
-class ModelInstancedComponent :public Component
+class ModelInstancedComponent :public ModelComponent
 {
-private:
+public:
     uint32_t amount;
-    uint32_t VAO;
-    uint32_t VBO;
     uint32_t instanceVBO;
 
     Mesh* mesh;
@@ -26,7 +24,8 @@ public:
     ~ModelInstancedComponent();
 
     bool Create(uint32_t amount, Mesh* mesh, Material* material);
-    void Draw(Shader* shader);
+    void UpdateTransformations();
+    bool Draw(Shader* shader);
 };
 
 #endif // __MODEL_INSTANCED_COMPONENT_H__

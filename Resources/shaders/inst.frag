@@ -2,13 +2,13 @@
 
 out vec4 FragColor;
 
-in VS_OUT {
-    vec3 fragPos;
-    vec3 normal;
-    vec2 texCoords;
-} fs_in;
+in vec2 texCoords;
+
+uniform sampler2D diffuseMapData;
+uniform sampler2D specularMapData;
+uniform sampler2D normalMapData;
 
 void main()
 {
-    FragColor = vec4(1.f, 0.f, 0.f, 1.f);
+    FragColor = texture(diffuseMapData, texCoords);
 }
