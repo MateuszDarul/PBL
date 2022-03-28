@@ -117,7 +117,7 @@ int main(void)
         Shader *shader = new Shader("Resources/shaders/default.vert", "Resources/shaders/default.frag");
     #endif // TEST_1_MODEL
     #ifdef TEST_N_MODEL
-        ModelInstancedComponent mc;
+        ModelInstancesComponent mc;
         mc.Create(9, &mesh, &material);
         mc.transformations[0] = glm::translate(glm::mat4(1.f), glm::vec3(0, 2, 0));
         mc.transformations[1] = glm::translate(glm::mat4(1.f), glm::vec3(5, 2, 0));

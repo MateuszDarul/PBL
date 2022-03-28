@@ -1,16 +1,16 @@
-#include "ModelInstancedComponent.h"
+#include "ModelInstancesComponent.h"
 
-ModelInstancedComponent::ModelInstancedComponent()
+ModelInstancesComponent::ModelInstancesComponent()
 {
     Component(4);
 }
 
-ModelInstancedComponent::~ModelInstancedComponent()
+ModelInstancesComponent::~ModelInstancesComponent()
 {
 
 }
 
-bool ModelInstancedComponent::Create(uint32_t amount, Mesh* mesh, Material* material)
+bool ModelInstancesComponent::Create(uint32_t amount, Mesh* mesh, Material* material)
 {
     this->amount = amount;
     this->mesh = mesh;
@@ -79,7 +79,7 @@ bool ModelInstancedComponent::Create(uint32_t amount, Mesh* mesh, Material* mate
     return true;
 }
 
-bool ModelInstancedComponent::Draw(Shader* shader)
+bool ModelInstancesComponent::Draw(Shader* shader)
 {
     if(this->mesh == nullptr || shader == nullptr)
     {
@@ -111,7 +111,7 @@ bool ModelInstancedComponent::Draw(Shader* shader)
     return true;
 }
 
-void ModelInstancedComponent::UpdateTransformations()
+void ModelInstancesComponent::UpdateTransformations()
 {
     glBindBuffer(GL_ARRAY_BUFFER, this->instanceVBO);
     void *ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);

@@ -9,7 +9,7 @@
 #include "Mesh.h"
 #include "Material.h"
 
-class ModelInstancedComponent :public ModelComponent
+class ModelInstancesComponent :public ModelComponent
 {
 public:
     uint32_t amount;
@@ -20,8 +20,8 @@ public:
     glm::mat4 *transformations;
 
 public:
-    ModelInstancedComponent();
-    ~ModelInstancedComponent();
+    ModelInstancesComponent();
+    ~ModelInstancesComponent();
 
     bool Create(uint32_t amount, Mesh* mesh, Material* material);
     void UpdateTransformations();
