@@ -7,6 +7,12 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/Component.cpp
 	src/GameObject/Components/NameComponent.cpp
 	src/GameObject/Components/ListComponent.cpp
+	src/GameObject/Components/ModelComponent.cpp
+	src/GameObject/Components/ModelInstancesComponent.cpp
+
+	src/Resource/Mesh.cpp
+	src/Resource/Material.cpp
+	src/Resource/ResourceManager.cpp
 
 	src/Shader.cpp
 
@@ -24,9 +30,16 @@ file(GLOB_RECURSE HEADER_FILES
 	include/System/InputManager.h
 
 	include/GameObject/GameObject.h
+	include/GameObject/Components/Components.h
 	include/GameObject/Components/Component.h
 	include/GameObject/Components/NameComponent.h
 	include/GameObject/Components/ListComponent.h
+	include/GameObject/Components/ModelComponent.h
+	include/GameObject/Components/ModelInstancesComponent.h
+
+	include/Resource/Mesh.h
+	include/Resource/Material.h
+	include/Resource/ResourceManager.h
 
 	src/Shader.h
 
@@ -38,8 +51,10 @@ include_directories(include)
 include_directories(include/System)
 include_directories(include/GameObject)
 include_directories(include/GameObject/Components)
+include_directories(include/Resource)
 include_directories(ImGui/include)
 
+add_compile_options(-Wall)
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
 
