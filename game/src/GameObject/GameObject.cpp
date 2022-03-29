@@ -2,7 +2,7 @@
 
 bool GameObject::AddComponent(Component *component)
 {
-    for(int i=0; i<components.size(); i++)
+    for(uint32_t i=0; i<components.size(); i++)
     {
         if(components[i]->GetClassUUID() == component->GetClassUUID())
         {
@@ -15,7 +15,7 @@ bool GameObject::AddComponent(Component *component)
 
 bool GameObject::RemoveComponent(Component *component)
 {
-    for(int i=0; i<components.size(); i++)
+    for(uint32_t i=0; i<components.size(); i++)
     {
         if(components[i] == component)
         {
@@ -30,7 +30,7 @@ template<typename T>
 bool GameObject::RemoveComponent()
 {
     T tmp;
-    for (int i=0; i<components.size(); i++)
+    for (uint32_t i=0; i<components.size(); i++)
     {
         if (components[i]->GetClassUUID() == tmp.GetClassUUID())
         {
@@ -45,7 +45,7 @@ template<typename T>
 T* GameObject::GetComponent()
 {
     T tmp;
-    for(int i=0; i<components.size(); i++)
+    for(uint32_t i=0; i<components.size(); i++)
     {
         if(components[i]->GetClassUUID() == tmp.GetClassUUID())
         {

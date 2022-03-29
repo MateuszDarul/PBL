@@ -8,7 +8,7 @@ ListComponent::ListComponent()
     list.push_back(2.75);
 }
 
-double ListComponent::Get(int index)
+double ListComponent::Get(uint32_t index)
 {
     if(index >= list.size() || index < 0)
         return 0.0;
@@ -16,7 +16,7 @@ double ListComponent::Get(int index)
     return list[index];
 }
 
-bool ListComponent::Remove(int index)
+bool ListComponent::Remove(uint32_t index)
 {
     if(index >= list.size() || index < 0)
         return false;

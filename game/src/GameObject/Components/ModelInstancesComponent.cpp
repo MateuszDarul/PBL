@@ -20,7 +20,7 @@ bool ModelInstancesComponent::Create(uint32_t amount, Mesh* mesh, Material* mate
 
     int rl = (int)sqrt(this->amount);
     int x=0, y=0;
-    for(int i=0; i<this->amount; i++)
+    for(uint32_t i=0; i<this->amount; i++)
     {
         this->transformations[i] = glm::translate(glm::mat4(1.0f), glm::vec3(x*5, 0, y*5));
 
@@ -117,4 +117,51 @@ void ModelInstancesComponent::UpdateTransformations()
     void *ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
     memcpy(ptr, &this->transformations[0], this->amount * sizeof(glm::mat4));
     glUnmapBuffer(GL_ARRAY_BUFFER);
+}
+
+uint32_t ModelInstancesComponent::GetAmount()
+{
+    return this->amount;
+}
+
+bool ModelInstancesComponent::SetTransformation(uint32_t instanceID, glm::mat4 newTransformations)
+{
+    if(instanceID < 0 || instanceID >= this->amount)
+    {
+        return false;
+    }
+
+    this->transformations[instanceID] = newTransformations;
+
+    return true;
+}
+
+bool ModelInstancesComponent::SetTransformation(uint32_t instanceID, glm::vec3 position, glm::vec3 rotation, float scale)
+{
+    if(instanceID < 0 || instanceID >= this->amount)
+    {
+        return false;
+    }
+
+    glm::mat4 transform = glm::mat4(1.f);
+
+    transform = glm::translate(transform, position);
+    transform = glm::rotate(transform, (float)rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+    transform = glm::rotate(transform, (float)rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    transform = glm::rotate(transform, (float)rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+    transform = glm::scale(transform, glm::vec3(scale, scale, scale));
+
+    this->transformations[instanceID] = transform;
+    
+    return true;
+}
+
+glm::mat4 ModelInstancesComponent::GetTransformation(uint32_t instanceID)
+{
+    if(instanceID < 0 || instanceID >= this->amount)
+    {
+        return glm::mat4(1.f);
+    }
+
+    return this->transformations[instanceID];
 }

@@ -56,7 +56,7 @@ bool Mesh::Load(const std::string& objPath)
             
         if(mesh->mTextureCoords[0])
         {
-            vec = glm::vec3(0,0,0);
+            vec = glm::vec2(0,0);
             vec.x = mesh->mTextureCoords[0][i].x; 
             vec.y = mesh->mTextureCoords[0][i].y;
             vertex.texCoords = vec;
