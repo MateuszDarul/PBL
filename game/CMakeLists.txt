@@ -9,12 +9,12 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/ListComponent.cpp
 	src/GameObject/Components/ModelComponent.cpp
 	src/GameObject/Components/ModelInstancesComponent.cpp
+	src/GameObject/Components/ShaderComponent.cpp
 
 	src/Resource/Mesh.cpp
 	src/Resource/Material.cpp
 	src/Resource/ResourceManager.cpp
 
-	src/Shader.cpp
 
 	main.cpp
 
@@ -36,12 +36,11 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/Components/ListComponent.h
 	include/GameObject/Components/ModelComponent.h
 	include/GameObject/Components/ModelInstancesComponent.h
+	include/GameObject/Components/ShaderComponent.h
 
 	include/Resource/Mesh.h
 	include/Resource/Material.h
 	include/Resource/ResourceManager.h
-
-	src/Shader.h
 
 	ImGui/include/*.h
 	ImGui/include/*.hpp
@@ -89,17 +88,22 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 					   COMMAND ${CMAKE_COMMAND} -E copy_directory
 							   ${CMAKE_SOURCE_DIR}/Resources
 							   ${CMAKE_CURRENT_BINARY_DIR}/Resources)
-   if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
-						COMMAND ${CMAKE_COMMAND} -E copy
-								${OPENAL_SOFT_DIR}/build/libopenal.so
-								${CMAKE_CURRENT_BINARY_DIR}/../thirdparty)
-   else()	
-	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
-						COMMAND ${CMAKE_COMMAND} -E copy
-								${OPENAL_SOFT_DIR}/build/OpenAL32.dll
-								${CMAKE_CURRENT_BINARY_DIR})
-   endif()						
+							   
+   	if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+
+		add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
+							COMMAND ${CMAKE_COMMAND} -E copy
+									${OPENAL_SOFT_DIR}/build/libopenal.so
+									${CMAKE_CURRENT_BINARY_DIR}/../thirdparty)
+	
+	else()
+	
+		add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
+							COMMAND ${CMAKE_COMMAND} -E copy
+									${OPENAL_SOFT_DIR}/build/OpenAL32.dll
+									${CMAKE_CURRENT_BINARY_DIR})
+   endif()
+   
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 
 	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
@@ -108,7 +112,17 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 							   ${CMAKE_CURRENT_BINARY_DIR}/Debug/Resources)
 
 	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
+						COMMAND ${CMAKE_COMMAND} -E copy_directory
+								${CMAKE_SOURCE_DIR}/Resources
+								${CMAKE_CURRENT_BINARY_DIR}/Resources)
+
+	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
 						COMMAND ${CMAKE_COMMAND} -E copy
 								${OPENAL_SOFT_DIR}/build/Debug/OpenAL32.dll
 								${CMAKE_CURRENT_BINARY_DIR}/Debug/)
+
+	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
+						COMMAND ${CMAKE_COMMAND} -E copy_directory
+								${CMAKE_SOURCE_DIR}/build/Debug/OpenAL32.dll
+								${CMAKE_CURRENT_BINARY_DIR}/)
 endif()

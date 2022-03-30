@@ -6,5 +6,6 @@
 #include "ListComponent.h"              // UUID 2
 #include "ModelComponent.h"             // UUID 3
 #include "ModelInstancesComponent.h"    // UUID 4
+#include "ShaderComponent.h"            // UUID 5
 
 #endif // __ALL_COMPONENTS_H__

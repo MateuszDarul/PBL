@@ -6,7 +6,7 @@
 #include "Component.h"
 #include "Mesh.h"
 #include "Material.h"
-#include "Shader.h"
+#include "ShaderComponent.h"
 
 /** @brief Komponent reprezentujacy model.
  */
@@ -45,7 +45,7 @@ public:
      * @return true - Udalo sie wyswietlic model.
      * @return false - Nie udalo sie wyswietlic modelu.
      */
-    bool Draw(Shader *shader);
+    bool Draw(ShaderComponent *shader);
 };
 
 #endif // __MODEL_COMPONENT_H__

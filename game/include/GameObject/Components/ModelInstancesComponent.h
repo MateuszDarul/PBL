@@ -5,7 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "ModelComponent.h"
-#include "Shader.h"
+#include "ShaderComponent.h"
 #include "Mesh.h"
 #include "Material.h"
 
@@ -48,7 +48,7 @@ public:
      * @return true - Udalo sie wyswietlic instancje modelu.
      * @return false - Nie udalo sie wyswietlic instancji modelu.
      */
-    bool Draw(Shader* shader);
+    bool Draw(ShaderComponent* shader);
 
     /** @brief Zwraca ile instancji posiada ten model.
      * @return uint32_t - Liczba instancji.

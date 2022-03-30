@@ -24,7 +24,6 @@ namespace rj = rapidjson;
 #include <AL/al.h>
 #include <AL/alc.h>
 
-#include "Shader.h"
 #include "InputManager.h"
 #include "ResourceManager.h"
 #include "GameObject.h"
@@ -105,7 +104,7 @@ int main(void)
             resMan->GetMesh("Resources/models/Crate/Crate.obj"), 
             resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
     );
-    Shader *shader = new Shader("Resources/shaders/inst.vert", "Resources/shaders/inst.frag");
+    ShaderComponent *shader = new ShaderComponent("Resources/shaders/inst.vert", "Resources/shaders/inst.frag");
     for(int x=-4, y=-4, i=0; i<9; i++)
     {
         mc.SetTransformation(i, glm::translate(glm::mat4(1.f), glm::vec3(x, 0, y)));
@@ -139,8 +138,8 @@ int main(void)
         glClearColor(0.08f, 0.2f, 0.08f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        shader->use();
-        shader->setMat4("transform", transform);
+        shader->Use();
+        shader->SetMat4("transform", transform);
         mc.Draw(shader);
 
         ImGui_ImplOpenGL3_NewFrame();
@@ -161,6 +160,8 @@ int main(void)
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+
+    delete resMan;
 
     glfwTerminate();
     return 0;

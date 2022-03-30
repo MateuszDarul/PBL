@@ -52,20 +52,20 @@ void ModelComponent::Clear()
     this->material = nullptr;
 }
 
-bool ModelComponent::Draw(Shader* shader) 
+bool ModelComponent::Draw(ShaderComponent* shader) 
 {
     if(this->mesh == nullptr || shader == nullptr)
     {
         return false;
     }
 
-    shader->use();
+    shader->Use();
 
     if(this->material != nullptr)
     {
-        shader->setInt("diffuseMapData", 0);
-        shader->setInt("specularMapData", 1);
-        shader->setInt("normalMapData", 2);
+        shader->SetInt("diffuseMapData", 0);
+        shader->SetInt("specularMapData", 1);
+        shader->SetInt("normalMapData", 2);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, this->material->diffuse_texture_id);
