@@ -1,18 +1,28 @@
 #include "ShaderComponent.h"
 
-ShaderComponent::ShaderComponent(const std::string& vertexShader_path, const std::string& fragmentShader_path)
+ShaderComponent::ShaderComponent()
     :Component(5)
+{
+
+}
+
+ShaderComponent::~ShaderComponent()
+{
+    glDeleteProgram(this->shaderProgram);
+}
+
+bool ShaderComponent::Create(const std::string& vertexShaderPath, const std::string& fragmentShaderPath)
 {
     std::string vertexShaderCode;
     std::string fragmentShaderCode;
 
     std::string tmp;
 
-    std::fstream vertexShaderFile(vertexShader_path, std::ios::in);
+    std::fstream vertexShaderFile(vertexShaderPath, std::ios::in);
     if(!vertexShaderFile.good())
     {
         std::cerr << "ERROR::SHADER::VERTEX::FILE_NOT_FOUND" << std::endl;
-        exit(1);
+        return false;
     }
     while(!vertexShaderFile.eof())
     {
@@ -22,11 +32,11 @@ ShaderComponent::ShaderComponent(const std::string& vertexShader_path, const std
     vertexShaderCode.pop_back();
     vertexShaderFile.close();
 
-    std::fstream fragmentShaderFile(fragmentShader_path, std::ios::in);
+    std::fstream fragmentShaderFile(fragmentShaderPath, std::ios::in);
     if(!fragmentShaderFile.good())
     {
         std::cerr << "ERROR::SHADER::VERTEX::FILE_NOT_FOUND" << std::endl;
-        exit(2);
+        return false;
     }
     while(!fragmentShaderFile.eof())
     {
@@ -54,7 +64,7 @@ ShaderComponent::ShaderComponent(const std::string& vertexShader_path, const std
         glGetShaderInfoLog(vertexShader, 512, NULL, info_log);
         std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED" << std::endl;
         std::cerr << info_log << std::endl;
-        exit(3);
+        return false;
     }
 
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -66,7 +76,7 @@ ShaderComponent::ShaderComponent(const std::string& vertexShader_path, const std
         glGetShaderInfoLog(fragmentShader, 512, NULL, info_log);
         std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED" << std::endl;
         std::cerr << info_log << std::endl;
-        exit(4);
+        return false;
     }
 
     this->shaderProgram = glCreateProgram();
@@ -79,16 +89,13 @@ ShaderComponent::ShaderComponent(const std::string& vertexShader_path, const std
         glGetProgramInfoLog(this->shaderProgram, 512, NULL, info_log);
         std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED" << std::endl;
         std::cerr << info_log << std::endl;
-        exit(5);
+        return false;
     }
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
-}
 
-ShaderComponent::~ShaderComponent()
-{
-    glDeleteProgram(this->shaderProgram);
+    return true;
 }
 
 void ShaderComponent::Use()

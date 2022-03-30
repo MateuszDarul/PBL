@@ -69,6 +69,7 @@ int main(void)
         glfwTerminate();
         return -1;
     }
+    glfwSwapInterval(false);
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
@@ -98,16 +99,18 @@ int main(void)
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
+    ///***
 
-    ModelInstancesComponent mc;
-    mc.Create(9, 
-            resMan->GetMesh("Resources/models/Crate/Crate.obj"), 
+    ModelInstancesComponent* mic = new ModelInstancesComponent();
+    mic->Create(9, 
+            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
             resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
     );
-    ShaderComponent *shader = new ShaderComponent("Resources/shaders/inst.vert", "Resources/shaders/inst.frag");
+    ShaderComponent *shader = new ShaderComponent();
+    shader->Create("Resources/shaders/inst.vert", "Resources/shaders/inst.frag");
     for(int x=-4, y=-4, i=0; i<9; i++)
     {
-        mc.SetTransformation(i, glm::translate(glm::mat4(1.f), glm::vec3(x, 0, y)));
+        mic->SetTransformation(i, TransformComponent::Transform(glm::vec3(x, -4, y), glm::vec3(0, 0, 0), 1));
         x += 4;
         if((x + 1) % 3 == 0)
         {
@@ -115,7 +118,26 @@ int main(void)
             y += 4;
         }
     }
-    mc.UpdateTransformations();
+    mic->UpdateTransformations();
+
+    ///***
+
+    ModelComponent* mc = new ModelComponent();
+    mc->Create(
+        resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+        resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+    );
+    ShaderComponent *shader_d = new ShaderComponent();
+    shader_d->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
+    TransformComponent* tc = new TransformComponent();
+
+
+    GameObject go;
+    go.AddComponent(shader_d);
+    go.AddComponent(mc);
+    go.AddComponent(tc);
+
+    ///***
 
     float radius = 10.0f;
     float camX = 0, camZ = 0;
@@ -140,14 +162,20 @@ int main(void)
 
         shader->Use();
         shader->SetMat4("transform", transform);
-        mc.Draw(shader);
+        mic->Draw(shader);
+
+        go.GetComponent<cmp::Transform>()->Rotate(0, 1, 0);
+        go.GetComponent<cmp::Shader>()->Use();
+        go.GetComponent<cmp::Shader>()->SetMat4("transform", 
+            transform * go.GetComponent<cmp::Transform>()->GetModelMatrix());
+        go.GetComponent<cmp::Model>()->Draw(go.GetComponent<cmp::Shader>());
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         {
             ImGui::Begin("GUI");
-			
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::End();
         }
         ImGui::Render();

@@ -10,6 +10,7 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/ModelComponent.cpp
 	src/GameObject/Components/ModelInstancesComponent.cpp
 	src/GameObject/Components/ShaderComponent.cpp
+	src/GameObject/Components/TransformComponent.cpp
 
 	src/Resource/Mesh.cpp
 	src/Resource/Material.cpp
@@ -37,6 +38,7 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/Components/ModelComponent.h
 	include/GameObject/Components/ModelInstancesComponent.h
 	include/GameObject/Components/ShaderComponent.h
+	include/GameObject/Components/TransformComponent.h
 
 	include/Resource/Mesh.h
 	include/Resource/Material.h
@@ -102,6 +104,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 							COMMAND ${CMAKE_COMMAND} -E copy
 									${OPENAL_SOFT_DIR}/build/OpenAL32.dll
 									${CMAKE_CURRENT_BINARY_DIR})
+
    endif()
    
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -125,4 +128,5 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 						COMMAND ${CMAKE_COMMAND} -E copy_directory
 								${CMAKE_SOURCE_DIR}/build/Debug/OpenAL32.dll
 								${CMAKE_CURRENT_BINARY_DIR}/)
+								
 endif()

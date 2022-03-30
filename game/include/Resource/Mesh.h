@@ -2,6 +2,7 @@
 #define __MESH_H__
 
 #include <iostream>
+#include <vector>
 
 #include <glm/glm.hpp>
 #include <assimp/Importer.hpp>
