@@ -1,5 +1,5 @@
-#ifndef SHADER_H
-#define SHADER_H
+#ifndef __SHADER_COMPONENT_H__
+#define __SHADER_COMPONENT_H__
 
 #include <string>
 #include <fstream>
@@ -17,8 +17,10 @@ private:
     unsigned int shaderProgram;
 
 public:
-    ShaderComponent(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
+    ShaderComponent();
     ~ShaderComponent();
+
+    bool Create(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
 
     void Use();
 
@@ -39,4 +41,4 @@ public:
     unsigned int GetID();
 };
 
-#endif
+#endif // __SHADER_COMPONENT_H__

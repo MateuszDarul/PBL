@@ -2,6 +2,7 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/System/MouseInputManager.cpp
 	src/System/KeyboardInputManager.cpp
 	src/System/InputManager.cpp
+	src/System/GameApplication.cpp
 
 	src/GameObject/GameObject.cpp
 	src/GameObject/Components/Component.cpp
@@ -10,10 +11,13 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/ModelComponent.cpp
 	src/GameObject/Components/ModelInstancesComponent.cpp
 	src/GameObject/Components/ShaderComponent.cpp
+	src/GameObject/Components/TransformComponent.cpp
 
 	src/Resource/Mesh.cpp
 	src/Resource/Material.cpp
 	src/Resource/ResourceManager.cpp
+
+	src/Scene/Scene.cpp
 
 
 	main.cpp
@@ -28,6 +32,7 @@ file(GLOB_RECURSE HEADER_FILES
 	include/System/KeyboardInputManager.h
 	include/System/KeyboardKeys.h
 	include/System/InputManager.h
+	include/System/GameApplication.h
 
 	include/GameObject/GameObject.h
 	include/GameObject/Components/Components.h
@@ -37,10 +42,13 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/Components/ModelComponent.h
 	include/GameObject/Components/ModelInstancesComponent.h
 	include/GameObject/Components/ShaderComponent.h
+	include/GameObject/Components/TransformComponent.h
 
 	include/Resource/Mesh.h
 	include/Resource/Material.h
 	include/Resource/ResourceManager.h
+
+	include/Scene/Scene.h
 
 	ImGui/include/*.h
 	ImGui/include/*.hpp
@@ -51,6 +59,7 @@ include_directories(include/System)
 include_directories(include/GameObject)
 include_directories(include/GameObject/Components)
 include_directories(include/Resource)
+include_directories(include/Scene)
 include_directories(ImGui/include)
 
 add_compile_options(-Wall)
@@ -102,6 +111,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 							COMMAND ${CMAKE_COMMAND} -E copy
 									${OPENAL_SOFT_DIR}/build/OpenAL32.dll
 									${CMAKE_CURRENT_BINARY_DIR})
+
    endif()
    
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -125,4 +135,5 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 						COMMAND ${CMAKE_COMMAND} -E copy_directory
 								${CMAKE_SOURCE_DIR}/build/Debug/OpenAL32.dll
 								${CMAKE_CURRENT_BINARY_DIR}/)
+								
 endif()
