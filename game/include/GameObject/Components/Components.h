@@ -8,6 +8,7 @@
 #include "ModelInstancesComponent.h"    // UUID 4
 #include "ShaderComponent.h"            // UUID 5
 #include "TransformComponent.h"         // UUID 6
+#include "CameraComponent.h"            // UUID 7
 
 namespace cmp
 {
@@ -18,6 +19,7 @@ namespace cmp
     typedef ModelInstancesComponent ModelInst;
     typedef ShaderComponent Shader;
     typedef TransformComponent Transform;
+    typedef CameraComponent Camera;
 
 } // namespace cmp
 
