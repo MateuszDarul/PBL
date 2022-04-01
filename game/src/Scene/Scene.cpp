@@ -5,12 +5,12 @@
 
 Scene::Scene()
 {
-    auto& resMan = GameApplication::GetResourceManager();
+    ResourceManager* resMan = GameApplication::GetResourceManager();
 
     mic = new ModelInstancesComponent();
     mic->Create(9, 
-            resMan.GetMesh("Resources/models/Crate/Crate.obj"),
-            resMan.GetMaterial("Resources/models/Crate/Crate.mtl")
+            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+            resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
     );
     shader = new ShaderComponent();
     shader->Create("Resources/shaders/inst.vert", "Resources/shaders/inst.frag");
@@ -33,8 +33,8 @@ Scene::Scene()
 
     ModelComponent* mc = new ModelComponent();
     mc->Create(
-        resMan.GetMesh("Resources/models/Crate/Crate.obj"),
-        resMan.GetMaterial("Resources/models/Crate/Crate.mtl")
+        resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+        resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
     );
     ShaderComponent *shader_d = new ShaderComponent();
     shader_d->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
@@ -53,9 +53,14 @@ Scene::~Scene()
 
 void Scene::OnUpdate(float dt)
 {
+    if (Input()->Keyboard()->IsPressed(Space))
+    {
+        std::cout << "..." << std::endl;
+    }
+
     camX = sin(glfwGetTime()) * radius;
     camZ = cos(glfwGetTime()) * radius;
-    projection = GameApplication::GetProjection();
+    projection = *GameApplication::GetProjection();
     view = glm::lookAt(glm::vec3(camX, 5.f, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
     transform = projection * view * glm::mat4(1.f);
 

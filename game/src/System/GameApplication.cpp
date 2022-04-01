@@ -239,17 +239,17 @@ GLFWwindow* const GameApplication::GetWindow()
     return s_Window;
 }
 
-InputManager& GameApplication::GetInputManager()
+InputManager* const GameApplication::GetInputManager()
 {
-    return *s_InputManager;
+    return s_InputManager;
 }
 
-ResourceManager& GameApplication::GetResourceManager()
+ResourceManager* const GameApplication::GetResourceManager()
 {
-    return *s_ResourceManager;
+    return s_ResourceManager;
 }
 
-glm::mat4& GameApplication::GetProjection()
+glm::mat4* const GameApplication::GetProjection()
 {
-    return s_ProjectionMatrix;
+    return &s_ProjectionMatrix;
 }
