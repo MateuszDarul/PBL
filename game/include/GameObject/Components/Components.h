@@ -9,6 +9,8 @@
 #include "ShaderComponent.h"            // UUID 5
 #include "TransformComponent.h"         // UUID 6
 
+#include "ScriptComponent.h"            // UUID 100
+
 namespace cmp
 {
 
@@ -18,6 +20,8 @@ namespace cmp
     typedef ModelInstancesComponent ModelInst;
     typedef ShaderComponent Shader;
     typedef TransformComponent Transform;
+
+    typedef ScriptComponent Scriptable;
 
 } // namespace cmp
 
