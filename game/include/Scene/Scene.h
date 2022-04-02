@@ -26,4 +26,7 @@ private:
     float camX = 0, camZ = 0;
     glm::mat4 projection, view;
     glm::mat4 transform;
+
+    //scripts testing
+    GameObject scrpitableGO;
 };

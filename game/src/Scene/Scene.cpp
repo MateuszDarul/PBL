@@ -3,6 +3,9 @@
 #include "ResourceManager.h"
 #include "InputManager.h"
 
+#include "Scripts/TestScript.h"
+#include "Scripts/StatsScript.h"
+
 Scene::Scene()
 {
     ResourceManager* resMan = GameApplication::GetResourceManager();
@@ -44,6 +47,44 @@ Scene::Scene()
     go.AddComponent(shader_d);
     go.AddComponent(mc);
     go.AddComponent(tc);
+
+
+
+    //==== scripts test ====
+
+    //create ScriptComponenent that holds script instances
+    ScriptComponent* scriptHolder = new ScriptComponent();
+
+    //create script instance and assign gameobject
+    TestScript* testScript = new TestScript();
+    testScript->gameObject = &scrpitableGO;
+
+    //add script to the gameobject component
+    scriptHolder->Add(testScript);
+
+    //add component to the gameobject
+    scrpitableGO.AddComponent(scriptHolder);
+
+
+    //------ adding another script -------
+
+    StatsScript* stats = new StatsScript();
+    stats->gameObject = &scrpitableGO;
+
+    //simulate reading saved values from file
+    stats->stat2 = 2.0f;
+
+    //add another script to the scriptableGO
+    scriptHolder->Add(stats);
+
+    //reference a script from another script
+    testScript->stats = stats;
+    
+    //------------------------------------
+
+
+    //call all OnStart methods (for each GameObject that has ScriptComponent)
+    scriptHolder->OnStart();
 }
 
 Scene::~Scene()
@@ -53,11 +94,6 @@ Scene::~Scene()
 
 void Scene::OnUpdate(float dt)
 {
-    if (Input()->Keyboard()->IsPressed(Space))
-    {
-        std::cout << "..." << std::endl;
-    }
-
     camX = sin(glfwGetTime()) * radius;
     camZ = cos(glfwGetTime()) * radius;
     projection = *GameApplication::GetProjection();
@@ -73,6 +109,11 @@ void Scene::OnUpdate(float dt)
     go.GetComponent<cmp::Shader>()->SetMat4("transform", 
     transform * go.GetComponent<cmp::Transform>()->GetModelMatrix());
     go.GetComponent<cmp::Model>()->Draw(go.GetComponent<cmp::Shader>());
+
+
+
+    //call all OnUpdate methods (for each GameObject that has ScriptComponent)
+    scrpitableGO.GetComponent<ScriptComponent>()->OnUpdate(dt);
 }
 
 
