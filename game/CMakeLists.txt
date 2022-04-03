@@ -132,8 +132,8 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 								${CMAKE_CURRENT_BINARY_DIR}/Debug/)
 
 	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
-						COMMAND ${CMAKE_COMMAND} -E copy_directory
-								${CMAKE_SOURCE_DIR}/build/Debug/OpenAL32.dll
+						COMMAND ${CMAKE_COMMAND} -E copy
+								${OPENAL_SOFT_DIR}/build/Debug/OpenAL32.dll
 								${CMAKE_CURRENT_BINARY_DIR}/)
 								
 endif()
