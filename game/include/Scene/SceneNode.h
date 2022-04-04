@@ -33,7 +33,7 @@ public:
      * @return SceneNode* - Wskazanie na wezel sceny.
      * @return nullptr - Nie znaleziono wezla z GameObjectem o podanej nazwie.
      */
-    SceneNode* Find(std::string name);
+    SceneNode* FindNode(std::string name);
 };
 
 #endif // __SCENE_NODE_H__

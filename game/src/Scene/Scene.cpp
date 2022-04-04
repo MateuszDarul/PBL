@@ -10,8 +10,8 @@ Scene::Scene()
     ModelComponent* mc;
 
     scene = new SceneNode(new GameObject());
+    scene->GetGameObject()->AddComponent(new cmp::Name("ROOT"));
     scene->GetGameObject()->AddComponent(new cmp::Transform());
-    //scene->GetGameObject()->GetComponent<cmp::Transform>();
 
     ///***
 
@@ -34,6 +34,7 @@ Scene::Scene()
     go->AddComponent(shader_d);
     go->AddComponent(mc);
     go->AddComponent(tc);
+    go->AddComponent(new cmp::Name("GO"));
 
 
     tc = new TransformComponent();
@@ -46,6 +47,8 @@ Scene::Scene()
     go2->AddComponent(shader_d);
     go2->AddComponent(mc);
     go2->AddComponent(tc);
+    go2->GetComponent<cmp::Transform>()->SetPosition(5, 0, 0);
+    go2->AddComponent(new cmp::Name("GO2"));
 
     ///***
 
@@ -75,21 +78,12 @@ Scene::Scene()
     go1->AddComponent(mic);
     */
 
-    ///***
-
-
-    ///***
-
-
-
-    go_node = new SceneNode(go);
-
-    scene->AddChild(go_node);
-
-    go2->GetComponent<cmp::Transform>()->SetPosition(5, 0, 0);
-    go_node->AddChild(go2);
-
     //scene->AddChild(go1);
+
+    ///***
+
+    scene->AddChild(go);
+    scene->FindNode("GO")->AddChild(go2);
 }
 
 Scene::~Scene()
@@ -102,6 +96,6 @@ void Scene::OnUpdate(float dt)
     goCamera.GetComponent<cmp::Camera>()->Update(GameApplication::GetInputManager(), dt);
     transform = GameApplication::GetProjection() * goCamera.GetComponent<cmp::Camera>()->GetView();
 
-    go_node->GetLocalTransformations()->Rotate(0, 180*dt, 0);
+    scene->FindNode("GO")->GetLocalTransformations()->Rotate(0, 180*dt, 0);
     scene->Render(transform);
 }

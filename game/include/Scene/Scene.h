@@ -16,7 +16,6 @@
 class Scene
 {
 private:
-    SceneNode* go_node;
     SceneNode* scene;
     GameObject goCamera;
 

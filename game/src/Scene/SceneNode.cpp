@@ -77,11 +77,8 @@ TransformComponent* SceneNode::GetLocalTransformations()
     return this->gameObject->GetComponent<cmp::Transform>();
 }
 
-SceneNode* SceneNode::Find(std::string name)
+SceneNode* SceneNode::FindNode(std::string name)
 {
-    if(this->gameObject->GetComponent<cmp::Name>() != nullptr)
-        std::cout << this->gameObject->GetComponent<cmp::Name>()->Get() << " " << name << "\n";
-
     if(this->gameObject->GetComponent<cmp::Name>() != nullptr &&
         this->gameObject->GetComponent<cmp::Name>()->Get() == name)
     {
@@ -90,7 +87,7 @@ SceneNode* SceneNode::Find(std::string name)
 
     for(unsigned short int i=0; i<this->children.size(); i++)
     {
-        this->children[i]->Find(name);
+        return this->children[i]->Find(name);
     }
     
     return nullptr;
