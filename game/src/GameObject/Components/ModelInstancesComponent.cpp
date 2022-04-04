@@ -1,8 +1,9 @@
 #include "ModelInstancesComponent.h"
 
 ModelInstancesComponent::ModelInstancesComponent()
+    :Component(4)
 {
-    Component(4);
+    
 }
 
 ModelInstancesComponent::~ModelInstancesComponent()

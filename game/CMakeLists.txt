@@ -19,6 +19,7 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/Resource/ResourceManager.cpp
 
 	src/Scene/Scene.cpp
+	src/Scene/SceneNode.cpp
 
 
 	main.cpp
@@ -51,6 +52,7 @@ file(GLOB_RECURSE HEADER_FILES
 	include/Resource/ResourceManager.h
 
 	include/Scene/Scene.h
+	include/Scene/SceneNode.h
 
 	ImGui/include/*.h
 	ImGui/include/*.hpp

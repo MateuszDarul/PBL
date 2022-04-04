@@ -38,7 +38,7 @@ public:
     void SetMat3(const std::string& name, const glm::mat3& mat) const;
     void SetMat4(const std::string& name, const glm::mat4& mat) const;
 
-    unsigned int GetID();
+    const unsigned int GetID();
 };
 
 #endif // __SHADER_COMPONENT_H__

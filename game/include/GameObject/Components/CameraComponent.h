@@ -120,7 +120,7 @@ public:
     /** @brief Zwraca macierz widoku kamery.
      * @return glm::mat4 - Macierz widoku.
      */
-    glm::mat4 GetView();
+    const glm::mat4& GetView();
 };
 
 #endif // __CAMERA_COMPONENT_H__

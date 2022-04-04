@@ -58,7 +58,7 @@ void CameraComponent::SetSpeed(const float& speedPerSec)
     this->speedPerSec = speedPerSec;
 }
 
-glm::mat4 CameraComponent::GetView()
+const glm::mat4& CameraComponent::GetView()
 {
     if(this->needUpdate)
     {
@@ -144,7 +144,7 @@ void CameraComponent::ProcessMouseMovement(const float& offsetX, const float& of
     this->pitch += yoffset;
 
     if(this->pitch > 89.0f)
-         this->pitch = 89.0f;
+        this->pitch = 89.0f;
     if(this->pitch < -89.0f)
         this->pitch = -89.0f;
 
