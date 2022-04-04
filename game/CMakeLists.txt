@@ -90,6 +90,11 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
 					   COMMAND ${CMAKE_COMMAND} -E copy_directory
 							   ${CMAKE_SOURCE_DIR}/Resources
+							   ${CMAKE_CURRENT_BINARY_DIR}/Resources)
+
+	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
+					   COMMAND ${CMAKE_COMMAND} -E copy_directory
+							   ${CMAKE_SOURCE_DIR}/Resources
 							   ${CMAKE_CURRENT_BINARY_DIR}/Debug/Resources)
 
 	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
