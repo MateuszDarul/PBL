@@ -87,7 +87,7 @@ SceneNode* SceneNode::FindNode(std::string name)
 
     for(unsigned short int i=0; i<this->children.size(); i++)
     {
-        return this->children[i]->Find(name);
+        return this->children[i]->FindNode(name);
     }
     
     return nullptr;
