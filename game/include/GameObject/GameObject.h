@@ -4,6 +4,8 @@
 #include <vector>
 #include <memory>
 
+#include <glm/glm.hpp>
+
 #include "Components.h"
 
 /** @brief Klasa reprezentujaca dowolny "byt" w silniku.

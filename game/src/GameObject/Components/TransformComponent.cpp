@@ -15,7 +15,7 @@ TransformComponent::~TransformComponent()
 
 }
 
-glm::mat4 TransformComponent::GetModelMatrix() const
+const glm::mat4& TransformComponent::GetModelMatrix() const
 {
     return this->modelMatrix;
 }
@@ -25,7 +25,7 @@ void TransformComponent::SetModelMatrix(const glm::mat4& modelMatrix)
     this->modelMatrix = modelMatrix;
 }
 
-glm::mat4 TransformComponent::CalculateModelMatrix()
+const glm::mat4& TransformComponent::CalculateModelMatrix()
 {
     this->modelMatrix = 
         glm::translate(glm::mat4(1.f), this->position)*
@@ -47,6 +47,11 @@ void TransformComponent::Scale(const float& scale)
 {
     this->scale *= scale;
     this->CalculateModelMatrix();
+}
+
+float TransformComponent::GetScale()
+{
+    return this->scale;
 }
 
 void TransformComponent::SetPosition(const float& x, const float& y, const float& z)
@@ -71,6 +76,11 @@ void TransformComponent::Move(const glm::vec3& vector)
     this->CalculateModelMatrix();
 }
 
+glm::vec3 TransformComponent::GetPosition()
+{
+    return this->position;
+}
+
 void TransformComponent::SetRotation(const float& x, const float& y, const float& z)
 {
     this->SetRotation(glm::vec3(x, y, z));
@@ -93,9 +103,14 @@ void TransformComponent::Rotate(const glm::vec3& degrees)
     this->CalculateModelMatrix();
 }
 
+glm::vec3 TransformComponent::GetRotation()
+{
+    return this->rotation;
+}
 
 
-glm::mat4 TransformComponent::Transform(const float& px, const float& py, const float& pz, const float& rx, const float& ry, const float& rz, const float& scale)
+
+glm::mat4 TransformComponent::Transform(const float& px, const float& py, const float& pz, const float& rx=0, const float& ry=0, const float& rz=0, const float& scale=1)
 {
     return TransformComponent::Transform(glm::vec3(px, py, pz), glm::vec3(rx, ry, rz), scale);
 }
