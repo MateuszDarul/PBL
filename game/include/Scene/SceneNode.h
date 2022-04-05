@@ -24,16 +24,16 @@ public:
     void AddChild(SceneNode* sceneNode);
     GameObject* GetGameObject();
 
-    void UpdateTransformations(glm::mat4 parentTransformations);
+    void UpdateTransformations(const glm::mat4& parentTransformations);
     TransformComponent* GetLocalTransformations();
-    void Render(glm::mat4 matrixPV);
+    void Render(const glm::mat4& matrixPV);
 
     /** @brief Szuka SceneNode, gdzie GameObject posiada komponent NameComponent o podanej zawartosci.
      * @param name - Nazwa poszukiwanego Noda.
      * @return SceneNode* - Wskazanie na wezel sceny.
      * @return nullptr - Nie znaleziono wezla z GameObjectem o podanej nazwie.
      */
-    SceneNode* FindNode(std::string name);
+    SceneNode* FindNode(const std::string& name);
 };
 
 #endif // __SCENE_NODE_H__

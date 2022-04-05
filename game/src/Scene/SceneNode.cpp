@@ -21,7 +21,7 @@ void SceneNode::AddChild(SceneNode* sceneNode)
     this->children.push_back(sceneNode);
 }
 
-void SceneNode::UpdateTransformations(glm::mat4 parentTransformations)
+void SceneNode::UpdateTransformations(const glm::mat4& parentTransformations)
 {
     this->globalTransformations = (parentTransformations *
         this->GetGameObject()->GetComponent<cmp::Transform>()->GetModelMatrix());
@@ -34,7 +34,7 @@ void SceneNode::UpdateTransformations(glm::mat4 parentTransformations)
     }
 }
 
-void SceneNode::Render(glm::mat4 matrixPV)
+void SceneNode::Render(const glm::mat4& matrixPV)
 {
     if(this->needUpdate)
     {
@@ -78,7 +78,7 @@ TransformComponent* SceneNode::GetLocalTransformations()
     return this->gameObject->GetComponent<cmp::Transform>();
 }
 
-SceneNode* SceneNode::FindNode(std::string name)
+SceneNode* SceneNode::FindNode(const std::string& name)
 {
     if(this->gameObject->GetComponent<cmp::Name>() != nullptr &&
         this->gameObject->GetComponent<cmp::Name>()->Get() == name)
