@@ -26,6 +26,8 @@ void SceneNode::UpdateTransformations(glm::mat4 parentTransformations)
     this->globalTransformations = (parentTransformations *
         this->GetGameObject()->GetComponent<cmp::Transform>()->GetModelMatrix());
 
+    this->needUpdate = false;
+
     for(unsigned short int i=0; i<children.size(); i++)
     {
         children[i]->UpdateTransformations(this->globalTransformations);
@@ -37,7 +39,6 @@ void SceneNode::Render(glm::mat4 matrixPV)
     if(this->needUpdate)
     {
         this->UpdateTransformations(glm::mat4(1.f));
-        this->needUpdate = false;
     }
 
     cmp::Shader* shaderPtr = this->gameObject->GetComponent<cmp::Shader>();
