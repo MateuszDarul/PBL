@@ -92,7 +92,7 @@ Scene::~Scene()
 void Scene::OnUpdate(float dt)
 {
     goCamera.GetComponent<cmp::Camera>()->Update(GameApplication::GetInputManager(), dt);
-    transform = GameApplication::GetProjection() * goCamera.GetComponent<cmp::Camera>()->GetView();
+    transform = *GameApplication::GetProjection() * goCamera.GetComponent<cmp::Camera>()->GetView();
 
     scene->FindNode("GO")->GetLocalTransformations()->Rotate(0, 180*dt, 0);
     scene->Render(transform);
