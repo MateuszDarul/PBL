@@ -1,11 +1,12 @@
 #pragma once
 
+#include "InputManager.h"
+#include "ResourceManager.h"
+
 #include <glm/matrix.hpp>
 
 class GLFWwindow;
 class Scene;
-class InputManager;
-class ResourceManager;
 
 
 /**
@@ -39,23 +40,23 @@ public:
     /**
      * @brief Zwraca obiekt InputManagera [skrót: Input()].
      * 
-     * @return InputManager& 
+     * @return InputManager*
      */
-    static InputManager& GetInputManager();
+    static InputManager* const GetInputManager();
 
     /**
      * @brief Zwraca obiekt ResourceManagera
      * 
-     * @return ResourceManager& 
+     * @return ResourceManager*
      */
-    static ResourceManager& GetResourceManager();
+    static ResourceManager* const GetResourceManager();
 
     /**
      * @brief Zwraca macierz projection
      * 
-     * @return glm::mat4& 
+     * @return glm::mat4* 
      */
-    static glm::mat4& GetProjection();
+    static glm::mat4* const GetProjection();
 
 private:
     /**

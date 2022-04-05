@@ -55,7 +55,6 @@ Scene::Scene()
     /*
     ShaderComponent* shader = new ShaderComponent();
     shader->Create("Resources/shaders/inst.vert", "Resources/shaders/inst.frag");
-
     ModelInstancesComponent* mic = new ModelInstancesComponent();
     mic->Create(9, 
             resMan->GetMesh("Resources/models/Crate/Crate.obj"),
@@ -72,7 +71,6 @@ Scene::Scene()
         }
     }
     mic->UpdateTransformations();
-
     GameObject* go1 = new GameObject();
     go1->AddComponent(shader);
     go1->AddComponent(mic);
