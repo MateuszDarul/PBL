@@ -8,22 +8,32 @@
 #include "SceneNode.h"
 #include "GameObject.h"
 #include "Components.h"
-
 #include "GameApplication.h"
 #include "ResourceManager.h"
 #include "InputManager.h"
 
+/** @brief Scena do zarzadzania SceneNode'ami
+ */
 class Scene
 {
 private:
     SceneNode* scene;
     GameObject goCamera;
 
-    glm::mat4 transform;
+    glm::mat4 transform; //!< Macierz transformacji widoku i kamery.
 
 public:
+    /** @brief Domyslny konstruktor.
+     */
     Scene();
+    
+    /** @brief Domyslny destruktor.
+     */
     ~Scene();
+
+    /** @brief Metoda wykonywana w kazdej klatce.
+     * @param dt - Taktowanie (delta time).
+     */
     void OnUpdate(float dt);
 };
 

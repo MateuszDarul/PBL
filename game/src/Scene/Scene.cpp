@@ -8,6 +8,8 @@ Scene::Scene()
 
     TransformComponent* tc;
     ModelComponent* mc;
+    ModelInstancesComponent* mic;
+    GameObject* go;
 
     scene = new SceneNode(new GameObject());
     scene->GetGameObject()->AddComponent(new cmp::Name("ROOT"));
@@ -23,6 +25,10 @@ Scene::Scene()
 
     ShaderComponent *shader_d = new ShaderComponent();
     shader_d->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
+    ShaderComponent* shader_i = new ShaderComponent();
+    shader_i->Create("Resources/shaders/inst.vert", "Resources/shaders/inst.frag");
+
+    ///***
 
     tc = new TransformComponent();
     mc = new ModelComponent();
@@ -30,12 +36,15 @@ Scene::Scene()
         resMan->GetMesh("Resources/models/Crate/Crate.obj"),
         resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
     );
-    GameObject* go = new GameObject();
+    go = new GameObject();
     go->AddComponent(shader_d);
     go->AddComponent(mc);
     go->AddComponent(tc);
     go->AddComponent(new cmp::Name("GO"));
 
+    scene->AddChild(go);
+
+    ///***
 
     tc = new TransformComponent();
     mc = new ModelComponent();
@@ -43,26 +52,26 @@ Scene::Scene()
         resMan->GetMesh("Resources/models/Crate/Crate.obj"),
         resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
     );
-    GameObject* go2 = new GameObject();
-    go2->AddComponent(shader_d);
-    go2->AddComponent(mc);
-    go2->AddComponent(tc);
-    go2->GetComponent<cmp::Transform>()->SetPosition(5, 0, 0);
-    go2->AddComponent(new cmp::Name("GO2"));
+    go = new GameObject();
+    go->AddComponent(shader_d);
+    go->AddComponent(mc);
+    go->AddComponent(tc);
+    go->GetComponent<cmp::Transform>()->SetPosition(5, 0, 0);
+    go->AddComponent(new cmp::Name("GO1"));
+
+    scene->FindNode("GO")->AddChild(go);
 
     ///***
 
-    /*
-    ShaderComponent* shader = new ShaderComponent();
-    shader->Create("Resources/shaders/inst.vert", "Resources/shaders/inst.frag");
-    ModelInstancesComponent* mic = new ModelInstancesComponent();
-    mic->Create(9, 
-            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-            resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+    tc = new TransformComponent();
+    mic = new ModelInstancesComponent();
+    mic->Create(9,
+        resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+        resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
     );
     for(int x=-4, y=-4, i=0; i<9; i++)
     {
-        mic->SetTransformation(i, TransformComponent::Transform(glm::vec3(x, -4, y), glm::vec3(0, 0, 0), 1));
+        mic->SetTransformation(i, TransformComponent::Transform(glm::vec3(x, -2, y), glm::vec3(0, 0, 0), 1));
         x += 4;
         if((x + 1) % 3 == 0)
         {
@@ -71,17 +80,16 @@ Scene::Scene()
         }
     }
     mic->UpdateTransformations();
-    GameObject* go1 = new GameObject();
-    go1->AddComponent(shader);
-    go1->AddComponent(mic);
-    */
+    go = new GameObject();
+    go->AddComponent(shader_i);
+    go->AddComponent(mic);
+    go->AddComponent(new cmp::Name("GO2"));
 
-    //scene->AddChild(go1);
+    scene->AddChild(go);
 
     ///***
 
-    scene->AddChild(go);
-    scene->FindNode("GO")->AddChild(go2);
+    scene->FindNode("GO")->GetLocalTransformations()->SetPosition(0, 2, 0);
 }
 
 Scene::~Scene()

@@ -23,14 +23,21 @@ void SceneNode::AddChild(SceneNode* sceneNode)
 
 void SceneNode::UpdateTransformations(const glm::mat4& parentTransformations)
 {
-    this->globalTransformations = (parentTransformations *
-        this->GetGameObject()->GetComponent<cmp::Transform>()->GetModelMatrix());
+    if(this->GetGameObject()->GetComponent<cmp::Transform>() != nullptr)
+    {
+        this->globalTransformations = (parentTransformations *
+            this->GetGameObject()->GetComponent<cmp::Transform>()->GetModelMatrix());
+    }
+    else
+    {
+        this->globalTransformations = parentTransformations;
+    }
 
     this->needUpdate = false;
 
     for(unsigned short int i=0; i<children.size(); i++)
     {
-        children[i]->UpdateTransformations(this->globalTransformations);
+        this->children[i]->UpdateTransformations(this->globalTransformations);
     }
 }
 
@@ -101,5 +108,8 @@ void SceneNode::FindByName(const std::string& name, SceneNode** result)
     for(unsigned short int i=0; i<this->children.size(); i++)
     {
         this->children[i]->FindByName(name, result);
+
+        if(*result != nullptr)
+            break;
     }
 }
