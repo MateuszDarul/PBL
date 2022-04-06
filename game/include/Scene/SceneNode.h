@@ -16,6 +16,9 @@ private:
     std::vector<SceneNode*> children;
     glm::mat4 globalTransformations;
 
+private:
+    void FindByName(const std::string& name, SceneNode** result);
+
 public:
     SceneNode(GameObject* gameObject);
     ~SceneNode();
