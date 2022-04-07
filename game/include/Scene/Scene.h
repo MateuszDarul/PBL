@@ -18,7 +18,7 @@ class Scene
 {
 private:
     SceneNode* scene;
-    GameObject goCamera;
+    GameObject* goCamera;
 
     glm::mat4 transform; //!< Macierz transformacji widoku i kamery.
 
@@ -32,9 +32,13 @@ public:
     ~Scene();
 
     /** @brief Metoda wykonywana w kazdej klatce.
-     * @param dt - Taktowanie (delta time).
+     * @param deltaTime - Taktowanie (delta time).
      */
-    void OnUpdate(float dt);
+    void Update(float deltaTime);
+
+    /** @brief Metoda wyswietlajaca obiekty na ekranie.
+     */
+    void Render();
 };
 
 #endif // __SCENE_H__

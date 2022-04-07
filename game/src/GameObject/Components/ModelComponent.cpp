@@ -52,7 +52,7 @@ void ModelComponent::Clear()
     this->material = nullptr;
 }
 
-bool ModelComponent::Draw(ShaderComponent* shader) 
+bool ModelComponent::Draw(std::shared_ptr<ShaderComponent> shader) 
 {
     if(this->mesh == nullptr || shader == nullptr)
     {

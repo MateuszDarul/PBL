@@ -1,6 +1,8 @@
 #ifndef __MODEL_INSTANCED_COMPONENT_H__
 #define __MODEL_INSTANCED_COMPONENT_H__
 
+#include <memory>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -50,7 +52,7 @@ public:
      * @return true - Udalo sie wyswietlic instancje modelu.
      * @return false - Nie udalo sie wyswietlic instancji modelu.
      */
-    bool Draw(ShaderComponent* shader);
+    bool Draw(std::shared_ptr<ShaderComponent> shader);
 
     /** @brief Zwraca ile instancji posiada ten model.
      * @return uint32_t - Liczba instancji.

@@ -38,11 +38,7 @@ namespace rj = rapidjson;
 int GameApplication::s_ScreenWidth = DEFAULT_SCREEN_WIDTH;
 int GameApplication::s_ScreenHeight = DEFAULT_SCREEN_HEIGHT;
 GLFWwindow* GameApplication::s_Window = nullptr;
-glm::mat4 GameApplication::s_ProjectionMatrix = glm::perspective(
-    DEFAULT_FOV,
-    (float)DEFAULT_SCREEN_WIDTH/DEFAULT_SCREEN_HEIGHT,
-    0.1f, 
-    1000.0f); //hmm to naprawdę wygląda jak ustawienie kamery nie aplikacji ale ok
+glm::mat4 GameApplication::s_ProjectionMatrix = glm::perspective(DEFAULT_FOV, (float)DEFAULT_SCREEN_WIDTH/DEFAULT_SCREEN_HEIGHT, 0.1f, 1000.0f);
 
 Scene* GameApplication::s_Scene = nullptr;
 
@@ -136,8 +132,6 @@ int GameApplication::Init()
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    // ImGuiIO& io = ImGui::GetIO();
-    // (void)io;
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(s_Window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
@@ -182,12 +176,10 @@ void GameApplication::Run()
         t2 = t1;
 
         //update logic
-         //Scene OnUpdate(dt)
-        s_Scene->OnUpdate(dt);
+        s_Scene->Update(dt);
 
         //show scene
-         //Scene OnRender (maybe can be included in OnUpdate)
-
+        s_Scene->Render();
 
 
         ImGui_ImplOpenGL3_NewFrame();
@@ -230,8 +222,7 @@ void GameApplication::FramebufferResizeCallback(GLFWwindow* window, int width, i
     GameApplication::s_ScreenWidth = width;
     GameApplication::s_ScreenHeight = height;
 
-    //why 83 fov? idk
-    s_ProjectionMatrix = glm::perspective(83.0f, (float)width/height, 0.1f, 1000.0f);
+    s_ProjectionMatrix = glm::perspective(DEFAULT_FOV, (float)width/height, 0.1f, 1000.0f);
 }
 
 GLFWwindow* const GameApplication::GetWindow()
@@ -249,7 +240,7 @@ ResourceManager* const GameApplication::GetResourceManager()
     return s_ResourceManager;
 }
 
-glm::mat4* const GameApplication::GetProjection()
+const glm::mat4& GameApplication::GetProjection()
 {
-    return &s_ProjectionMatrix;
+    return s_ProjectionMatrix;
 }
