@@ -12,15 +12,15 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/ModelInstancesComponent.cpp
 	src/GameObject/Components/ShaderComponent.cpp
 	src/GameObject/Components/TransformComponent.cpp
+	src/GameObject/Components/CameraComponent.cpp
 
 	src/Resource/Mesh.cpp
 	src/Resource/Material.cpp
 	src/Resource/ResourceManager.cpp
 
 	src/Scene/Scene.cpp
-	
-	src/AI/State.cpp
-	src/AI/StateMachine.cpp
+	src/Scene/SceneNode.cpp
+
 
 	main.cpp
 
@@ -45,15 +45,14 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/Components/ModelInstancesComponent.h
 	include/GameObject/Components/ShaderComponent.h
 	include/GameObject/Components/TransformComponent.h
+	include/GameObject/Components/CameraComponent.h
 
 	include/Resource/Mesh.h
 	include/Resource/Material.h
 	include/Resource/ResourceManager.h
 
 	include/Scene/Scene.h
-
-	include/AI/State.h
-	include/AI/StateMachine.h
+	include/Scene/SceneNode.h
 
 	ImGui/include/*.h
 	ImGui/include/*.hpp
@@ -65,7 +64,6 @@ include_directories(include/GameObject)
 include_directories(include/GameObject/Components)
 include_directories(include/Resource)
 include_directories(include/Scene)
-include_directories(include/AI)
 include_directories(ImGui/include)
 
 add_compile_options(-Wall)
@@ -127,11 +125,19 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 							   ${CMAKE_SOURCE_DIR}/Resources
 							   ${CMAKE_CURRENT_BINARY_DIR}/Debug/Resources)
 
+	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
+						COMMAND ${CMAKE_COMMAND} -E copy_directory
+								${CMAKE_SOURCE_DIR}/Resources
+								${CMAKE_CURRENT_BINARY_DIR}/Resources)
 
 	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
 						COMMAND ${CMAKE_COMMAND} -E copy
 								${OPENAL_SOFT_DIR}/build/Debug/OpenAL32.dll
 								${CMAKE_CURRENT_BINARY_DIR}/Debug/)
 
+	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
+						COMMAND ${CMAKE_COMMAND} -E copy
+								${OPENAL_SOFT_DIR}/build/Debug/OpenAL32.dll
+								${CMAKE_CURRENT_BINARY_DIR}/)
 								
 endif()

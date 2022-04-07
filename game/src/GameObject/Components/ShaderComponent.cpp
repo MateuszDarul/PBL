@@ -168,7 +168,7 @@ void ShaderComponent::SetMat4(const std::string& name, const glm::mat4& mat) con
     glUniformMatrix4fv(glGetUniformLocation(this->shaderProgram, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
-unsigned int ShaderComponent::GetID()
+const unsigned int ShaderComponent::GetID()
 {
     return this->shaderProgram;
 }

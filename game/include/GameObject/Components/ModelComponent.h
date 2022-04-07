@@ -12,7 +12,7 @@
  */
 class ModelComponent :public Component
 {
-protected:
+private:
     unsigned int VAO; //!< Vertex Array Object.
     unsigned int VBO; //!< Vertex Buffer Object.
 

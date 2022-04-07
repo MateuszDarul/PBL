@@ -4,17 +4,19 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "ModelComponent.h"
+#include "Component.h"
 #include "ShaderComponent.h"
 #include "Mesh.h"
 #include "Material.h"
 
 /** @brief Klasa pozwalajaca na wyswietlanie wielu instancji tego samego modelu w roznych miejscach, rozmiarach i rotacji.
  */
-class ModelInstancesComponent :public ModelComponent
+class ModelInstancesComponent :public Component
 {
 private:
     uint32_t amount; //!< Liczba instancji, ktore beda wyswietlane.
+    unsigned int VAO; //!< Vertex Array Object.
+    unsigned int VBO; //!< Vertex Buffer Object.
     uint32_t instanceVBO; //! VBO, ktore przechowuje transformacje dla kazdej instancji modelu.
 
     Mesh* mesh; //!< Siatka wykorzysywana przez model.
