@@ -3,9 +3,13 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/System/KeyboardInputManager.cpp
 	src/System/InputManager.cpp
 	src/System/GameApplication.cpp
+	src/System/CollidersManager.cpp
 
 	src/GameObject/GameObject.cpp
 	src/GameObject/Components/Component.cpp
+	src/GameObject/Components/Collider.cpp
+	src/GameObject/Components/SphereCollider.cpp
+	src/GameObject/Components/BoxCollider.cpp
 	src/GameObject/Components/NameComponent.cpp
 	src/GameObject/Components/ListComponent.cpp
 	src/GameObject/Components/ModelComponent.cpp
@@ -33,10 +37,14 @@ file(GLOB_RECURSE HEADER_FILES
 	include/System/KeyboardKeys.h
 	include/System/InputManager.h
 	include/System/GameApplication.h
+	include/System/CollidersManager.h
 
 	include/GameObject/GameObject.h
 	include/GameObject/Components/Components.h
 	include/GameObject/Components/Component.h
+	include/GameObject/Components/Collider.h
+	include/GameObject/Components/SphereCollider.h
+	include/GameObject/Components/BoxCollider.h
 	include/GameObject/Components/NameComponent.h
 	include/GameObject/Components/ListComponent.h
 	include/GameObject/Components/ModelComponent.h
@@ -131,9 +139,5 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 								${OPENAL_SOFT_DIR}/build/Debug/OpenAL32.dll
 								${CMAKE_CURRENT_BINARY_DIR}/Debug/)
 
-	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
-						COMMAND ${CMAKE_COMMAND} -E copy
-								${OPENAL_SOFT_DIR}/build/Debug/OpenAL32.dll
-								${CMAKE_CURRENT_BINARY_DIR}/)
 								
 endif()

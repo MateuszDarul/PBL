@@ -20,6 +20,7 @@ public:
 private:
     ShaderComponent* shader;
     ModelInstancesComponent* mic;
+    CollidersManager* colliderManager;
     GameObject go;
 
     float radius = 10.0f;

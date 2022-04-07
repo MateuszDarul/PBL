@@ -63,6 +63,7 @@ template ModelComponent* GameObject::GetComponent<ModelComponent>();
 template ModelInstancesComponent* GameObject::GetComponent<ModelInstancesComponent>();
 template ShaderComponent* GameObject::GetComponent<ShaderComponent>();
 template TransformComponent* GameObject::GetComponent<TransformComponent>();
+template ColliderComponent* GameObject::GetComponent<ColliderComponent>();
 
 template bool GameObject::RemoveComponent<NameComponent>();
 template bool GameObject::RemoveComponent<ListComponent>();
@@ -70,3 +71,4 @@ template bool GameObject::RemoveComponent<ModelComponent>();
 template bool GameObject::RemoveComponent<ModelInstancesComponent>();
 template bool GameObject::RemoveComponent<ShaderComponent>();
 template bool GameObject::RemoveComponent<TransformComponent>();
+template bool GameObject::RemoveComponent<ColliderComponent>();
