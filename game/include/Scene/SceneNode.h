@@ -2,6 +2,7 @@
 #define __SCENE_NODE_H__
 
 #include <vector>
+#include <memory>
 
 #include <glm/matrix.hpp>
 
@@ -14,8 +15,8 @@ class SceneNode
 {
 private:
     bool needUpdate; //!< Informacja czy trzeba obliczyc globalne transformacje dla wszystkich potomkow tego wezla.
-    GameObject* gameObject; //!< GameObject w scenie.
-    std::vector<SceneNode*> children; //!< Potomkowie tego wezla.
+    std::shared_ptr<GameObject> gameObject; //!< GameObject w scenie.
+    std::vector<std::shared_ptr<SceneNode>> children; //!< Potomkowie tego wezla.
     glm::mat4 globalTransformations; //!< Globalne transformacje wezla (iloczyn transformacji wezlow wyzszego stopnia i lokalnych transformacji danego GameObject'u).
 
 private:
@@ -29,7 +30,7 @@ public:
     /** @brief Tworzy nowy wezel.
      * @param gameObject - Wskazanie na GameObject nowego wezla.
      */
-    SceneNode(GameObject* gameObject);
+    SceneNode(std::shared_ptr<GameObject> gameObject);
 
     /** @brief domyslny destruktor.
      */
@@ -38,17 +39,17 @@ public:
     /** @brief Dodaje nowy wezel (potomek) do tego wezla.
      * @param gameObject - Wskazanie na GameObject, ktory ma zostac umieszczony w wezle potomnym.
      */
-    void AddChild(GameObject* gameObject);
+    void AddChild(std::shared_ptr<GameObject> gameObject);
     
     /** @brief Dodaje nowy wezel do tego wezla.
      * @param sceneNode - Wskazanie na SceneNode, ktory ma zostac dodany jako potomek.
      */
-    void AddChild(SceneNode* sceneNode);
+    void AddChild(std::shared_ptr<SceneNode> sceneNode);
 
     /** @brief Zwraca wskazanie na GameObject danego wezla.
      * @return GameObject* - Wskazanie na GameObject.
      */
-    GameObject* GetGameObject();
+    std::shared_ptr<GameObject> GetGameObject();
 
     /** @brief Aktualizuje transformacje potomkow danego wezla.
      * @param parentTransformations - Macierz transformacji rodzica.
@@ -58,7 +59,7 @@ public:
     /** @brief Pozwala na zmiane transformacji danego wezla, jak i zapewnia, ze transformacje potomkowow zostana zaktualizowane.  
      * @return TransformComponent* - Wskazanie na komponent lokalnych transformacji GameObject'u danego wezla.
      */
-    TransformComponent* GetLocalTransformations();
+    std::shared_ptr<TransformComponent> GetLocalTransformations();
     
     /** @brief Wyswietla wszystkie GameObject'y, ktore mogą zostac wyswietlone.
      * @param matrixPV - Iloczyn macierzy transformacji perspektywy i kamery.

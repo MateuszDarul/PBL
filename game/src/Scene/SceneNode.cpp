@@ -1,6 +1,6 @@
 #include "SceneNode.h"
 
-SceneNode::SceneNode(GameObject* gameObject)
+SceneNode::SceneNode(std::shared_ptr<GameObject> gameObject)
     :gameObject(gameObject)
 {
     this->globalTransformations = glm::mat4(1.f);
@@ -11,12 +11,12 @@ SceneNode::~SceneNode()
 
 }
 
-void SceneNode::AddChild(GameObject* gameObject)
+void SceneNode::AddChild(std::shared_ptr<GameObject> gameObject)
 {
-    this->children.push_back(new SceneNode(gameObject));
+    this->children.push_back(std::make_shared<SceneNode>(gameObject));
 }
 
-void SceneNode::AddChild(SceneNode* sceneNode)
+void SceneNode::AddChild(std::shared_ptr<SceneNode> sceneNode)
 {
     this->children.push_back(sceneNode);
 }
@@ -48,22 +48,21 @@ void SceneNode::Render(const glm::mat4& matrixPV)
         this->UpdateTransformations(glm::mat4(1.f));
     }
 
-    cmp::Shader* shaderPtr = this->gameObject->GetComponent<cmp::Shader>();
+    std::shared_ptr<cmp::Shader> shaderPtr = this->gameObject->GetComponent<cmp::Shader>();
     if(shaderPtr != nullptr)
     {
-        cmp::Model* modelPtr = this->gameObject->GetComponent<cmp::Model>();
-        cmp::ModelInst* modelInstPtr = this->gameObject->GetComponent<cmp::ModelInst>();
+        std::shared_ptr<cmp::Model> modelPtr = this->gameObject->GetComponent<cmp::Model>();
+        std::shared_ptr<cmp::ModelInst> modelInstPtr = this->gameObject->GetComponent<cmp::ModelInst>();
+
+        shaderPtr->Use();
+        shaderPtr->SetMat4("transform", matrixPV * this->globalTransformations);
 
         if(modelPtr != nullptr)
         {
-            shaderPtr->Use();
-            shaderPtr->SetMat4("transform", matrixPV * this->globalTransformations);
             modelPtr->Draw(shaderPtr);
         }
         else if(modelInstPtr != nullptr)
         {
-            shaderPtr->Use();
-            shaderPtr->SetMat4("transform", matrixPV);
             modelInstPtr->Draw(shaderPtr);
         }
     }
@@ -74,12 +73,12 @@ void SceneNode::Render(const glm::mat4& matrixPV)
     }
 }
 
-GameObject* SceneNode::GetGameObject()
+std::shared_ptr<GameObject> SceneNode::GetGameObject()
 {
     return this->gameObject;
 }
 
-TransformComponent* SceneNode::GetLocalTransformations()
+std::shared_ptr<TransformComponent> SceneNode::GetLocalTransformations()
 {
     this->needUpdate = true;
     return this->gameObject->GetComponent<cmp::Transform>();
