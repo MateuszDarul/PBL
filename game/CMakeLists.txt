@@ -21,6 +21,8 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/Scene/Scene.cpp
 	src/Scene/SceneNode.cpp
 
+	src/AI/State.cpp
+	src/AI/StateMachine.cpp
 
 	main.cpp
 
@@ -54,6 +56,9 @@ file(GLOB_RECURSE HEADER_FILES
 	include/Scene/Scene.h
 	include/Scene/SceneNode.h
 
+	include/AI/State.h
+	include/AI/StateMachine.h
+
 	ImGui/include/*.h
 	ImGui/include/*.hpp
 )
@@ -64,6 +69,7 @@ include_directories(include/GameObject)
 include_directories(include/GameObject/Components)
 include_directories(include/Resource)
 include_directories(include/Scene)
+include_directories(include/AI)
 include_directories(ImGui/include)
 
 add_compile_options(-Wall)
