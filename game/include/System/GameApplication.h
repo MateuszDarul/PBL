@@ -1,11 +1,12 @@
 #pragma once
 
+#include "InputManager.h"
+#include "ResourceManager.h"
+
 #include <glm/matrix.hpp>
 
 class GLFWwindow;
 class Scene;
-class InputManager;
-class ResourceManager;
 
 
 /**

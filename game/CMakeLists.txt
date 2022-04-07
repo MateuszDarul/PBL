@@ -13,12 +13,14 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/ShaderComponent.cpp
 	src/GameObject/Components/TransformComponent.cpp
 	src/GameObject/Components/ScriptComponent.cpp
+	src/GameObject/Components/CameraComponent.cpp
 
 	src/Resource/Mesh.cpp
 	src/Resource/Material.cpp
 	src/Resource/ResourceManager.cpp
 
 	src/Scene/Scene.cpp
+	src/Scene/SceneNode.cpp
 
 
 	main.cpp
@@ -45,12 +47,14 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/Components/ShaderComponent.h
 	include/GameObject/Components/TransformComponent.h
 	include/GameObject/Components/ScriptComponent.h
+	include/GameObject/Components/CameraComponent.h
 
 	include/Resource/Mesh.h
 	include/Resource/Material.h
 	include/Resource/ResourceManager.h
 
 	include/Scene/Scene.h
+	include/Scene/SceneNode.h
 
 	ImGui/include/*.h
 	ImGui/include/*.hpp
@@ -134,8 +138,8 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 								${CMAKE_CURRENT_BINARY_DIR}/Debug/)
 
 	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
-						COMMAND ${CMAKE_COMMAND} -E copy_directory
-								${CMAKE_SOURCE_DIR}/build/Debug/OpenAL32.dll
+						COMMAND ${CMAKE_COMMAND} -E copy
+								${OPENAL_SOFT_DIR}/build/Debug/OpenAL32.dll
 								${CMAKE_CURRENT_BINARY_DIR}/)
 								
 endif()
