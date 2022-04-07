@@ -2,7 +2,7 @@
 
 bool GameObject::AddComponent(Component *component)
 {
-    for(int i=0; i<components.size(); i++)
+    for(uint32_t i=0; i<components.size(); i++)
     {
         if(components[i]->GetClassUUID() == component->GetClassUUID())
         {
@@ -13,23 +13,9 @@ bool GameObject::AddComponent(Component *component)
     return true;
 }
 
-template<typename T>
-T* GameObject::GetComponent()
-{
-    T tmp;
-    for(int i=0; i<components.size(); i++)
-    {
-        if(components[i]->GetClassUUID() == tmp.GetClassUUID())
-        {
-            return (T*)components[i];
-        }
-    }
-    return nullptr;
-}
-
 bool GameObject::RemoveComponent(Component *component)
 {
-    for(int i=0; i<components.size(); i++)
+    for(uint32_t i=0; i<components.size(); i++)
     {
         if(components[i] == component)
         {
@@ -44,7 +30,7 @@ template<typename T>
 bool GameObject::RemoveComponent()
 {
     T tmp;
-    for (int i=0; i<components.size(); i++)
+    for (uint32_t i=0; i<components.size(); i++)
     {
         if (components[i]->GetClassUUID() == tmp.GetClassUUID())
         {
@@ -55,10 +41,34 @@ bool GameObject::RemoveComponent()
     return false;
 }
 
+template<typename T>
+T* GameObject::GetComponent()
+{
+    T tmp;
+    for(uint32_t i=0; i<components.size(); i++)
+    {
+        if(components[i]->GetClassUUID() == tmp.GetClassUUID())
+        {
+            return (T*)components[i];
+        }
+    }
+    return nullptr;
+}
+
 ///***
 
 template NameComponent* GameObject::GetComponent<NameComponent>();
 template ListComponent* GameObject::GetComponent<ListComponent>();
+template ModelComponent* GameObject::GetComponent<ModelComponent>();
+template ModelInstancesComponent* GameObject::GetComponent<ModelInstancesComponent>();
+template ShaderComponent* GameObject::GetComponent<ShaderComponent>();
+template TransformComponent* GameObject::GetComponent<TransformComponent>();
+template CameraComponent* GameObject::GetComponent<CameraComponent>();
 
 template bool GameObject::RemoveComponent<NameComponent>();
 template bool GameObject::RemoveComponent<ListComponent>();
+template bool GameObject::RemoveComponent<ModelComponent>();
+template bool GameObject::RemoveComponent<ModelInstancesComponent>();
+template bool GameObject::RemoveComponent<ShaderComponent>();
+template bool GameObject::RemoveComponent<TransformComponent>();
+template bool GameObject::RemoveComponent<CameraComponent>();
