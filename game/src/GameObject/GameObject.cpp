@@ -64,6 +64,7 @@ template ModelInstancesComponent* GameObject::GetComponent<ModelInstancesCompone
 template ShaderComponent* GameObject::GetComponent<ShaderComponent>();
 template TransformComponent* GameObject::GetComponent<TransformComponent>();
 template ColliderComponent* GameObject::GetComponent<ColliderComponent>();
+template CameraComponent* GameObject::GetComponent<CameraComponent>();
 
 template bool GameObject::RemoveComponent<NameComponent>();
 template bool GameObject::RemoveComponent<ListComponent>();
@@ -72,3 +73,4 @@ template bool GameObject::RemoveComponent<ModelInstancesComponent>();
 template bool GameObject::RemoveComponent<ShaderComponent>();
 template bool GameObject::RemoveComponent<TransformComponent>();
 template bool GameObject::RemoveComponent<ColliderComponent>();
+template bool GameObject::RemoveComponent<CameraComponent>();

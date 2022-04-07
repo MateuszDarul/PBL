@@ -1,30 +1,40 @@
-#pragma once
+#ifndef __SCENE_H__
+#define __SCENE_H__
 
-#include "GameObject.h"
-#include "Components.h"
+#include <vector>
 
 #include <glm/matrix.hpp>
 
-/*
-brak poprawnej implementacji,
-stworzone tylko po to by GameApplication mialo sie do czego odniesc
-*/
+#include "SceneNode.h"
+#include "GameObject.h"
+#include "Components.h"
+#include "GameApplication.h"
+#include "ResourceManager.h"
+#include "InputManager.h"
 
+/** @brief Scena do zarzadzania SceneNode'ami
+ */
 class Scene
 {
-public:
-    Scene();
-    ~Scene();
-    void OnUpdate(float dt);
-
 private:
-    ShaderComponent* shader;
-    ModelInstancesComponent* mic;
-    CollidersManager* colliderManager;
-    GameObject go;
+    SceneNode* scene;
+    GameObject goCamera;
 
-    float radius = 10.0f;
-    float camX = 0, camZ = 0;
-    glm::mat4 projection, view;
-    glm::mat4 transform;
+    glm::mat4 transform; //!< Macierz transformacji widoku i kamery.
+
+public:
+    /** @brief Domyslny konstruktor.
+     */
+    Scene();
+    
+    /** @brief Domyslny destruktor.
+     */
+    ~Scene();
+
+    /** @brief Metoda wykonywana w kazdej klatce.
+     * @param dt - Taktowanie (delta time).
+     */
+    void OnUpdate(float dt);
 };
+
+#endif // __SCENE_H__
