@@ -12,6 +12,7 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/ModelInstancesComponent.cpp
 	src/GameObject/Components/ShaderComponent.cpp
 	src/GameObject/Components/TransformComponent.cpp
+	src/GameObject/Components/ScriptComponent.cpp
 	src/GameObject/Components/CameraComponent.cpp
 
 	src/Resource/Mesh.cpp
@@ -47,6 +48,7 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/Components/ModelInstancesComponent.h
 	include/GameObject/Components/ShaderComponent.h
 	include/GameObject/Components/TransformComponent.h
+	include/GameObject/Components/ScriptComponent.h
 	include/GameObject/Components/CameraComponent.h
 
 	include/Resource/Mesh.h

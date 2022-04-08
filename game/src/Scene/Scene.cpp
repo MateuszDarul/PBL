@@ -1,5 +1,8 @@
 #include "Scene.h"
 
+#include "Scripts/TestScript.h"
+#include "Scripts/StatsScript.h"
+
 Scene::Scene()
 {
     glfwSetInputMode(GameApplication::GetWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
