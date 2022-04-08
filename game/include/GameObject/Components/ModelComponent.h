@@ -1,6 +1,8 @@
 #ifndef __MODEL_COMPONENT_H__
 #define __MODEL_COMPONENT_H__
 
+#include <memory>
+
 #include <glad/glad.h>
 
 #include "Component.h"
@@ -45,7 +47,7 @@ public:
      * @return true - Udalo sie wyswietlic model.
      * @return false - Nie udalo sie wyswietlic modelu.
      */
-    bool Draw(ShaderComponent *shader);
+    bool Draw(std::shared_ptr<ShaderComponent> shader);
 };
 
 #endif // __MODEL_COMPONENT_H__

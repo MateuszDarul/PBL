@@ -56,7 +56,7 @@ public:
      * 
      * @return glm::mat4* 
      */
-    static glm::mat4* const GetProjection();
+    static const glm::mat4& GetProjection();
 
 private:
     /**

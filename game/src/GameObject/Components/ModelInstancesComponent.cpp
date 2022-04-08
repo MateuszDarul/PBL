@@ -80,7 +80,7 @@ bool ModelInstancesComponent::Create(uint32_t amount, Mesh* mesh, Material* mate
     return true;
 }
 
-bool ModelInstancesComponent::Draw(ShaderComponent* shader)
+bool ModelInstancesComponent::Draw(std::shared_ptr<ShaderComponent> shader)
 {
     if(this->mesh == nullptr || shader == nullptr)
     {
