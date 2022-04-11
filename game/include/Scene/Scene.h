@@ -11,13 +11,15 @@
 #include "GameApplication.h"
 #include "ResourceManager.h"
 #include "InputManager.h"
+#include "MapLoader.h"
+
 
 /** @brief Scena do zarzadzania SceneNode'ami
  */
 class Scene
 {
 private:
-    SceneNode* scene;
+    SceneNode* world;
     GameObject* goCamera;
 
     glm::mat4 transform; //!< Macierz transformacji widoku i kamery.

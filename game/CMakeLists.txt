@@ -21,6 +21,7 @@ file(GLOB_RECURSE SOURCE_FILES
 
 	src/Scene/Scene.cpp
 	src/Scene/SceneNode.cpp
+	src/Scene/MapLoader.cpp
 
 	src/AI/State.cpp
 	src/AI/StateMachine.cpp
@@ -57,6 +58,7 @@ file(GLOB_RECURSE HEADER_FILES
 
 	include/Scene/Scene.h
 	include/Scene/SceneNode.h
+	include/Scene/MapLoader.h
 
 	include/AI/State.h
 	include/AI/StateMachine.h
