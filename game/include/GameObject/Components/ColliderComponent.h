@@ -1,9 +1,13 @@
 #ifndef __COLLIDER_COMPONENT_H__
 #define __COLLIDER_COMPONENT_H__
 #include "Component.h"
-#include "GameObject.h"
-#include "CollidersManager.h"
+
 #include <glm/glm.hpp>
+
+
+class CollidersManager;
+class GameObject;
+
 class ColliderComponent : public Component
 {
 protected:

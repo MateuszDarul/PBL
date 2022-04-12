@@ -1,7 +1,15 @@
+
 #include "ColliderComponent.h"
+#include "CollidersManager.h"
+#include "GameObject.h"
+
+#include <iostream>
+
+
 ColliderComponent::ColliderComponent(uint32_t UUID, GameObject* gameObject, CollidersManager* collidersManager, bool isTrigger, bool isStatic)
 	:Component(UUID, gameObject), isTrigger(isTrigger), isStatic(isStatic)
 {
+	if(!collidersManager) return;
 	if(isTrigger)
 	{
 		if (isStatic)

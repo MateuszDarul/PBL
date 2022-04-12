@@ -5,7 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Component.h"
-#include "GameObject.h"
+
 
 class TransformComponent :public Component
 {

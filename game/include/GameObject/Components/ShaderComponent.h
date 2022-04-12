@@ -10,7 +10,6 @@
 #include <glm/glm.hpp>
 
 #include "Component.h"
-#include "GameObject.h"
 
 class ShaderComponent :public Component
 {

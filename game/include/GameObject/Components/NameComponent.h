@@ -2,7 +2,7 @@
 #define __NAME_COMPONENT_H__
 
 #include "Component.h"
-#include "GameObject.h"
+
 
 /** @brief Komponent przechowywujacy nazwe.
  */
@@ -13,7 +13,7 @@ private:
 
 public:
     /** @brief Konstruktor, ktory pozwala na ustawienie nazwy.
-     * @param gameObject - GameObject do którego nale¿y komponent.
+     * @param gameObject - GameObject do ktï¿½rego naleï¿½y komponent.
      * @param name - Nazwa.
      */
     NameComponent(GameObject* gameObject, const std::string& name = "DefaultName");

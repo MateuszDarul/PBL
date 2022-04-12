@@ -93,6 +93,7 @@ Scene::Scene()
 
     go = new GameObject();
     tc = new TransformComponent(go);
+    tc->SetScale(0.01f);
     mc = new ModelComponent(go);
     mc->Create(
         resMan->GetMesh("Resources/models/sphere.obj"),
@@ -107,11 +108,15 @@ Scene::Scene()
     go->GetComponent<SphereCollider>()->radius = 5;
 
     scene->AddChild(go);
+    std::cout << "======================\n";
+    go->GetComponent<TransformComponent>();
+    std::cout << "======================\n";
 
-    ///***
+    // ///***
 
     go = new GameObject();
     tc = new TransformComponent(go);
+    tc->SetScale(0.01f);
     mc = new ModelComponent(go);
     mc->Create(
         resMan->GetMesh("Resources/models/sphere.obj"),
@@ -143,7 +148,8 @@ void Scene::OnUpdate(float dt)
     transform = *GameApplication::GetProjection() * goCamera->GetComponent<cmp::Camera>()->GetView();
 
     scene->FindNode("GO")->GetLocalTransformations()->Rotate(0, 180*dt, 0);
-    scene->FindNode("Ball1")->GetComponent<TransformComponent>()->Move(0.0f, 0.0f, -0.5f);
+
+    scene->FindNode("Ball1")->GetGameObject()->GetComponent<TransformComponent>()->Move(0.0f, 0.0f, -10.0f * dt);
     collidersManager->CheckCollisions();
     scene->Render(transform);
 }

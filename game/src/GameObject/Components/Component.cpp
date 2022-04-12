@@ -1,5 +1,5 @@
 #include "Component.h"
-
+#include "GameObject.h"
 uint32_t Component::id_update = 0;
 
 Component::Component(uint32_t component_type_uuid, GameObject* gameObject)

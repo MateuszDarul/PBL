@@ -1,4 +1,14 @@
 #include "SphereCollider.h"
+#include "Components.h"
+#include "GameObject.h"
+
+
+SphereCollider::SphereCollider(GameObject* gameObject)
+	:ColliderComponent(11, gameObject, nullptr, false, false)
+{
+	radius = 1.0f;
+}
+
 SphereCollider::SphereCollider(GameObject* gameObject, CollidersManager* collidersManager, bool isTrigger, bool isStatic)
 	:ColliderComponent(11, gameObject, collidersManager, isTrigger, isStatic)
 {

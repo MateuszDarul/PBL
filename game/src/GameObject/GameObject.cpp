@@ -29,7 +29,7 @@ bool GameObject::RemoveComponent(Component *component)
 template<typename T>
 bool GameObject::RemoveComponent()
 {
-    T tmp;
+    T tmp(this);
     for (uint32_t i=0; i<components.size(); i++)
     {
         if (components[i]->GetClassUUID() == tmp.GetClassUUID())
@@ -44,9 +44,10 @@ bool GameObject::RemoveComponent()
 template<typename T>
 T* GameObject::GetComponent()
 {
-    T tmp;
+    T tmp(this);
     for(uint32_t i=0; i<components.size(); i++)
     {
+       // std::cout << components[i]->GetClassUUID() << ' ' << tmp.GetClassUUID() << '\n';
         if(components[i]->GetClassUUID() == tmp.GetClassUUID())
         {
             return (T*)components[i];
@@ -63,7 +64,8 @@ template ModelComponent* GameObject::GetComponent<ModelComponent>();
 template ModelInstancesComponent* GameObject::GetComponent<ModelInstancesComponent>();
 template ShaderComponent* GameObject::GetComponent<ShaderComponent>();
 template TransformComponent* GameObject::GetComponent<TransformComponent>();
-template ColliderComponent* GameObject::GetComponent<ColliderComponent>();
+template BoxCollider* GameObject::GetComponent<BoxCollider>();
+template SphereCollider* GameObject::GetComponent<SphereCollider>();
 template CameraComponent* GameObject::GetComponent<CameraComponent>();
 
 template bool GameObject::RemoveComponent<NameComponent>();
@@ -72,5 +74,6 @@ template bool GameObject::RemoveComponent<ModelComponent>();
 template bool GameObject::RemoveComponent<ModelInstancesComponent>();
 template bool GameObject::RemoveComponent<ShaderComponent>();
 template bool GameObject::RemoveComponent<TransformComponent>();
-template bool GameObject::RemoveComponent<ColliderComponent>();
+template bool GameObject::RemoveComponent<BoxCollider>();
+template bool GameObject::RemoveComponent<SphereCollider>();
 template bool GameObject::RemoveComponent<CameraComponent>();

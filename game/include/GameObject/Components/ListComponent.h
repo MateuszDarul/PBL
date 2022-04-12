@@ -2,7 +2,7 @@
 #define __LIST_COMPONENT_H__
 
 #include "Component.h"
-#include "GameObject.h"
+
 
 /** @brief Komponent sluzacy do przechowywania wartosci liczbowych.
  */
@@ -13,7 +13,7 @@ private:
 
 public:
     /** @brief Domyslny konstruktor.
-     * @param gameObject - GameObject do którego nale¿y komponent.
+     * @param gameObject - GameObject do ktï¿½rego naleï¿½y komponent.
      */
     ListComponent(GameObject* gameObject);
 

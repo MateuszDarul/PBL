@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 
 #include "Component.h"
-#include "GameObject.h"
+
 #include "Mesh.h"
 #include "Material.h"
 #include "ShaderComponent.h"
@@ -22,7 +22,7 @@ private:
 
 public:
     /** @brief Domyslny konstruktor.
-     * @param gameObject - GameObject do którego nale¿y komponent.
+     * @param gameObject - GameObject do ktï¿½rego naleï¿½y komponent.
      */
     ModelComponent(GameObject* gameObject);
     

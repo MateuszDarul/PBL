@@ -3,7 +3,8 @@
 
 #include <string>
 #include <vector>
-#include "GameObject.h"
+
+class GameObject;
 
 class Component
 {
@@ -11,12 +12,12 @@ private:
     static uint32_t id_update; //!< Wartosc wykorzystywana do nadawania unikalnych wartosci ID.
     uint32_t component_type_uuid; //!< Wartosc sluzaca do rozrozniania typu komponenta, kazda klasa dziedziczaca z Component musi miec inna wartosc.
     uint32_t component_id; //!< Unikalna wartosc komponenta.
-    GameObject* gameObject; //!<WskaŸnik na gameObject posiadaj¹cy ten komponent
+    GameObject* gameObject; //!<Wskaï¿½nik na gameObject posiadajï¿½cy ten komponent
 
 public:
     /** @brief Konstruktor, ktory musi byc wykonany w konstruktorach klas dziedziczacych z klasy Component.
      * @param component_type_uuid - Wartosc, ktora nie byla wykorzystana w innych komponentach.
-     * @param gameObject - GameObject do którego nale¿y komponent.
+     * @param gameObject - GameObject do ktï¿½rego naleï¿½y komponent.
      */
     Component(uint32_t component_type_uuid, GameObject* gameObject);
 
