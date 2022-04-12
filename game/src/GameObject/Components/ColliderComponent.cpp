@@ -25,11 +25,11 @@ ColliderComponent::ColliderComponent(uint32_t UUID, GameObject* gameObject, Coll
 	{
 		if (isStatic)
 		{
-			collidersManager->AddStaticTrigger(this);
+			collidersManager->AddStaticCollider(this);
 		}
 		else
 		{
-			collidersManager->AddDynamicTrigger(this);
+			collidersManager->AddDynamicCollider(this);
 		}
 	}
 	offset = glm::vec3(0.0f, 0.0f, 0.0f);

@@ -108,9 +108,6 @@ Scene::Scene()
     go->GetComponent<SphereCollider>()->radius = 5;
 
     scene->AddChild(go);
-    std::cout << "======================\n";
-    go->GetComponent<TransformComponent>();
-    std::cout << "======================\n";
 
     // ///***
 
@@ -127,7 +124,7 @@ Scene::Scene()
     go->AddComponent(tc);
     go->GetComponent<TransformComponent>()->SetPosition(0.0f, 0.0f, -20.0f);
     go->AddComponent(new cmp::Name(go, "Ball2"));
-    go->AddComponent(new cmp::SphereCol(go, collidersManager, false, false));
+    go->AddComponent(new cmp::SphereCol(go, collidersManager, false, true));
     go->GetComponent<SphereCollider>()->radius = 5;
 
     scene->AddChild(go);
@@ -149,7 +146,7 @@ void Scene::OnUpdate(float dt)
 
     scene->FindNode("GO")->GetLocalTransformations()->Rotate(0, 180*dt, 0);
 
-    scene->FindNode("Ball1")->GetGameObject()->GetComponent<TransformComponent>()->Move(0.0f, 0.0f, -10.0f * dt);
+    scene->FindNode("Ball1")->GetLocalTransformations()->Move(0.0f, 0.0f,dt*-5.0f);
     collidersManager->CheckCollisions();
     scene->Render(transform);
 }

@@ -15,8 +15,8 @@ public:
 	CollidersManager();
 	~CollidersManager();
 	
-	void AddStaticColllider(ColliderComponent* collider);
-	void AddDynamicColllider(ColliderComponent* collider);
+	void AddStaticCollider(ColliderComponent* collider);
+	void AddDynamicCollider(ColliderComponent* collider);
 	void AddStaticTrigger(ColliderComponent* trigger);
 	void AddDynamicTrigger(ColliderComponent* trigger);
 

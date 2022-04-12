@@ -1,4 +1,5 @@
 #include "CollidersManager.h"
+#include <iostream>
 
 void CollidersManager::RemoveFromVector(std::vector<ColliderComponent*> vector, ColliderComponent* col)
 {
@@ -25,12 +26,12 @@ CollidersManager::~CollidersManager()
 	staticTriggers.clear();
 }
 
-void CollidersManager::AddStaticColllider(ColliderComponent* collider)
+void CollidersManager::AddStaticCollider(ColliderComponent* collider)
 {
 	staticColliders.push_back(collider);
 }
 
-void CollidersManager::AddDynamicColllider(ColliderComponent* collider)
+void CollidersManager::AddDynamicCollider(ColliderComponent* collider)
 {
 	dynamicColliders.push_back(collider);
 }
@@ -67,6 +68,7 @@ void CollidersManager::RemoveStaticTrigger(ColliderComponent* trigger)
 
 void CollidersManager::CheckCollisions()
 {
+	//std::cout << dynamicColliders.size();
 	for (int i = 0; i<dynamicColliders.size(); i++)
 	{
 		for (int j = i + 1; j < dynamicColliders.size(); j++)

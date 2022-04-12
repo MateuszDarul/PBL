@@ -1,5 +1,4 @@
 #include "TransformComponent.h"
-
 TransformComponent::TransformComponent(GameObject* gameObject)
     :Component(6, gameObject)
 {
@@ -72,7 +71,7 @@ void TransformComponent::Move(const float& x, const float& y, const float& z)
 
 void TransformComponent::Move(const glm::vec3& vector)
 {
-    this->position += position;
+    this->position += vector;
     this->CalculateModelMatrix();
 }
 

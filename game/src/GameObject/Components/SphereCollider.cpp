@@ -42,19 +42,19 @@ bool SphereCollider::CheckCollision(ColliderComponent* collider)
 			bool otherMoves = !other->isStatic && !other->isTrigger;
 			if (thisMoves && otherMoves)
 			{
-				thisVec += 0.5 * -radiusDiff / radius;
-				otherVec += 0.5 * -radiusDiff / radius;
+				thisVec *= 0.5 * -radiusDiff / radius;
+				otherVec *= 0.5 * -radiusDiff / radius;
 				thisTransform->SetPosition(thisTransform->GetPosition() + otherVec);
 				otherTransform->SetPosition(otherTransform->GetPosition() + thisVec);
 			}
 			else if(thisMoves)
 			{
-				otherVec += -radiusDiff / radius;
+				otherVec *= -radiusDiff / radius;
 				thisTransform->SetPosition(thisTransform->GetPosition() + otherVec);
 			}
 			else if (otherMoves)
 			{
-				thisVec += -radiusDiff / radius;
+				thisVec *= -radiusDiff / radius;
 				otherTransform->SetPosition(otherTransform->GetPosition() + otherVec);
 			}
 			return true;
