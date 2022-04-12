@@ -1,7 +1,7 @@
 #include "CameraComponent.h"
 
-CameraComponent::CameraComponent()
-    :Component(7)
+CameraComponent::CameraComponent(GameObject* gameObject)
+    :Component(7, gameObject)
 {
     this->needUpdate = true;
     this->firstMouseMovement = true;

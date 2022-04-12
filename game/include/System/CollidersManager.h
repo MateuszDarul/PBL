@@ -2,7 +2,6 @@
 #define __COLLIDERS_MANAGER_H__
 #include "ColliderComponent.h"
 #include <vector>
-#include <thread>
 
 class CollidersManager 
 {

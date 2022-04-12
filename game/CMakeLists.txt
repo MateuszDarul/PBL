@@ -7,7 +7,7 @@ file(GLOB_RECURSE SOURCE_FILES
 
 	src/GameObject/GameObject.cpp
 	src/GameObject/Components/Component.cpp
-	src/GameObject/Components/Collider.cpp
+	src/GameObject/Components/ColliderComponent.cpp
 	src/GameObject/Components/SphereCollider.cpp
 	src/GameObject/Components/BoxCollider.cpp
 	src/GameObject/Components/NameComponent.cpp
@@ -46,7 +46,7 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/GameObject.h
 	include/GameObject/Components/Components.h
 	include/GameObject/Components/Component.h
-	include/GameObject/Components/Collider.h
+	include/GameObject/Components/ColliderComponent.h
 	include/GameObject/Components/SphereCollider.h
 	include/GameObject/Components/BoxCollider.h
 	include/GameObject/Components/NameComponent.h

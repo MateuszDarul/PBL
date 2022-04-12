@@ -11,6 +11,7 @@
 #include "GameApplication.h"
 #include "ResourceManager.h"
 #include "InputManager.h"
+#include "CollidersManager.h"
 
 /** @brief Scena do zarzadzania SceneNode'ami
  */
@@ -18,8 +19,8 @@ class Scene
 {
 private:
     SceneNode* scene;
-    GameObject goCamera;
-
+    GameObject* goCamera;
+    CollidersManager* collidersManager;
     glm::mat4 transform; //!< Macierz transformacji widoku i kamery.
 
 public:

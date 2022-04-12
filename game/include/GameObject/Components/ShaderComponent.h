@@ -10,6 +10,7 @@
 #include <glm/glm.hpp>
 
 #include "Component.h"
+#include "GameObject.h"
 
 class ShaderComponent :public Component
 {
@@ -17,7 +18,7 @@ private:
     unsigned int shaderProgram;
 
 public:
-    ShaderComponent();
+    ShaderComponent(GameObject* gameObject);
     ~ShaderComponent();
 
     bool Create(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);

@@ -7,7 +7,8 @@ class SphereCollider : public ColliderComponent
 {
 public:
 	float radius;
-	SphereCollider(bool isTrigger, bool isStatic);
+	SphereCollider(GameObject* gameObject, CollidersManager* collidersManager, bool isTrigger, bool isStatic);
 	~SphereCollider();
+	bool virtual CheckCollision(ColliderComponent* collider);
 };
 #endif

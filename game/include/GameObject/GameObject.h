@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 
 #include "Components.h"
+#include "Component.h"
 
 /** @brief Klasa reprezentujaca dowolny "byt" w silniku.
  */

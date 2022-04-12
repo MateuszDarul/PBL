@@ -1,5 +1,6 @@
 #include "BoxCollider.h"
-BoxCollider::BoxCollider(bool isTrigger, bool isStatic) :ColliderComponent(12, isTrigger, isStatic)
+BoxCollider::BoxCollider(GameObject* gameObject, CollidersManager* collidersManager, bool isTrigger, bool isStatic) 
+	:ColliderComponent(12, gameObject, collidersManager, isTrigger, isStatic)
 {
 	offset = glm::vec3(0.0f, 0.0f, 0.0f);
 	isStatic = false;
@@ -9,5 +10,10 @@ BoxCollider::BoxCollider(bool isTrigger, bool isStatic) :ColliderComponent(12, i
 BoxCollider::~BoxCollider()
 {
 
+}
+
+bool BoxCollider::CheckCollision(ColliderComponent* collider)
+{
+	return false;
 }
 

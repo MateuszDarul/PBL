@@ -1,7 +1,7 @@
 #include "NameComponent.h"
 
-NameComponent::NameComponent(const std::string& name)
-    :Component(1), name(name)
+NameComponent::NameComponent(GameObject* gameObject, const std::string& name)
+    :Component(1, gameObject), name(name)
 {
     ;
 }

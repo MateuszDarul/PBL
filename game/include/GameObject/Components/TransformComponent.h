@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Component.h"
+#include "GameObject.h"
 
 class TransformComponent :public Component
 {
@@ -17,8 +18,9 @@ private:
 
 public:
     /** @brief Domyslny konstruktor.
+     * @param gameObject - GameObject do którego należy komponent.
      */
-    TransformComponent();
+    TransformComponent(GameObject* gameObject);
     
     /** @brief Domyslny destruktor.
      */

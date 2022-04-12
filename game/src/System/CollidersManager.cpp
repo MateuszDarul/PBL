@@ -67,8 +67,42 @@ void CollidersManager::RemoveStaticTrigger(ColliderComponent* trigger)
 
 void CollidersManager::CheckCollisions()
 {
+	for (int i = 0; i<dynamicColliders.size(); i++)
+	{
+		for (int j = i + 1; j < dynamicColliders.size(); j++)
+		{
+			dynamicColliders[i]->CheckCollision(dynamicColliders[j]);
+		}
+		for (int j = 0; j < staticColliders.size(); j++)
+		{
+			dynamicColliders[i]->CheckCollision(staticColliders[j]);
+		}
+		for (int j = 0; j < dynamicTriggers.size(); j++)
+		{
+			dynamicColliders[i]->CheckCollision(dynamicTriggers[j]);
+		}
+		for (int j = 0; j < staticTriggers.size(); j++)
+		{
+			dynamicColliders[i]->CheckCollision(staticTriggers[j]);
+		}
+	}
 }
 
 void CollidersManager::CheckTriggers()
 {
+	for (int i = 0; i < dynamicTriggers.size(); i++)
+	{
+		for (int j = i + 1; j < dynamicTriggers.size(); j++)
+		{
+			dynamicColliders[i]->CheckCollision(dynamicTriggers[j]);
+		}
+		for (int j = 0; j < staticColliders.size(); j++)
+		{
+			dynamicColliders[i]->CheckCollision(staticColliders[j]);
+		}
+		for (int j = 0; j < staticTriggers.size(); j++)
+		{
+			dynamicColliders[i]->CheckCollision(staticTriggers[j]);
+		}
+	}
 }

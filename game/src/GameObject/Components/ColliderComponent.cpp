@@ -1,11 +1,27 @@
 #include "ColliderComponent.h"
-ColliderComponent::ColliderComponent(uint32_t UUID, bool isTrigger, bool isStatic):Component(UUID), isTrigger(isTrigger), isStatic(isStatic)
+ColliderComponent::ColliderComponent(uint32_t UUID, GameObject* gameObject, CollidersManager* collidersManager, bool isTrigger, bool isStatic)
+	:Component(UUID, gameObject), isTrigger(isTrigger), isStatic(isStatic)
 {
 	if(isTrigger)
 	{
 		if (isStatic)
 		{
-			
+			collidersManager->AddStaticTrigger(this);
+		}
+		else
+		{
+			collidersManager->AddDynamicTrigger(this);
+		}
+	}
+	else
+	{
+		if (isStatic)
+		{
+			collidersManager->AddStaticTrigger(this);
+		}
+		else
+		{
+			collidersManager->AddDynamicTrigger(this);
 		}
 	}
 	offset = glm::vec3(0.0f, 0.0f, 0.0f);
