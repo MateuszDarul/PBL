@@ -124,7 +124,7 @@ Scene::Scene()
     go->AddComponent(tc);
     go->GetComponent<TransformComponent>()->SetPosition(0.0f, 0.0f, -20.0f);
     go->AddComponent(new cmp::Name(go, "Ball2"));
-    go->AddComponent(new cmp::SphereCol(go, collidersManager, false, true));
+    go->AddComponent(new cmp::SphereCol(go, collidersManager, false, false));
     go->GetComponent<SphereCollider>()->SetRadius(4.1f);
 
     scene->AddChild(go);
