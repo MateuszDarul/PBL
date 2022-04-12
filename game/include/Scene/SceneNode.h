@@ -10,7 +10,7 @@
 
 /** @brief Wezly, ktore pozwalaja na hierarchizacje GameObject'ow w aplikacji.
  */
-class SceneNode : public GameObject
+class SceneNode
 {
 private:
     bool needUpdate; //!< Informacja czy trzeba obliczyc globalne transformacje dla wszystkich potomkow tego wezla.

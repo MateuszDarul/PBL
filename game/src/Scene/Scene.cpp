@@ -14,8 +14,8 @@ Scene::Scene()
     GameObject* go;
 
     scene = new SceneNode(new GameObject());
-    scene->GetGameObject()->AddComponent(new cmp::Name(scene, "ROOT"));
-    scene->GetGameObject()->AddComponent(new cmp::Transform(scene));
+    scene->GetGameObject()->AddComponent(new cmp::Name(scene->GetGameObject(), "ROOT"));
+    scene->GetGameObject()->AddComponent(new cmp::Transform(scene->GetGameObject()));
 
     ///***
     goCamera = new GameObject();
@@ -25,9 +25,9 @@ Scene::Scene()
 
     ///***
 
-    ShaderComponent *shader_d = new ShaderComponent(scene);
+    ShaderComponent *shader_d = new ShaderComponent(scene->GetGameObject());
     shader_d->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
-    ShaderComponent* shader_i = new ShaderComponent(scene);
+    ShaderComponent* shader_i = new ShaderComponent(scene->GetGameObject());
     shader_i->Create("Resources/shaders/inst.vert", "Resources/shaders/inst.frag");
 
     ///***
@@ -102,10 +102,10 @@ Scene::Scene()
     go->AddComponent(shader_d);
     go->AddComponent(mc);
     go->AddComponent(tc);
-    go->GetComponent<TransformComponent>()->SetPosition(0.0f, 0.0f, 20.0f);
+    go->GetComponent<TransformComponent>()->SetPosition(0.0f, 2.0f, 20.0f);
     go->AddComponent(new cmp::Name(go, "Ball1"));
     go->AddComponent(new cmp::SphereCol(go, collidersManager, false, false));
-    go->GetComponent<SphereCollider>()->radius = 5;
+    go->GetComponent<SphereCollider>()->SetRadius(4.1);
 
     scene->AddChild(go);
 
@@ -125,7 +125,7 @@ Scene::Scene()
     go->GetComponent<TransformComponent>()->SetPosition(0.0f, 0.0f, -20.0f);
     go->AddComponent(new cmp::Name(go, "Ball2"));
     go->AddComponent(new cmp::SphereCol(go, collidersManager, false, true));
-    go->GetComponent<SphereCollider>()->radius = 5;
+    go->GetComponent<SphereCollider>()->SetRadius(4.1f);
 
     scene->AddChild(go);
 

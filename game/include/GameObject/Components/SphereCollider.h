@@ -5,11 +5,15 @@
 
 class SphereCollider : public ColliderComponent
 {
-public:
+private:
 	float radius;
+
+public:
 	SphereCollider(GameObject*);
 	SphereCollider(GameObject* gameObject, CollidersManager* collidersManager, bool isTrigger, bool isStatic);
 	~SphereCollider();
 	bool virtual CheckCollision(ColliderComponent* collider);
+	void SetRadius(float radius);
+	float GetRadius();
 };
 #endif

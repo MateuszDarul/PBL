@@ -63,3 +63,20 @@ bool SphereCollider::CheckCollision(ColliderComponent* collider)
 	return false;
 }
 
+void SphereCollider::SetRadius(float radius)
+{
+	if (radius < 0)
+	{
+		this->radius = 0;
+	}
+	else
+	{
+		this->radius = radius;
+	}
+}
+
+float SphereCollider::GetRadius()
+{
+	return radius;
+}
+
