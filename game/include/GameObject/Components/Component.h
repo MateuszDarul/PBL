@@ -6,13 +6,15 @@
 
 class GameObject;
 
+/** @brief Klasa bazowa dla wszystkich komponentow jakie moga istniec w silniku.
+ */
 class Component
 {
 private:
     static uint32_t id_update; //!< Wartosc wykorzystywana do nadawania unikalnych wartosci ID.
     uint32_t component_type_uuid; //!< Wartosc sluzaca do rozrozniania typu komponenta, kazda klasa dziedziczaca z Component musi miec inna wartosc.
     uint32_t component_id; //!< Unikalna wartosc komponenta.
-    GameObject* owner;
+    GameObject* owner; //!< Wskaznik na GameObject, ktory posiada ten komponent.
 
 public:
     /** @brief Konstruktor, ktory musi byc wykonany w konstruktorach klas dziedziczacych z klasy Component.
