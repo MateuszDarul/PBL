@@ -5,14 +5,11 @@ bool MapLoader::Load(std::string path, SceneNode* root)
     ResourceManager* resMan = GameApplication::GetResourceManager();
 
     std::shared_ptr<GameObject> gameObject;
-    std::shared_ptr<cmp::Name> nameCmp;
-    std::shared_ptr<cmp::Model> modelCmp;
-    std::shared_ptr<cmp::Transform> transformCmp;
     std::shared_ptr<cmp::Shader> shaderCmp = std::make_shared<cmp::Shader>();
     shaderCmp->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
 
     std::string line;
-    uint32_t line_id = 0;
+    uint32_t line_id = 1;
 
     std::fstream file;
     file.open(path.c_str(), std::ios::in);
@@ -32,59 +29,60 @@ bool MapLoader::Load(std::string path, SceneNode* root)
         if(line == "NEW")
         {
             gameObject = std::make_shared<GameObject>();
-            nameCmp = std::make_shared<cmp::Name>();
-            modelCmp = std::make_shared<cmp::Model>();
-            transformCmp = std::make_shared<cmp::Transform>();
         }
         else if(line == "Name:")
         {
-            std::string name;
+            std::shared_ptr<cmp::Name> nameCmp = std::make_shared<cmp::Name>();
+            {
+                std::string name;
 
-            file >> name;
-            line_id++;
+                file >> name;
+                line_id++;
 
-            nameCmp->Set(name);
+                nameCmp->Set(name);
+            }
+            gameObject->AddComponent(nameCmp);
         }
         else if(line == "Path:")
         {
-            std::string modelName;
+            std::shared_ptr<cmp::Model> modelCmp = std::make_shared<cmp::Model>();
+            {
+                std::string modelName;
 
-            file >> modelName;
-            line_id++;
+                file >> modelName;
+                line_id++;
 
-            modelCmp->Create(
-                resMan->GetMesh("Resources/models/" + modelName + ".obj"),
-                resMan->GetMaterial("Resources/models/" + modelName + ".mtl")
-            );
+                modelCmp->Create(
+                    resMan->GetMesh("Resources/models/" + modelName + ".obj"),
+                    resMan->GetMaterial("Resources/models/" + modelName + ".mtl")
+                );
+            }
+            gameObject->AddComponent(modelCmp);
         }
-        else if(line == "Position:")
+        else if(line == "Transformations:")
         {
-            glm::vec3 position;
+            std::shared_ptr<cmp::Transform> transformCmp = std::make_shared<cmp::Transform>();
+            {
+                glm::vec3 position;
+                file >> std::dec >> position.x;
+                file >> std::dec >> position.y;
+                file >> std::dec >> position.z;
 
-            file >> std::dec >> position.x;
-            file >> std::dec >> position.y;
-            file >> std::dec >> position.z;
-            line_id += 3;
+                glm::vec3 rotation;
+                file >> std::dec >> rotation.x;
+                file >> std::dec >> rotation.y;
+                file >> std::dec >> rotation.z;
 
-            transformCmp->SetPosition(position);
-        }
-        else if(line == "Rotation:")
-        {
-            glm::vec3 rotation;
+                line_id += 6;
 
-            file >> std::dec >> rotation.x;
-            file >> std::dec >> rotation.y;
-            file >> std::dec >> rotation.z;
-            line_id += 3;
-
-            transformCmp->SetRotation(rotation);
+                transformCmp->SetPosition(position);
+                transformCmp->SetRotation(rotation);
+            }
+            gameObject->AddComponent(transformCmp);
         }
         else if(line == "END")
         {
-            gameObject->AddComponent(nameCmp);
-            gameObject->AddComponent(modelCmp);
             gameObject->AddComponent(shaderCmp);
-            gameObject->AddComponent(transformCmp);
             root->AddChild(gameObject);
         }
         else
