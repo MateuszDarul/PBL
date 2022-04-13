@@ -2,7 +2,8 @@
 
 bool GameObject::AddComponent(std::shared_ptr<Component> component)
 {
-    if(!component->SetOwner(this))
+    /// [ component->GetClassUUID() != 5 ] Poniewaz ShaderComponent ma id rowne 5, a shadery moga byc wspolne.
+    if(component->GetClassUUID() != 5 && !component->SetOwner(this))
     {
         return false;
     }
