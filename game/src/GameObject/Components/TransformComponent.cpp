@@ -25,7 +25,7 @@ void TransformComponent::SetModelMatrix(const glm::mat4& modelMatrix)
     this->modelMatrix = modelMatrix;
 }
 
-const glm::mat4& TransformComponent::CalculateModelMatrix()
+void TransformComponent::CalculateModelMatrix()
 {
     this->modelMatrix = 
         glm::translate(glm::mat4(1.f), this->position)*
@@ -33,8 +33,6 @@ const glm::mat4& TransformComponent::CalculateModelMatrix()
         glm::rotate(glm::mat4(1.f), glm::radians(this->rotation.y), glm::vec3(0,1,0))*
         glm::rotate(glm::mat4(1.f), glm::radians(this->rotation.x), glm::vec3(1,0,0))*
         glm::scale(glm::mat4(1.f), glm::vec3(scale, scale, scale));
-
-    return this->modelMatrix;
 }
 
 void TransformComponent::SetScale(const float& scale)

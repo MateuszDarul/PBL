@@ -14,7 +14,7 @@
 class SceneNode
 {
 private:
-    bool needUpdate; //!< Informacja czy trzeba obliczyc globalne transformacje dla wszystkich potomkow tego wezla.
+    SceneNode* parent; //!< Wskazanie na wezel nadrzedny.
     std::shared_ptr<GameObject> gameObject; //!< GameObject w scenie.
     std::vector<std::shared_ptr<SceneNode>> children; //!< Potomkowie tego wezla.
     glm::mat4 globalTransformations; //!< Globalne transformacje wezla (iloczyn transformacji wezlow wyzszego stopnia i lokalnych transformacji danego GameObject'u).
@@ -26,6 +26,11 @@ private:
      */
     void FindByName(const std::string& name, SceneNode** result);
 
+    /** @brief Ustawia rodzica danego wezla.
+     * @param parent 
+     */
+    void SetParent(SceneNode* parent);
+
 public:
     /** @brief Tworzy nowy wezel.
      * @param gameObject - Wskazanie na GameObject nowego wezla.
@@ -36,12 +41,12 @@ public:
      */
     ~SceneNode();
 
-    /** @brief Dodaje nowy wezel (potomek) do tego wezla.
+    /** @brief Tworzy nowy wezel na podstawie otrzymanego GameObject'u i dodaje go do listy potomkow.
      * @param gameObject - Wskazanie na GameObject, ktory ma zostac umieszczony w wezle potomnym.
      */
     void AddChild(std::shared_ptr<GameObject> gameObject);
     
-    /** @brief Dodaje nowy wezel do tego wezla.
+    /** @brief Dodaje nowy wezel (potomek) do tego wezla.
      * @param sceneNode - Wskazanie na SceneNode, ktory ma zostac dodany jako potomek.
      */
     void AddChild(std::shared_ptr<SceneNode> sceneNode);
@@ -66,12 +71,35 @@ public:
      */
     void Render(const glm::mat4& matrixPV);
 
+    /** @brief Aktualizuje transformacje danego wezla i wszystkich jego podwezlow.
+     */
+    void Update();
+
     /** @brief Szuka SceneNode, gdzie GameObject posiada komponent NameComponent o podanej zawartosci.
      * @param name - Nazwa poszukiwanego Noda.
      * @return SceneNode* - Wskazanie na wezel sceny.
      * @return nullptr - Nie znaleziono wezla z GameObject'em o podanej nazwie.
      */
     SceneNode* FindNode(const std::string& name);
+
+    /** @brief Zwraca wskazanie na rodzica danego wezla.
+     * @return SceneNode* - rodzic.
+     */
+    SceneNode* GetParent();
+
+    /** @brief Porownuje SceneNode'y.
+     * @param second - Wezel z ktorym chcemy porownac.
+     * @return true - To jest ten sam wezel.
+     * @return false - Sa to rozne wezly.
+     */
+    bool Is(SceneNode* second);
+
+    /** @brief Porownuje SceneNode'y.
+     * @param second - Wezel z ktorym chcemy porownac.
+     * @return true - To jest ten sam wezel.
+     * @return false - Sa to rozne wezly.
+     */
+    bool Is(std::shared_ptr<SceneNode> second);
 };
 
 #endif // __SCENE_NODE_H__

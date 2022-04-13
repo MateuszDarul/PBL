@@ -2,6 +2,11 @@
 
 bool GameObject::AddComponent(std::shared_ptr<Component> component)
 {
+    if(!component->SetOwner(this))
+    {
+        return false;
+    }
+
     for(uint32_t i=0; i<components.size(); i++)
     {
         if(components[i]->GetClassUUID() == component->GetClassUUID())
@@ -54,6 +59,17 @@ std::shared_ptr<T> GameObject::GetComponent()
     }
     return nullptr;
 }
+
+bool GameObject::Is(GameObject* second)
+{
+    return this == second;
+}
+
+bool GameObject::Is(std::shared_ptr<GameObject> second)
+{
+    return this == second.get();
+}
+
 
 ///***
 
