@@ -92,6 +92,26 @@ Scene::Scene()
     scene->FindNode("GO")->GetLocalTransformations()->SetPosition(0, 2, 0);
     scene->FindNode("GO1")->GetLocalTransformations()->SetPosition(5, 0, 0);
     scene->FindNode("GO2")->GetLocalTransformations()->SetPosition(0, -2, 0);
+
+
+    //=== text test ===
+
+    std::shared_ptr<ShaderComponent> textShader = std::make_shared<ShaderComponent>();
+    textShader->Create("Resources/shaders/text.vert", "Resources/shaders/text.frag");
+    resMan->GetFont("Resources/fonts/arial.ttf");
+    std::shared_ptr<TextComponent> textComponent = std::make_shared<TextComponent>();
+    textComponent->Create("Sample text", resMan->GetFont("Resources/fonts/arial.ttf"));
+
+    go = std::make_shared<GameObject>();
+    go->AddComponent(std::make_shared<cmp::Name>("In world text"));
+    go->AddComponent(std::make_shared<cmp::Transform>());
+
+    go->AddComponent(textShader);
+    go->AddComponent(textComponent);
+
+    scene->AddChild(go);
+
+    scene->FindNode("In world text")->GetLocalTransformations()->SetPosition(15, 0, 0);
 }
 
 Scene::~Scene()
@@ -109,6 +129,8 @@ void Scene::Update(float dt)
     transform = GameApplication::GetProjection() * goCamera->GetComponent<cmp::Camera>()->GetView();
 
     scene->FindNode("GO")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0, 180*dt, 0);
+
+    scene->FindNode("In world text")->GetLocalTransformations()->Rotate(-50 * dt, 0, 0);
 }
 
 void Scene::Render()

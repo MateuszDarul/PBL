@@ -6,6 +6,10 @@
 
 #include "Mesh.h"
 #include "Material.h"
+#include "Font.h"
+
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 /** @brief Klasa zarzadzajaca zasobami w silniku.
  */
@@ -15,6 +19,9 @@ private:
     std::vector<std::pair<size_t, Mesh*>> loadedMesh; //!< Lista wczytanych siatek i ich kluczy.
     std::vector<std::pair<size_t, Material*>> loadedMaterial; //!< Lista wczytanych materialow i ich kluczy.
     //std::vector<ResourceNode<Texture>> loadedTexture;
+    std::vector< std::pair<size_t, Font*>> loadedFont; //!< Lista wczytanych czcionek i ich kluczy.
+
+    FT_Library ftLibrary;
 
 public:
     /** @brief Domyslny konstruktor.
@@ -52,6 +59,20 @@ public:
      * @return false - Nie udalo sie usunac materialu i zwolnic pamieci.
      */
     bool RemoveMaterial(const std::string& path);
+
+    /** @brief Zwraca wskaznik do czcionki o podanej sciezce, lub tworzy nowy zasob, jesli jeszcze nie istnial.
+     * @param path - Sciezka do czcionki (pliku .ttf).
+     * @return Font* - Wskazanie na obiekt czcionki.
+     * @return nullptr - Jesli sciezka byla bledna.
+     */
+    Font* GetFont(const std::string& path);
+
+    /** @brief Usuwa czcionke o podanej sciezce i zwalnia pamiec.
+     * @param path - Sciezka do zasobu, ktory chcemy usunac z managera (plik .ttf).
+     * @return true - Pomyslnie usunieto czcionke i zwolniono pamiec.
+     * @return false - Nie udalo sie usunac czcionke i zwolnic pamieci.
+     */
+    bool RemoveFont(const std::string& path);
 };
 
 #endif // __RESOURCE_MANAGER_H__
