@@ -27,6 +27,8 @@ bool TextComponent::Create(const std::string& text, Font* font)
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+
+    return true;
 }
 
 void TextComponent::Clear()
@@ -86,4 +88,6 @@ bool TextComponent::Draw(std::shared_ptr<ShaderComponent> shader)
     }
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    return true;
 }
