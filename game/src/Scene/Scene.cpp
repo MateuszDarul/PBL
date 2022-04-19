@@ -46,6 +46,8 @@ void Scene::Update(float dt)
 {
     goCamera->GetComponent<cmp::Camera>()->Update(GameApplication::GetInputManager(), dt);
     transform = GameApplication::GetProjection() * goCamera->GetComponent<cmp::Camera>()->GetView();
+    
+    world->Update();
 }
 
 void Scene::Render()
