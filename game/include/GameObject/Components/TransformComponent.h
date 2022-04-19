@@ -6,6 +6,8 @@
 
 #include "Component.h"
 
+/** @brief Komponent odpowiedzialny za transformacje GameObjectow.
+ */
 class TransformComponent :public Component
 {
 private:
@@ -14,6 +16,12 @@ private:
     glm::vec3 position; //!< Pozycja obiektu.
     glm::vec3 rotation; //!< Rotacja obiektu.
     float scale; //!< Skala obiektu.
+
+private:
+    /** @brief Oblicza nowa macierz modelu dla aktualnych wartosci pozycji, rotacji i skali.
+     * @return glm::mat4 - Nowo wyliczona macierz modelu (TransformComponent::modelMatrix jest nadpisywana automatycznie).
+     */
+    void CalculateModelMatrix();
 
 public:
     /** @brief Domyslny konstruktor.
@@ -33,11 +41,6 @@ public:
      * @param modelMatrix - Nowa macierz.
      */
     void SetModelMatrix(const glm::mat4& modelMatrix);
-
-    /** @brief Oblicza nowa macierz modelu dla aktualnych wartosci pozycji, rotacji i skali.
-     * @return glm::mat4 - Nowo wyliczona macierz modelu (TransformComponent::modelMatrix jest nadpisywana automatycznie).
-     */
-    const glm::mat4& CalculateModelMatrix();
 
     /** @brief Ustala nowa skale obiektu.
      * @param scale - Nowa skala.

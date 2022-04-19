@@ -1,7 +1,7 @@
 #include "SceneNode.h"
 
 SceneNode::SceneNode(std::shared_ptr<GameObject> gameObject)
-    :gameObject(gameObject)
+    :parent(nullptr), gameObject(gameObject)
 {
     this->globalTransformations = glm::mat4(1.f);
 }
@@ -13,12 +13,18 @@ SceneNode::~SceneNode()
 
 void SceneNode::AddChild(std::shared_ptr<GameObject> gameObject)
 {
-    this->children.push_back(std::make_shared<SceneNode>(gameObject));
+    this->AddChild(std::make_shared<SceneNode>(gameObject));
 }
 
 void SceneNode::AddChild(std::shared_ptr<SceneNode> sceneNode)
 {
+    sceneNode->SetParent(this);
     this->children.push_back(sceneNode);
+}
+
+void SceneNode::Update()
+{
+    this->UpdateTransformations(glm::mat4(1.f));
 }
 
 void SceneNode::UpdateTransformations(const glm::mat4& parentTransformations)
@@ -33,8 +39,6 @@ void SceneNode::UpdateTransformations(const glm::mat4& parentTransformations)
         this->globalTransformations = parentTransformations;
     }
 
-    this->needUpdate = false;
-
     for(unsigned short int i=0; i<children.size(); i++)
     {
         this->children[i]->UpdateTransformations(this->globalTransformations);
@@ -43,11 +47,6 @@ void SceneNode::UpdateTransformations(const glm::mat4& parentTransformations)
 
 void SceneNode::Render(const glm::mat4& matrixPV)
 {
-    if(this->needUpdate)
-    {
-        this->UpdateTransformations(glm::mat4(1.f));
-    }
-
     std::shared_ptr<cmp::Shader> shaderPtr = this->gameObject->GetComponent<cmp::Shader>();
     if(shaderPtr != nullptr)
     {
@@ -80,7 +79,6 @@ std::shared_ptr<GameObject> SceneNode::GetGameObject()
 
 std::shared_ptr<TransformComponent> SceneNode::GetLocalTransformations()
 {
-    this->needUpdate = true;
     return this->gameObject->GetComponent<cmp::Transform>();
 }
 
@@ -111,4 +109,24 @@ void SceneNode::FindByName(const std::string& name, SceneNode** result)
         if(*result != nullptr)
             break;
     }
+}
+
+void SceneNode::SetParent(SceneNode* parent)
+{
+    this->parent = parent;
+}
+
+SceneNode* SceneNode::GetParent()
+{
+    return this->parent;
+}
+
+bool SceneNode::Is(SceneNode* second)
+{
+    return this == second;
+}
+
+bool SceneNode::Is(std::shared_ptr<SceneNode> second)
+{
+    return this == second.get();
 }

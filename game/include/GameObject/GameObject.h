@@ -42,6 +42,20 @@ public:
      * @return false - Nie usunieto komponenta.
      */
     template<typename T> bool RemoveComponent();
+
+    /** @brief Porownuje GameObject'y.
+     * @param second - GameObject z ktorym chcemy porownac.
+     * @return true - To jest ten sam GameObject.
+     * @return false - Sa to rozne GameObject.
+     */
+    bool Is(GameObject* second);
+
+    /** @brief Porownuje GameObject'y.
+     * @param second - GameObject z ktorym chcemy porownac.
+     * @return true - To jest ten sam GameObject.
+     * @return false - Sa to rozne GameObject.
+     */
+    bool Is(std::shared_ptr<GameObject> second);
 };
 
 #endif // __GAME_OBJECT_H__
