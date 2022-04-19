@@ -34,5 +34,5 @@ for ob in bpy.data.objects:
     
 
 f.close()
-print("File location: ", os.getcwd(), filename)
+print("File created: ", os.getcwd(), "/", filename)
 

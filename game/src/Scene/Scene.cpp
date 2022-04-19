@@ -16,11 +16,7 @@ Scene::Scene()
     world = new SceneNode(std::make_shared<GameObject>());
     world->GetGameObject()->AddComponent(std::make_shared<cmp::Name>("ROOT"));
     world->GetGameObject()->AddComponent(std::make_shared<cmp::Transform>());
-
-    {
-        std::string path = "Resources/maps/world.map";
-        MapLoader::Load(path, world);
-    }
+    MapLoader::Load("Resources/maps/world.map", world);
 
     ///***
 
@@ -35,7 +31,6 @@ Scene::Scene()
     shader_d->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
     std::shared_ptr<ShaderComponent> shader_i = std::make_shared<ShaderComponent>();
     shader_i->Create("Resources/shaders/inst.vert", "Resources/shaders/inst.frag");
-
 }
 
 Scene::~Scene()
