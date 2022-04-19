@@ -13,9 +13,10 @@ Scene::Scene()
     std::shared_ptr<cmp::ModelInst> mic;
     std::shared_ptr<GameObject> go;
 
-    scene = new SceneNode(std::make_shared<GameObject>());
-    scene->GetGameObject()->AddComponent(std::make_shared<cmp::Name>("ROOT"));
-    scene->GetGameObject()->AddComponent(std::make_shared<cmp::Transform>());
+    world = new SceneNode(std::make_shared<GameObject>());
+    world->GetGameObject()->AddComponent(std::make_shared<cmp::Name>("ROOT"));
+    world->GetGameObject()->AddComponent(std::make_shared<cmp::Transform>());
+    MapLoader::Load("Resources/maps/world.map", world);
 
     ///***
 
@@ -30,74 +31,12 @@ Scene::Scene()
     shader_d->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
     std::shared_ptr<ShaderComponent> shader_i = std::make_shared<ShaderComponent>();
     shader_i->Create("Resources/shaders/inst.vert", "Resources/shaders/inst.frag");
-
-    ///***
-
-    mc = std::make_shared<ModelComponent>();
-    mc->Create(
-        resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-        resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
-    );
-    go = std::make_shared<GameObject>();
-    go->AddComponent(std::make_shared<cmp::Name>("GO"));
-    go->AddComponent(shader_d);
-    go->AddComponent(mc);
-    go->AddComponent(std::make_shared<cmp::Transform>());
-
-    scene->AddChild(go);
-
-    ///***
-
-    mc = std::make_shared<ModelComponent>();
-    mc->Create(
-        resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-        resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
-    );
-    go = std::make_shared<GameObject>();
-    go->AddComponent(shader_d);
-    go->AddComponent(mc);
-    go->AddComponent(std::make_shared<cmp::Transform>());
-    go->AddComponent(std::make_shared<cmp::Name>("GO1"));
-
-    scene->FindNode("GO")->AddChild(go);
-
-    ///***
-
-    mic = std::make_shared<ModelInstancesComponent>();
-    mic->Create(9,
-        resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-        resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
-    );
-    for(int x=-4, y=-4, i=0; i<9; i++)
-    {
-        mic->SetTransformation(i, TransformComponent::Transform(glm::vec3(x, 0, y), glm::vec3(0, 0, 0), 1));
-        x += 4;
-        if((x + 1) % 3 == 0)
-        {
-            x = -4;
-            y += 4;
-        }
-    }
-    mic->UpdateTransformations();
-    go = std::make_shared<GameObject>();
-    go->AddComponent(std::make_shared<cmp::Name>("GO2"));
-    go->AddComponent(std::make_shared<cmp::Transform>());
-    go->AddComponent(shader_i);
-    go->AddComponent(mic);
-
-    scene->AddChild(go);
-
-    ///***
-
-    scene->FindNode("GO")->GetLocalTransformations()->SetPosition(0, 2, 0);
-    scene->FindNode("GO1")->GetLocalTransformations()->SetPosition(5, 0, 0);
-    scene->FindNode("GO2")->GetLocalTransformations()->SetPosition(0, -2, 0);
 }
 
 Scene::~Scene()
 {
-    delete scene;
-    scene = nullptr;
+    delete world;
+    world = nullptr;
 
     delete goCamera;
     goCamera = nullptr;
@@ -107,12 +46,9 @@ void Scene::Update(float dt)
 {
     goCamera->GetComponent<cmp::Camera>()->Update(GameApplication::GetInputManager(), dt);
     transform = GameApplication::GetProjection() * goCamera->GetComponent<cmp::Camera>()->GetView();
-
-    scene->FindNode("GO")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0, 180*dt, 0);
 }
 
 void Scene::Render()
 {
-    scene->Update();
-    scene->Render(transform);
+    world->Render(transform);
 }
