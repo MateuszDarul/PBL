@@ -2,6 +2,7 @@
 #define __SCENE_H__
 
 #include <vector>
+#include <memory>
 
 #include <glm/matrix.hpp>
 
@@ -19,7 +20,6 @@ class Scene
 {
 private:
     SceneNode* world; //!< Swiat gry.
-    GameObject* goCamera; //!< GameObject z kamera.
 
     glm::mat4 transform; //!< Macierz transformacji widoku i kamery.
 

@@ -87,8 +87,6 @@ bool ModelInstancesComponent::Draw(std::shared_ptr<ShaderComponent> shader)
         return false;
     }
 
-    shader->Use();
-
     if(this->material != nullptr)
     {
         shader->SetInt("diffuseMapData", 0);

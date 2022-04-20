@@ -1,12 +1,11 @@
 #include "MapLoader.h"
 
-bool MapLoader::Load(std::string path, SceneNode* root)
+bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<ShaderComponent> shader)
 {
     ResourceManager* resMan = GameApplication::GetResourceManager();
 
     std::shared_ptr<GameObject> gameObject;
-    std::shared_ptr<cmp::Shader> shaderCmp = std::make_shared<cmp::Shader>();
-    shaderCmp->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
+    std::shared_ptr<cmp::Shader> shaderCmp = shader;
 
     std::string line;
     uint32_t line_id = 1;
