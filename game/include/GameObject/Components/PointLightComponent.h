@@ -2,6 +2,7 @@
 #define __POINT_LIGHT_COMPONNET_H__
 
 #include <memory>
+#include <string>
 
 #include <glm/glm.hpp>
 
@@ -10,10 +11,13 @@
 
 class PointLightComponent :public Component
 {
-private:
-    std::string var[6];
+public:
+    static int lightAmount;
+    static int thisLightID;
+    static bool needUpdate;
 
-    int pointLightID;
+    bool wasCreated;
+    std::string textID;
 
     glm::vec3 position;
 
@@ -24,10 +28,15 @@ private:
     // distance.x = constant;
     // distance.y = linear;
     // distance.z = quadratic;
+    float range;
 
 public:
-    PointLightComponent(int pointLightID = -1);
+    PointLightComponent();
     ~PointLightComponent();
+
+    bool Create();
+    bool Destroy();
+
     void Use(std::shared_ptr<ShaderComponent> shader);
 };
 

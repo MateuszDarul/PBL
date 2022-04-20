@@ -25,8 +25,19 @@ Scene::Scene()
     world->GetGameObject()->AddComponent(std::make_shared<cmp::Transform>());
 
     go = std::make_shared<GameObject>();
-    go->AddComponent(std::make_shared<cmp::PointLight>(0));
+    go->AddComponent(std::make_shared<cmp::PointLight>());
+    go->GetComponent<cmp::PointLight>()->Create();
+    go->GetComponent<cmp::PointLight>()->position = glm::vec3(0, 5, 0);
     go->AddComponent(std::make_shared<cmp::Name>("light1"));
+    go->AddComponent(shader_l);
+    world->AddChild(go);
+    go = nullptr;
+
+    go = std::make_shared<GameObject>();
+    go->AddComponent(std::make_shared<cmp::PointLight>());
+    go->GetComponent<cmp::PointLight>()->Create();
+    go->GetComponent<cmp::PointLight>()->position = glm::vec3(10, 3, 0);
+    go->AddComponent(std::make_shared<cmp::Name>("light2"));
     go->AddComponent(shader_l);
     world->AddChild(go);
     go = nullptr;
@@ -65,15 +76,30 @@ Scene::Scene()
     go->AddComponent(mc);
     mc = nullptr;
     go->AddComponent(std::make_shared<cmp::Transform>());
-    go->AddComponent(std::make_shared<cmp::Name>("swiatelko"));
+    go->AddComponent(std::make_shared<cmp::Name>("mark1"));
     go->AddComponent(shader_d);
-    world->AddChild(go);
+    world->FindNode("light1")->AddChild(go);
+    go = nullptr;
+
+    mc = std::make_shared<cmp::Model>();
+    mc->Create(resMan->GetMesh("Resources/models/NWM/NWM.obj"),
+                resMan->GetMaterial("Resources/models/NWM/NWM.mtl")
+                );
+    go = std::make_shared<GameObject>();
+    go->AddComponent(mc);
+    mc = nullptr;
+    go->AddComponent(std::make_shared<cmp::Transform>());
+    go->AddComponent(std::make_shared<cmp::Name>("mark2"));
+    go->AddComponent(shader_d);
+    world->FindNode("light2")->AddChild(go);
     go = nullptr;
 
 
     world->FindNode("Cos")->GetLocalTransformations()->SetPosition(0,3,0);
-    world->FindNode("swiatelko")->GetLocalTransformations()->SetPosition(0,5,0);
-    world->FindNode("swiatelko")->GetLocalTransformations()->SetScale(0.1);
+    world->FindNode("mark1")->GetLocalTransformations()->SetPosition(0,5,0);
+    world->FindNode("mark1")->GetLocalTransformations()->SetScale(0.1);
+    world->FindNode("mark2")->GetLocalTransformations()->SetPosition(10,3,0);
+    world->FindNode("mark2")->GetLocalTransformations()->SetScale(0.1);
 }
 
 Scene::~Scene()
