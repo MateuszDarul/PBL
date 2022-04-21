@@ -23,6 +23,9 @@ BoxCollider::BoxCollider(GameObject* gameObject)
 	offset = glm::vec3(0.0f, 0.0f, 0.0f);
 	isStatic = false;
 	isTrigger = false;
+	xLength = 1.0f;
+	yLength = 1.0f;
+	zLength = 1.0f;
 }
 
 BoxCollider::BoxCollider(GameObject* gameObject, CollidersManager* collidersManager, bool isTrigger, bool isStatic) 
@@ -31,6 +34,9 @@ BoxCollider::BoxCollider(GameObject* gameObject, CollidersManager* collidersMana
 	offset = glm::vec3(0.0f, 0.0f, 0.0f);
 	isStatic = false;
 	isTrigger = false;
+	xLength = 1.0f;
+	yLength = 1.0f;
+	zLength = 1.0f;
 }
 
 BoxCollider::~BoxCollider()
