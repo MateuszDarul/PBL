@@ -75,7 +75,8 @@ bool BoxCollider::CheckCollision(ColliderComponent* collider)
 			bool otherMoves = !other->isStatic && !other->isTrigger;
 			if (thisMoves || otherMoves)
 			{
-				float array[] = { otherMaxX - thisMinX, thisMaxX - otherMinX, otherMaxZ - thisMinZ, thisMaxZ - otherMinZ, otherMaxY - thisMinY, thisMaxY - otherMinY };
+				float array[] = { glm::abs(otherMaxX - thisMinX), glm::abs(thisMaxX - otherMinX), glm::abs(otherMaxZ - thisMinZ),
+					glm::abs(thisMaxZ - otherMinZ), glm::abs(otherMaxY - thisMinY), glm::abs(thisMaxY - otherMinY) };
 				int index = GetLowestValueIndex(array);
 				glm::vec3 thisMoveVec = { 0.0f,0.0f,0.0f };
 				glm::vec3 otherMoveVec = { 0.0f,0.0f,0.0f };
@@ -84,21 +85,27 @@ bool BoxCollider::CheckCollision(ColliderComponent* collider)
 				case 0:
 					otherMoveVec.x = -array[index] * 0.5f;
 					thisMoveVec.x = array[index] * 0.5f;
+					break;
 				case 1:
 					otherMoveVec.x = array[index] * 0.5f;
 					thisMoveVec.x = -array[index] * 0.5f;
+					break;
 				case 2:
 					otherMoveVec.z = -array[index] * 0.5f;
 					thisMoveVec.z = array[index] * 0.5f;
+					break;
 				case 3:
 					otherMoveVec.z = array[index] * 0.5f;
 					thisMoveVec.z = -array[index] * 0.5f;
+					break;
 				case 4:
 					otherMoveVec.y = -array[index] * 0.5f;
 					thisMoveVec.y = array[index] * 0.5f;
+					break;
 				case 5:
 					otherMoveVec.y = array[index] * 0.5f;
 					thisMoveVec.y = -array[index] * 0.5f;
+					break;
 				}
 				if (thisMoves && otherMoves)
 				{
