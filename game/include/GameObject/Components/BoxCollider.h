@@ -8,7 +8,12 @@
  */
 class BoxCollider : public ColliderComponent
 {
+private:
+	int GetLowestValueIndex(float array[6]); //!< Get index of lowest value in array 
 public:
+	float xLength; //!< Length of box edges parallel to X axis.
+	float yLength; //!< Length of box edges parallel to Y axis.
+	float zLength; //!< Length of box edges parallel to Z axis.
 
 	/** @brief Konstruktor komponentu koliderów.
 	 * @param gameObject - WskaŸnik na GameObject do którego nale¿y komponent.
