@@ -101,12 +101,10 @@ Scene::Scene()
     go->AddComponent(shader_d);
     go->AddComponent(mc);
     go->AddComponent(tc);
-    go->GetComponent<TransformComponent>()->SetPosition(0.0f, 0.0f, 20.0f);
-    go->AddComponent(new cmp::Name(go, "Ball1"));
-    go->AddComponent(new cmp::BoxCol(go, collidersManager, false, false));
-    go->GetComponent<BoxCollider>()->xLength = 2.0f;
-    go->GetComponent<BoxCollider>()->yLength = 2.0f;
-    go->GetComponent<BoxCollider>()->zLength = 2.0f;
+    go->GetComponent<TransformComponent>()->SetPosition(0.0f, 1.0f, -20.0f);
+    go->AddComponent(new cmp::Name(go, "Box1"));
+    go->AddComponent(new cmp::BoxCol(go, collidersManager, false, true));
+    go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
 
     scene->AddChild(go);
 
@@ -122,12 +120,48 @@ Scene::Scene()
     go->AddComponent(shader_d);
     go->AddComponent(mc);
     go->AddComponent(tc);
-    go->GetComponent<TransformComponent>()->SetPosition(0.0f, 0.0f, -20.0f);
-    go->AddComponent(new cmp::Name(go, "Ball2"));
-    go->AddComponent(new cmp::BoxCol(go, collidersManager, false, false));
-    go->GetComponent<BoxCollider>()->xLength = 2.0f;
-    go->GetComponent<BoxCollider>()->yLength = 2.0f;
-    go->GetComponent<BoxCollider>()->zLength = 2.0f;
+    go->GetComponent<TransformComponent>()->SetPosition(0.0f, 3.0f, -22.0f);
+    go->AddComponent(new cmp::Name(go, "Box2"));
+    go->AddComponent(new cmp::BoxCol(go, collidersManager, false, true));
+    go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
+
+    scene->AddChild(go);
+
+    // ///***
+
+    go = new GameObject();
+    tc = new TransformComponent(go);
+    mc = new ModelComponent(go);
+    mc->Create(
+        resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+        resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+    );
+    go->AddComponent(shader_d);
+    go->AddComponent(mc);
+    go->AddComponent(tc);
+    go->GetComponent<TransformComponent>()->SetPosition(0.0f, 5.0f, -24.0f);
+    go->AddComponent(new cmp::Name(go, "Box3"));
+    go->AddComponent(new cmp::BoxCol(go, collidersManager, false, true));
+    go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
+
+    scene->AddChild(go);
+    ///***
+
+    go = new GameObject();
+    tc = new TransformComponent(go);
+    tc->SetScale(0.01f);
+    mc = new ModelComponent(go);
+    mc->Create(
+        resMan->GetMesh("Resources/models/sphere.obj"),
+        resMan->GetMaterial("Resources/models/sphere.mtl")
+    );
+    go->AddComponent(shader_d);
+    go->AddComponent(mc);
+    go->AddComponent(tc);
+    go->GetComponent<TransformComponent>()->SetPosition(0.0f, 4.1f, 20.0f);
+    go->AddComponent(new cmp::Name(go, "Ball1"));
+    go->AddComponent(new cmp::SphereCol(go, collidersManager, false, false));
+    go->GetComponent<SphereCollider>()->SetRadius(4.1f);
 
     scene->AddChild(go);
 
@@ -146,10 +180,9 @@ void Scene::OnUpdate(float dt)
     goCamera->GetComponent<cmp::Camera>()->Update(GameApplication::GetInputManager(), dt);
     transform = *GameApplication::GetProjection() * goCamera->GetComponent<cmp::Camera>()->GetView();
 
-    scene->FindNode("GO")->GetLocalTransformations()->Rotate(0, 180*dt, 0);
+   // scene->FindNode("GO")->GetLocalTransformations()->Rotate(0, 180*dt, 0);
 
-    scene->FindNode("Ball1")->GetLocalTransformations()->Move(0.0f, 0.0f,dt*-5.0f);
-    scene->FindNode("Ball2")->GetLocalTransformations()->Move(0.0f, 0.0f, dt * 3.0f);
+    scene->FindNode("Ball1")->GetLocalTransformations()->Move(0.0f, 0.0f, dt * -5.0f);
     collidersManager->CheckCollisions();
     scene->Render(transform);
 }

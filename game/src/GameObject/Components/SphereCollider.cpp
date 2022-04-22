@@ -42,8 +42,11 @@ bool SphereCollider::CheckCollision(ColliderComponent* collider)
 			bool otherMoves = !other->isStatic && !other->isTrigger;
 			if (thisMoves && otherMoves)
 			{
-				thisVec *= 0.5 * -radiusDiff / radius;
-				otherVec *= 0.5 * -radiusDiff / radius;
+				float thisMass = this->GetMass();
+				float otherMass = other->GetMass();
+				float massSum = thisMass + otherMass;
+				thisVec *= otherMass / massSum * -radiusDiff / radius;
+				otherVec *= thisMass / massSum * -radiusDiff / radius;
 				thisTransform->SetPosition(thisTransform->GetPosition() + otherVec);
 				otherTransform->SetPosition(otherTransform->GetPosition() + thisVec);
 			}
@@ -56,6 +59,65 @@ bool SphereCollider::CheckCollision(ColliderComponent* collider)
 			{
 				thisVec *= -radiusDiff / radius;
 				otherTransform->SetPosition(otherTransform->GetPosition() + thisVec);
+			}
+			return true;
+		}
+	}
+	else if (collider->GetClassUUID() == 12)
+	{
+		BoxCollider* other = (BoxCollider*) collider;
+		glm::uvec3 otherLenghts = other->getLengths();
+		float otherMinX = otherPos.x - otherLenghts.x * 0.5f;
+		float otherMaxX = otherPos.x + otherLenghts.x * 0.5f;
+		float otherMinY = otherPos.y - otherLenghts.y * 0.5f;
+		float otherMaxY = otherPos.y + otherLenghts.y * 0.5f;
+		float otherMinZ = otherPos.z - otherLenghts.z * 0.5f;
+		float otherMaxZ = otherPos.z + otherLenghts.z * 0.5f;
+
+		float thisRadius = this->GetRadius();
+		glm::vec3 closer = {
+			Clamp(thisPos.x, otherMinX, otherMaxX),
+			Clamp(thisPos.y, otherMinY, otherMaxY),
+			Clamp(thisPos.z, otherMinZ, otherMaxZ)};
+		float distance = glm::distance(closer, thisPos);
+		if (distance < thisRadius)
+		{
+			bool thisMoves = !this->isStatic && !this->isTrigger;
+			bool otherMoves = !other->isStatic && !other->isTrigger;
+			if (thisMoves || otherMoves)
+			{
+				glm::vec3 thisMoveVec = { 0.0f,0.0f,0.0f };
+				glm::vec3 otherMoveVec = { 0.0f,0.0f,0.0f };
+				if (closer == thisPos)
+				{
+					float array[] = { glm::abs(thisPos.x - otherMinX + thisRadius), glm::abs(otherMaxX - thisPos.x + thisRadius),
+						glm::abs(thisPos.z - otherMinZ + thisRadius), glm::abs(otherMaxZ - thisPos.z + thisRadius),
+						glm::abs(thisPos.y - otherMinY + thisRadius), glm::abs(otherMaxY - thisPos.y + thisRadius) };
+					GetSeparationVectors(array, otherMoveVec, thisMoveVec);
+				}
+				else
+				{
+					glm::vec3 moveVec = glm::normalize(thisPos - closer) * (thisRadius - distance);
+					thisMoveVec = moveVec;
+					otherMoveVec = -moveVec;
+				}
+
+				if (thisMoves && otherMoves)
+				{
+					float thisMass = this->GetMass();
+					float otherMass = other->GetMass();
+					float massSum = thisMass + otherMass;
+					thisTransform->SetPosition(thisTransform->GetPosition() + thisMoveVec * otherMass / massSum);
+					otherTransform->SetPosition(otherTransform->GetPosition() + otherMoveVec * thisMass / massSum);
+				}
+				else if (thisMoves)
+				{
+					thisTransform->SetPosition(thisTransform->GetPosition() + thisMoveVec);
+				}
+				else if (otherMoves)
+				{
+					otherTransform->SetPosition(otherTransform->GetPosition() + otherMoveVec);
+				}
 			}
 			return true;
 		}

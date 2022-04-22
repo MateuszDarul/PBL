@@ -2,30 +2,13 @@
 #include "Components.h"
 #include "GameObject.h"
 
-int BoxCollider::GetLowestValueIndex(float array[6])
-{
-	float min = array[0];
-	int index = 0;
-	for (int i = 1; i < 6; i++)
-	{
-		if (array[i] < min)
-		{
-			min = array[i];
-			index = i;
-		}
-	}
-	return index;
-}
-
 BoxCollider::BoxCollider(GameObject* gameObject)
 	:ColliderComponent(12, gameObject, nullptr, false, false)
 {
 	offset = glm::vec3(0.0f, 0.0f, 0.0f);
 	isStatic = false;
 	isTrigger = false;
-	xLength = 1.0f;
-	yLength = 1.0f;
-	zLength = 1.0f;
+	lengths = { 1.0f, 1.0f, 1.0f };
 }
 
 BoxCollider::BoxCollider(GameObject* gameObject, CollidersManager* collidersManager, bool isTrigger, bool isStatic) 
@@ -34,9 +17,7 @@ BoxCollider::BoxCollider(GameObject* gameObject, CollidersManager* collidersMana
 	offset = glm::vec3(0.0f, 0.0f, 0.0f);
 	isStatic = false;
 	isTrigger = false;
-	xLength = 1.0f;
-	yLength = 1.0f;
-	zLength = 1.0f;
+	lengths = { 1.0f, 1.0f, 1.0f };
 }
 
 BoxCollider::~BoxCollider()
@@ -52,21 +33,76 @@ bool BoxCollider::CheckCollision(ColliderComponent* collider)
 	glm::vec3 thisPos = glm::vec3(thisModelMat[3][0], thisModelMat[3][1], thisModelMat[3][2]) + this->offset;
 	glm::mat4 otherModelMat = otherTransform->GetModelMatrix();
 	glm::vec3 otherPos = glm::vec3(otherModelMat[3][0], otherModelMat[3][1], otherModelMat[3][2]) + collider->GetOffset();
-	if (collider->GetClassUUID() == 12)
+
+	glm::uvec3 thisLenghts = this->getLengths();
+	float thisMinX = thisPos.x - thisLenghts.x * 0.5f;
+	float thisMaxX = thisPos.x + thisLenghts.x * 0.5f;
+	float thisMinY = thisPos.y - thisLenghts.y * 0.5f;
+	float thisMaxY = thisPos.y + thisLenghts.y * 0.5f;
+	float thisMinZ = thisPos.z - thisLenghts.z * 0.5f;
+	float thisMaxZ = thisPos.z + thisLenghts.z * 0.5f;
+
+	if (collider->GetClassUUID() == 11)
+	{
+		SphereCollider* other = (SphereCollider*)collider;
+		float otherRadius = other->GetRadius();
+		glm::vec3 closer = {
+			Clamp(otherPos.x, thisMinX, thisMaxX),
+			Clamp(otherPos.y, thisMinY, thisMaxY),
+			Clamp(otherPos.z, thisMinZ, thisMaxZ)};
+		float distance = glm::distance(closer, otherPos);
+		if (distance < otherRadius)
+		{
+			bool thisMoves = !this->isStatic && !this->isTrigger;
+			bool otherMoves = !other->isStatic && !other->isTrigger;
+			if (thisMoves || otherMoves)
+			{
+				glm::vec3 thisMoveVec = { 0.0f,0.0f,0.0f };
+				glm::vec3 otherMoveVec = { 0.0f,0.0f,0.0f };
+				if (closer == otherPos)
+				{
+					float array[] = { glm::abs(otherPos.x - thisMinX + otherRadius), glm::abs(thisMaxX - otherPos.x + otherRadius),
+						glm::abs(otherPos.z - thisMinZ + otherRadius), glm::abs(thisMaxZ - otherPos.z + otherRadius),
+						glm::abs(otherPos.y - thisMinY + otherRadius), glm::abs(thisMaxY - otherPos.y + otherRadius) };
+					GetSeparationVectors(array, thisMoveVec, otherMoveVec);
+				}
+				else
+				{
+					glm::vec3 moveVec = glm::normalize(otherPos - closer) * (otherRadius - distance);
+					thisMoveVec = -moveVec;
+					otherMoveVec = moveVec;
+				}
+
+				if (thisMoves && otherMoves)
+				{
+					float thisMass = this->GetMass();
+					float otherMass = other->GetMass();
+					float massSum = thisMass + otherMass;
+					thisTransform->SetPosition(thisTransform->GetPosition() + thisMoveVec * otherMass / massSum);
+					otherTransform->SetPosition(otherTransform->GetPosition() + otherMoveVec * thisMass / massSum);
+				}
+				else if (thisMoves)
+				{
+					thisTransform->SetPosition(thisTransform->GetPosition() + thisMoveVec);
+				}
+				else if (otherMoves)
+				{
+					otherTransform->SetPosition(otherTransform->GetPosition() + otherMoveVec);
+				}
+			}
+			return true;
+		}
+	}
+	else if (collider->GetClassUUID() == 12)
 	{
 		BoxCollider* other = (BoxCollider*)collider;
-		float thisMinX = thisPos.x - this->xLength * 0.5f;
-		float thisMaxX = thisPos.x + this->xLength * 0.5f;
-		float thisMinY = thisPos.y - this->yLength * 0.5f;
-		float thisMaxY = thisPos.y + this->yLength * 0.5f;
-		float thisMinZ = thisPos.z - this->zLength * 0.5f;
-		float thisMaxZ = thisPos.z + this->zLength * 0.5f;
-		float otherMinX = otherPos.x - other->xLength * 0.5f;
-		float otherMaxX = otherPos.x + other->xLength * 0.5f;
-		float otherMinY = otherPos.y - other->yLength * 0.5f;
-		float otherMaxY = otherPos.y + other->yLength * 0.5f;
-		float otherMinZ = otherPos.z - other->zLength * 0.5f;
-		float otherMaxZ = otherPos.z + other->zLength * 0.5f;
+		glm::uvec3 otherLenghts = other->getLengths();
+		float otherMinX = otherPos.x - otherLenghts.x * 0.5f;
+		float otherMaxX = otherPos.x + otherLenghts.x * 0.5f;
+		float otherMinY = otherPos.y - otherLenghts.y * 0.5f;
+		float otherMaxY = otherPos.y + otherLenghts.y * 0.5f;
+		float otherMinZ = otherPos.z - otherLenghts.z * 0.5f;
+		float otherMaxZ = otherPos.z + otherLenghts.z * 0.5f;
 		if (thisMinX <= otherMaxX && otherMinX <= thisMaxX &&
 			thisMinZ <= otherMaxZ && otherMinZ <= thisMaxZ &&
 			thisMinY <= otherMaxY && otherMinY <= thisMaxY)
@@ -77,53 +113,39 @@ bool BoxCollider::CheckCollision(ColliderComponent* collider)
 			{
 				float array[] = { glm::abs(otherMaxX - thisMinX), glm::abs(thisMaxX - otherMinX), glm::abs(otherMaxZ - thisMinZ),
 					glm::abs(thisMaxZ - otherMinZ), glm::abs(otherMaxY - thisMinY), glm::abs(thisMaxY - otherMinY) };
-				int index = GetLowestValueIndex(array);
 				glm::vec3 thisMoveVec = { 0.0f,0.0f,0.0f };
 				glm::vec3 otherMoveVec = { 0.0f,0.0f,0.0f };
-				switch (index)
-				{
-				case 0:
-					otherMoveVec.x = -array[index] * 0.5f;
-					thisMoveVec.x = array[index] * 0.5f;
-					break;
-				case 1:
-					otherMoveVec.x = array[index] * 0.5f;
-					thisMoveVec.x = -array[index] * 0.5f;
-					break;
-				case 2:
-					otherMoveVec.z = -array[index] * 0.5f;
-					thisMoveVec.z = array[index] * 0.5f;
-					break;
-				case 3:
-					otherMoveVec.z = array[index] * 0.5f;
-					thisMoveVec.z = -array[index] * 0.5f;
-					break;
-				case 4:
-					otherMoveVec.y = -array[index] * 0.5f;
-					thisMoveVec.y = array[index] * 0.5f;
-					break;
-				case 5:
-					otherMoveVec.y = array[index] * 0.5f;
-					thisMoveVec.y = -array[index] * 0.5f;
-					break;
-				}
+				GetSeparationVectors(array, thisMoveVec, otherMoveVec);
 				if (thisMoves && otherMoves)
 				{
-					thisTransform->SetPosition(thisTransform->GetPosition() + thisMoveVec);
-					otherTransform->SetPosition(otherTransform->GetPosition() + otherMoveVec);
+					float thisMass = this->GetMass();
+					float otherMass = other->GetMass();
+					float massSum = thisMass + otherMass;
+					thisTransform->SetPosition(thisTransform->GetPosition() + thisMoveVec * otherMass / massSum);
+					otherTransform->SetPosition(otherTransform->GetPosition() + otherMoveVec * thisMass / massSum);
 				}
 				else if (thisMoves)
 				{
-					thisTransform->SetPosition(thisTransform->GetPosition() + thisMoveVec - otherMoveVec);
+					thisTransform->SetPosition(thisTransform->GetPosition() + thisMoveVec);
 				}
 				else if (otherMoves)
 				{
-					otherTransform->SetPosition(otherTransform->GetPosition() + otherMoveVec - thisMoveVec);
+					otherTransform->SetPosition(otherTransform->GetPosition() + otherMoveVec);
 				}
 			}
 			return true;
 		}
 	}
 	return false;
+}
+
+void BoxCollider::setLengths(glm::uvec3 lengths)
+{
+	this->lengths = lengths;
+}
+
+glm::uvec3 BoxCollider::getLengths()
+{
+	return lengths;
 }
 

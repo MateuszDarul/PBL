@@ -9,11 +9,8 @@
 class BoxCollider : public ColliderComponent
 {
 private:
-	int GetLowestValueIndex(float array[6]); //!< Get index of lowest value in array 
+	glm::uvec3 lengths; //!< D³ugoœci boków pude³ka, równoleg³e do osi X, Y lub Z.
 public:
-	float xLength; //!< Length of box edges parallel to X axis.
-	float yLength; //!< Length of box edges parallel to Y axis.
-	float zLength; //!< Length of box edges parallel to Z axis.
 
 	/** @brief Konstruktor komponentu koliderów.
 	 * @param gameObject - WskaŸnik na GameObject do którego nale¿y komponent.
@@ -38,5 +35,15 @@ public:
 	* @return flase - nie zasz³a kolizja.
 	*/
 	bool virtual CheckCollision(ColliderComponent* collider);
+
+	/** @brief Metoda ustawiaj¹ca nowe d³ugoœci krawêdzi pude³kowego kolidera.
+	* @param lengths - nowe d³ugoœci krawêdzi pude³kowego kolidera.
+	*/
+	void setLengths(glm::uvec3 lengths);
+
+	/** @brief Metoda zwracaj¹ca d³ugoœci krawêdzi pude³kowego kolidera.
+	* @return glm::uvec3 - D³ugoœci krawêdzi.
+	*/
+	glm::uvec3 getLengths();
 };
 #endif
