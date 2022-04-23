@@ -7,6 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Component.h"
+
 #include "ShaderComponent.h"
 #include "Mesh.h"
 #include "Material.h"
@@ -27,8 +28,9 @@ private:
 
 public:
     /** @brief Domyslny konstruktor.
+     * @param gameObject - GameObject do kt�rego nale�y komponent.
      */
-    ModelInstancesComponent();
+    ModelInstancesComponent(GameObject* gameObject);
     
     /** @brief Domyslny destruktor.
      */

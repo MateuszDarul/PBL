@@ -1,9 +1,9 @@
 #include "Component.h"
-
+#include "GameObject.h"
 uint32_t Component::id_update = 0;
 
-Component::Component(uint32_t component_type_uuid)
-    :component_type_uuid(component_type_uuid), component_id(id_update)
+Component::Component(uint32_t component_type_uuid, GameObject* gameObject)
+    :component_type_uuid(component_type_uuid), component_id(id_update), gameObject(gameObject)
 {
     id_update++;
     this->owner = nullptr;
@@ -11,7 +11,6 @@ Component::Component(uint32_t component_type_uuid)
 
 Component::~Component()
 {
-    ;
 }
 
 uint32_t Component::GetID()
@@ -37,4 +36,3 @@ bool Component::SetOwner(GameObject* owner)
         return true;
     }
     return false;
-}

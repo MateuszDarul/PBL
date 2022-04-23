@@ -1,7 +1,7 @@
 #include "ShaderComponent.h"
 
-ShaderComponent::ShaderComponent()
-    :Component(5)
+ShaderComponent::ShaderComponent(GameObject* gameObject)
+    :Component(5, gameObject)
 {
 
 }

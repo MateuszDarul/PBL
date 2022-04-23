@@ -25,8 +25,9 @@ private:
 
 public:
     /** @brief Domyslny konstruktor.
+     * @param gameObject - GameObject do którego należy komponent.
      */
-    TransformComponent();
+    TransformComponent(GameObject* gameObject);
     
     /** @brief Domyslny destruktor.
      */

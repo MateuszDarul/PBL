@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Component.h"
+
 #include "InputManager.h"
 
 class CameraComponent :public Component
@@ -51,6 +52,7 @@ public:
     /** @brief Konstruktor ustawiajacy parametry poczatkowe kamery.
      */
     CameraComponent();
+    CameraComponent(GameObject* gameObject);
     
     /** @brief Domyslny destruktor.
      */

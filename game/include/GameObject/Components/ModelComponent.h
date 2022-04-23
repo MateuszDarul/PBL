@@ -6,6 +6,7 @@
 #include <glad/glad.h>
 
 #include "Component.h"
+
 #include "Mesh.h"
 #include "Material.h"
 #include "ShaderComponent.h"
@@ -23,8 +24,9 @@ private:
 
 public:
     /** @brief Domyslny konstruktor.
+     * @param gameObject - GameObject do kt�rego nale�y komponent.
      */
-    ModelComponent();
+    ModelComponent(GameObject* gameObject);
     
     /** @brief Domyslny destruktor.
      */

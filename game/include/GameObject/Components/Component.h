@@ -19,8 +19,9 @@ private:
 public:
     /** @brief Konstruktor, ktory musi byc wykonany w konstruktorach klas dziedziczacych z klasy Component.
      * @param component_type_uuid - Wartosc, ktora nie byla wykorzystana w innych komponentach.
+     * @param gameObject - GameObject do kt�rego nale�y komponent.
      */
-    Component(uint32_t component_type_uuid);
+    Component(uint32_t component_type_uuid, GameObject* gameObject);
 
     /** @brief Wirtualny destruktor.
      */
@@ -47,6 +48,7 @@ public:
      * @return false - Ten komponent juz posiada wlasciciela.
      */
     bool SetOwner(GameObject* owner);
+
 };
 
 #endif // __COMPONENT_H__

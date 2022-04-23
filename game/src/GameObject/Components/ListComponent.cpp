@@ -1,7 +1,7 @@
 #include "ListComponent.h"
 
-ListComponent::ListComponent()
-    :Component(2)
+ListComponent::ListComponent(GameObject* gameObject)
+    :Component(2, gameObject)
 {
     list.push_back(0.25);
     list.push_back(1.50);

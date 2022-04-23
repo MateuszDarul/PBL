@@ -35,7 +35,7 @@ bool GameObject::RemoveComponent(std::shared_ptr<Component> component)
 template<typename T>
 bool GameObject::RemoveComponent()
 {
-    T tmp;
+    T tmp(this);
     for (uint32_t i=0; i<components.size(); i++)
     {
         if (components[i]->GetClassUUID() == tmp.GetClassUUID())
@@ -50,9 +50,10 @@ bool GameObject::RemoveComponent()
 template<typename T>
 std::shared_ptr<T> GameObject::GetComponent()
 {
-    T tmp;
+    T tmp(this);
     for(uint32_t i=0; i<components.size(); i++)
     {
+       // std::cout << components[i]->GetClassUUID() << ' ' << tmp.GetClassUUID() << '\n';
         if(components[i]->GetClassUUID() == tmp.GetClassUUID())
         {
             return std::static_pointer_cast<T>(components[i]);
@@ -82,6 +83,9 @@ template std::shared_ptr<ShaderComponent> GameObject::GetComponent<ShaderCompone
 template std::shared_ptr<TransformComponent> GameObject::GetComponent<TransformComponent>();
 template std::shared_ptr<CameraComponent> GameObject::GetComponent<CameraComponent>();
 template std::shared_ptr<ScriptComponent> GameObject::GetComponent<ScriptComponent>();
+template std::shared_ptr<BoxCollider> GameObject::GetComponent<BoxCollider>();
+template std::shared_ptr<SphereCollider> GameObject::GetComponent<SphereCollider>();
+
 
 template bool GameObject::RemoveComponent<NameComponent>();
 template bool GameObject::RemoveComponent<ListComponent>();
@@ -91,3 +95,5 @@ template bool GameObject::RemoveComponent<ShaderComponent>();
 template bool GameObject::RemoveComponent<TransformComponent>();
 template bool GameObject::RemoveComponent<CameraComponent>();
 template bool GameObject::RemoveComponent<ScriptComponent>();
+template bool GameObject::RemoveComponent<BoxCollider>();
+template bool GameObject::RemoveComponent<SphereCollider>();
