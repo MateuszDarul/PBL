@@ -38,27 +38,30 @@ bool SphereCollider::CheckCollision(ColliderComponent* collider)
 		float radiusDiff = distance - thisRadius - otherRadius;
 		if (radiusDiff < 0)
 		{
-			bool thisMoves = !this->isStatic && !this->isTrigger;
-			bool otherMoves = !other->isStatic && !other->isTrigger;
-			if (thisMoves && otherMoves)
+			bool thisMoves = !this->isStatic;
+			bool otherMoves = !other->isStatic;
+			if (!this->isTrigger && !other->isTrigger)
 			{
-				float thisMass = this->GetMass();
-				float otherMass = other->GetMass();
-				float massSum = thisMass + otherMass;
-				thisVec *= otherMass / massSum * -radiusDiff / radius;
-				otherVec *= thisMass / massSum * -radiusDiff / radius;
-				thisTransform->SetPosition(thisTransform->GetPosition() + otherVec);
-				otherTransform->SetPosition(otherTransform->GetPosition() + thisVec);
-			}
-			else if(thisMoves)
-			{
-				otherVec *= -radiusDiff / radius;
-				thisTransform->SetPosition(thisTransform->GetPosition() + otherVec);
-			}
-			else if (otherMoves)
-			{
-				thisVec *= -radiusDiff / radius;
-				otherTransform->SetPosition(otherTransform->GetPosition() + thisVec);
+				if (thisMoves && otherMoves)
+				{
+					float thisMass = this->GetMass();
+					float otherMass = other->GetMass();
+					float massSum = thisMass + otherMass;
+					thisVec *= otherMass / massSum * -radiusDiff / radius;
+					otherVec *= thisMass / massSum * -radiusDiff / radius;
+					thisTransform->SetPosition(thisTransform->GetPosition() + otherVec);
+					otherTransform->SetPosition(otherTransform->GetPosition() + thisVec);
+				}
+				else if (thisMoves)
+				{
+					otherVec *= -radiusDiff / radius;
+					thisTransform->SetPosition(thisTransform->GetPosition() + otherVec);
+				}
+				else if (otherMoves)
+				{
+					thisVec *= -radiusDiff / radius;
+					otherTransform->SetPosition(otherTransform->GetPosition() + thisVec);
+				}
 			}
 			return true;
 		}
@@ -82,9 +85,9 @@ bool SphereCollider::CheckCollision(ColliderComponent* collider)
 		float distance = glm::distance(closer, thisPos);
 		if (distance < thisRadius)
 		{
-			bool thisMoves = !this->isStatic && !this->isTrigger;
-			bool otherMoves = !other->isStatic && !other->isTrigger;
-			if (thisMoves || otherMoves)
+			bool thisMoves = !this->isStatic;
+			bool otherMoves = !other->isStatic;
+			if ((thisMoves || otherMoves) && !this->isTrigger && !other->isTrigger)
 			{
 				glm::vec3 thisMoveVec = { 0.0f,0.0f,0.0f };
 				glm::vec3 otherMoveVec = { 0.0f,0.0f,0.0f };

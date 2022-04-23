@@ -53,9 +53,9 @@ bool BoxCollider::CheckCollision(ColliderComponent* collider)
 		float distance = glm::distance(closer, otherPos);
 		if (distance < otherRadius)
 		{
-			bool thisMoves = !this->isStatic && !this->isTrigger;
-			bool otherMoves = !other->isStatic && !other->isTrigger;
-			if (thisMoves || otherMoves)
+			bool thisMoves = !this->isStatic;
+			bool otherMoves = !other->isStatic;
+			if ((thisMoves || otherMoves) && !this->isTrigger && !other->isTrigger)
 			{
 				glm::vec3 thisMoveVec = { 0.0f,0.0f,0.0f };
 				glm::vec3 otherMoveVec = { 0.0f,0.0f,0.0f };
@@ -107,9 +107,9 @@ bool BoxCollider::CheckCollision(ColliderComponent* collider)
 			thisMinZ <= otherMaxZ && otherMinZ <= thisMaxZ &&
 			thisMinY <= otherMaxY && otherMinY <= thisMaxY)
 		{
-			bool thisMoves = !this->isStatic && !this->isTrigger;
-			bool otherMoves = !other->isStatic && !other->isTrigger;
-			if (thisMoves || otherMoves)
+			bool thisMoves = !this->isStatic;
+			bool otherMoves = !other->isStatic;
+			if ((thisMoves || otherMoves) && !this->isTrigger && !other->isTrigger)
 			{
 				float array[] = { glm::abs(otherMaxX - thisMinX), glm::abs(thisMaxX - otherMinX), glm::abs(otherMaxZ - thisMinZ),
 					glm::abs(thisMaxZ - otherMinZ), glm::abs(otherMaxY - thisMinY), glm::abs(thisMaxY - otherMinY) };
