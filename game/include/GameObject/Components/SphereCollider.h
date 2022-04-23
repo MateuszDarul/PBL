@@ -15,15 +15,13 @@ public:
 	/** @brief Konstruktor komponentu koliderów.
 	 * @param gameObject - WskaŸnik na GameObject do którego nale¿y komponent.
 	 */
-	SphereCollider(GameObject*);
+	SphereCollider();
 
 	/** @brief Konstruktor komponent koliderów.
-	 * @param gameObject - WskaŸnik na GameObject do którego nale¿y komponent.
-	 * @param collidersManager - WskaŸnik na menad¿er koliderów.
 	 * @param isTrigger - Czy ten kolider ma byæ wyzwalaczem.
 	 * @param isStatic -Czy ten kolider ma byæ statyczny.
 	 */
-	SphereCollider(GameObject* gameObject, CollidersManager* collidersManager, bool isTrigger, bool isStatic);
+	SphereCollider(bool isTrigger, bool isStatic);
 
 	/** @brief Bazowy destruktor.
 	 */
@@ -34,7 +32,7 @@ public:
 	* @return true - zasz³a kolizja.
 	* @return flase - nie zasz³a kolizja.
 	*/
-	bool virtual CheckCollision(ColliderComponent* collider);
+	bool virtual CheckCollision(std::shared_ptr<ColliderComponent> collider);
 	
 	/** @brief Ustawia promieñ sferycznego kolidera.
 	* @param radius - Promieñ.

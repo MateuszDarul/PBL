@@ -2,6 +2,7 @@
 #define __LIST_COMPONENT_H__
 
 #include "Component.h"
+#include <memory>
 
 
 /** @brief Komponent sluzacy do przechowywania wartosci liczbowych.
@@ -13,9 +14,8 @@ private:
 
 public:
     /** @brief Domyslny konstruktor.
-     * @param gameObject - GameObject do kt�rego nale�y komponent.
      */
-    ListComponent(GameObject* gameObject);
+    ListComponent();
 
     /** @brief Zwraca wybrana wartosc.
      * @param index - Ktora wartosc chcemy odczytac.

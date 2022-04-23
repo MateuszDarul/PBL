@@ -20,7 +20,7 @@ class Scene
 {
 private:
     SceneNode* world; //!< Swiat gry.
-    GameObject* goCamera; //!< GameObject z kamera.
+    std::shared_ptr<GameObject> goCamera; //!< GameObject z kamera.
     CollidersManager* collidersManager;
     glm::mat4 transform; //!< Macierz transformacji widoku i kamery.
 

@@ -7,6 +7,7 @@
 #include "Component.h"
 
 #include "InputManager.h"
+class GameObject;
 
 class CameraComponent :public Component
 {
@@ -52,7 +53,6 @@ public:
     /** @brief Konstruktor ustawiajacy parametry poczatkowe kamery.
      */
     CameraComponent();
-    CameraComponent(GameObject* gameObject);
     
     /** @brief Domyslny destruktor.
      */

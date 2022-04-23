@@ -24,9 +24,8 @@ private:
 
 public:
     /** @brief Domyslny konstruktor.
-     * @param gameObject - GameObject do kt�rego nale�y komponent.
      */
-    ModelComponent(GameObject* gameObject);
+    ModelComponent();
     
     /** @brief Domyslny destruktor.
      */

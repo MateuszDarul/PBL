@@ -52,41 +52,45 @@ void ColliderComponent::GetSeparationVectors(float array[6], glm::vec3& boxMoveV
 	}
 }
 
-ColliderComponent::ColliderComponent(uint32_t UUID, GameObject* gameObject, CollidersManager* collidersManager, bool isTrigger, bool isStatic)
-	:Component(UUID, gameObject), isTrigger(isTrigger), isStatic(isStatic)
+ColliderComponent::ColliderComponent(uint32_t UUID, bool isTrigger, bool isStatic)
+	:Component(UUID), isTrigger(isTrigger), isStatic(isStatic)
 {
 	offset = glm::vec3(0.0f, 0.0f, 0.0f);
 	mass = 1.0f;
+}
+
+ColliderComponent::~ColliderComponent()
+{
+
+}
+
+void ColliderComponent::AddToCollidersManager(CollidersManager* collidersManager)
+{
 	if (collidersManager)
 	{
 		if (isTrigger)
 		{
 			if (isStatic)
 			{
-				collidersManager->AddStaticTrigger(this);
+				collidersManager->AddStaticTrigger(std::dynamic_pointer_cast<ColliderComponent>(shared_from_this()));
 			}
 			else
 			{
-				collidersManager->AddDynamicTrigger(this);
+				collidersManager->AddDynamicTrigger(std::dynamic_pointer_cast<ColliderComponent>(shared_from_this()));
 			}
 		}
 		else
 		{
 			if (isStatic)
 			{
-				collidersManager->AddStaticCollider(this);
+				collidersManager->AddStaticCollider(std::dynamic_pointer_cast<ColliderComponent>(shared_from_this()));
 			}
 			else
 			{
-				collidersManager->AddDynamicCollider(this);
+				collidersManager->AddDynamicCollider(std::dynamic_pointer_cast<ColliderComponent>(shared_from_this()));
 			}
 		}
 	}
-}
-
-ColliderComponent::~ColliderComponent()
-{
-
 }
 
 glm::vec3 ColliderComponent::GetOffset()

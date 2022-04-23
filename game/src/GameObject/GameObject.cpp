@@ -3,7 +3,7 @@
 bool GameObject::AddComponent(std::shared_ptr<Component> component)
 {
     /// [ component->GetClassUUID() != 5 ] Poniewaz ShaderComponent ma id rowne 5, a shadery moga byc wspolne.
-    if(component->GetClassUUID() != 5 && !component->SetOwner(this))
+    if(component->GetClassUUID() != 5 && !component->SetOwner(shared_from_this()))
     {
         return false;
     }
@@ -35,7 +35,7 @@ bool GameObject::RemoveComponent(std::shared_ptr<Component> component)
 template<typename T>
 bool GameObject::RemoveComponent()
 {
-    T tmp(this);
+    T tmp;
     for (uint32_t i=0; i<components.size(); i++)
     {
         if (components[i]->GetClassUUID() == tmp.GetClassUUID())
@@ -50,7 +50,7 @@ bool GameObject::RemoveComponent()
 template<typename T>
 std::shared_ptr<T> GameObject::GetComponent()
 {
-    T tmp(this);
+    T tmp;
     for(uint32_t i=0; i<components.size(); i++)
     {
        // std::cout << components[i]->GetClassUUID() << ' ' << tmp.GetClassUUID() << '\n';

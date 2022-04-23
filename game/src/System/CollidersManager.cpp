@@ -1,12 +1,13 @@
 #include "CollidersManager.h"
 #include <iostream>
 
-void CollidersManager::RemoveFromVector(std::vector<ColliderComponent*> vector, ColliderComponent* col)
+void CollidersManager::RemoveFromVector(std::vector<std::weak_ptr<ColliderComponent>> vector, std::shared_ptr<ColliderComponent> col)
 {
 	int size = vector.size();
 	for (int i = 0; i < size; i++)
 	{
-		if (vector[i] == col)
+		std::shared_ptr<ColliderComponent> collider = vector[i].lock();
+		if (collider == col)
 		{
 			vector.erase(vector.begin() + i);
 			break;
@@ -26,42 +27,42 @@ CollidersManager::~CollidersManager()
 	staticTriggers.clear();
 }
 
-void CollidersManager::AddStaticCollider(ColliderComponent* collider)
+void CollidersManager::AddStaticCollider(std::shared_ptr<ColliderComponent> collider)
 {
 	staticColliders.push_back(collider);
 }
 
-void CollidersManager::AddDynamicCollider(ColliderComponent* collider)
+void CollidersManager::AddDynamicCollider(std::shared_ptr<ColliderComponent> collider)
 {
 	dynamicColliders.push_back(collider);
 }
 
-void CollidersManager::AddStaticTrigger(ColliderComponent* trigger)
+void CollidersManager::AddStaticTrigger(std::shared_ptr<ColliderComponent> trigger)
 {
 	staticTriggers.push_back(trigger);
 }
 
-void CollidersManager::AddDynamicTrigger(ColliderComponent* trigger)
+void CollidersManager::AddDynamicTrigger(std::shared_ptr<ColliderComponent> trigger)
 {
 	dynamicTriggers.push_back(trigger);
 }
 
-void CollidersManager::RemoveDynamicColllider(ColliderComponent* collider)
+void CollidersManager::RemoveDynamicColllider(std::shared_ptr<ColliderComponent> collider)
 {
 	RemoveFromVector(dynamicColliders, collider);
 }
 
-void CollidersManager::RemoveStaticColllider(ColliderComponent* collider)
+void CollidersManager::RemoveStaticColllider(std::shared_ptr<ColliderComponent> collider)
 {
 	RemoveFromVector(staticColliders, collider);
 }
 
-void CollidersManager::RemoveDynamicTrigger(ColliderComponent* trigger)
+void CollidersManager::RemoveDynamicTrigger(std::shared_ptr<ColliderComponent> trigger)
 {
 	RemoveFromVector(dynamicTriggers, trigger);
 }
 
-void CollidersManager::RemoveStaticTrigger(ColliderComponent* trigger)
+void CollidersManager::RemoveStaticTrigger(std::shared_ptr<ColliderComponent> trigger)
 {
 	RemoveFromVector(staticTriggers, trigger);
 }
@@ -71,21 +72,26 @@ void CollidersManager::CheckCollisions()
 	//std::cout << dynamicColliders.size();
 	for (int i = 0; i<dynamicColliders.size(); i++)
 	{
+		std::shared_ptr<ColliderComponent> firstCollider = dynamicColliders[i].lock();
 		for (int j = i + 1; j < dynamicColliders.size(); j++)
 		{
-			dynamicColliders[i]->CheckCollision(dynamicColliders[j]);
+			std::shared_ptr<ColliderComponent> secondCollider = dynamicColliders[j].lock();
+			firstCollider->CheckCollision(secondCollider);
 		}
 		for (int j = 0; j < staticColliders.size(); j++)
 		{
-			dynamicColliders[i]->CheckCollision(staticColliders[j]);
+			std::shared_ptr<ColliderComponent> secondCollider = staticColliders[j].lock();
+			firstCollider->CheckCollision(secondCollider);
 		}
 		for (int j = 0; j < dynamicTriggers.size(); j++)
 		{
-			dynamicColliders[i]->CheckCollision(dynamicTriggers[j]);
+			std::shared_ptr<ColliderComponent> secondCollider = dynamicTriggers[j].lock();
+			firstCollider->CheckCollision(secondCollider);
 		}
 		for (int j = 0; j < staticTriggers.size(); j++)
 		{
-			dynamicColliders[i]->CheckCollision(staticTriggers[j]);
+			std::shared_ptr<ColliderComponent> secondCollider = staticTriggers[j].lock();
+			firstCollider->CheckCollision(secondCollider);
 		}
 	}
 }
@@ -94,17 +100,21 @@ void CollidersManager::CheckTriggers()
 {
 	for (int i = 0; i < dynamicTriggers.size(); i++)
 	{
+		std::shared_ptr<ColliderComponent> firstCollider = dynamicColliders[i].lock();
 		for (int j = i + 1; j < dynamicTriggers.size(); j++)
 		{
-			dynamicColliders[i]->CheckCollision(dynamicTriggers[j]);
+			std::shared_ptr<ColliderComponent> secondCollider = dynamicTriggers[j].lock();
+			firstCollider->CheckCollision(secondCollider);
 		}
 		for (int j = 0; j < staticColliders.size(); j++)
 		{
-			dynamicColliders[i]->CheckCollision(staticColliders[j]);
+			std::shared_ptr<ColliderComponent> secondCollider = staticColliders[j].lock();
+			firstCollider->CheckCollision(secondCollider);
 		}
 		for (int j = 0; j < staticTriggers.size(); j++)
 		{
-			dynamicColliders[i]->CheckCollision(staticTriggers[j]);
+			std::shared_ptr<ColliderComponent> secondCollider = staticTriggers[j].lock();
+			firstCollider->CheckCollision(secondCollider);
 		}
 	}
 }

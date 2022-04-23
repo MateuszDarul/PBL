@@ -1,9 +1,9 @@
 #include "NameComponent.h"
+#include "GameObject.h"
 
-NameComponent::NameComponent(GameObject* gameObject, const std::string& name)
-    :Component(1, gameObject), name(name)
+NameComponent::NameComponent(const std::string& name)
+    :Component(1), name(name)
 {
-    ;
 }
 
 void NameComponent::Set(const std::string& name)

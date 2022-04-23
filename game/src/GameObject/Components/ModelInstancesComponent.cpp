@@ -1,7 +1,7 @@
 #include "ModelInstancesComponent.h"
 
-ModelInstancesComponent::ModelInstancesComponent(GameObject* gameObject)
-    :Component(4, gameObject)
+ModelInstancesComponent::ModelInstancesComponent()
+    :Component(4)
 {
     
 }

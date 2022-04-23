@@ -2,8 +2,8 @@
 #include "Components.h"
 #include "GameObject.h"
 
-BoxCollider::BoxCollider(GameObject* gameObject)
-	:ColliderComponent(12, gameObject, nullptr, false, false)
+BoxCollider::BoxCollider()
+	:ColliderComponent(12, false, false)
 {
 	offset = glm::vec3(0.0f, 0.0f, 0.0f);
 	isStatic = false;
@@ -11,12 +11,10 @@ BoxCollider::BoxCollider(GameObject* gameObject)
 	lengths = { 1.0f, 1.0f, 1.0f };
 }
 
-BoxCollider::BoxCollider(GameObject* gameObject, CollidersManager* collidersManager, bool isTrigger, bool isStatic) 
-	:ColliderComponent(12, gameObject, collidersManager, isTrigger, isStatic)
+BoxCollider::BoxCollider(bool isTrigger, bool isStatic)
+	:ColliderComponent(12, isTrigger, isStatic)
 {
 	offset = glm::vec3(0.0f, 0.0f, 0.0f);
-	isStatic = false;
-	isTrigger = false;
 	lengths = { 1.0f, 1.0f, 1.0f };
 }
 
@@ -25,10 +23,10 @@ BoxCollider::~BoxCollider()
 
 }
 
-bool BoxCollider::CheckCollision(ColliderComponent* collider)
+bool BoxCollider::CheckCollision(std::shared_ptr<ColliderComponent> collider)
 {
-	TransformComponent* thisTransform = this->GetGameObject()->GetComponent<TransformComponent>();
-	TransformComponent* otherTransform = collider->GetGameObject()->GetComponent<TransformComponent>();
+	std::shared_ptr<TransformComponent> thisTransform = this->GetOwner()->GetComponent<TransformComponent>();
+	std::shared_ptr<TransformComponent> otherTransform = collider->GetOwner()->GetComponent<TransformComponent>();
 	glm::mat4 thisModelMat = thisTransform->GetModelMatrix();
 	glm::vec3 thisPos = glm::vec3(thisModelMat[3][0], thisModelMat[3][1], thisModelMat[3][2]) + this->offset;
 	glm::mat4 otherModelMat = otherTransform->GetModelMatrix();
@@ -44,7 +42,7 @@ bool BoxCollider::CheckCollision(ColliderComponent* collider)
 
 	if (collider->GetClassUUID() == 11)
 	{
-		SphereCollider* other = (SphereCollider*)collider;
+		std::shared_ptr<SphereCollider> other = std::dynamic_pointer_cast<SphereCollider>(collider);
 		float otherRadius = other->GetRadius();
 		glm::vec3 closer = {
 			Clamp(otherPos.x, thisMinX, thisMaxX),
@@ -95,7 +93,7 @@ bool BoxCollider::CheckCollision(ColliderComponent* collider)
 	}
 	else if (collider->GetClassUUID() == 12)
 	{
-		BoxCollider* other = (BoxCollider*)collider;
+		std::shared_ptr<BoxCollider> other = std::dynamic_pointer_cast<BoxCollider>(collider);
 		glm::uvec3 otherLenghts = other->getLengths();
 		float otherMinX = otherPos.x - otherLenghts.x * 0.5f;
 		float otherMaxX = otherPos.x + otherLenghts.x * 0.5f;

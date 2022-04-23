@@ -17,7 +17,7 @@ private:
     unsigned int shaderProgram;
 
 public:
-    ShaderComponent(GameObject* gameObject);
+    ShaderComponent();
     ~ShaderComponent();
 
     bool Create(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);

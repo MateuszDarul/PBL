@@ -35,16 +35,19 @@ public:
 
 	/** @brief Konstruktor komponent koliderów.
 	 * @param UUID - Unikalny indentyfikator klasy komponentu.
-	 * @param gameObject - WskaŸnik na GameObject do którego nale¿y komponent.
-	 * @param collidersManager - WskaŸnik na menad¿er koliderów.
 	 * @param isTrigger - Czy ten kolider ma byæ wyzwalaczem.
 	 * @param isStatic -Czy ten kolider ma byæ statyczny.
 	 */
-	ColliderComponent(uint32_t UUID, GameObject* gameObject, CollidersManager* collidersManager, bool isTrigger, bool isStatic);
+	ColliderComponent(uint32_t UUID, bool isTrigger, bool isStatic);
 	
 	/** @brief Bazowy destruktor
 	*/
 	~ColliderComponent();
+
+	/** @brief Metoda dodaje kolider do menad¿era koliderów.
+	* @param collidersManager - wskaŸnik na menad¿er koliderów.
+	*/
+	void AddToCollidersManager(CollidersManager* collidersManager);
 
 	/** @brief Zwraca przesuniêcie kolidera.
 	* @return glm::vec3 - Wektor przesuniêcia.
@@ -61,7 +64,7 @@ public:
 	* @return true - zasz³a kolizja.
 	* @return flase - nie zasz³a kolizja.
 	*/
-	bool virtual CheckCollision(ColliderComponent* collider) = 0;
+	bool virtual CheckCollision(std::shared_ptr<ColliderComponent> collider) = 0;
 
 	/** @brief Metoda sprawdzaj¹ca czy sfera znajduje siê miêdzy dwoma równoleg³ymi œcianami pude³ka na danej osi.
 	* @param spherePos - wartoœæ X, Y lub z œrodka sfery.

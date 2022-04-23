@@ -23,7 +23,7 @@ Scene::Scene()
 
     ///***
 
-    goCamera = new GameObject();
+    goCamera = std::make_shared<GameObject>();
     goCamera->AddComponent(std::make_shared<CameraComponent>());
     goCamera->GetComponent<cmp::Camera>()->Create(glm::vec3(0,3,10));
     goCamera->GetComponent<cmp::Camera>()->SetSpeed(5);
@@ -38,8 +38,8 @@ Scene::Scene()
     ///***
 
     go = std::make_shared<GameObject>();
-    tc = std::make_shared<TransformComponent>(go);
-    mc = std::make_shared<ModelComponent>(go);
+    tc = std::make_shared<TransformComponent>();
+    mc = std::make_shared<ModelComponent>();
     mc->Create(
         resMan->GetMesh("Resources/models/Crate/Crate.obj"),
         resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
@@ -47,15 +47,15 @@ Scene::Scene()
     go->AddComponent(shader_d);
     go->AddComponent(mc);
     go->AddComponent(tc);
-    go->AddComponent(std::make_shared<cmp::Name>(go, "GO"));
+    go->AddComponent(std::make_shared<cmp::Name>("GO"));
 
     world->AddChild(go);
 
     ///***
 
     go = std::make_shared<GameObject>();
-    tc = std::make_shared<TransformComponent>(go);
-    mc = std::make_shared<ModelComponent>(go);
+    tc = std::make_shared<TransformComponent>();
+    mc = std::make_shared<ModelComponent>();
     mc->Create(
         resMan->GetMesh("Resources/models/Crate/Crate.obj"),
         resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
@@ -64,15 +64,15 @@ Scene::Scene()
     go->AddComponent(mc);
     go->AddComponent(tc);
     go->GetComponent<cmp::Transform>()->SetPosition(5, 0, 0);
-    go->AddComponent(std::make_shared<cmp::Name>(go, "GO1"));
+    go->AddComponent(std::make_shared<cmp::Name>("GO1"));
 
     world->FindNode("GO")->AddChild(go);
 
     ///***
 
     go = std::make_shared<GameObject>();
-    tc = std::make_shared<TransformComponent>(go);
-    mc = std::make_shared<ModelComponent>(go);
+    tc = std::make_shared<TransformComponent>();
+    mic = std::make_shared<ModelInstancesComponent>();
     mic->Create(9,
         resMan->GetMesh("Resources/models/Crate/Crate.obj"),
         resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
@@ -90,15 +90,15 @@ Scene::Scene()
     mic->UpdateTransformations();
     go->AddComponent(shader_i);
     go->AddComponent(mic);
-    go->AddComponent(std::make_shared<cmp::Name>(go, "GO2"));
+    go->AddComponent(std::make_shared<cmp::Name>("GO2"));
 
     world->AddChild(go);
 
     ///***
 
     go = std::make_shared<GameObject>();
-    tc = std::make_shared<TransformComponent>(go);
-    mc = std::make_shared<ModelComponent>(go);
+    tc = std::make_shared<TransformComponent>();
+    mc = std::make_shared<ModelComponent>();
     mc->Create(
         resMan->GetMesh("Resources/models/Crate/Crate.obj"),
         resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
@@ -107,8 +107,9 @@ Scene::Scene()
     go->AddComponent(mc);
     go->AddComponent(tc);
     go->GetComponent<TransformComponent>()->SetPosition(0.0f, 1.0f, -20.0f);
-    go->AddComponent(std::make_shared<cmp::Name>(go, "Box1"));
-    go->AddComponent(std::make_shared<cmp::BoxCol>(go, collidersManager, false, true));
+    go->AddComponent(std::make_shared<cmp::Name>("Box1"));
+    go->AddComponent(std::make_shared<cmp::BoxCol>(false, true));
+    go->GetComponent<BoxCollider>()->AddToCollidersManager(collidersManager);
     go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
 
     world->AddChild(go);
@@ -116,8 +117,8 @@ Scene::Scene()
     // ///***
 
     go = std::make_shared<GameObject>();
-    tc = std::make_shared<TransformComponent>(go);
-    mc = std::make_shared<ModelComponent>(go);
+    tc = std::make_shared<TransformComponent>();
+    mc = std::make_shared<ModelComponent>();
     mc->Create(
         resMan->GetMesh("Resources/models/Crate/Crate.obj"),
         resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
@@ -126,8 +127,9 @@ Scene::Scene()
     go->AddComponent(mc);
     go->AddComponent(tc);
     go->GetComponent<TransformComponent>()->SetPosition(0.0f, 3.0f, -22.0f);
-    go->AddComponent(std::make_shared<cmp::Name>(go, "Box2"));
-    go->AddComponent(std::make_shared<cmp::BoxCol>(go, collidersManager, false, true));
+    go->AddComponent(std::make_shared<cmp::Name>("Box2"));
+    go->AddComponent(std::make_shared<cmp::BoxCol>(false, true));
+    go->GetComponent<BoxCollider>()->AddToCollidersManager(collidersManager);
     go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
 
     world->AddChild(go);
@@ -135,8 +137,8 @@ Scene::Scene()
     // ///***
 
     go = std::make_shared<GameObject>();
-    tc = std::make_shared<TransformComponent>(go);
-    mc = std::make_shared<ModelComponent>(go);
+    tc = std::make_shared<TransformComponent>();
+    mc = std::make_shared<ModelComponent>();
     mc->Create(
         resMan->GetMesh("Resources/models/Crate/Crate.obj"),
         resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
@@ -145,17 +147,18 @@ Scene::Scene()
     go->AddComponent(mc);
     go->AddComponent(tc);
     go->GetComponent<TransformComponent>()->SetPosition(0.0f, 5.0f, -24.0f);
-    go->AddComponent(std::make_shared<cmp::Name>(go, "Box3"));
-    go->AddComponent(std::make_shared<cmp::BoxCol>(go, collidersManager, false, true));
+    go->AddComponent(std::make_shared<cmp::Name>("Box3"));
+    go->AddComponent(std::make_shared<cmp::BoxCol>(false, true));
+    go->GetComponent<BoxCollider>()->AddToCollidersManager(collidersManager);
     go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
 
     world->AddChild(go);
     ///***
 
     go = std::make_shared<GameObject>();
-    tc = std::make_shared<TransformComponent>(go);
+    tc = std::make_shared<TransformComponent>();
     tc->SetScale(0.01f);
-    mc = std::make_shared<ModelComponent>(go);
+    mc = std::make_shared<ModelComponent>();
     mc->Create(
         resMan->GetMesh("Resources/models/sphere.obj"),
         resMan->GetMaterial("Resources/models/sphere.mtl")
@@ -164,8 +167,9 @@ Scene::Scene()
     go->AddComponent(mc);
     go->AddComponent(tc);
     go->GetComponent<TransformComponent>()->SetPosition(0.0f, 4.1f, 20.0f);
-    go->AddComponent(std::make_shared<cmp::Name>(go, "Ball1"));
-    go->AddComponent(std::make_shared<cmp::SphereCol>(go, collidersManager, false, false));
+    go->AddComponent(std::make_shared<cmp::Name>("Ball1"));
+    go->AddComponent(std::make_shared<cmp::SphereCol>(false, false));
+    go->GetComponent<SphereCollider>()->AddToCollidersManager(collidersManager);
     go->GetComponent<SphereCollider>()->SetRadius(4.1f);
 
     world->AddChild(go);
@@ -181,7 +185,6 @@ Scene::~Scene()
     delete world;
     world = nullptr;
 
-    delete goCamera;
     goCamera = nullptr;
 }
 

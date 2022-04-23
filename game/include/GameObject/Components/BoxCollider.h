@@ -13,17 +13,14 @@ private:
 public:
 
 	/** @brief Konstruktor komponentu koliderów.
-	 * @param gameObject - WskaŸnik na GameObject do którego nale¿y komponent.
 	 */
-	BoxCollider(GameObject*);
+	BoxCollider();
 
 	/** @brief Konstruktor komponent koliderów.
-	 * @param gameObject - WskaŸnik na GameObject do którego nale¿y komponent.
-	 * @param collidersManager - WskaŸnik na menad¿er koliderów.
 	 * @param isTrigger - Czy ten kolider ma byæ wyzwalaczem.
 	 * @param isStatic -Czy ten kolider ma byæ statyczny.
 	 */
-	BoxCollider(GameObject* gameObject, CollidersManager* collidersManager, bool isTrigger, bool isStatic);
+	BoxCollider(bool isTrigger, bool isStatic);
 
 	/** @brief Bazowy destruktor.
 	 */
@@ -34,7 +31,7 @@ public:
 	* @return true - zasz³a kolizja.
 	* @return flase - nie zasz³a kolizja.
 	*/
-	bool virtual CheckCollision(ColliderComponent* collider);
+	bool virtual CheckCollision(std::shared_ptr<ColliderComponent> collider);
 
 	/** @brief Metoda ustawiaj¹ca nowe d³ugoœci krawêdzi pude³kowego kolidera.
 	* @param lengths - nowe d³ugoœci krawêdzi pude³kowego kolidera.

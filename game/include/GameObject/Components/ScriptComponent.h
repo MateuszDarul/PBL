@@ -4,6 +4,7 @@
 #include "Component.h"
 
 #include <typeinfo>
+#include <memory>
 
 class GameObject;
 

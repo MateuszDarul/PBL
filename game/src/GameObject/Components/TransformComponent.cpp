@@ -1,6 +1,6 @@
 #include "TransformComponent.h"
-TransformComponent::TransformComponent(GameObject* gameObject)
-    :Component(6, gameObject)
+TransformComponent::TransformComponent()
+    :Component(6)
 {
     this->modelMatrix = glm::mat4(1.f);
 
