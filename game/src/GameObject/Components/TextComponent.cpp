@@ -52,7 +52,7 @@ bool TextComponent::Draw(std::shared_ptr<ShaderComponent> shader)
 
     float x = 0.0f;
     float y = 0.0f;
-    float scale = 0.01f;
+    float scale = 0.01f * 0.25f;
 
     // iterate through all characters
     std::string::const_iterator c;

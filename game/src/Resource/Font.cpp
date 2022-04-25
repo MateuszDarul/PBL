@@ -26,7 +26,7 @@ bool Font::Load(const std::string& path, FT_Library& ft)
     else
     {
         // set size to load glyphs as
-        FT_Set_Pixel_Sizes(face, 0, 48);
+        FT_Set_Pixel_Sizes(face, 0, 192);
 
         // disable byte-alignment restriction
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
