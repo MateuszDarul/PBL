@@ -2,6 +2,7 @@
 
 #include "Scripts/TestScript.h"
 #include "Scripts/StatsScript.h"
+#include "Scripts/RotatorScript.h"
 
 Scene::Scene()
 {
@@ -98,9 +99,11 @@ Scene::Scene()
 
     std::shared_ptr<ShaderComponent> textShader = std::make_shared<ShaderComponent>();
     textShader->Create("Resources/shaders/text.vert", "Resources/shaders/text.frag");
-    resMan->GetFont("Resources/fonts/arial.ttf");
+    
     std::shared_ptr<TextComponent> textComponent = std::make_shared<TextComponent>();
     textComponent->Create("Sample text", resMan->GetFont("Resources/fonts/arial.ttf"));
+    textComponent->color = {1.0f, 1.0f, 0.0f};
+
 
     go = std::make_shared<GameObject>();
     go->AddComponent(std::make_shared<cmp::Name>("In world text"));
@@ -112,6 +115,34 @@ Scene::Scene()
     scene->AddChild(go);
 
     scene->FindNode("In world text")->GetLocalTransformations()->SetPosition(15, 0, 0);
+
+    std::shared_ptr<cmp::Scriptable> scriptHolder = std::make_shared<ScriptComponent>();
+    RotatorScript* rotScript = new RotatorScript();
+    
+    rotScript->gameObject = go.get();
+    rotScript->speed = 50.0f;
+
+    
+    go->AddComponent(scriptHolder);
+    scriptHolder->Add(rotScript);
+    scriptHolder->OnStart();
+
+    //-
+    textComponent = std::make_shared<TextComponent>();
+    textComponent->Create("Facing camera", resMan->GetFont("Resources/fonts/arial.ttf"));
+    textComponent->alwaysSeen = true;
+
+
+    go = std::make_shared<GameObject>();
+    go->AddComponent(std::make_shared<cmp::Name>("Face camera text"));
+    go->AddComponent(std::make_shared<cmp::Transform>());
+
+    go->AddComponent(textShader);
+    go->AddComponent(textComponent);
+
+    scene->AddChild(go);
+
+    scene->FindNode("Face camera text")->GetLocalTransformations()->SetPosition(10, 0, 0);
 }
 
 Scene::~Scene()
@@ -130,7 +161,10 @@ void Scene::Update(float dt)
 
     scene->FindNode("GO")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0, 180*dt, 0);
 
-    scene->FindNode("In world text")->GetLocalTransformations()->Rotate(-50 * dt, 0, 0);
+    scene->FindNode("In world text")->GetGameObject()->GetComponent<ScriptComponent>()->OnUpdate(dt);
+
+    auto faceTextNode = scene->FindNode("Face camera text");
+    faceTextNode->GetGameObject()->GetComponent<cmp::Text>()->FaceCamera(goCamera->GetComponent<cmp::Camera>(), faceTextNode);
 }
 
 void Scene::Render()

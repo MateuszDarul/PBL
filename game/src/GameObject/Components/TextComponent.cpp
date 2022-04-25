@@ -1,4 +1,5 @@
 #include "TextComponent.h"
+#include "SceneNode.h"
 
 TextComponent::TextComponent()
 	: Component(13)
@@ -45,7 +46,7 @@ bool TextComponent::Draw(std::shared_ptr<ShaderComponent> shader)
 
     // activate corresponding render state	
     shader->Use();
-    shader->SetVec3("textColor", {1.0f, 1.0f, 0.0f});
+    shader->SetVec3("textColor", color);
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
 
@@ -90,4 +91,14 @@ bool TextComponent::Draw(std::shared_ptr<ShaderComponent> shader)
     glBindTexture(GL_TEXTURE_2D, 0);
 
     return true;
+}
+
+void TextComponent::FaceCamera(std::shared_ptr<CameraComponent> camera, SceneNode* node)
+{
+    auto m = glm::inverse(camera->GetView());
+    const auto& t = node->GetLocalTransformations()->GetPosition();
+    m[3][0] = t.x;
+    m[3][1] = t.y;
+    m[3][2] = t.z;
+    node->GetLocalTransformations()->SetModelMatrix(m);
 }

@@ -7,6 +7,9 @@
 #include "Component.h"
 #include "Font.h"
 #include "ShaderComponent.h"
+#include "CameraComponent.h"
+
+class SceneNode;
 
 /** @brief Komponent reprezentujacy model.
  */
@@ -33,6 +36,10 @@ public:
 
     void Clear();
 
-
+    void FaceCamera(std::shared_ptr<CameraComponent>, SceneNode*);
     bool Draw(std::shared_ptr<ShaderComponent> shader);
+
+
+    glm::vec3 color = {1.0f, 1.0f, 1.0f};
+    bool alwaysSeen = false;
 };

@@ -39,6 +39,11 @@ void SceneNode::UpdateTransformations(const glm::mat4& parentTransformations)
         this->globalTransformations = parentTransformations;
     }
 
+    if (auto scriptHolder = this->GetGameObject()->GetComponent<ScriptComponent>())
+    {
+        //scriptHolder->OnUpdate(dt);
+    }
+
     for(unsigned short int i=0; i<children.size(); i++)
     {
         this->children[i]->UpdateTransformations(this->globalTransformations);
@@ -67,7 +72,18 @@ void SceneNode::Render(const glm::mat4& matrixPV)
         }
         else if (textPtr != nullptr)
         {
-            textPtr->Draw(shaderPtr);
+            if(textPtr->alwaysSeen)
+            {
+                glDepthMask(GL_FALSE);
+                glDepthFunc(GL_ALWAYS);
+                textPtr->Draw(shaderPtr);
+                glDepthFunc(GL_LESS);
+                glDepthMask(GL_TRUE);
+            }
+            else
+            {
+                textPtr->Draw(shaderPtr);
+            }
         }
     }
 
