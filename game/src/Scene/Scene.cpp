@@ -178,6 +178,9 @@ Scene::Scene()
 
     world->FindNode("GO")->GetLocalTransformations()->SetPosition(0, 2, 0);
 
+    ///***
+
+    world->LoadScripts();
 }
 
 Scene::~Scene()
@@ -198,7 +201,8 @@ void Scene::Update(float dt)
 
     world->FindNode("Ball1")->GetLocalTransformations()->Move(0.0f, 0.0f, dt * -5.0f);
     collidersManager->CheckCollisions();
-    world->Update();
+
+    world->Update(dt);
 }
 
 void Scene::Render()

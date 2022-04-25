@@ -22,26 +22,48 @@ void SceneNode::AddChild(std::shared_ptr<SceneNode> sceneNode)
     this->children.push_back(sceneNode);
 }
 
-void SceneNode::Update()
+void SceneNode::LoadScripts()
 {
-    this->UpdateTransformations(glm::mat4(1.f));
+    std::shared_ptr<ScriptComponent> scriptPtr = this->gameObject->GetComponent<cmp::Scriptable>();
+    if(scriptPtr)
+    {
+        scriptPtr->OnStart();
+    }
+
+    for(unsigned short int i=0; i<children.size(); i++)
+    {
+        this->children[i]->LoadScripts();
+    }
 }
 
-void SceneNode::UpdateTransformations(const glm::mat4& parentTransformations)
+void SceneNode::Update(float dt)
 {
-    if(this->GetGameObject()->GetComponent<cmp::Transform>() != nullptr)
+    this->PrivateUpdate(dt, glm::mat4(1.f));
+}
+
+void SceneNode::PrivateUpdate(float dt, const glm::mat4& parentTransformations)
+{
+    std::shared_ptr<ScriptComponent> scriptPtr = this->gameObject->GetComponent<cmp::Scriptable>();
+    if(scriptPtr)
     {
-        this->globalTransformations = (parentTransformations *
-            this->GetGameObject()->GetComponent<cmp::Transform>()->GetModelMatrix());
+        scriptPtr->OnUpdate(dt);
+    }
+
+    std::shared_ptr<TransformComponent> transformPtr = this->gameObject->GetComponent<cmp::Transform>();
+    if(transformPtr)
+    {
+        this->globalTransformations = (parentTransformations * transformPtr->GetModelMatrix());
     }
     else
     {
         this->globalTransformations = parentTransformations;
     }
 
+    ///***
+
     for(unsigned short int i=0; i<children.size(); i++)
     {
-        this->children[i]->UpdateTransformations(this->globalTransformations);
+        this->children[i]->PrivateUpdate(dt, this->globalTransformations);
     }
 }
 
