@@ -143,6 +143,48 @@ Scene::Scene()
     scene->AddChild(go);
 
     scene->FindNode("Face camera text")->GetLocalTransformations()->SetPosition(10, 0, 0);
+    
+
+    //=== line test ===
+    std::shared_ptr<ShaderComponent> lineShader = std::make_shared<ShaderComponent>();
+    lineShader->Create("Resources/shaders/line.vert", "Resources/shaders/line.frag");
+    
+    std::shared_ptr<LineComponent> lineComponent = std::make_shared<LineComponent>();
+    lineComponent->Create();
+    lineComponent->color1 = { 0.0f, 1.0f, 0.7f };
+
+
+
+    go = std::make_shared<GameObject>();
+    go->AddComponent(std::make_shared<cmp::Name>("Line Renderer 1"));
+    go->AddComponent(std::make_shared<cmp::Transform>());
+
+    go->AddComponent(lineShader);
+    go->AddComponent(lineComponent);
+
+    scene->AddChild(go);
+
+    scene->FindNode("Line Renderer 1")->GetLocalTransformations()->SetPosition(10, 0, 0);
+
+    // -
+    lineComponent = std::make_shared<LineComponent>();
+    lineComponent->Create();
+    lineComponent->color1 = { 0.0f, 1.0f, 0.7f };
+    lineComponent->thickness = 3.0f;
+    lineComponent->AddPoint(0, 0, -6.2f);
+    lineComponent->AddPoint(0, 1, -6);
+
+
+    go = std::make_shared<GameObject>();
+    go->AddComponent(std::make_shared<cmp::Name>("Line Renderer 2"));
+    go->AddComponent(std::make_shared<cmp::Transform>());
+
+    go->AddComponent(lineShader);
+    go->AddComponent(lineComponent);
+
+    scene->AddChild(go);
+
+    scene->FindNode("Line Renderer 2")->GetLocalTransformations()->SetPosition(10, 0, 5);
 }
 
 Scene::~Scene()
@@ -154,14 +196,21 @@ Scene::~Scene()
     goCamera = nullptr;
 }
 
+float asd = 10.0f;
 void Scene::Update(float dt)
 {
+    scene->FindNode("Face camera text")->GetGameObject()->GetComponent<cmp::Transform>()->SetScale(asd);
+    asd += dt;
+
     goCamera->GetComponent<cmp::Camera>()->Update(GameApplication::GetInputManager(), dt);
     transform = GameApplication::GetProjection() * goCamera->GetComponent<cmp::Camera>()->GetView();
 
     scene->FindNode("GO")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0, 180*dt, 0);
 
     scene->FindNode("In world text")->GetGameObject()->GetComponent<ScriptComponent>()->OnUpdate(dt);
+
+    auto& p = scene->FindNode("Line Renderer 2")->GetGameObject()->GetComponent<cmp::Line>()->Get(3);
+    p.z += dt * 0.2f;
 
     auto faceTextNode = scene->FindNode("Face camera text");
     faceTextNode->GetGameObject()->GetComponent<cmp::Text>()->FaceCamera(goCamera->GetComponent<cmp::Camera>(), faceTextNode);

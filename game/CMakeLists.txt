@@ -15,6 +15,7 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/ScriptComponent.cpp
 	src/GameObject/Components/CameraComponent.cpp
 	src/GameObject/Components/TextComponent.cpp
+	src/GameObject/Components/LineComponent.cpp
 
 	src/Resource/Font.cpp
 	src/Resource/Mesh.cpp
@@ -52,7 +53,8 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/Components/TransformComponent.h
 	include/GameObject/Components/ScriptComponent.h
 	include/GameObject/Components/CameraComponent.h
-	include/GameObject/Components/FontComponent.h
+	include/GameObject/Components/TextComponent.h
+	include/GameObject/Components/LineComponent.h
 
 	include/Resource/Font.h
 	include/Resource/Mesh.h

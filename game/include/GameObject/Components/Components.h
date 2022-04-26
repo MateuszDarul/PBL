@@ -10,6 +10,7 @@
 #include "TransformComponent.h"         // UUID 6
 #include "CameraComponent.h"            // UUID 7
 #include "TextComponent.h"              // UUID 13
+#include "LineComponent.h"              // UUID 14
 
 #include "ScriptComponent.h"            // UUID 100
 
@@ -24,6 +25,7 @@ namespace cmp
     typedef TransformComponent Transform;
     typedef CameraComponent Camera;
     typedef TextComponent Text;
+    typedef LineComponent Line;
 
     typedef ScriptComponent Scriptable;
 

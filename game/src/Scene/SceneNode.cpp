@@ -58,6 +58,7 @@ void SceneNode::Render(const glm::mat4& matrixPV)
         std::shared_ptr<cmp::Model> modelPtr = this->gameObject->GetComponent<cmp::Model>();
         std::shared_ptr<cmp::ModelInst> modelInstPtr = this->gameObject->GetComponent<cmp::ModelInst>();
         std::shared_ptr<cmp::Text> textPtr = this->gameObject->GetComponent<cmp::Text>();
+        std::shared_ptr<cmp::Line> linePtr = this->gameObject->GetComponent<cmp::Line>();
 
         shaderPtr->Use();
         shaderPtr->SetMat4("transform", matrixPV * this->globalTransformations);
@@ -84,6 +85,10 @@ void SceneNode::Render(const glm::mat4& matrixPV)
             {
                 textPtr->Draw(shaderPtr);
             }
+        }
+        else if (linePtr != nullptr)
+        {
+            linePtr->Draw(shaderPtr);
         }
     }
 
