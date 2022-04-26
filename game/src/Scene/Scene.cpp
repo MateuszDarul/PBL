@@ -29,10 +29,14 @@ Scene::Scene()
     ///***
 
     go = std::make_shared<GameObject>();
+    go->AddComponent(std::make_shared<cmp::Transform>());
     go->AddComponent(std::make_shared<NameComponent>("CAMERA"));
     go->AddComponent(std::make_shared<CameraComponent>());
     go->GetComponent<cmp::Camera>()->Create(glm::vec3(0,3,10));
     go->GetComponent<cmp::Camera>()->SetSpeed(5);
+    go->AddComponent(std::make_shared<BoxCollider>(false, false));
+    go->GetComponent<cmp::BoxCol>()->setLengths(glm::vec3(2,3,2));
+    go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
     world->AddChild(go);
 
     ///***
@@ -40,6 +44,42 @@ Scene::Scene()
     MapLoader::Load("Resources/maps/world.map", world, shader_d, collidersManager);
 
     ///***
+
+    go = std::make_shared<GameObject>();
+    mc = std::make_shared<cmp::Model>();
+    mc->Create(
+        resMan->GetMesh("Resources/models/wieze/w1/w1.obj"),
+        resMan->GetMaterial("Resources/models/wieze/w1/w1.mtl")
+    );
+    go->AddComponent(mc);
+    go->AddComponent(shader_d);
+    go->AddComponent(std::make_shared<cmp::Transform>());
+    go->GetComponent<cmp::Transform>()->SetPosition(0,0.5,0);
+    world->AddChild(go);
+
+    go = std::make_shared<GameObject>();
+    mc = std::make_shared<cmp::Model>();
+    mc->Create(
+        resMan->GetMesh("Resources/models/wieze/w2/w2.obj"),
+        resMan->GetMaterial("Resources/models/wieze/w2/w2.mtl")
+    );
+    go->AddComponent(mc);
+    go->AddComponent(shader_d);
+    go->AddComponent(std::make_shared<cmp::Transform>());
+    go->GetComponent<cmp::Transform>()->SetPosition(0,0.5,0);
+    world->AddChild(go);
+    
+    go = std::make_shared<GameObject>();
+    mc = std::make_shared<cmp::Model>();
+    mc->Create(
+        resMan->GetMesh("Resources/models/wieze/w3/w3.obj"),
+        resMan->GetMaterial("Resources/models/wieze/w3/w3.mtl")
+    );
+    go->AddComponent(mc);
+    go->AddComponent(shader_d);
+    go->AddComponent(std::make_shared<cmp::Transform>());
+    go->GetComponent<cmp::Transform>()->SetPosition(0,0.5,0);
+    world->AddChild(go);
 
     world->LoadScripts();
 }
@@ -56,13 +96,17 @@ Scene::~Scene()
 void Scene::Update(float dt)
 {
     std::shared_ptr<GameObject> goCamera = world->FindNode("CAMERA")->GetGameObject();
-    goCamera->GetComponent<cmp::Camera>()->Update(GameApplication::GetInputManager(), dt);
+    std::shared_ptr<TransformComponent> transformCamera = goCamera->GetComponent<cmp::Transform>();
 
-    transform = GameApplication::GetProjection() * goCamera->GetComponent<cmp::Camera>()->GetView();
+    goCamera->GetComponent<CameraComponent>()->Update(GameApplication::GetInputManager(), dt);
+    transformCamera->SetPosition(goCamera->GetComponent<CameraComponent>()->GetPosition());
+
+    transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();
 
 
 
     collidersManager->CheckCollisions();
+    goCamera->GetComponent<CameraComponent>()->SetPosition(transformCamera->GetPosition());
     world->Update(dt);
 }
 
