@@ -3,9 +3,13 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/System/KeyboardInputManager.cpp
 	src/System/InputManager.cpp
 	src/System/GameApplication.cpp
+	src/System/CollidersManager.cpp
 
 	src/GameObject/GameObject.cpp
 	src/GameObject/Components/Component.cpp
+	src/GameObject/Components/ColliderComponent.cpp
+	src/GameObject/Components/SphereCollider.cpp
+	src/GameObject/Components/BoxCollider.cpp
 	src/GameObject/Components/NameComponent.cpp
 	src/GameObject/Components/ListComponent.cpp
 	src/GameObject/Components/ModelComponent.cpp
@@ -24,6 +28,7 @@ file(GLOB_RECURSE SOURCE_FILES
 
 	src/Scene/Scene.cpp
 	src/Scene/SceneNode.cpp
+	src/Scene/MapLoader.cpp
 
 	src/AI/State.cpp
 	src/AI/StateMachine.cpp
@@ -41,10 +46,14 @@ file(GLOB_RECURSE HEADER_FILES
 	include/System/KeyboardKeys.h
 	include/System/InputManager.h
 	include/System/GameApplication.h
+	include/System/CollidersManager.h
 
 	include/GameObject/GameObject.h
 	include/GameObject/Components/Components.h
 	include/GameObject/Components/Component.h
+	include/GameObject/Components/ColliderComponent.h
+	include/GameObject/Components/SphereCollider.h
+	include/GameObject/Components/BoxCollider.h
 	include/GameObject/Components/NameComponent.h
 	include/GameObject/Components/ListComponent.h
 	include/GameObject/Components/ModelComponent.h
@@ -63,6 +72,7 @@ file(GLOB_RECURSE HEADER_FILES
 
 	include/Scene/Scene.h
 	include/Scene/SceneNode.h
+	include/Scene/MapLoader.h
 
 	include/AI/State.h
 	include/AI/StateMachine.h
@@ -137,6 +147,11 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
 					   COMMAND ${CMAKE_COMMAND} -E copy_directory
 							   ${CMAKE_SOURCE_DIR}/Resources
+							   ${CMAKE_CURRENT_BINARY_DIR}/Resources)
+
+	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
+					   COMMAND ${CMAKE_COMMAND} -E copy_directory
+							   ${CMAKE_SOURCE_DIR}/Resources
 							   ${CMAKE_CURRENT_BINARY_DIR}/Debug/Resources)
 
 	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
@@ -149,9 +164,5 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 								${OPENAL_SOFT_DIR}/build/Debug/OpenAL32.dll
 								${CMAKE_CURRENT_BINARY_DIR}/Debug/)
 
-	add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
-						COMMAND ${CMAKE_COMMAND} -E copy
-								${OPENAL_SOFT_DIR}/build/Debug/OpenAL32.dll
-								${CMAKE_CURRENT_BINARY_DIR}/)
 								
 endif()

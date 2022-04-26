@@ -1,4 +1,5 @@
 #include "ListComponent.h"
+#include "GameObject.h"
 
 ListComponent::ListComponent()
     :Component(2)

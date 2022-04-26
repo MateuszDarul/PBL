@@ -6,6 +6,8 @@
 
 Scene::Scene()
 {
+    collidersManager = new CollidersManager();
+
     glfwSetInputMode(GameApplication::GetWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     ResourceManager* resMan = GameApplication::GetResourceManager();
@@ -13,14 +15,16 @@ Scene::Scene()
     std::shared_ptr<cmp::Model> mc;
     std::shared_ptr<cmp::ModelInst> mic;
     std::shared_ptr<GameObject> go;
+    std::shared_ptr<cmp::Transform> tc;
 
-    scene = new SceneNode(std::make_shared<GameObject>());
-    scene->GetGameObject()->AddComponent(std::make_shared<cmp::Name>("ROOT"));
-    scene->GetGameObject()->AddComponent(std::make_shared<cmp::Transform>());
+    world = new SceneNode(std::make_shared<GameObject>());
+    world->GetGameObject()->AddComponent(std::make_shared<cmp::Name>("ROOT"));
+    world->GetGameObject()->AddComponent(std::make_shared<cmp::Transform>());
+    MapLoader::Load("Resources/maps/world.map", world);
 
     ///***
 
-    goCamera = new GameObject();
+    goCamera = std::make_shared<GameObject>();
     goCamera->AddComponent(std::make_shared<CameraComponent>());
     goCamera->GetComponent<cmp::Camera>()->Create(glm::vec3(0,3,10));
     goCamera->GetComponent<cmp::Camera>()->SetSpeed(5);
@@ -34,36 +38,41 @@ Scene::Scene()
 
     ///***
 
+    go = std::make_shared<GameObject>();
+    tc = std::make_shared<TransformComponent>();
     mc = std::make_shared<ModelComponent>();
     mc->Create(
         resMan->GetMesh("Resources/models/Crate/Crate.obj"),
         resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
     );
-    go = std::make_shared<GameObject>();
-    go->AddComponent(std::make_shared<cmp::Name>("GO"));
     go->AddComponent(shader_d);
     go->AddComponent(mc);
-    go->AddComponent(std::make_shared<cmp::Transform>());
+    go->AddComponent(tc);
+    go->AddComponent(std::make_shared<cmp::Name>("GO"));
 
-    scene->AddChild(go);
+    world->AddChild(go);
 
     ///***
 
+    go = std::make_shared<GameObject>();
+    tc = std::make_shared<TransformComponent>();
     mc = std::make_shared<ModelComponent>();
     mc->Create(
         resMan->GetMesh("Resources/models/Crate/Crate.obj"),
         resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
     );
-    go = std::make_shared<GameObject>();
     go->AddComponent(shader_d);
     go->AddComponent(mc);
-    go->AddComponent(std::make_shared<cmp::Transform>());
+    go->AddComponent(tc);
+    go->GetComponent<cmp::Transform>()->SetPosition(5, 0, 0);
     go->AddComponent(std::make_shared<cmp::Name>("GO1"));
 
-    scene->FindNode("GO")->AddChild(go);
+    world->FindNode("GO")->AddChild(go);
 
     ///***
 
+    go = std::make_shared<GameObject>();
+    tc = std::make_shared<TransformComponent>();
     mic = std::make_shared<ModelInstancesComponent>();
     mic->Create(9,
         resMan->GetMesh("Resources/models/Crate/Crate.obj"),
@@ -71,7 +80,7 @@ Scene::Scene()
     );
     for(int x=-4, y=-4, i=0; i<9; i++)
     {
-        mic->SetTransformation(i, TransformComponent::Transform(glm::vec3(x, 0, y), glm::vec3(0, 0, 0), 1));
+        mic->SetTransformation(i, TransformComponent::Transform(glm::vec3(x, -2, y), glm::vec3(0, 0, 0), 1));
         x += 4;
         if((x + 1) % 3 == 0)
         {
@@ -80,144 +89,128 @@ Scene::Scene()
         }
     }
     mic->UpdateTransformations();
-    go = std::make_shared<GameObject>();
-    go->AddComponent(std::make_shared<cmp::Name>("GO2"));
-    go->AddComponent(std::make_shared<cmp::Transform>());
     go->AddComponent(shader_i);
     go->AddComponent(mic);
+    go->AddComponent(std::make_shared<cmp::Name>("GO2"));
 
-    scene->AddChild(go);
+    world->AddChild(go);
 
     ///***
 
-    scene->FindNode("GO")->GetLocalTransformations()->SetPosition(0, 2, 0);
-    scene->FindNode("GO1")->GetLocalTransformations()->SetPosition(5, 0, 0);
-    scene->FindNode("GO2")->GetLocalTransformations()->SetPosition(0, -2, 0);
+    go = std::make_shared<GameObject>();
+    tc = std::make_shared<TransformComponent>();
+    mc = std::make_shared<ModelComponent>();
+    mc->Create(
+        resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+        resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+    );
+    go->AddComponent(shader_d);
+    go->AddComponent(mc);
+    go->AddComponent(tc);
+    go->GetComponent<TransformComponent>()->SetPosition(0.0f, 1.0f, -20.0f);
+    go->AddComponent(std::make_shared<cmp::Name>("Box1"));
+    go->AddComponent(std::make_shared<cmp::BoxCol>(false, true));
+    go->GetComponent<BoxCollider>()->AddToCollidersManager(collidersManager);
+    go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
 
+    world->AddChild(go);
 
-    //=== text test ===
-
-    std::shared_ptr<ShaderComponent> textShader = std::make_shared<ShaderComponent>();
-    textShader->Create("Resources/shaders/text.vert", "Resources/shaders/text.frag");
-    
-    std::shared_ptr<TextComponent> textComponent = std::make_shared<TextComponent>();
-    textComponent->Create("Sample text", resMan->GetFont("Resources/fonts/arial.ttf"));
-    textComponent->color = {1.0f, 1.0f, 0.0f};
-
+    // ///***
 
     go = std::make_shared<GameObject>();
-    go->AddComponent(std::make_shared<cmp::Name>("In world text"));
-    go->AddComponent(std::make_shared<cmp::Transform>());
+    tc = std::make_shared<TransformComponent>();
+    mc = std::make_shared<ModelComponent>();
+    mc->Create(
+        resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+        resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+    );
+    go->AddComponent(shader_d);
+    go->AddComponent(mc);
+    go->AddComponent(tc);
+    go->GetComponent<TransformComponent>()->SetPosition(0.0f, 3.0f, -22.0f);
+    go->AddComponent(std::make_shared<cmp::Name>("Box2"));
+    go->AddComponent(std::make_shared<cmp::BoxCol>(false, true));
+    go->GetComponent<BoxCollider>()->AddToCollidersManager(collidersManager);
+    go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
 
-    go->AddComponent(textShader);
-    go->AddComponent(textComponent);
+    world->AddChild(go);
 
-    scene->AddChild(go);
-
-    scene->FindNode("In world text")->GetLocalTransformations()->SetPosition(15, 0, 0);
-
-    std::shared_ptr<cmp::Scriptable> scriptHolder = std::make_shared<ScriptComponent>();
-    RotatorScript* rotScript = new RotatorScript();
-    
-    rotScript->gameObject = go.get();
-    rotScript->speed = 50.0f;
-
-    
-    go->AddComponent(scriptHolder);
-    scriptHolder->Add(rotScript);
-    scriptHolder->OnStart();
-
-    //-
-    textComponent = std::make_shared<TextComponent>();
-    textComponent->Create("Facing camera", resMan->GetFont("Resources/fonts/arial.ttf"));
-    textComponent->alwaysSeen = true;
-
+    // ///***
 
     go = std::make_shared<GameObject>();
-    go->AddComponent(std::make_shared<cmp::Name>("Face camera text"));
-    go->AddComponent(std::make_shared<cmp::Transform>());
+    tc = std::make_shared<TransformComponent>();
+    mc = std::make_shared<ModelComponent>();
+    mc->Create(
+        resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+        resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+    );
+    go->AddComponent(shader_d);
+    go->AddComponent(mc);
+    go->AddComponent(tc);
+    go->GetComponent<TransformComponent>()->SetPosition(0.0f, 5.0f, -24.0f);
+    go->AddComponent(std::make_shared<cmp::Name>("Box3"));
+    go->AddComponent(std::make_shared<cmp::BoxCol>(false, true));
+    go->GetComponent<BoxCollider>()->AddToCollidersManager(collidersManager);
+    go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
 
-    go->AddComponent(textShader);
-    go->AddComponent(textComponent);
-
-    scene->AddChild(go);
-
-    scene->FindNode("Face camera text")->GetLocalTransformations()->SetPosition(10, 0, 0);
-    
-
-    //=== line test ===
-    std::shared_ptr<ShaderComponent> lineShader = std::make_shared<ShaderComponent>();
-    lineShader->Create("Resources/shaders/line.vert", "Resources/shaders/line.frag");
-    
-    std::shared_ptr<LineComponent> lineComponent = std::make_shared<LineComponent>();
-    lineComponent->Create();
-    lineComponent->color1 = { 0.0f, 1.0f, 0.7f };
-
-
+    world->AddChild(go);
+    ///***
 
     go = std::make_shared<GameObject>();
-    go->AddComponent(std::make_shared<cmp::Name>("Line Renderer 1"));
-    go->AddComponent(std::make_shared<cmp::Transform>());
+    tc = std::make_shared<TransformComponent>();
+    tc->SetScale(0.01f);
+    mc = std::make_shared<ModelComponent>();
+    mc->Create(
+        resMan->GetMesh("Resources/models/sphere.obj"),
+        resMan->GetMaterial("Resources/models/sphere.mtl")
+    );
+    go->AddComponent(shader_d);
+    go->AddComponent(mc);
+    go->AddComponent(tc);
+    go->GetComponent<TransformComponent>()->SetPosition(0.0f, 4.1f, 20.0f);
+    go->AddComponent(std::make_shared<cmp::Name>("Ball1"));
+    go->AddComponent(std::make_shared<cmp::SphereCol>(false, false));
+    go->GetComponent<SphereCollider>()->AddToCollidersManager(collidersManager);
+    go->GetComponent<SphereCollider>()->SetRadius(4.1f);
 
-    go->AddComponent(lineShader);
-    go->AddComponent(lineComponent);
+    world->AddChild(go);
 
-    scene->AddChild(go);
+    ///***
 
-    scene->FindNode("Line Renderer 1")->GetLocalTransformations()->SetPosition(10, 0, 0);
+    world->FindNode("GO")->GetLocalTransformations()->SetPosition(0, 2, 0);
 
-    // -
-    lineComponent = std::make_shared<LineComponent>();
-    lineComponent->Create();
-    lineComponent->color1 = { 0.0f, 1.0f, 0.7f };
-    lineComponent->thickness = 3.0f;
-    lineComponent->AddPoint(0, 0, -6.2f);
-    lineComponent->AddPoint(0, 1, -6);
+    ///***
 
-
-    go = std::make_shared<GameObject>();
-    go->AddComponent(std::make_shared<cmp::Name>("Line Renderer 2"));
-    go->AddComponent(std::make_shared<cmp::Transform>());
-
-    go->AddComponent(lineShader);
-    go->AddComponent(lineComponent);
-
-    scene->AddChild(go);
-
-    scene->FindNode("Line Renderer 2")->GetLocalTransformations()->SetPosition(10, 0, 5);
+    world->LoadScripts();
 }
 
 Scene::~Scene()
 {
-    delete scene;
-    scene = nullptr;
+    delete world;
+    world = nullptr;
 
-    delete goCamera;
     goCamera = nullptr;
 }
 
 float asd = 10.0f;
 void Scene::Update(float dt)
 {
-    scene->FindNode("Face camera text")->GetGameObject()->GetComponent<cmp::Transform>()->SetScale(asd);
+    //scene->FindNode("Face camera text")->GetGameObject()->GetComponent<cmp::Transform>()->SetScale(asd);
     asd += dt;
 
     goCamera->GetComponent<cmp::Camera>()->Update(GameApplication::GetInputManager(), dt);
+
     transform = GameApplication::GetProjection() * goCamera->GetComponent<cmp::Camera>()->GetView();
 
-    scene->FindNode("GO")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0, 180*dt, 0);
+    // scene->FindNode("GO")->GetLocalTransformations()->Rotate(0, 180*dt, 0);
 
-    scene->FindNode("In world text")->GetGameObject()->GetComponent<ScriptComponent>()->OnUpdate(dt);
+    world->FindNode("Ball1")->GetLocalTransformations()->Move(0.0f, 0.0f, dt * -5.0f);
+    collidersManager->CheckCollisions();
 
-    auto& p = scene->FindNode("Line Renderer 2")->GetGameObject()->GetComponent<cmp::Line>()->Get(3);
-    p.z += dt * 0.2f;
-
-    auto faceTextNode = scene->FindNode("Face camera text");
-    faceTextNode->GetGameObject()->GetComponent<cmp::Text>()->FaceCamera(goCamera->GetComponent<cmp::Camera>(), faceTextNode);
+    world->Update(dt);
 }
 
 void Scene::Render()
 {
-    scene->Update();
-    scene->Render(transform);
+    world->Render(transform);
 }

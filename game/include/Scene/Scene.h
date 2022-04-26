@@ -11,15 +11,17 @@
 #include "GameApplication.h"
 #include "ResourceManager.h"
 #include "InputManager.h"
+#include "MapLoader.h"
+#include "CollidersManager.h"
 
 /** @brief Scena do zarzadzania SceneNode'ami
  */
 class Scene
 {
 private:
-    SceneNode* scene;
-    GameObject* goCamera;
-
+    SceneNode* world; //!< Swiat gry.
+    std::shared_ptr<GameObject> goCamera; //!< GameObject z kamera.
+    CollidersManager* collidersManager;
     glm::mat4 transform; //!< Macierz transformacji widoku i kamery.
 
 public:

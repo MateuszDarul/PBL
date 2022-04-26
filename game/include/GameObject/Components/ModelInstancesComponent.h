@@ -7,6 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Component.h"
+
 #include "ShaderComponent.h"
 #include "Mesh.h"
 #include "Material.h"

@@ -2,6 +2,8 @@
 #define __LIST_COMPONENT_H__
 
 #include "Component.h"
+#include <memory>
+
 
 /** @brief Komponent sluzacy do przechowywania wartosci liczbowych.
  */

@@ -7,10 +7,11 @@
 #include <glm/glm.hpp>
 
 #include "Components.h"
+#include "Component.h"
 
 /** @brief Klasa reprezentujaca dowolny "byt" w silniku.
  */
-class GameObject
+class GameObject : public std::enable_shared_from_this<GameObject>
 {
 private:
     std::vector<std::shared_ptr<Component>> components; //!< Lista komponentow nalezacych to GameObjectu.
