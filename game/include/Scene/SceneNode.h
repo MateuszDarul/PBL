@@ -103,8 +103,6 @@ public:
      * @return false - Sa to rozne wezly.
      */
     bool Is(std::shared_ptr<SceneNode> second);
-
-    SceneNode* GetRoot();
 };
 
 #endif // __SCENE_NODE_H__

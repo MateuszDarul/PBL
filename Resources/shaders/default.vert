@@ -7,10 +7,9 @@ layout (location = 2) in vec2 vTex;
 out vec2 vertexTexture;
 
 uniform mat4 transform;
-uniform mat4 model;
 
 void main()
 {
-    gl_Position = transform * model * vec4(vPos, 1.0);
+    gl_Position = transform * vec4(vPos, 1.0);
     vertexTexture = vTex;
 }

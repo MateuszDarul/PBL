@@ -18,7 +18,6 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/TransformComponent.cpp
 	src/GameObject/Components/ScriptComponent.cpp
 	src/GameObject/Components/CameraComponent.cpp
-	src/GameObject/Components/PointLightComponent.cpp
 
 	src/Resource/Mesh.cpp
 	src/Resource/Material.cpp
@@ -60,7 +59,6 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/Components/TransformComponent.h
 	include/GameObject/Components/ScriptComponent.h
 	include/GameObject/Components/CameraComponent.h
-	include/GameObject/Components/PointLightComponent.h
 
 	include/Resource/Mesh.h
 	include/Resource/Material.h

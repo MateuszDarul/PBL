@@ -72,26 +72,17 @@ void SceneNode::Render(const glm::mat4& matrixPV)
     std::shared_ptr<cmp::Shader> shaderPtr = this->gameObject->GetComponent<cmp::Shader>();
     if(shaderPtr != nullptr)
     {
-        shaderPtr->Use();
-
-        std::shared_ptr<cmp::PointLight> pl = this->GetGameObject()->GetComponent<cmp::PointLight>();
         std::shared_ptr<cmp::Model> modelPtr = this->gameObject->GetComponent<cmp::Model>();
         std::shared_ptr<cmp::ModelInst> modelInstPtr = this->gameObject->GetComponent<cmp::ModelInst>();
-        
-        shaderPtr->SetMat4("model", this->globalTransformations);
-        shaderPtr->SetMat4("transform", matrixPV);
-        glm::vec3 cameraPos = this->GetRoot()->FindNode("Camera")->GetGameObject()->GetComponent<cmp::Camera>()->GetPosition();
-        shaderPtr->SetVec3("cameraPos", cameraPos);
 
-        if(pl)
-        {
-            pl->Use(shaderPtr);
-        }
-        else if(modelPtr)
+        shaderPtr->Use();
+        shaderPtr->SetMat4("transform", matrixPV * this->globalTransformations);
+
+        if(modelPtr != nullptr)
         {
             modelPtr->Draw(shaderPtr);
         }
-        else if(modelInstPtr)
+        else if(modelInstPtr != nullptr)
         {
             modelInstPtr->Draw(shaderPtr);
         }
@@ -160,16 +151,4 @@ bool SceneNode::Is(SceneNode* second)
 bool SceneNode::Is(std::shared_ptr<SceneNode> second)
 {
     return this == second.get();
-}
-
-SceneNode* SceneNode::GetRoot()
-{
-    SceneNode* result = this;
-    
-    while(result->GetParent() != nullptr)
-    {
-        result = result->GetParent();
-    }
-
-    return result;
 }

@@ -167,7 +167,7 @@ void GameApplication::Run()
             glfwSetWindowShouldClose(s_Window, true);
         }
 
-        glClearColor(0,0,0, 1.0f);
+        glClearColor(0.78f, 0.21f, 0.18f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //get time step
