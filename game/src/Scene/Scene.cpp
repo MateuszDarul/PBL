@@ -35,7 +35,8 @@ Scene::Scene()
     go->GetComponent<cmp::Camera>()->Create(glm::vec3(0,3,10));
     go->GetComponent<cmp::Camera>()->SetSpeed(5);
     go->AddComponent(std::make_shared<BoxCollider>(false, false));
-    go->GetComponent<cmp::BoxCol>()->setLengths(glm::vec3(2,3,2));
+    go->GetComponent<cmp::BoxCol>()->setLengths(glm::vec3(1,3,1));
+    go->GetComponent<cmp::BoxCol>()->SetOffset(glm::vec3(0,-1.5,0));
     go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
     world->AddChild(go);
 
@@ -100,6 +101,7 @@ void Scene::Update(float dt)
 
     goCamera->GetComponent<CameraComponent>()->Update(GameApplication::GetInputManager(), dt);
     transformCamera->SetPosition(goCamera->GetComponent<CameraComponent>()->GetPosition());
+    
 
     transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();
 
