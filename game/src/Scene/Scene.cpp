@@ -108,6 +108,8 @@ Scene::~Scene()
     world = nullptr;
 }
 
+
+float h_y = 1;
 void Scene::Update(float dt)
 {
     world->FindNode("Camera")->GetGameObject()->GetComponent<cmp::Camera>()->Update(GameApplication::GetInputManager(), dt);
@@ -115,7 +117,15 @@ void Scene::Update(float dt)
     transform = GameApplication::GetProjection();
     transform *= world->FindNode("Camera")->GetGameObject()->GetComponent<cmp::Camera>()->GetView();
     
-    world->Update();
+    world->Update(dt);
+
+    if(GameApplication::GetInputManager()->Keyboard()->IsPressed(KeyboardKey::Z))
+    {
+        h_y += 1*dt;
+        world->FindNode("light1")->GetGameObject()->GetComponent<cmp::PointLight>()->SetPosition(glm::vec3(0, h_y, 0));
+        world->FindNode("mark1")->GetLocalTransformations()->SetPosition(glm::vec3(0,h_y,0));
+        //std::cout << h_y << "\n";
+    }
 }
 
 void Scene::Render()

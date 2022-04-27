@@ -22,6 +22,7 @@ bool PointLightComponent::Create()
     this->lightColor = glm::vec3(0.5,0.5,0.5);
     this->specularColor = glm::vec3(1,1,1);
     this->distance = glm::vec3(1.f,0.25f,0.f);
+    this->range = 0;
 
     PointLightComponent::needUpdate = true;
     PointLightComponent::lightAmount++;
@@ -30,9 +31,13 @@ bool PointLightComponent::Create()
     for(int i=0; i<10000; i++)
     {
         this->range += step;
-        if( (1 / (this->distance.x + this->range * this->distance.y + this->range * this->range * this->distance.z)) < 0.01 )
+        if( 
+            (1 / (this->distance.x + this->range * this->distance.y + this->range * this->range * this->distance.z))
+             < 0.01
+        )
             break;
     }
+    std::cout << range << "\n";
 
     return true;
 }
@@ -75,4 +80,56 @@ void PointLightComponent::Use(std::shared_ptr<ShaderComponent> shader)
     {
         PointLightComponent::thisLightID++;
     }
+}
+
+void PointLightComponent::SetPosition(glm::vec3 position)
+{
+    this->position = position;
+    PointLightComponent::needUpdate = true;
+}
+
+void PointLightComponent::Move(glm::vec3 vector)
+{
+    this->position += vector;
+    PointLightComponent::needUpdate = true;
+}
+
+glm::vec3 PointLightComponent::GetPosition()
+{
+    return this->position;
+}
+
+void PointLightComponent::SetLightColor(glm::vec3 lightColor)
+{
+    this->lightColor = lightColor;
+    PointLightComponent::needUpdate = true;
+}
+
+glm::vec3 PointLightComponent::GetLightColor()
+{
+    return this->lightColor;
+}
+
+void PointLightComponent::SetSpecularColor(glm::vec3 specularColor)
+{
+    this->specularColor = specularColor;
+    PointLightComponent::needUpdate = true;
+}
+
+glm::vec3 PointLightComponent::GetSpecularColor()
+{
+    return this->specularColor;
+}
+
+void PointLightComponent::SetRange(float constant, float linear, float quadratic)
+{
+    this->distance.x = constant;
+    this->distance.y = linear;
+    this->distance.z = quadratic;
+    PointLightComponent::needUpdate = true;
+}
+
+glm::vec3 PointLightComponent::GetRange()
+{
+    return this->distance;
 }
