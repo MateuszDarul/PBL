@@ -72,13 +72,19 @@ void SceneNode::Render(const glm::mat4& matrixPV)
     std::shared_ptr<cmp::Shader> shaderPtr = this->gameObject->GetComponent<cmp::Shader>();
     if(shaderPtr != nullptr)
     {
+        std::shared_ptr<cmp::PointLight> pointLightPtr = this->gameObject->GetComponent<cmp::PointLight>();
         std::shared_ptr<cmp::Model> modelPtr = this->gameObject->GetComponent<cmp::Model>();
         std::shared_ptr<cmp::ModelInst> modelInstPtr = this->gameObject->GetComponent<cmp::ModelInst>();
 
         shaderPtr->Use();
-        shaderPtr->SetMat4("transform", matrixPV * this->globalTransformations);
+        shaderPtr->SetMat4("transform", matrixPV);
+        shaderPtr->SetMat4("model", this->globalTransformations);
 
-        if(modelPtr != nullptr)
+        if(pointLightPtr != nullptr)
+        {
+            pointLightPtr->Use(shaderPtr);
+        }
+        else if(modelPtr != nullptr)
         {
             modelPtr->Draw(shaderPtr);
         }

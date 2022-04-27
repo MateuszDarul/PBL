@@ -17,6 +17,8 @@ Scene::Scene()
     shader_d->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
     std::shared_ptr<ShaderComponent> shader_i = std::make_shared<ShaderComponent>();
     shader_i->Create("Resources/shaders/inst.vert", "Resources/shaders/inst.frag");
+    std::shared_ptr<ShaderComponent> shader_l = std::make_shared<ShaderComponent>();
+    shader_l->Create("Resources/shaders/light.vert", "Resources/shaders/light.frag");
 
     collidersManager = new CollidersManager();
 
@@ -42,44 +44,96 @@ Scene::Scene()
 
     ///***
 
-    MapLoader::Load("Resources/maps/world.map", world, shader_d, collidersManager);
+    MapLoader::Load("Resources/maps/world.map", world, shader_l, collidersManager);
 
     ///***
 
     go = std::make_shared<GameObject>();
-    mc = std::make_shared<cmp::Model>();
-    mc->Create(
-        resMan->GetMesh("Resources/models/wieze/w1/w1.obj"),
-        resMan->GetMaterial("Resources/models/wieze/w1/w1.mtl")
-    );
-    go->AddComponent(mc);
-    go->AddComponent(shader_d);
-    go->AddComponent(std::make_shared<cmp::Transform>());
-    go->GetComponent<cmp::Transform>()->SetPosition(0,0.5,-5);
+    {
+        go->AddComponent(std::make_shared<cmp::PointLight>());
+        go->GetComponent<cmp::PointLight>()->Create();
+        go->GetComponent<cmp::PointLight>()->SetPosition(glm::vec3(-5, 4, 0));
+        go->AddComponent(std::make_shared<cmp::Name>("light1"));
+        go->AddComponent(shader_l);
+        world->AddChild(go);
+
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+            resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetScale(0.1);
+        world->FindNode("light1")->AddChild(go);
+    }
+    go = nullptr;
+
+    go = std::make_shared<GameObject>();
+    {
+        go->AddComponent(std::make_shared<cmp::PointLight>());
+        go->GetComponent<cmp::PointLight>()->Create();
+        go->GetComponent<cmp::PointLight>()->SetPosition(glm::vec3(18, 5, 0));
+        go->AddComponent(std::make_shared<cmp::Name>("light2"));
+        go->AddComponent(shader_l);
+        world->AddChild(go);
+
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+            resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetScale(0.1);
+        world->FindNode("light2")->AddChild(go);
+    }
+    go = nullptr;
+
+    go = std::make_shared<GameObject>();
+    {    
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/wieze/w1/w1.obj"),
+            resMan->GetMaterial("Resources/models/wieze/w1/w1.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_l);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(0,0.5,-5);
+    }
     world->AddChild(go);
 
     go = std::make_shared<GameObject>();
-    mc = std::make_shared<cmp::Model>();
-    mc->Create(
-        resMan->GetMesh("Resources/models/wieze/w2/w2.obj"),
-        resMan->GetMaterial("Resources/models/wieze/w2/w2.mtl")
-    );
-    go->AddComponent(mc);
-    go->AddComponent(shader_d);
-    go->AddComponent(std::make_shared<cmp::Transform>());
-    go->GetComponent<cmp::Transform>()->SetPosition(0,0.5,0);
+    {
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/wieze/w2/w2.obj"),
+            resMan->GetMaterial("Resources/models/wieze/w2/w2.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_l);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(0,0.5,0);
+    }
     world->AddChild(go);
     
     go = std::make_shared<GameObject>();
-    mc = std::make_shared<cmp::Model>();
-    mc->Create(
-        resMan->GetMesh("Resources/models/wieze/w3/w3.obj"),
-        resMan->GetMaterial("Resources/models/wieze/w3/w3.mtl")
-    );
-    go->AddComponent(mc);
-    go->AddComponent(shader_d);
-    go->AddComponent(std::make_shared<cmp::Transform>());
-    go->GetComponent<cmp::Transform>()->SetPosition(0,0.5,5);
+    {
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/wieze/w3/w3.obj"),
+            resMan->GetMaterial("Resources/models/wieze/w3/w3.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_l);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(0,0.5,5);
+    }
     world->AddChild(go);
 
     world->LoadScripts();

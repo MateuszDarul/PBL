@@ -9,6 +9,8 @@
 #include "ShaderComponent.h"            // UUID 5
 #include "TransformComponent.h"         // UUID 6
 #include "CameraComponent.h"            // UUID 7
+#include "PointLightComponent.h"        // UUID 8
+
 #include "SphereCollider.h"             // UUID 11
 #include "BoxCollider.h"                // UUID 12
 
@@ -16,16 +18,17 @@
 
 namespace cmp
 {
-
     typedef NameComponent Name;
     typedef ListComponent List;
     typedef ModelComponent Model;
     typedef ModelInstancesComponent ModelInst;
     typedef ShaderComponent Shader;
     typedef TransformComponent Transform;
+    typedef CameraComponent Camera;
+    typedef PointLightComponent PointLight;
+
     typedef SphereCollider SphereCol;
     typedef BoxCollider BoxCol;
-    typedef CameraComponent Camera;
 
     typedef ScriptComponent Scriptable;
 
