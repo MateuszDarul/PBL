@@ -6,6 +6,7 @@
 #include <glad/glad.h>
 
 #include "Component.h"
+
 #include "Mesh.h"
 #include "Material.h"
 #include "ShaderComponent.h"

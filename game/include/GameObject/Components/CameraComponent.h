@@ -5,7 +5,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Component.h"
+
 #include "InputManager.h"
+class GameObject;
 
 class CameraComponent :public Component
 {

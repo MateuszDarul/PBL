@@ -40,4 +40,8 @@
 build
 Build
 thirdparty/openal-soft
+<<<<<<< HEAD
 blender
+=======
+.vs
+>>>>>>> colliderss

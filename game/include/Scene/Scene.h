@@ -13,6 +13,7 @@
 #include "ResourceManager.h"
 #include "InputManager.h"
 #include "MapLoader.h"
+#include "CollidersManager.h"
 
 /** @brief Scena do zarzadzania SceneNode'ami
  */
@@ -20,7 +21,7 @@ class Scene
 {
 private:
     SceneNode* world; //!< Swiat gry.
-
+    CollidersManager* collidersManager;
     glm::mat4 transform; //!< Macierz transformacji widoku i kamery.
 
 public:
