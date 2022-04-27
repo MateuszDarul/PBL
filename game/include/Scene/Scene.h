@@ -2,6 +2,7 @@
 #define __SCENE_H__
 
 #include <vector>
+#include <memory>
 
 #include <glm/matrix.hpp>
 

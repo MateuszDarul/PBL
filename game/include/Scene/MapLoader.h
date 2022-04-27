@@ -22,6 +22,7 @@ public:
     /** @brief Wczytuje uklad GameObject'ow z pliku i odtwarza go w SceneNode.
      * @param path - Sciezka do pliku z danymi o ukladzie sceny.
      * @param root - Wskazanie do SceneNode'a, w ktorym ma zostac odtworzona struktura z pliku.
+     * @param shader - Shader wykorzystywany do wyswietlania swiata.
      * @return true - Poprawnie wczytano uklad SceneNodow.
      * @return false - Blad podczas wczytywania SceneNodow.
      */
