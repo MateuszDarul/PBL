@@ -55,7 +55,7 @@ Scene::Scene()
     go->AddComponent(mc);
     go->AddComponent(shader_d);
     go->AddComponent(std::make_shared<cmp::Transform>());
-    go->GetComponent<cmp::Transform>()->SetPosition(0,0.5,0);
+    go->GetComponent<cmp::Transform>()->SetPosition(0,0.5,-5);
     world->AddChild(go);
 
     go = std::make_shared<GameObject>();
@@ -79,7 +79,7 @@ Scene::Scene()
     go->AddComponent(mc);
     go->AddComponent(shader_d);
     go->AddComponent(std::make_shared<cmp::Transform>());
-    go->GetComponent<cmp::Transform>()->SetPosition(0,0.5,0);
+    go->GetComponent<cmp::Transform>()->SetPosition(0,0.5,5);
     world->AddChild(go);
 
     world->LoadScripts();
