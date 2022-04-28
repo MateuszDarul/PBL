@@ -12,6 +12,8 @@ private:
 	std::vector<std::weak_ptr<ColliderComponent>> staticTriggers; //!< Lista statycznych wyzwalaczy.
 	std::vector<std::weak_ptr<ColliderComponent>> dynamicColliders; //!< Lista statycznych zderzaczy.
 	std::vector<std::weak_ptr<ColliderComponent>> dynamicTriggers; //!< Lista statycznych wyzwalaczy.
+	float distanceFromPlayer; //!< Dystans od gracza, do której optymalizowane kolidery s¹ sprawdzane.
+	std::shared_ptr<GameObject> player;
 
 	/** @brief Usuwa komponent koliderów.
 	 * @param vector - Z której listy ma usun¹æ kolider.
@@ -22,7 +24,7 @@ public:
 
 	/** @brief Bazowy konstruktor.
 	 */
-	CollidersManager();
+	CollidersManager(std::shared_ptr<GameObject> player);
 
 	/** @brief Bazowy destruktor.
 	 */
@@ -75,5 +77,15 @@ public:
 	/** @brief Sprawdza kolizje kolejno: dynamicze wyzwalacze z dynamicznymi wyzwalaczami, dynamicze wyzwalacze ze statycznymi zderzaczami, dynamicze zderzacze ze statycznymi wyzwalaczami.
 	 */
 	void CheckTriggers();
+
+	/** @brief Ustawia dystans od gracza, do którego dla optymalizowanych koliderów sprawdzana jest kolizja.
+	 * @param distance - Nowy dystans od gracza do optymalizacji kolizji.
+	 */
+	void SetDistanceFromPlayer(float distance);
+
+	/** @brief Zwraca dystans od gracza, do którego dla optymalizowanych koliderów sprawdzana jest kolizja.
+	 * @return float - Dystans od gracza do optymalizacji kolizji.
+	 */
+	float GetDistanceFromPlayer();
 };
 #endif

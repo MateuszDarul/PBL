@@ -5,8 +5,6 @@
 
 Scene::Scene()
 {
-    collidersManager = new CollidersManager();
-
     glfwSetInputMode(GameApplication::GetWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     ResourceManager* resMan = GameApplication::GetResourceManager();
@@ -27,6 +25,10 @@ Scene::Scene()
     goCamera->AddComponent(std::make_shared<CameraComponent>());
     goCamera->GetComponent<cmp::Camera>()->Create(glm::vec3(0,3,10));
     goCamera->GetComponent<cmp::Camera>()->SetSpeed(5);
+
+    ///***
+
+    collidersManager = new CollidersManager(goCamera);
 
     ///***
 

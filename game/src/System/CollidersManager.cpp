@@ -1,4 +1,7 @@
 #include "CollidersManager.h"
+#include "GameObject.h"
+#include "TransformComponent.h"
+#include "CameraComponent.h"
 #include <iostream>
 
 void CollidersManager::RemoveFromVector(std::vector<std::weak_ptr<ColliderComponent>> vector, std::shared_ptr<ColliderComponent> col)
@@ -15,8 +18,9 @@ void CollidersManager::RemoveFromVector(std::vector<std::weak_ptr<ColliderCompon
 	}
 }
 
-CollidersManager::CollidersManager()
+CollidersManager::CollidersManager(std::shared_ptr<GameObject> player): player(player)
 {
+	distanceFromPlayer = 0.0f;
 }
 
 CollidersManager::~CollidersManager()
@@ -69,52 +73,101 @@ void CollidersManager::RemoveStaticTrigger(std::shared_ptr<ColliderComponent> tr
 
 void CollidersManager::CheckCollisions()
 {
-	//std::cout << dynamicColliders.size();
+	glm::vec3 playerPos = player->GetComponent<CameraComponent>()->GetPosition();
 	for (int i = 0; i<dynamicColliders.size(); i++)
 	{
 		std::shared_ptr<ColliderComponent> firstCollider = dynamicColliders[i].lock();
-		for (int j = i + 1; j < dynamicColliders.size(); j++)
+		bool firstOptimize = firstCollider->isOptimized;
+		if (!firstOptimize || (firstOptimize && glm::distance(firstCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer))
 		{
-			std::shared_ptr<ColliderComponent> secondCollider = dynamicColliders[j].lock();
-			firstCollider->CheckCollision(secondCollider);
-		}
-		for (int j = 0; j < staticColliders.size(); j++)
-		{
-			std::shared_ptr<ColliderComponent> secondCollider = staticColliders[j].lock();
-			firstCollider->CheckCollision(secondCollider);
-		}
-		for (int j = 0; j < dynamicTriggers.size(); j++)
-		{
-			std::shared_ptr<ColliderComponent> secondCollider = dynamicTriggers[j].lock();
-			firstCollider->CheckCollision(secondCollider);
-		}
-		for (int j = 0; j < staticTriggers.size(); j++)
-		{
-			std::shared_ptr<ColliderComponent> secondCollider = staticTriggers[j].lock();
-			firstCollider->CheckCollision(secondCollider);
+			bool secondOptimize = false;
+			for (int j = i + 1; j < dynamicColliders.size(); j++)
+			{
+				std::shared_ptr<ColliderComponent> secondCollider = dynamicColliders[j].lock();
+				secondOptimize = secondCollider->isOptimized;
+				if (!secondOptimize || (secondOptimize && glm::distance(firstCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer))
+				{
+					firstCollider->CheckCollision(secondCollider);
+				}
+			}
+			for (int j = 0; j < staticColliders.size(); j++)
+			{
+				std::shared_ptr<ColliderComponent> secondCollider = staticColliders[j].lock();
+				secondOptimize = secondCollider->isOptimized;
+				if (!secondOptimize || (secondOptimize && glm::distance(firstCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer))
+				{
+					firstCollider->CheckCollision(secondCollider);
+				}
+			}
+			for (int j = 0; j < dynamicTriggers.size(); j++)
+			{
+				std::shared_ptr<ColliderComponent> secondCollider = dynamicTriggers[j].lock();
+				secondOptimize = secondCollider->isOptimized;
+				if (!secondOptimize || (secondOptimize && glm::distance(firstCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer))
+				{
+					firstCollider->CheckCollision(secondCollider);
+				}
+			}
+			for (int j = 0; j < staticTriggers.size(); j++)
+			{
+				std::shared_ptr<ColliderComponent> secondCollider = staticTriggers[j].lock();
+				secondOptimize = secondCollider->isOptimized;
+				if (!secondOptimize || (secondOptimize && glm::distance(firstCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer))
+				{
+					firstCollider->CheckCollision(secondCollider);
+				}
+			}
 		}
 	}
 }
 
 void CollidersManager::CheckTriggers()
 {
+	glm::vec3 playerPos = player->GetComponent<TransformComponent>()->GetPosition();
 	for (int i = 0; i < dynamicTriggers.size(); i++)
 	{
 		std::shared_ptr<ColliderComponent> firstCollider = dynamicColliders[i].lock();
-		for (int j = i + 1; j < dynamicTriggers.size(); j++)
+		bool firstOptimize = firstCollider->isOptimized;
+		if (!firstOptimize || (firstOptimize && glm::distance(firstCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer))
 		{
-			std::shared_ptr<ColliderComponent> secondCollider = dynamicTriggers[j].lock();
-			firstCollider->CheckCollision(secondCollider);
-		}
-		for (int j = 0; j < staticColliders.size(); j++)
-		{
-			std::shared_ptr<ColliderComponent> secondCollider = staticColliders[j].lock();
-			firstCollider->CheckCollision(secondCollider);
-		}
-		for (int j = 0; j < staticTriggers.size(); j++)
-		{
-			std::shared_ptr<ColliderComponent> secondCollider = staticTriggers[j].lock();
-			firstCollider->CheckCollision(secondCollider);
+			bool secondOptimize = false;
+			for (int j = i + 1; j < dynamicTriggers.size(); j++)
+			{
+				std::shared_ptr<ColliderComponent> secondCollider = dynamicTriggers[j].lock();
+				secondOptimize = secondCollider->isOptimized;
+				if (!secondOptimize || (secondOptimize && glm::distance(firstCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer))
+				{
+					firstCollider->CheckCollision(secondCollider);
+				}
+			}
+			for (int j = 0; j < staticColliders.size(); j++)
+			{
+				std::shared_ptr<ColliderComponent> secondCollider = staticColliders[j].lock();
+				secondOptimize = secondCollider->isOptimized;
+				if (!secondOptimize || (secondOptimize && glm::distance(firstCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer))
+				{
+					firstCollider->CheckCollision(secondCollider);
+				}
+			}
+			for (int j = 0; j < staticTriggers.size(); j++)
+			{
+				std::shared_ptr<ColliderComponent> secondCollider = staticTriggers[j].lock();
+				secondOptimize = secondCollider->isOptimized;
+				if (!secondOptimize || (secondOptimize && glm::distance(firstCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer))
+				{
+					firstCollider->CheckCollision(secondCollider);
+				}
+			}
 		}
 	}
+}
+
+void CollidersManager::SetDistanceFromPlayer(float distance)
+{
+	distanceFromPlayer = distance;
+}
+
+float CollidersManager::GetDistanceFromPlayer()
+{
+	return distanceFromPlayer;
 }
