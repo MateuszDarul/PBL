@@ -1,12 +1,10 @@
 #include "MapLoader.h"
 
-bool MapLoader::Load(std::string path, SceneNode* root)
+bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Shader> shader, CollidersManager* collisionManager)
 {
     ResourceManager* resMan = GameApplication::GetResourceManager();
 
     std::shared_ptr<GameObject> gameObject;
-    std::shared_ptr<cmp::Shader> shaderCmp = std::make_shared<cmp::Shader>();
-    shaderCmp->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
 
     std::string line;
     uint32_t line_id = 1;
@@ -35,7 +33,6 @@ bool MapLoader::Load(std::string path, SceneNode* root)
             std::shared_ptr<cmp::Name> nameCmp = std::make_shared<cmp::Name>();
             {
                 std::string name;
-
                 file >> name;
                 line_id++;
 
@@ -48,7 +45,6 @@ bool MapLoader::Load(std::string path, SceneNode* root)
             std::shared_ptr<cmp::Model> modelCmp = std::make_shared<cmp::Model>();
             {
                 std::string modelName;
-
                 file >> modelName;
                 line_id++;
 
@@ -80,9 +76,52 @@ bool MapLoader::Load(std::string path, SceneNode* root)
             }
             gameObject->AddComponent(transformCmp);
         }
+        else if(line == "Collider:")
+        {
+            int type = 0;
+            file >> std::dec >> type;
+            line_id++;
+
+            std::shared_ptr<BoxCollider> boxCollider = nullptr;
+            std::shared_ptr<SphereCollider> sphereCollider = nullptr;
+
+            switch(type)
+            {
+            case 0: /// BOX
+                boxCollider = std::make_shared<BoxCollider>(false, true);
+                {
+                    glm::vec3 size;
+                    file >> std::dec >> size.x;
+                    file >> std::dec >> size.y;
+                    file >> std::dec >> size.z;
+                    line_id += 3;
+
+                    boxCollider->AddToCollidersManager(collisionManager);
+                    boxCollider->setLengths(size);
+                }
+                gameObject->AddComponent(boxCollider);
+            break;
+
+            case 1: /// SPHERE
+                sphereCollider = std::make_shared<SphereCollider>(false, true);
+                {
+                    float size;
+                    file >> std::dec >> size;
+                    line_id++;
+
+                    sphereCollider->AddToCollidersManager(collisionManager);
+                    sphereCollider->SetRadius(size);
+                }
+                gameObject->AddComponent(sphereCollider);
+            break;
+            
+            default:
+                std::cerr << "Undefined collider type:" << type << " supported [0,1]" << std::endl;
+            }
+        }
         else if(line == "END")
         {
-            gameObject->AddComponent(shaderCmp);
+            gameObject->AddComponent(shader);
             root->AddChild(gameObject);
         }
         else

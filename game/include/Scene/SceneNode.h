@@ -31,6 +31,10 @@ private:
      */
     void SetParent(SceneNode* parent);
 
+    /** @brief Aktualizuje transformacje danego wezla i wszystkich jego podwezlow.
+     */
+    void PrivateUpdate(float dt, const glm::mat4& parentTransformations);
+
 public:
     /** @brief Tworzy nowy wezel.
      * @param gameObject - Wskazanie na GameObject nowego wezla.
@@ -56,11 +60,6 @@ public:
      */
     std::shared_ptr<GameObject> GetGameObject();
 
-    /** @brief Aktualizuje transformacje potomkow danego wezla.
-     * @param parentTransformations - Macierz transformacji rodzica.
-     */
-    void UpdateTransformations(const glm::mat4& parentTransformations);
-
     /** @brief Pozwala na zmiane transformacji danego wezla, jak i zapewnia, ze transformacje potomkowow zostana zaktualizowane.  
      * @return TransformComponent* - Wskazanie na komponent lokalnych transformacji GameObject'u danego wezla.
      */
@@ -71,9 +70,13 @@ public:
      */
     void Render(const glm::mat4& matrixPV);
 
+    /** @brief Wykonuje metode OnStart skryptow wszystkich GameObject'ow na scenie.
+     */
+    void LoadScripts();
+
     /** @brief Aktualizuje transformacje danego wezla i wszystkich jego podwezlow.
      */
-    void Update();
+    void Update(float dt);
 
     /** @brief Szuka SceneNode, gdzie GameObject posiada komponent NameComponent o podanej zawartosci.
      * @param name - Nazwa poszukiwanego Noda.
