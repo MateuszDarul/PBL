@@ -73,27 +73,27 @@ void CameraComponent::Update(InputManager* inputManager, const float& deltaTime)
 
     if(inputManager->Keyboard()->IsPressed(KeyboardKey::W))
     {
-        this->Move(CameraComponent::Movement::FORWARD, this->speedPerSec, deltaTime);
+        this->Move(Movement::FORWARD, this->speedPerSec, deltaTime);
     }
     if(inputManager->Keyboard()->IsPressed(KeyboardKey::S))
     {
-        this->Move(CameraComponent::Movement::BACKWARD, this->speedPerSec, deltaTime);
+        this->Move(Movement::BACKWARD, this->speedPerSec, deltaTime);
     }
     if(inputManager->Keyboard()->IsPressed(KeyboardKey::A))
     {
-        this->Move(CameraComponent::Movement::LEFT, this->speedPerSec, deltaTime);
+        this->Move(Movement::LEFT, this->speedPerSec, deltaTime);
     }
     if(inputManager->Keyboard()->IsPressed(KeyboardKey::D))
     {
-        this->Move(CameraComponent::Movement::RIGHT, this->speedPerSec, deltaTime);
+        this->Move(Movement::RIGHT, this->speedPerSec, deltaTime);
     }
     if(inputManager->Keyboard()->IsPressed(KeyboardKey::Q))
     {
-        this->Move(CameraComponent::Movement::UP, this->speedPerSec, deltaTime);
+        this->Move(Movement::UP, this->speedPerSec, deltaTime);
     }
     if(inputManager->Keyboard()->IsPressed(KeyboardKey::E))
     {
-        this->Move(CameraComponent::Movement::DOWN, this->speedPerSec, deltaTime);
+        this->Move(Movement::DOWN, this->speedPerSec, deltaTime);
     }
 }
 
