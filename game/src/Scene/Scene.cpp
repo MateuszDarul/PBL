@@ -2,7 +2,7 @@
 
 #include "Scripts/TestScript.h"
 #include "Scripts/StatsScript.h"
-#include "Scripts/RotatorScript.h"
+#include "Scripts/RaycastTest.h"
 
 Scene::Scene()
 {
@@ -181,6 +181,119 @@ Scene::Scene()
 
     ///***
 
+
+    //=== text
+
+    Font* font = resMan->GetFont("Resources/fonts/arial.ttf");
+
+    go = std::make_shared<GameObject>();
+    tc = std::make_shared<TransformComponent>();
+    auto textComponent = std::make_shared<TextComponent>();
+    textComponent->Create("Hello world", font);
+    // textComponent->alwaysSeen = true;
+    textComponent->color = {1.0f, 0.0f, 0.0f};
+
+    auto textShader = std::make_shared<ShaderComponent>();
+    textShader->Create("Resources/shaders/text.vert", "Resources/shaders/text.frag");
+
+    
+    go->AddComponent(textShader);
+    go->AddComponent(mc);
+    go->AddComponent(tc);
+    go->AddComponent(textComponent);
+
+    go->GetComponent<TransformComponent>()->SetPosition(0.0f, 5.0f, 0.0f);
+    go->AddComponent(std::make_shared<cmp::Name>("In world text"));
+    
+
+    world->AddChild(go);
+
+    //=== ray test ===
+
+    //- colider object
+    go = std::make_shared<GameObject>();
+    tc = std::make_shared<TransformComponent>();
+    tc->SetPosition(8.0f, 3.0f, 6.5f);
+    tc->SetRotation(0.0f, 15.0f, 0.0f);
+    go->AddComponent(tc);
+    mc = std::make_shared<ModelComponent>();
+    mc->Create(
+        resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+        resMan->GetMaterial("Resources/models/floor/floor.mtl")
+    );
+    go->AddComponent(shader_d);
+    go->AddComponent(mc);
+    go->AddComponent(std::make_shared<cmp::Name>("ray target"));
+    go->AddComponent(std::make_shared<cmp::BoxCol>(false, true));
+    go->GetComponent<BoxCollider>()->AddToCollidersManager(collidersManager);
+    go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
+
+    world->AddChild(go);
+
+    //- raycaster object
+
+    go = std::make_shared<GameObject>();
+
+    tc = std::make_shared<TransformComponent>();
+    tc->SetPosition(0.0f, 3.0f, 6.5f);
+    go->AddComponent(tc);
+
+    go->AddComponent(std::make_shared<cmp::Name>("Raycaster"));
+
+    auto lineShader = std::make_shared<cmp::Shader>();
+    lineShader->Create("Resources/shaders/line.vert", "Resources/shaders/line.frag");
+    go->AddComponent(lineShader);
+
+    auto line = std::make_shared<cmp::Line>();
+    line->Create();
+    line->color2 = { 0.0f, 1.0f, 1.0f };
+    go->AddComponent(line);
+
+    auto scriptHolder = std::make_shared<cmp::Scriptable>();
+    go->AddComponent(scriptHolder);
+
+    auto raycastScript = new RaycastTest();
+    scriptHolder->Add(raycastScript);
+    raycastScript->gameObject = go.get();
+    raycastScript->line = line.get();
+    raycastScript->collisionTarget = world->FindNode("ray target")->GetGameObject()->GetComponent<cmp::Transform>().get();
+
+    world->AddChild(go);
+
+    //===
+    go = std::make_shared<GameObject>();
+    tc = std::make_shared<TransformComponent>();
+    tc->SetPosition(8.0f, 3.0f, 4.0f);
+    mc = std::make_shared<ModelComponent>();
+    mc->Create(
+        resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+        resMan->GetMaterial("Resources/models/wall/wall.mtl")
+    );
+    go->AddComponent(shader_d);
+    go->AddComponent(mc);
+    go->AddComponent(tc);
+    go->AddComponent(std::make_shared<cmp::Name>("quicc test 1"));
+
+    world->AddChild(go);
+
+    //-
+    // go = std::make_shared<GameObject>();
+    // tc = std::make_shared<TransformComponent>();
+    // tc->SetPosition(8.0f, 3.0f, 6.5f);
+    // mc = std::make_shared<ModelComponent>();
+    // mc->Create(
+    //     resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+    //     resMan->GetMaterial("Resources/models/floor/floor.mtl")
+    // );
+    // go->AddComponent(shader_d);
+    // go->AddComponent(mc);
+    // go->AddComponent(tc);
+    // go->AddComponent(std::make_shared<cmp::Name>("quicc test 2"));
+
+    // world->AddChild(go);
+
+    //
+
     world->LoadScripts();
 }
 
@@ -192,11 +305,11 @@ Scene::~Scene()
     goCamera = nullptr;
 }
 
-float asd = 10.0f;
+
 void Scene::Update(float dt)
 {
-    //scene->FindNode("Face camera text")->GetGameObject()->GetComponent<cmp::Transform>()->SetScale(asd);
-    asd += dt;
+    world->FindNode("ray target")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, 0.0f, dt * 2.71f);
+    world->FindNode("In world text")->GetGameObject()->GetComponent<cmp::Text>()->FaceCamera(goCamera->GetComponent<cmp::Camera>());
 
     goCamera->GetComponent<cmp::Camera>()->Update(GameApplication::GetInputManager(), dt);
 
