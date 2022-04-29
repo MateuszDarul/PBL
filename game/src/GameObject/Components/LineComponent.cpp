@@ -14,9 +14,9 @@ LineComponent::~LineComponent()
 
 bool LineComponent::Create()
 {
-    pointsBuffer.push_back({ 1.0f,  2.0f, 3.0f,   0.0f});
-    pointsBuffer.push_back({ 1.0f, -5.0f, 2.5f,   0.5f});
-    pointsBuffer.push_back({ 0.0f, -4.0f, 2.0f,   1.0f });
+    pointsBuffer.push_back({{ 0.0f,  0.0f, 0.0f }, 0.0f });
+    pointsBuffer.push_back({{ 1.0f,  0.0f, 0.0f }, 1.0f });
+    
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -64,7 +64,7 @@ void LineComponent::AddPoint(const glm::vec3& point)
 
     for (int i = pointsBuffer.size()-2; i >= 0; i--)
     {
-        pointsBuffer[i].w = pointsBuffer[i+1].w - diff;
+        pointsBuffer[i].gradient = pointsBuffer[i+1].gradient - diff;
     }
 }
 
@@ -83,11 +83,16 @@ void LineComponent::RemoveAll()
     pointsBuffer.clear();
 }
 
-glm::vec4& LineComponent::Get(int i)
+glm::vec3& LineComponent::Get(int i)
 {
     if (i < pointsBuffer.size())
     {
-        return pointsBuffer[i];
+        return pointsBuffer[i].pos;
     }
+}
+
+int LineComponent::Count()
+{
+    return pointsBuffer.size();
 }
 

@@ -44,6 +44,12 @@ bool TextComponent::Draw(std::shared_ptr<ShaderComponent> shader)
 {
 	if (!font || !shader) return false;
 
+    if (alwaysSeen)
+    {
+    glDepthMask(GL_FALSE);
+    glDepthFunc(GL_ALWAYS);
+    }
+
     // activate corresponding render state	
     shader->Use();
     shader->SetVec3("textColor", color);
@@ -90,15 +96,20 @@ bool TextComponent::Draw(std::shared_ptr<ShaderComponent> shader)
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 
+    glDepthFunc(GL_LESS);
+    glDepthMask(GL_TRUE);
+
+
     return true;
 }
 
-void TextComponent::FaceCamera(std::shared_ptr<CameraComponent> camera, SceneNode* node)
+void TextComponent::FaceCamera(std::shared_ptr<CameraComponent> camera)
 {
+    auto node = GetOwner();
     auto m = glm::inverse(camera->GetView());
-    const auto& t = node->GetLocalTransformations()->GetPosition();
+    const auto& t = node->GetComponent<TransformComponent>()->GetPosition();
     m[3][0] = t.x;
     m[3][1] = t.y;
     m[3][2] = t.z;
-    node->GetLocalTransformations()->SetModelMatrix(m);
+    node->GetComponent<TransformComponent>()->SetModelMatrix(m);
 }

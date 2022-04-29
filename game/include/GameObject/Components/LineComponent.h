@@ -11,7 +11,13 @@
 
 #define MAX_LINE_POINTS 100
 
-/** @brief Komponent reprezentujacy model.
+struct LineVertex
+{
+    glm::vec3 pos;
+    float gradient;
+};
+
+/** @brief Komponent reprezentujacy linie.
  */
 class LineComponent :public Component
 {
@@ -36,14 +42,13 @@ public:
     void RemoveLast(int count = 1);
     void RemoveAll();
 
-    glm::vec4& Get(int index);
+    glm::vec3& Get(int index);
+
+    int Count();
 
 private:
     unsigned int VAO; //!< Vertex Array Object.
     unsigned int VBO; //!< Vertex Buffer Object.
 
-    std::vector<glm::vec4> pointsBuffer;
-    // float pointsBuffer[4*3] = { 1.0f,  2.0f, 3.0f,  0.0f,
-    //                             1.0f, -5.0f, 2.5f,  0.5f,
-    //                             0.0f, -4.0f, 2.0f,  1.0f }; //4 * x y z gradient
+    std::vector<LineVertex> pointsBuffer;
 };

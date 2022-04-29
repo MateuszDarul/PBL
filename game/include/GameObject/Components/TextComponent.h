@@ -44,9 +44,8 @@ public:
      * @brief Obraca tekst w strone kamery
      * 
      * @param cam Kamera docelowa
-     * @param textNode Wezel zawierajacy komponent tekstu
      */
-    void FaceCamera(std::shared_ptr<CameraComponent> cam, SceneNode* textNode);
+    void FaceCamera(std::shared_ptr<CameraComponent> cam);
 
     /**
      * @brief Wyswietla tekst w swiecie
