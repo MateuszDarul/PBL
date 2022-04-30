@@ -42,9 +42,9 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
         }
         else if(line == "Path:")
         {
+            std::string modelName;
             std::shared_ptr<cmp::Model> modelCmp = std::make_shared<cmp::Model>();
             {
-                std::string modelName;
                 file >> modelName;
                 line_id++;
 
@@ -54,6 +54,17 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
                 );
             }
             gameObject->AddComponent(modelCmp);
+
+            bool useFC;
+            file >> std::dec >> useFC;
+            line_id++;
+            if(useFC)
+            {
+                gameObject->AddComponent(std::make_shared<cmp::FrustumCulling>());
+                gameObject->GetComponent<cmp::FrustumCulling>()->Create(
+                    resMan->GetMesh("Resources/models/" + modelName + ".obj")
+                );
+            }
         }
         else if(line == "Transformations:")
         {

@@ -161,3 +161,23 @@ void CameraComponent::SetPosition(const glm::vec3& position)
 {
     this->position = position;
 }
+
+
+Frustum CameraComponent::GetFrustum(float aspect, float fov, float nearPlane, float farPlane)
+{
+    Frustum frustum;
+    float halfVSide = farPlane * tanf(fov * 0.5f);
+    float halfHSide = halfVSide * aspect;
+    glm::vec3 frontMultFar = farPlane * this->front;
+
+    frustum.Create(
+        Plane(this->position, glm::cross(this->right, frontMultFar - this->up * halfVSide)),
+        Plane(this->position, glm::cross(frontMultFar + this->up * halfVSide, this->right)),
+        Plane(this->position, glm::cross(frontMultFar - this->right * halfHSide, this->up)),
+        Plane(this->position, glm::cross(this->up,frontMultFar + this->right * halfHSide)),
+        Plane(this->position + frontMultFar, -this->front),
+        Plane(this->position + nearPlane * this->front, this->front)
+    );
+
+    return frustum;
+}

@@ -40,6 +40,10 @@ for ob in bpy.data.objects:
         f.write((ob.name + "\n"))
     f.write(("Path:\n"))
     f.write((GetModelName(ob.name) + "\n"))
+    if "_NUFC" not in ob.name:
+        f.write(("1" + "\n"))
+    else:
+        f.write(("0" + "\n"))
     f.write(("Transformations:\n"))
     f.write((str(round(-ob.location.x, 3)) + "\n"))
     f.write((str(round(ob.location.z, 3)) + "\n"))

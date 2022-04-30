@@ -73,6 +73,7 @@ void main()
             pixelColor += GetPointLight(pointLight[i]);
         }
     }
+    pixelColor = texture(diffuseMapData, vertexTexture).rgb;
 
     FragColor = vec4(pixelColor, 1.0f);
 }

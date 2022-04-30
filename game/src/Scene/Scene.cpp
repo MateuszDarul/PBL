@@ -36,9 +36,7 @@ Scene::Scene()
     go->AddComponent(std::make_shared<CameraComponent>());
     go->GetComponent<cmp::Camera>()->Create(glm::vec3(0,3,10));
     go->GetComponent<cmp::Camera>()->SetSpeed(5);
-
     collidersManager = new CollidersManager(go);
-
     go->AddComponent(std::make_shared<BoxCollider>(false, false));
     go->GetComponent<cmp::BoxCol>()->setLengths(glm::vec3(1,3,1));
     go->GetComponent<cmp::BoxCol>()->SetOffset(glm::vec3(0,-1.5,0));

@@ -10,6 +10,7 @@
 #include "TransformComponent.h"         // UUID 6
 #include "CameraComponent.h"            // UUID 7
 #include "PointLightComponent.h"        // UUID 8
+#include "FrustumCullingComponent.h"    // UUID 10
 
 #include "SphereCollider.h"             // UUID 11
 #include "BoxCollider.h"                // UUID 12
@@ -26,6 +27,7 @@ namespace cmp
     typedef TransformComponent Transform;
     typedef CameraComponent Camera;
     typedef PointLightComponent PointLight;
+    typedef FrustumCullingComponent FrustumCulling;
 
     typedef SphereCollider SphereCol;
     typedef BoxCollider BoxCol;

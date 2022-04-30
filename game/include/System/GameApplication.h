@@ -15,8 +15,28 @@ class Scene;
  */
 class GameApplication
 {
-public:
+private:
+    static void FramebufferResizeCallback(GLFWwindow*, int width, int height);
 
+    static GLFWwindow* s_Window;
+
+    static float s_Fov;
+    static int s_ScreenWidth, s_ScreenHeight;
+    static float s_NearPlane, s_FarPlane;
+    static glm::mat4 s_ProjectionMatrix;
+
+    static Scene* s_Scene;
+    static InputManager* s_InputManager;
+    static ResourceManager* s_ResourceManager;
+
+private:
+    /**
+     * @brief Sprząta po sobie, wywoływane po zakończeniu pętli gry.
+     * 
+     */
+    static void OnStop();
+
+public:
     /**
      * @brief Inicjalizacja bibliotek, managerów oraz resourców. Zwraca 0 przy powodzeniu.
      * 
@@ -58,24 +78,30 @@ public:
      */
     static const glm::mat4& GetProjection();
 
-private:
     /**
-     * @brief Sprząta po sobie, wywoływane po zakończeniu pętli gry.
+     * @brief Zwraca rozmiar okna
      * 
+     * @return glm::uvec2 - Rozmiar okna.
      */
-    static void OnStop();
+    static glm::uvec2 GetWindowSize();
 
+    /**
+     * @brief Get the Projection Range
+     * @return glm::vec2::x - Near plane
+     * @return glm::vec2::y - Far plane
+     */
+    static glm::vec2 GetProjectionRange();
 
-    static void FramebufferResizeCallback(GLFWwindow*, int width, int height);
+    /**
+     * @brief Set the Projection Range
+     * @return float - Near plane
+     * @return float - Far plane
+     */
+    static void SetProjectionRange(float nearPlane, float farPlane);
 
-    static GLFWwindow* s_Window;
-    static int s_ScreenWidth, s_ScreenHeight;
-    static glm::mat4 s_ProjectionMatrix;
+    static float GetFov();
 
-    static Scene* s_Scene;
-
-    static InputManager* s_InputManager;
-    static ResourceManager* s_ResourceManager;
+    static void SetFov(float fov);
 };
 
 /**

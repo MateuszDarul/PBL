@@ -8,12 +8,15 @@
 
 #include "GameObject.h"
 #include "Components.h"
+#include "GameApplication.h"
 
 /** @brief Wezly, ktore pozwalaja na hierarchizacje GameObject'ow w aplikacji.
  */
 class SceneNode
 {
 private:
+    static Frustum cameraFrustum; //!< Ostroslup widzenia kamery.
+
     SceneNode* parent; //!< Wskazanie na wezel nadrzedny.
     std::shared_ptr<GameObject> gameObject; //!< GameObject w scenie.
     std::vector<std::shared_ptr<SceneNode>> children; //!< Potomkowie tego wezla.
@@ -89,6 +92,11 @@ public:
      * @return SceneNode* - rodzic.
      */
     SceneNode* GetParent();
+
+    /** @brief Zwraca wskazanie na wezel glowny danego drzewa.
+     * @return SceneNode* - Wezel glowny.
+     */
+    SceneNode* GetRoot();
 
     /** @brief Porownuje SceneNode'y.
      * @param second - Wezel z ktorym chcemy porownac.

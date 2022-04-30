@@ -1,5 +1,8 @@
 #include "SceneNode.h"
 
+//#define DISPLAY_FC_RESULT
+Frustum SceneNode::cameraFrustum;
+
 SceneNode::SceneNode(std::shared_ptr<GameObject> gameObject)
     :parent(nullptr), gameObject(gameObject)
 {
@@ -36,9 +39,27 @@ void SceneNode::LoadScripts()
     }
 }
 
+#ifdef DISPLAY_FC_RESULT
+uint8_t all = 0;
+uint8_t rendered = 0;
+#endif  // DISPLAY_FC_RESULT
 void SceneNode::Update(float dt)
 {
+    #ifdef DISPLAY_FC_RESULT
+    std::cout << (int)rendered << " / " << (int)all << "\n";
+    all = 0;
+    rendered = 0;
+    #endif  // DISPLAY_FC_RESULT
+
     this->PrivateUpdate(dt, glm::mat4(1.f));
+
+    SceneNode::cameraFrustum = 
+    this->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>()->GetFrustum(
+        (float)GameApplication::GetWindowSize().x/GameApplication::GetWindowSize().y,
+        GameApplication::GetFov(),
+        GameApplication::GetProjectionRange().x,
+        GameApplication::GetProjectionRange().y
+    );
 }
 
 void SceneNode::PrivateUpdate(float dt, const glm::mat4& parentTransformations)
@@ -65,6 +86,7 @@ void SceneNode::PrivateUpdate(float dt, const glm::mat4& parentTransformations)
     {
         this->children[i]->PrivateUpdate(dt, this->globalTransformations);
     }
+    
 }
 
 void SceneNode::Render(const glm::mat4& matrixPV)
@@ -72,25 +94,43 @@ void SceneNode::Render(const glm::mat4& matrixPV)
     std::shared_ptr<cmp::Shader> shaderPtr = this->gameObject->GetComponent<cmp::Shader>();
     if(shaderPtr != nullptr)
     {
-        std::shared_ptr<cmp::PointLight> pointLightPtr = this->gameObject->GetComponent<cmp::PointLight>();
-        std::shared_ptr<cmp::Model> modelPtr = this->gameObject->GetComponent<cmp::Model>();
-        std::shared_ptr<cmp::ModelInst> modelInstPtr = this->gameObject->GetComponent<cmp::ModelInst>();
+        #ifdef DISPLAY_FC_RESULT
+        all++;
+        #endif  // DISPLAY_FC_RESULT
 
-        shaderPtr->Use();
-        shaderPtr->SetMat4("transform", matrixPV);
-        shaderPtr->SetMat4("model", this->globalTransformations);
+        bool display = true;
+        std::shared_ptr<FrustumCullingComponent> frustumCullingPtr = this->gameObject->GetComponent<FrustumCullingComponent>();
+        if(frustumCullingPtr != nullptr)
+        {
+            display = frustumCullingPtr->IsVisible(SceneNode::cameraFrustum);
+        }
 
-        if(pointLightPtr != nullptr)
+        if(display)
         {
-            pointLightPtr->Use(shaderPtr);
-        }
-        else if(modelPtr != nullptr)
-        {
-            modelPtr->Draw(shaderPtr);
-        }
-        else if(modelInstPtr != nullptr)
-        {
-            modelInstPtr->Draw(shaderPtr);
+            #ifdef DISPLAY_FC_RESULT
+            rendered++;
+            #endif  // DISPLAY_FC_RESULT
+
+            std::shared_ptr<cmp::PointLight> pointLightPtr = this->gameObject->GetComponent<cmp::PointLight>();
+            std::shared_ptr<cmp::Model> modelPtr = this->gameObject->GetComponent<cmp::Model>();
+            std::shared_ptr<cmp::ModelInst> modelInstPtr = this->gameObject->GetComponent<cmp::ModelInst>();
+
+            shaderPtr->Use();
+            shaderPtr->SetMat4("transform", matrixPV);
+            shaderPtr->SetMat4("model", this->globalTransformations);
+
+            if(pointLightPtr != nullptr)
+            {
+                pointLightPtr->Use(shaderPtr);
+            }
+            else if(modelPtr != nullptr)
+            {
+                modelPtr->Draw(shaderPtr);
+            }
+            else if(modelInstPtr != nullptr)
+            {
+                modelInstPtr->Draw(shaderPtr);
+            }
         }
     }
 
@@ -147,6 +187,16 @@ void SceneNode::SetParent(SceneNode* parent)
 SceneNode* SceneNode::GetParent()
 {
     return this->parent;
+}
+
+SceneNode* SceneNode::GetRoot()
+{
+    SceneNode* root = this;
+    while(root->GetParent() != nullptr)
+    {
+        root = root->GetParent();
+    }
+    return root;
 }
 
 bool SceneNode::Is(SceneNode* second)

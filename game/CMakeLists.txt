@@ -5,6 +5,9 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/System/GameApplication.cpp
 	src/System/CollidersManager.cpp
 
+	src/DataStructures/Plane.cpp
+	src/DataStructures/Frustum.cpp
+
 	src/GameObject/GameObject.cpp
 	src/GameObject/Components/Component.cpp
 	src/GameObject/Components/ColliderComponent.cpp
@@ -19,6 +22,7 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/ScriptComponent.cpp
 	src/GameObject/Components/CameraComponent.cpp
 	src/GameObject/Components/PointLightComponent.cpp
+	src/GameObject/Components/FrustumCullingComponent.cpp
 
 	src/Resource/Mesh.cpp
 	src/Resource/Material.cpp
@@ -46,6 +50,9 @@ file(GLOB_RECURSE HEADER_FILES
 	include/System/GameApplication.h
 	include/System/CollidersManager.h
 
+	include/DataStructures/Plane.h
+	include/DataStructures/Frustum.h
+
 	include/GameObject/GameObject.h
 	include/GameObject/Components/Components.h
 	include/GameObject/Components/Component.h
@@ -61,6 +68,7 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/Components/ScriptComponent.h
 	include/GameObject/Components/CameraComponent.h
 	include/GameObject/Components/PointLightComponent.h
+	include/GameObject/Components/FrustumCullingComponent.h
 
 	include/Resource/Mesh.h
 	include/Resource/Material.h
@@ -79,6 +87,7 @@ file(GLOB_RECURSE HEADER_FILES
 
 include_directories(include)
 include_directories(include/System)
+include_directories(include/DataStructures)
 include_directories(include/GameObject)
 include_directories(include/GameObject/Components)
 include_directories(include/Resource)
