@@ -33,7 +33,7 @@ public:
     /**
      * @brief GameObject posiadajacy instancje skryptu
      */
-    GameObject* gameObject;
+    std::shared_ptr<GameObject> gameObject;
 
     /**
      * @brief Flaga ustalajaca czy wykonywac daną instancje skryptu
@@ -101,7 +101,7 @@ ScriptType* ScriptComponent::Get()
     {
         if (typeid(*s) == typeid(ScriptType)) 
         {
-           return s;
+           return (ScriptType*)s;
         }
     }
 
