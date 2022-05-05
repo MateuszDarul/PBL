@@ -3,7 +3,15 @@
 #include "ColliderComponent.h"
 #include <vector>
 
-/** @brief Menad¿er kolizji.
+struct RayHitInfo
+{
+	glm::vec3 point;
+	glm::vec3 normal;
+	float distance;
+	GameObject* gameObject;
+};
+
+/** @brief Menadï¿½er kolizji.
  */
 class CollidersManager
 {
@@ -13,9 +21,9 @@ private:
 	std::vector<std::weak_ptr<ColliderComponent>> dynamicColliders; //!< Lista statycznych zderzaczy.
 	std::vector<std::weak_ptr<ColliderComponent>> dynamicTriggers; //!< Lista statycznych wyzwalaczy.
 
-	/** @brief Usuwa komponent koliderów.
-	 * @param vector - Z której listy ma usun¹æ kolider.
-	 * @param col - WskaŸnik kolideru do usuniêcia.
+	/** @brief Usuwa komponent koliderï¿½w.
+	 * @param vector - Z ktï¿½rej listy ma usunï¿½ï¿½ kolider.
+	 * @param col - Wskaï¿½nik kolideru do usuniï¿½cia.
 	 */
 	void RemoveFromVector(std::vector<std::weak_ptr<ColliderComponent>> vector, std::shared_ptr<ColliderComponent> col);
 public:
@@ -28,43 +36,43 @@ public:
 	 */
 	~CollidersManager();
 
-	/** @brief Dodaje wskaŸnik statycznego zderzacza do listy.
-	 * @param col - WskaŸnik na statyczny zderzacz do dodania.
+	/** @brief Dodaje wskaï¿½nik statycznego zderzacza do listy.
+	 * @param col - Wskaï¿½nik na statyczny zderzacz do dodania.
 	 */
 	void AddStaticCollider(std::shared_ptr<ColliderComponent> collider);
 
-	/** @brief Dodaje wskaŸnik dynamicznego zderzacza do listy.
-	 * @param col - WskaŸnik na dynamiczny zderzacz do dodania.
+	/** @brief Dodaje wskaï¿½nik dynamicznego zderzacza do listy.
+	 * @param col - Wskaï¿½nik na dynamiczny zderzacz do dodania.
 	 */
 	void AddDynamicCollider(std::shared_ptr<ColliderComponent> collider);
 
-	/** @brief Dodaje wskaŸnik statycznego wyzwalacza do listy.
-	 * @param col - WskaŸnik na statyczny wyzwalacz do dodania.
+	/** @brief Dodaje wskaï¿½nik statycznego wyzwalacza do listy.
+	 * @param col - Wskaï¿½nik na statyczny wyzwalacz do dodania.
 	 */
 	void AddStaticTrigger(std::shared_ptr<ColliderComponent> trigger);
 
-	/** @brief Dodaje wskaŸnik dynamicznego wyzwalacza do listy.
-	 * @param col - WskaŸnik na dynamiczny wyzwalacz do dodania.
+	/** @brief Dodaje wskaï¿½nik dynamicznego wyzwalacza do listy.
+	 * @param col - Wskaï¿½nik na dynamiczny wyzwalacz do dodania.
 	 */
 	void AddDynamicTrigger(std::shared_ptr<ColliderComponent> trigger);
 
-	/** @brief Usuwa wskaŸnik dynamicznego zderzacza z listy.
-	 * @param col - WskaŸnik na dynamiczny zderzacz do usuniêcia.
+	/** @brief Usuwa wskaï¿½nik dynamicznego zderzacza z listy.
+	 * @param col - Wskaï¿½nik na dynamiczny zderzacz do usuniï¿½cia.
 	 */
 	void RemoveDynamicColllider(std::shared_ptr<ColliderComponent> collider);
 
-	/** @brief Usuwa wskaŸnik statycznego zderzacza z listy.
-	 * @param col - WskaŸnik na statyczny zderzacz do usuniêcia.
+	/** @brief Usuwa wskaï¿½nik statycznego zderzacza z listy.
+	 * @param col - Wskaï¿½nik na statyczny zderzacz do usuniï¿½cia.
 	 */
 	void RemoveStaticColllider(std::shared_ptr<ColliderComponent> collider);
 
-	/** @brief Usuwa wskaŸnik dynamicznego wyzywalacza z listy.
-	 * @param col - WskaŸnik na dynamiczny wyzwalacz do usuniêcia.
+	/** @brief Usuwa wskaï¿½nik dynamicznego wyzywalacza z listy.
+	 * @param col - Wskaï¿½nik na dynamiczny wyzwalacz do usuniï¿½cia.
 	 */
 	void RemoveDynamicTrigger(std::shared_ptr<ColliderComponent> trigger);
 
-	/** @brief Usuwa wskaŸnik dynamicznego wyzwalacza z listy.
-	 * @param col - WskaŸnik na statyczny wyzwalacz do usuniêcia.
+	/** @brief Usuwa wskaï¿½nik dynamicznego wyzwalacza z listy.
+	 * @param col - Wskaï¿½nik na statyczny wyzwalacz do usuniï¿½cia.
 	 */
 	void RemoveStaticTrigger(std::shared_ptr<ColliderComponent> trigger);
 	
@@ -75,5 +83,8 @@ public:
 	/** @brief Sprawdza kolizje kolejno: dynamicze wyzwalacze z dynamicznymi wyzwalaczami, dynamicze wyzwalacze ze statycznymi zderzaczami, dynamicze zderzacze ze statycznymi wyzwalaczami.
 	 */
 	void CheckTriggers();
+
+
+	bool Raycast(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance = 100000.0f, bool shouldHitTriggers = false /*, layer*/ );
 };
 #endif

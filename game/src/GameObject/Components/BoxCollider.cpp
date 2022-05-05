@@ -2,6 +2,11 @@
 #include "Components.h"
 #include "GameObject.h"
 
+#include "CollidersManager.h"
+
+#include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/intersect.hpp>
+
 BoxCollider::BoxCollider()
 	:ColliderComponent(12, false, false)
 {
@@ -147,3 +152,46 @@ glm::uvec3 BoxCollider::getLengths()
 	return lengths;
 }
 
+bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance)
+{
+	auto transform = GetOwner()->GetComponent<cmp::Transform>();
+	glm::vec3 normal(transform->GetModelMatrix() * glm::vec4(-1.0f, 0.0f, 0.0f, 1.0f));
+    normal -= GetOwner()->GetComponent<cmp::Transform>()->GetPosition();
+    normal = glm::normalize(normal);
+
+
+	glm::vec4 v0_4 = transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x,  0.5f * lengths.y,  0.5f * lengths.z, 1.0);
+	glm::vec4 v1_4 = transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x, -0.5f * lengths.y,  0.5f * lengths.z, 1.0);
+	glm::vec4 v2_4 = transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x, -0.5f * lengths.y, -0.5f * lengths.z, 1.0);
+	glm::vec4 v4_4 = transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x,  0.5f * lengths.y, -0.5f * lengths.z, 1.0);
+
+	glm::vec3 v0(v0_4);
+	glm::vec3 v1(v1_4);
+	glm::vec3 v2(v2_4);
+	glm::vec3 v4(v4_4);
+
+	glm::vec2 bary1, bary2;
+	
+	float d1 = maxDistance;
+	float d2 = maxDistance;
+	float d  = maxDistance;
+	if (glm::intersectRayTriangle(origin, dir, v0, v1, v2, bary1, d1)
+		|  glm::intersectRayTriangle(origin, dir, v2, v4, v0, bary2, d2))
+	{
+		d = std::min(d1, d2);
+		if (d <= 0.0001f)
+		{
+			return false;
+		}
+
+		hitInfo.point = origin + dir * d;
+		hitInfo.normal = normal;
+		hitInfo.distance = d;
+		hitInfo.gameObject = GetOwner().get();
+		
+
+		return true;
+	}
+	
+	return false;
+}

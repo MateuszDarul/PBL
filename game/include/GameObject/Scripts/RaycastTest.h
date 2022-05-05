@@ -3,6 +3,7 @@
 #include "GameApplication.h"
 #include "Components.h"
 
+
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/intersect.hpp>
 
@@ -15,13 +16,14 @@ public:
     cmp::Line* line;
     cmp::Transform* collisionTarget;
 
-    float distance = 1.0f;
-    float hitDistance;
+    CollidersManager* colMan;
+ 
+    
     glm::vec3 dir = { 1.0f, 0.0f, 0.0f };
     glm::vec3 origin = { 0.0f, 0.0f, 0.0f };
-    int currentIndex;
-
+   
     cmp::Transform* transform;
+
 
     void Start()
     {
@@ -32,106 +34,82 @@ public:
         if (line)
         {
             origin = line->Get(0) + transform->GetPosition();  
-            currentIndex = 1;
             line->AddPoint(0, 0, 0);
-         //   hitDistance = GetNextDistance();
         }
     }
-
-    void LineStuff()
-    {
-        auto& p1 = line->Get(1);
-
-        glm::vec3 normal = { -1.0f, 0.0f, 0.0f }; 
-        normal = glm::rotate( 
-            normal, 
-            glm::radians(collisionTarget->GetRotation().y),
-            {0.0f, 1.0f, 0.0f}
-        );
-    
-        glm::vec3 otherPos = collisionTarget->GetPosition();
-        glm::vec3 c = normal * (float)collisionTarget->GetOwner()->GetComponent<cmp::BoxCol>()->getLengths().x;
-        otherPos += c;
-        
-        glm::vec3 w = otherPos - line->Get(0);
-
-        p1 = otherPos;
-
-        auto& p2 = line->Get(2);
-
-        p2 = glm::reflect(p1 - origin, normal);
-
-        p2 -= gameObject->GetComponent<cmp::Transform>()->GetPosition();
-        p1 -= gameObject->GetComponent<cmp::Transform>()->GetPosition();
-
-        //float k = glm::dot(w, normal) / glm::dot(dir, normal);
-    }
-
-    void Raycast()
-    {
-        glm::vec3 normal(collisionTarget->GetModelMatrix() * glm::vec4(-1.0f, 0.0f, 0.0f, 1.0f));
-        normal -= collisionTarget->GetPosition();
-        normal = glm::normalize(normal);
-
-        auto col = collisionTarget->GetOwner()->GetComponent<cmp::BoxCol>()->getLengths();
-
-        glm::vec4 v0_4 = collisionTarget->GetModelMatrix() * glm::vec4(-0.5f * col.x,  0.5f * col.y,  0.5f * col.z, 1.0);
-        glm::vec4 v1_4 = collisionTarget->GetModelMatrix() * glm::vec4(-0.5f * col.x, -0.5f * col.y,  0.5f * col.z, 1.0);
-        glm::vec4 v2_4 = collisionTarget->GetModelMatrix() * glm::vec4(-0.5f * col.x, -0.5f * col.y, -0.5f * col.z, 1.0);
-        glm::vec4 v4_4 = collisionTarget->GetModelMatrix() * glm::vec4(-0.5f * col.x,  0.5f * col.y, -0.5f * col.z, 1.0);
-
-        glm::vec3 v0(v0_4);
-        glm::vec3 v1(v1_4);
-        glm::vec3 v2(v2_4);
-        glm::vec3 v4(v4_4);
-
-        glm::vec2 bary1, bary2;
-        float maxDistance = 14.0f;
-        float d1 = maxDistance;
-        float d2 = maxDistance;
-        float d  = maxDistance;
-        if (glm::intersectRayTriangle(origin, dir, v0, v1, v2, bary1, d1)
-         |  glm::intersectRayTriangle(origin, dir, v2, v4, v0, bary2, d2))
-        {
-            d = std::min(d1, d2);
-            line->Get(2) = (maxDistance - d) * glm::reflect(dir, normal);
-        }
-        else
-        {
-            line->Get(2) = line->Get(0);;
-        }
-
-
-        printf("Triangle:\n %f %f %f\n %f %f %f\n %f %f %f\n %f %f %f\n",
-            v0.x, v0.y, v0.z,
-            v1.x, v1.y, v1.z,
-            v2.x, v2.y, v2.z,
-            v4.x, v4.y, v4.z
-        );
-        printf("Bary1: %f, %f \t%f\n", bary1.x, bary1.y, d1);
-        printf("Bary2: %f, %f \t%f\n", bary2.x, bary2.y, d2);
-        //printf("dist %f\n", d);
-        
-        line->Get(1).x = d;
-    }
-
-    float animation = 0.0f;
 
     void Update(float dt)
     {
-        if (line)
+        if (collisionTarget)
         {
-            origin = line->Get(0) + transform->GetPosition();  
-            if (collisionTarget)
+            if(Input()->Keyboard()->IsPressed(KeyboardKey::Right))
             {
-                Raycast();
+                collisionTarget->Rotate(0, -7.0f * dt, 0);
+            }
+            if(Input()->Keyboard()->IsPressed(KeyboardKey::Left))
+            {
+                collisionTarget->Rotate(0,  7.0f * dt, 0);
             }
         }
 
-        glm::vec3 pos = transform->GetPosition();
-        pos.y = 2.5f * sin(animation * 0.1f) + 2.0f;
-        transform->SetPosition(pos);
+        if (line)
+        {
+            float maxDistance = 25.0f;
+            int maxBounces = 10;
 
-        animation += dt;
+            origin = line->Get(0) + transform->GetPosition();
+            float d = maxDistance;
+            int hits = 0;
+            dir = { 1.0f, 0.0f, 0.0f };
+
+            RayHitInfo hit;
+            while (hits < maxBounces && d > 0.0f && colMan->Raycast(origin, dir, hit, d))
+            {
+                hits += 1;
+                d -= hit.distance;
+
+                if (line->Count()-1 < hits)
+                {
+                    line->AddPoint(hit.point - transform->GetPosition());
+                }
+                else
+                {
+                    line->Get(hits) = hit.point - transform->GetPosition();
+                }
+
+                // if (hit.gameObject.layer == mirror)
+                // {
+
+                    printf("  old origin: %f, %f, %f\n", origin.x, origin.y, origin.z);
+                    printf("old dir: %f, %f, %f\n", dir.x, dir.y, dir.z);
+                    dir = glm::reflect(dir, hit.normal);
+                    origin = hit.point;// + dir * 0.001f;
+                // }
+                // else
+                // {
+                //     if (hit.gameObject.layer == activable)
+                //     {
+                //         hit.gameObject.dostuff;
+                //     }
+                //     break;
+                // }
+                printf("New origin: %f, %f, %f\n", origin.x, origin.y, origin.z);
+                printf("New dir: %f, %f, %f\n", dir.x, dir.y, dir.z);
+                printf("New distance: %f\n", d);
+                printf("Hit count: %i\n", hits);
+            }
+
+            if (line->Count() > hits + 2)
+            {
+                line->RemoveLast(line->Count() - hits - 2);
+            }
+            else if (line->Count() < hits + 2)
+            {
+                line->AddPoint(0,0,0);
+            }
+            
+
+            line->Get(hits+1) = origin + dir * d - transform->GetPosition();
+        }
     }
 };

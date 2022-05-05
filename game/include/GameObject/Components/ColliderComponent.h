@@ -7,36 +7,37 @@
 
 class CollidersManager;
 class GameObject;
+class RayHitInfo;
 
-/** @brief Abstrakcyjny komponent koliderów.
+/** @brief Abstrakcyjny komponent koliderï¿½w.
  */
 class ColliderComponent : public Component
 {
 protected:
-	glm::vec3 offset; //!< Przesuniêcie kolidera wzglêdem bazowego obiektu.
-	float mass; //!< Masa obiektu do którego podczepiony jest kolider.
+	glm::vec3 offset; //!< Przesuniï¿½cie kolidera wzglï¿½dem bazowego obiektu.
+	float mass; //!< Masa obiektu do ktï¿½rego podczepiony jest kolider.
 
-	/** @brief Zwraca indeks najmniejszej wartoœci z tablicy z d³ugoœciami wektorów rozsuniêcia.
-	 * @param array - Tablica z 6 d³ugoœciami potencjalnych wektorów rozsuniêcia.
-	 * @return int - indeks najmniejszej wartoœci z tablicy.
+	/** @brief Zwraca indeks najmniejszej wartoï¿½ci z tablicy z dï¿½ugoï¿½ciami wektorï¿½w rozsuniï¿½cia.
+	 * @param array - Tablica z 6 dï¿½ugoï¿½ciami potencjalnych wektorï¿½w rozsuniï¿½cia.
+	 * @return int - indeks najmniejszej wartoï¿½ci z tablicy.
 	 */
 	int GetLowestValueIndex(float array[6]);
 
-	/** @brief Ustawia wektory rozsuniêcia na podstawie tablicy z d³ugoœciami potencjalnych wektorów rozsuniêcia, gdy przebiega ono wzd³u¿ osi X, Y lub Z.
-	 * @param array - Tablica z 6 d³ugoœciami potencjalnych wektorów rozsuniêcia.
-	 * @param thisMoveVec - Referencja do wektoru, który pos³u¿y do odsuniêcia tego obiektu.
-	 * @param thisMoveVec - Referencja do wektoru, który pos³u¿y do odsuniêcia drugiego obiektu.
+	/** @brief Ustawia wektory rozsuniï¿½cia na podstawie tablicy z dï¿½ugoï¿½ciami potencjalnych wektorï¿½w rozsuniï¿½cia, gdy przebiega ono wzdï¿½uï¿½ osi X, Y lub Z.
+	 * @param array - Tablica z 6 dï¿½ugoï¿½ciami potencjalnych wektorï¿½w rozsuniï¿½cia.
+	 * @param thisMoveVec - Referencja do wektoru, ktï¿½ry posï¿½uï¿½y do odsuniï¿½cia tego obiektu.
+	 * @param thisMoveVec - Referencja do wektoru, ktï¿½ry posï¿½uï¿½y do odsuniï¿½cia drugiego obiektu.
 	 */
 	void GetSeparationVectors(float array[6], glm::vec3& boxMoveVec, glm::vec3& sphereMoveVec);
 
 public:
-	bool isStatic; //!< Czy ten kolider ma byæ statyczny.
-	bool isTrigger; //!< Czy ten kolider ma byæ wyzwalaczem.
+	bool isStatic; //!< Czy ten kolider ma byï¿½ statyczny.
+	bool isTrigger; //!< Czy ten kolider ma byï¿½ wyzwalaczem.
 
-	/** @brief Konstruktor komponent koliderów.
+	/** @brief Konstruktor komponent koliderï¿½w.
 	 * @param UUID - Unikalny indentyfikator klasy komponentu.
-	 * @param isTrigger - Czy ten kolider ma byæ wyzwalaczem.
-	 * @param isStatic -Czy ten kolider ma byæ statyczny.
+	 * @param isTrigger - Czy ten kolider ma byï¿½ wyzwalaczem.
+	 * @param isStatic -Czy ten kolider ma byï¿½ statyczny.
 	 */
 	ColliderComponent(uint32_t UUID, bool isTrigger, bool isStatic);
 	
@@ -44,42 +45,44 @@ public:
 	*/
 	~ColliderComponent();
 
-	/** @brief Metoda dodaje kolider do menad¿era koliderów.
-	* @param collidersManager - wskaŸnik na menad¿er koliderów.
+	/** @brief Metoda dodaje kolider do menadï¿½era koliderï¿½w.
+	* @param collidersManager - wskaï¿½nik na menadï¿½er koliderï¿½w.
 	*/
 	void AddToCollidersManager(CollidersManager* collidersManager);
 
-	/** @brief Zwraca przesuniêcie kolidera.
-	* @return glm::vec3 - Wektor przesuniêcia.
+	/** @brief Zwraca przesuniï¿½cie kolidera.
+	* @return glm::vec3 - Wektor przesuniï¿½cia.
 	*/
 	glm::vec3 GetOffset();
 	
-	/** @brief Ustawia przesuniêcie kolidera.
-	* @param glm::vec3 - Wektor przesuniêcia.
+	/** @brief Ustawia przesuniï¿½cie kolidera.
+	* @param glm::vec3 - Wektor przesuniï¿½cia.
 	*/
 	void SetOffset(glm::vec3 offset);
 
-	/** @brief Abstrakcyjna metoda sprawdzaj¹ca kolizjê z innym obiektem.
-	* @param collider - wskaŸnik na kolider z którym trzeba sprawdziæ kolizjê.
-	* @return true - zasz³a kolizja.
-	* @return flase - nie zasz³a kolizja.
+	/** @brief Abstrakcyjna metoda sprawdzajï¿½ca kolizjï¿½ z innym obiektem.
+	* @param collider - wskaï¿½nik na kolider z ktï¿½rym trzeba sprawdziï¿½ kolizjï¿½.
+	* @return true - zaszï¿½a kolizja.
+	* @return flase - nie zaszï¿½a kolizja.
 	*/
 	bool virtual CheckCollision(std::shared_ptr<ColliderComponent> collider) = 0;
 
-	/** @brief Metoda sprawdzaj¹ca czy sfera znajduje siê miêdzy dwoma równoleg³ymi œcianami pude³ka na danej osi.
-	* @param spherePos - wartoœæ X, Y lub z œrodka sfery.
-	* @param boxMinSidePos - wartoœæ tej œciany le¿¹cej na danej osi, która ma j¹ mniejsz¹.
-	* @param boxMaxSidePos - wartoœæ tej œciany le¿¹cej na danej osi, która ma j¹ wiêksz¹.
-	* @return float - wartoœæ X, Y lub Z œrodka sfery, je¿eli le¿y miêdzy dwiema œcianami pude³ka, lub wartoœæ X, Y lub Z œciany bli¿szej tego œrodka.
+	virtual bool RayCollision(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance) = 0;
+
+	/** @brief Metoda sprawdzajï¿½ca czy sfera znajduje siï¿½ miï¿½dzy dwoma rï¿½wnolegï¿½ymi ï¿½cianami pudeï¿½ka na danej osi.
+	* @param spherePos - wartoï¿½ï¿½ X, Y lub z ï¿½rodka sfery.
+	* @param boxMinSidePos - wartoï¿½ï¿½ tej ï¿½ciany leï¿½ï¿½cej na danej osi, ktï¿½ra ma jï¿½ mniejszï¿½.
+	* @param boxMaxSidePos - wartoï¿½ï¿½ tej ï¿½ciany leï¿½ï¿½cej na danej osi, ktï¿½ra ma jï¿½ wiï¿½kszï¿½.
+	* @return float - wartoï¿½ï¿½ X, Y lub Z ï¿½rodka sfery, jeï¿½eli leï¿½y miï¿½dzy dwiema ï¿½cianami pudeï¿½ka, lub wartoï¿½ï¿½ X, Y lub Z ï¿½ciany bliï¿½szej tego ï¿½rodka.
 	*/
 	float Clamp(float spherePos, float boxMinSidePos, float boxMaxSidePos);
 
-	/** @brief Ustawia dodatni¹ masê obiektu, do którego jest podczepiony kolider.
+	/** @brief Ustawia dodatniï¿½ masï¿½ obiektu, do ktï¿½rego jest podczepiony kolider.
 	* @param float - masa obiektu.
 	*/
 	void SetMass(float mass);
 
-	/** @brief Zwraca masê obiektu, do którego jest podczepiony kolider.
+	/** @brief Zwraca masï¿½ obiektu, do ktï¿½rego jest podczepiony kolider.
 	* @return float - masa obiektu.
 	*/
 	float GetMass();

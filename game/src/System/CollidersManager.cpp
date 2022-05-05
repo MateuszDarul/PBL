@@ -118,3 +118,32 @@ void CollidersManager::CheckTriggers()
 		}
 	}
 }
+
+#include "Components.h"
+#include "GameObject.h"
+bool CollidersManager::Raycast(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance, bool shouldHitTriggers/*, layer*/ )
+{
+	//FIXME: inefficient checks 
+
+	bool hit = false;
+
+
+	for (int i = 0; i<dynamicColliders.size(); i++)
+	{
+		std::shared_ptr<ColliderComponent> collider = dynamicColliders[i].lock();
+		hit |= collider->RayCollision(origin, dir, hitInfo, maxDistance);
+	}
+	//static ...
+	
+
+	if (shouldHitTriggers)
+	{
+		for (int i = 0; i<dynamicTriggers.size(); i++)
+		{
+			std::shared_ptr<ColliderComponent> collider = dynamicTriggers[i].lock();
+			hit |= collider->RayCollision(origin, dir, hitInfo, maxDistance);
+		}
+	}
+
+	return hit;
+}

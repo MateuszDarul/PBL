@@ -4,21 +4,21 @@
 
 #include <glm/glm.hpp>
 
-/** @brief Komponent pude³kowych koliderów.
+/** @brief Komponent pudeï¿½kowych koliderï¿½w.
  */
 class BoxCollider : public ColliderComponent
 {
 private:
-	glm::uvec3 lengths; //!< D³ugoœci boków pude³ka, równoleg³e do osi X, Y lub Z.
+	glm::uvec3 lengths; //!< Dï¿½ugoï¿½ci bokï¿½w pudeï¿½ka, rï¿½wnolegï¿½e do osi X, Y lub Z.
 public:
 
-	/** @brief Konstruktor komponentu koliderów.
+	/** @brief Konstruktor komponentu koliderï¿½w.
 	 */
 	BoxCollider();
 
-	/** @brief Konstruktor komponent koliderów.
-	 * @param isTrigger - Czy ten kolider ma byæ wyzwalaczem.
-	 * @param isStatic -Czy ten kolider ma byæ statyczny.
+	/** @brief Konstruktor komponent koliderï¿½w.
+	 * @param isTrigger - Czy ten kolider ma byï¿½ wyzwalaczem.
+	 * @param isStatic -Czy ten kolider ma byï¿½ statyczny.
 	 */
 	BoxCollider(bool isTrigger, bool isStatic);
 
@@ -26,20 +26,21 @@ public:
 	 */
 	~BoxCollider();
 
-	/** @brief Metoda sprawdzaj¹ca kolizjê z innym obiektem.
-	* @param collider - wskaŸnik na kolider z którym trzeba sprawdziæ kolizjê.
-	* @return true - zasz³a kolizja.
-	* @return flase - nie zasz³a kolizja.
+	/** @brief Metoda sprawdzajï¿½ca kolizjï¿½ z innym obiektem.
+	* @param collider - wskaï¿½nik na kolider z ktï¿½rym trzeba sprawdziï¿½ kolizjï¿½.
+	* @return true - zaszï¿½a kolizja.
+	* @return flase - nie zaszï¿½a kolizja.
 	*/
 	bool virtual CheckCollision(std::shared_ptr<ColliderComponent> collider);
+	virtual bool RayCollision(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance);
 
-	/** @brief Metoda ustawiaj¹ca nowe d³ugoœci krawêdzi pude³kowego kolidera.
-	* @param lengths - nowe d³ugoœci krawêdzi pude³kowego kolidera.
+	/** @brief Metoda ustawiajï¿½ca nowe dï¿½ugoï¿½ci krawï¿½dzi pudeï¿½kowego kolidera.
+	* @param lengths - nowe dï¿½ugoï¿½ci krawï¿½dzi pudeï¿½kowego kolidera.
 	*/
 	void setLengths(glm::uvec3 lengths);
 
-	/** @brief Metoda zwracaj¹ca d³ugoœci krawêdzi pude³kowego kolidera.
-	* @return glm::uvec3 - D³ugoœci krawêdzi.
+	/** @brief Metoda zwracajï¿½ca dï¿½ugoï¿½ci krawï¿½dzi pudeï¿½kowego kolidera.
+	* @return glm::uvec3 - Dï¿½ugoï¿½ci krawï¿½dzi.
 	*/
 	glm::uvec3 getLengths();
 };

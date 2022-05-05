@@ -158,7 +158,7 @@ Scene::Scene()
 
     go = std::make_shared<GameObject>();
     tc = std::make_shared<TransformComponent>();
-    tc->SetScale(0.01f);
+    tc->SetScale(0.01f * .25f);
     mc = std::make_shared<ModelComponent>();
     mc->Create(
         resMan->GetMesh("Resources/models/sphere.obj"),
@@ -167,11 +167,11 @@ Scene::Scene()
     go->AddComponent(shader_d);
     go->AddComponent(mc);
     go->AddComponent(tc);
-    go->GetComponent<TransformComponent>()->SetPosition(0.0f, 4.1f, 20.0f);
+    tc->SetPosition(5.0f, 3.0f, 9.5f);
     go->AddComponent(std::make_shared<cmp::Name>("Ball1"));
     go->AddComponent(std::make_shared<cmp::SphereCol>(false, false));
     go->GetComponent<SphereCollider>()->AddToCollidersManager(collidersManager);
-    go->GetComponent<SphereCollider>()->SetRadius(4.1f);
+    go->GetComponent<SphereCollider>()->SetRadius(1.1f);
 
     world->AddChild(go);
 
@@ -224,7 +224,27 @@ Scene::Scene()
     go->AddComponent(shader_d);
     go->AddComponent(mc);
     go->AddComponent(std::make_shared<cmp::Name>("ray target"));
-    go->AddComponent(std::make_shared<cmp::BoxCol>(false, true));
+    go->AddComponent(std::make_shared<cmp::BoxCol>(false, false));
+    go->GetComponent<BoxCollider>()->AddToCollidersManager(collidersManager);
+    go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
+
+    world->AddChild(go);
+
+    //- colider object 2
+    go = std::make_shared<GameObject>();
+    tc = std::make_shared<TransformComponent>();
+    tc->SetPosition(1.0f, 3.0f, 9.0f);
+    tc->SetRotation(0.0f, 180.0f, 0.0f);
+    go->AddComponent(tc);
+    mc = std::make_shared<ModelComponent>();
+    mc->Create(
+        resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+        resMan->GetMaterial("Resources/models/floor/floor.mtl")
+    );
+    go->AddComponent(shader_d);
+    go->AddComponent(mc);
+    go->AddComponent(std::make_shared<cmp::Name>("ray target 2"));
+    go->AddComponent(std::make_shared<cmp::BoxCol>(false, false));
     go->GetComponent<BoxCollider>()->AddToCollidersManager(collidersManager);
     go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
 
@@ -246,7 +266,7 @@ Scene::Scene()
 
     auto line = std::make_shared<cmp::Line>();
     line->Create();
-    line->color2 = { 0.0f, 1.0f, 1.0f };
+    //line->color2 = { 0.0f, 1.0f, 1.0f };
     go->AddComponent(line);
 
     auto scriptHolder = std::make_shared<cmp::Scriptable>();
@@ -256,7 +276,8 @@ Scene::Scene()
     scriptHolder->Add(raycastScript);
     raycastScript->gameObject = go.get();
     raycastScript->line = line.get();
-    raycastScript->collisionTarget = world->FindNode("ray target")->GetGameObject()->GetComponent<cmp::Transform>().get();
+    raycastScript->collisionTarget = world->FindNode("ray target 2")->GetGameObject()->GetComponent<cmp::Transform>().get();
+    raycastScript->colMan = collidersManager;
 
     world->AddChild(go);
 
@@ -277,23 +298,7 @@ Scene::Scene()
     world->AddChild(go);
 
     //-
-    // go = std::make_shared<GameObject>();
-    // tc = std::make_shared<TransformComponent>();
-    // tc->SetPosition(8.0f, 3.0f, 6.5f);
-    // mc = std::make_shared<ModelComponent>();
-    // mc->Create(
-    //     resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-    //     resMan->GetMaterial("Resources/models/floor/floor.mtl")
-    // );
-    // go->AddComponent(shader_d);
-    // go->AddComponent(mc);
-    // go->AddComponent(tc);
-    // go->AddComponent(std::make_shared<cmp::Name>("quicc test 2"));
-
-    // world->AddChild(go);
-
-    //
-
+   
     world->LoadScripts();
 }
 
@@ -308,7 +313,7 @@ Scene::~Scene()
 
 void Scene::Update(float dt)
 {
-    world->FindNode("ray target")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, 0.0f, dt * 2.71f);
+    //world->FindNode("ray target")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, 0.0f, dt * 2.71f);
     world->FindNode("In world text")->GetGameObject()->GetComponent<cmp::Text>()->FaceCamera(goCamera->GetComponent<cmp::Camera>());
 
     goCamera->GetComponent<cmp::Camera>()->Update(GameApplication::GetInputManager(), dt);
@@ -317,7 +322,7 @@ void Scene::Update(float dt)
 
     // scene->FindNode("GO")->GetLocalTransformations()->Rotate(0, 180*dt, 0);
 
-    world->FindNode("Ball1")->GetLocalTransformations()->Move(0.0f, 0.0f, dt * -5.0f);
+    // world->FindNode("Ball1")->GetLocalTransformations()->Move(0.0f, 0.0f, dt * -5.0f);
     collidersManager->CheckCollisions();
 
     world->Update(dt);

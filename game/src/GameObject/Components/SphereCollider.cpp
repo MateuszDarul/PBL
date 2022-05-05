@@ -2,6 +2,8 @@
 #include "Components.h"
 #include "GameObject.h"
 
+#include "CollidersManager.h"
+#include <glm/gtx/intersect.hpp>
 
 SphereCollider::SphereCollider()
 	:ColliderComponent(11, false, false)
@@ -145,3 +147,21 @@ float SphereCollider::GetRadius()
 	return radius;
 }
 
+bool SphereCollider::RayCollision(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance)
+{
+	hitInfo.distance = maxDistance;
+
+	auto center = GetOwner()->GetComponent<TransformComponent>()->GetPosition();
+
+	if (glm::intersectRaySphere(origin, dir, center, radius*radius, hitInfo.distance))
+	{
+		if (hitInfo.distance < 0.0001f) return false;
+		hitInfo.point = origin + dir * hitInfo.distance;
+		hitInfo.normal = (hitInfo.point - center) / radius;
+		hitInfo.gameObject = GetOwner().get();
+
+		return true;
+	}
+
+	return false;
+}
