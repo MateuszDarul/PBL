@@ -33,7 +33,12 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/Scene/MapLoader.cpp
 
 	src/AI/State.cpp
+	src/AI/FollowPathState.cpp
+
 	src/AI/StateMachine.cpp
+	src/AI/EnemyScript.cpp
+
+	src/AI/SteeringBehaviours.cpp
 
 	main.cpp
 
@@ -79,7 +84,14 @@ file(GLOB_RECURSE HEADER_FILES
 	include/Scene/MapLoader.h
 
 	include/AI/State.h
+	include/AI/FollowPathState.h
+
 	include/AI/StateMachine.h
+	include/AI/EnemyScript.h
+
+	include/AI/SteeringBehaviours.h
+
+	include/AI/Path.h
 
 	ImGui/include/*.h
 	ImGui/include/*.hpp
