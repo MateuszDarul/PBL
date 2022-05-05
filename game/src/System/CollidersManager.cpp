@@ -1,6 +1,7 @@
 #include "CollidersManager.h"
 #include "GameApplication.h"
 #include "GameObject.h"
+#include "SceneNode.h"
 #include "TransformComponent.h"
 #include "CameraComponent.h"
 #include <iostream>
@@ -75,10 +76,7 @@ void CollidersManager::RemoveStaticTrigger(std::shared_ptr<ColliderComponent> tr
 void CollidersManager::CheckCollisions()
 {
 	std::shared_ptr<CameraComponent> playerCam = player->GetComponent<CameraComponent>();
-	Frustum frustum = playerCam->GetFrustum((float)GameApplication::GetWindowSize().x / GameApplication::GetWindowSize().y,
-		GameApplication::GetFov(),
-		GameApplication::GetProjectionRange().x,
-		GameApplication::GetProjectionRange().y);
+	Frustum frustum = SceneNode::cameraFrustum;
 	glm::vec3 playerPos = playerCam->GetPosition();
 	for (unsigned int i = 0; i<dynamicColliders.size(); i++)
 	{
@@ -153,10 +151,7 @@ void CollidersManager::CheckCollisions()
 void CollidersManager::CheckTriggers()
 {
 	std::shared_ptr<CameraComponent> playerCam= player->GetComponent<CameraComponent>();
-	Frustum frustum = playerCam->GetFrustum((float)GameApplication::GetWindowSize().x / GameApplication::GetWindowSize().y,
-		GameApplication::GetFov(),
-		GameApplication::GetProjectionRange().x,
-		GameApplication::GetProjectionRange().y);
+	Frustum frustum = SceneNode::cameraFrustum;
 	glm::vec3 playerPos = playerCam->GetPosition();
 	for (unsigned int i = 0; i < dynamicTriggers.size(); i++)
 	{

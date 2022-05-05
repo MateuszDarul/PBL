@@ -36,7 +36,10 @@ Scene::Scene()
     go->AddComponent(std::make_shared<CameraComponent>());
     go->GetComponent<cmp::Camera>()->Create(glm::vec3(0,3,10));
     go->GetComponent<cmp::Camera>()->SetSpeed(5);
-    collidersManager = new CollidersManager(go);
+
+    collidersManager = new CollidersManager(go); //mened¿er koliderów
+    collidersManager->SetDistanceFromPlayer(10.0f);
+
     go->AddComponent(std::make_shared<BoxCollider>(false, false));
     go->GetComponent<cmp::BoxCol>()->setLengths(glm::vec3(1,3,1));
     go->GetComponent<cmp::BoxCol>()->SetOffset(glm::vec3(0,-1.5,0));
@@ -138,6 +141,55 @@ Scene::Scene()
     }
     world->AddChild(go);
 
+    go = std::make_shared<GameObject>();
+    {
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+            resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_l);
+
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(0, 20, 5);
+
+        go->AddComponent(std::make_shared<cmp::Name>("Crate1"));
+
+        go->AddComponent(std::make_shared<BoxCollider>(false, false));
+        go->GetComponent<cmp::BoxCol>()->setLengths(glm::vec3(2, 2, 2));
+        go->GetComponent<cmp::BoxCol>()->isOptimized = true;
+        go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
+
+        go->AddComponent(std::make_shared<FrustumCullingComponent>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+    }
+    world->AddChild(go);
+
+    go = std::make_shared<GameObject>();
+    {
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+            resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_l);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(20, 20, 5);
+
+        go->AddComponent(std::make_shared<cmp::Name>("Crate2"));
+
+        go->AddComponent(std::make_shared<BoxCollider>(false, false));
+        go->GetComponent<cmp::BoxCol>()->setLengths(glm::vec3(2, 2, 2));
+        go->GetComponent<cmp::BoxCol>()->isOptimized = true;
+        go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
+
+        go->AddComponent(std::make_shared<FrustumCullingComponent>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+    }
+    world->AddChild(go);
+
     world->LoadScripts();
 }
 
@@ -161,7 +213,7 @@ void Scene::Update(float dt)
 
     transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();
 
-
+    world->FindNode("Crate1")->GetGameObject()->GetComponent<cmp::Transform>()->Move(5 * dt,0,0);
 
     collidersManager->CheckCollisions();
     goCamera->GetComponent<CameraComponent>()->SetPosition(transformCamera->GetPosition());

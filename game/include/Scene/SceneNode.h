@@ -15,7 +15,6 @@
 class SceneNode
 {
 private:
-    static Frustum cameraFrustum; //!< Ostroslup widzenia kamery.
 
     SceneNode* parent; //!< Wskazanie na wezel nadrzedny.
     std::shared_ptr<GameObject> gameObject; //!< GameObject w scenie.
@@ -39,6 +38,7 @@ private:
     void PrivateUpdate(float dt, const glm::mat4& parentTransformations);
 
 public:
+    static Frustum cameraFrustum; //!< Ostroslup widzenia kamery.
     /** @brief Tworzy nowy wezel.
      * @param gameObject - Wskazanie na GameObject nowego wezla.
      */
