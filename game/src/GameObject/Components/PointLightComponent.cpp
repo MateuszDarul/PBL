@@ -7,7 +7,7 @@ int PointLightComponent::thisLightID = 0;
 bool PointLightComponent::needUpdate = false;
 
 PointLightComponent::PointLightComponent()
-    :Component(8)
+    :LightComponent(8)
 {
     this->wasCreated = false;
 }

@@ -103,8 +103,8 @@ Scene::Scene()
     {
         go->AddComponent(std::make_shared<cmp::SpotLight>());
         go->GetComponent<cmp::SpotLight>()->Create();
-        go->GetComponent<cmp::SpotLight>()->SetPosition(glm::vec3(0, 2, 15));
-        go->GetComponent<cmp::SpotLight>()->SetDirection(glm::vec3(0, -1, 0));
+        go->GetComponent<cmp::SpotLight>()->SetPosition(glm::vec3(-5, 5, 17));
+        go->GetComponent<cmp::SpotLight>()->SetDirection(glm::vec3(-1, -1, 0));
         go->AddComponent(std::make_shared<cmp::Name>("light3"));
         go->AddComponent(shader_l);
         world->AddChild(go);

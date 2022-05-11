@@ -1,29 +1,17 @@
 #ifndef __SPOT_LIGHT_COMPONENT_H__
 #define __SPOT_LIGHT_COMPONENT_H__
 
-#include <memory>
-#include <string>
-
 #include <glm/glm.hpp>
 
-#include "Component.h"
-#include "TransformComponent.h"
-#include "ShaderComponent.h"
+#include "LightComponent.h"
 
-class SpotLightComponent :public Component
+class SpotLightComponent :public LightComponent
 {
 private:
     static int lightAmount;
     static int thisLightID;
     static bool needUpdate;
 
-    std::string textID;
-    bool wasCreated;
-
-    std::shared_ptr<TransformComponent> transform;
-    glm::vec3 lightColor;
-    glm::vec3 specularColor;
-    float distance;
     glm::vec2 cutOff;
 
 public:

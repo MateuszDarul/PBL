@@ -7,7 +7,7 @@ int SpotLightComponent::thisLightID = 0;
 bool SpotLightComponent::needUpdate = false;
 
 SpotLightComponent::SpotLightComponent()
-    :Component(9)
+    :LightComponent(9)
 {
     this->wasCreated = false;
 }
@@ -31,7 +31,7 @@ bool SpotLightComponent::Create()
     this->lightColor = glm::vec3(0.5,0.5,0.5);
     this->specularColor = glm::vec3(1,1,1);
     this->distance = 0.04f;
-    this->cutOff = glm::vec2(12.5f, 25.f);
+    this->cutOff = glm::vec2(12.5f, 45.f);
 
     SpotLightComponent::needUpdate = true;
     SpotLightComponent::lightAmount++;
