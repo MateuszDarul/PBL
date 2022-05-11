@@ -22,6 +22,7 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/ScriptComponent.cpp
 	src/GameObject/Components/CameraComponent.cpp
 	src/GameObject/Components/PointLightComponent.cpp
+	src/GameObject/Components/SpotLightComponent.cpp
 	src/GameObject/Components/FrustumCullingComponent.cpp
 
 	src/Resource/Mesh.cpp
@@ -73,6 +74,7 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/Components/ScriptComponent.h
 	include/GameObject/Components/CameraComponent.h
 	include/GameObject/Components/PointLightComponent.h
+	include/GameObject/Components/SpotLightComponent.h
 	include/GameObject/Components/FrustumCullingComponent.h
 
 	include/Resource/Mesh.h
