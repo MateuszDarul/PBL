@@ -24,12 +24,19 @@ public:
      */
     ~FrustumCullingComponent();
 
-    /** @brief 
+    /** @brief Tworzy bryle otaczajaca.
      * @param mesh - Siatka, dla ktorej ma zostac stworzony komponent.
      * @return true - Komponent zostal stworzony.
      * @return false - Komponent nie zostal stworzony.
      */
     bool Create(Mesh* mesh);
+
+    /** @brief Tworzy bryle otaczajaca.
+     * @param size - Rozmiar bryly otaczajacej (kuli).
+     * @return true - Komponent zostal stworzony.
+     * @return false - Komponent nie zostal stworzony.
+     */
+    bool Create(float size);
 
     /** @brief Sprawdza, czy dany obiekt znajduje sie w polu widzenia kamery.
      * @param frustum - Pole widzenia kamery.

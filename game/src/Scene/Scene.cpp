@@ -134,6 +134,10 @@ Scene::Scene()
         go->AddComponent(shader_l);
         go->AddComponent(std::make_shared<cmp::Transform>());
         go->GetComponent<cmp::Transform>()->SetPosition(0,0.5,-5);
+        go->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(
+            resMan->GetMesh("Resources/models/wieze/w1/w1.obj")
+        );
     }
     world->AddChild(go);
 
@@ -148,6 +152,10 @@ Scene::Scene()
         go->AddComponent(shader_l);
         go->AddComponent(std::make_shared<cmp::Transform>());
         go->GetComponent<cmp::Transform>()->SetPosition(0,0.5,0);
+        go->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(
+            resMan->GetMesh("Resources/models/wieze/w2/w2.obj")
+        );
     }
     world->AddChild(go);
     
@@ -162,6 +170,10 @@ Scene::Scene()
         go->AddComponent(shader_l);
         go->AddComponent(std::make_shared<cmp::Transform>());
         go->GetComponent<cmp::Transform>()->SetPosition(0,0.5,5);
+        go->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(
+            resMan->GetMesh("Resources/models/wieze/w3/w3.obj")
+        );
     }
     world->AddChild(go);
 
@@ -186,7 +198,9 @@ Scene::Scene()
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
         go->AddComponent(std::make_shared<FrustumCullingComponent>());
-        go->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+        go->GetComponent<cmp::FrustumCulling>()->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj")
+        );
     }
     world->AddChild(go);
 
@@ -210,7 +224,9 @@ Scene::Scene()
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
         go->AddComponent(std::make_shared<FrustumCullingComponent>());
-        go->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+        go->GetComponent<cmp::FrustumCulling>()->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj")
+        );
     }
     world->AddChild(go);
 

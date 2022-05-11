@@ -19,15 +19,24 @@ bool FrustumCullingComponent::Create(Mesh* mesh)
         return false;
 
     float max = 0;
-    float* vecPtr;
+    glm::vec3 vec;
     for(uint32_t i=0; i<mesh->vertices.size(); i++)
     {
-        vecPtr = &mesh->vertices[i].position.x;
-        for(uint8_t j=0; j<3; j++)
-            if(*(vecPtr+j) > max)
-                max = *(vecPtr+j);
+        vec = glm::vec3(mesh->vertices[i].position);
+        float distance = glm::length(vec);
+        if(distance > max)
+        {
+            max = distance;
+        }
     }
     this->radius = max;
+
+    return true;
+}
+
+bool FrustumCullingComponent::Create(float size)
+{
+    this->radius = size;
 
     return true;
 }

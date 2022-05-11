@@ -30,7 +30,8 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
         }
         else if(line == "Name:")
         {
-            std::shared_ptr<cmp::Name> nameCmp = std::make_shared<cmp::Name>();
+            gameObject->AddComponent(std::make_shared<cmp::Name>());
+            std::shared_ptr<cmp::Name> nameCmp = gameObject->GetComponent<cmp::Name>();
             {
                 std::string name;
                 file >> name;
@@ -38,12 +39,13 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
 
                 nameCmp->Set(name);
             }
-            gameObject->AddComponent(nameCmp);
         }
         else if(line == "Path:")
         {
             std::string modelName;
-            std::shared_ptr<cmp::Model> modelCmp = std::make_shared<cmp::Model>();
+
+            gameObject->AddComponent(std::make_shared<cmp::Model>());
+            std::shared_ptr<cmp::Model> modelCmp = gameObject->GetComponent<cmp::Model>();
             {
                 file >> modelName;
                 line_id++;
@@ -53,7 +55,6 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
                     resMan->GetMaterial("Resources/models/" + modelName + ".mtl")
                 );
             }
-            gameObject->AddComponent(modelCmp);
 
             bool useFC;
             file >> std::dec >> useFC;
@@ -68,7 +69,8 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
         }
         else if(line == "Transformations:")
         {
-            std::shared_ptr<cmp::Transform> transformCmp = std::make_shared<cmp::Transform>();
+            gameObject->AddComponent(std::make_shared<cmp::Transform>());
+            std::shared_ptr<cmp::Transform> transformCmp = gameObject->GetComponent<cmp::Transform>();
             {
                 glm::vec3 position;
                 file >> std::dec >> position.x;
@@ -85,7 +87,6 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
                 transformCmp->SetPosition(position);
                 transformCmp->SetRotation(rotation);
             }
-            gameObject->AddComponent(transformCmp);
         }
         else if(line == "Collider:")
         {
@@ -99,7 +100,8 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
             switch(type)
             {
             case 0: /// BOX
-                boxCollider = std::make_shared<BoxCollider>(false, true);
+                gameObject->AddComponent(std::make_shared<BoxCollider>(false, true));
+                boxCollider = gameObject->GetComponent<BoxCollider>();
                 {
                     glm::vec3 size;
                     file >> std::dec >> size.x;
@@ -110,11 +112,11 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
                     boxCollider->AddToCollidersManager(collisionManager);
                     boxCollider->setLengths(size);
                 }
-                gameObject->AddComponent(boxCollider);
             break;
 
             case 1: /// SPHERE
-                sphereCollider = std::make_shared<SphereCollider>(false, true);
+                gameObject->AddComponent(std::make_shared<SphereCollider>(false, true));
+                sphereCollider = gameObject->GetComponent<SphereCollider>();
                 {
                     float size;
                     file >> std::dec >> size;
@@ -123,7 +125,6 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
                     sphereCollider->AddToCollidersManager(collisionManager);
                     sphereCollider->SetRadius(size);
                 }
-                gameObject->AddComponent(sphereCollider);
             break;
             
             default:
