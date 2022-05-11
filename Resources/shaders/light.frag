@@ -2,6 +2,13 @@
 
 ///--------------------------------------------------------- STRUCTURS
 
+struct TextureMaps
+{
+    vec3 colorMAP;
+    vec3 specularMAP;
+    vec3 normalMAP;
+};
+
 struct PointLight
 {
     vec3 position;
@@ -9,10 +16,7 @@ struct PointLight
     vec3 lightColor;
     vec3 specularColor;
 	
-    vec3 distanceVec;
-    // distanceVec.x = constant;
-    // distanceVec.y = linear;
-    // distanceVec.z = quadratic;
+    float distance;
 };
 
 struct SpotLight 
@@ -26,10 +30,7 @@ struct SpotLight
     float cutOff;
     float outerCutOff;
 	
-    vec3 distanceVec;
-    // distanceVec.x = constant;
-    // distanceVec.y = linear;
-    // distanceVec.z = quadratic;
+    float distance;
 };
 
 ///--------------------------------------------------------- IN
@@ -54,15 +55,25 @@ uniform vec3 cameraPos;
 uniform int pointLightAmount;
 uniform PointLight pointLight[10];
 
+uniform int spotLightAmount;
+uniform SpotLight spotLight[10];
+
 ///--------------------------------------------------------- CODE
 
-vec3 GetPointLight(PointLight pointLight);
+vec3 GetPointLight(TextureMaps textureMaps, PointLight pointLight);
+vec3 GetSpotLight(TextureMaps textureMaps, SpotLight sLight);
 
 void main()
 {
-    vec3 pixelColor = vec3(0,0,0);
+    TextureMaps tm;
+    tm.colorMAP = texture(diffuseMapData, vertexTexture).rgb;
+    tm.specularMAP = texture(specularMapData, vertexTexture).rgb;
+    tm.normalMAP = normalize(mat3(transpose(inverse(model_transformations))) * normalVEC);
 
-    if(pointLightAmount == 0)
+    vec3 pixelColor = vec3(0,0,0);
+    pixelColor += tm.colorMAP * 0.025;
+
+    if(pointLightAmount == 0 && spotLightAmount == 0)
     {
         pixelColor = texture(diffuseMapData, vertexTexture).rgb;
     }
@@ -70,58 +81,65 @@ void main()
     {
         for(int i=0; i<pointLightAmount; i++)
         {
-            pixelColor += GetPointLight(pointLight[i]);
+            pixelColor += GetPointLight(tm, pointLight[i]);
+        }
+
+        for(int i=0; i<spotLightAmount; i++)
+        {
+            pixelColor += GetSpotLight(tm, spotLight[i]);
         }
     }
-    pixelColor = texture(diffuseMapData, vertexTexture).rgb;
 
     FragColor = vec4(pixelColor, 1.0f);
 }
 
-vec3 GetPointLight(PointLight pLight)
+vec3 GetPointLight(TextureMaps textureMaps, PointLight pLight)
 {
-    vec3 colorMAP = texture(diffuseMapData, vertexTexture).rgb;
-    vec3 specularMAP = texture(specularMapData, vertexTexture).rgb;
-    //vec3 normalMAP = texture(normalMapData, vertexTexture).xyz;
-    vec3 normalMAP = normalVEC;
-    normalMAP = normalize(mat3(transpose(inverse(model_transformations))) * normalMAP);
-
     vec3 viewDir = normalize(cameraPos - fragPos);
 
-    vec3 ambient = 0.2 * colorMAP;
-
     vec3 lightDir = normalize(pLight.position - fragPos);
-    float diff = max(dot(normalMAP, lightDir), 0.0);
-    vec3 diffuse = pLight.lightColor * diff * colorMAP;
+    float diff = max(dot(textureMaps.normalMAP, lightDir), 0.0);
+    vec3 diffuse = pLight.lightColor * diff * textureMaps.colorMAP;
 
-    vec3 reflectDir = reflect(-lightDir, normalMAP);
+    vec3 reflectDir = reflect(-lightDir, textureMaps.normalMAP);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-    vec3 specular = pLight.specularColor * spec * specularMAP;
+    vec3 specular = pLight.specularColor * spec * textureMaps.specularMAP;
 
     float distance = length(pLight.position - fragPos);
-    float attenuation;
-    if(true)
-    {
-        /*
-        //pLight.distanceVec = vec3(1.f,0.0f,0.f);
-        attenuation = 1.0 / (
-            pLight.distanceVec.x + 
-            pLight.distanceVec.y * distance +
-            pLight.distanceVec.z * distance * distance);
-        */
-        attenuation = 1 - 0.04 * distance;
-    }
-    else
-    {
-        if(distance < 16)
-            attenuation = 1;
-        else 
-            attenuation = 0;
-    }
+    float attenuation = 1 - pLight.distance * distance;
 
-    ambient *= attenuation;  
     diffuse *= attenuation;
     specular *= attenuation;   
 
-    return ambient + diffuse + specular;
+    return diffuse + specular;
+}
+
+vec3 GetSpotLight(TextureMaps textureMaps, SpotLight sLight)
+{
+    vec3 diffuse = vec3(0,0,0);
+    vec3 specular = vec3(0,0,0);
+
+    vec3 lightDir = normalize(sLight.position - fragPos);
+    vec3 viewDir = normalize(cameraPos - fragPos);
+
+    float diff = max(dot(textureMaps.normalMAP, lightDir), 0.0);
+    diffuse = sLight.lightColor * diff * textureMaps.colorMAP;  
+        
+    vec3 reflectDir = reflect(-lightDir, textureMaps.normalMAP);  
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32/*material.shininess*/);
+    specular = sLight.specularColor * spec * textureMaps.specularMAP;  
+        
+    float theta = dot(lightDir, normalize(-sLight.direction)); 
+    float epsilon = (sLight.cutOff - sLight.outerCutOff);
+    float intensity = clamp((theta - sLight.outerCutOff) / epsilon, 0.0, 1.0);
+    diffuse  *= intensity;
+    specular *= intensity;
+
+    float distance = length(sLight.position - fragPos);
+    float attenuation = 1 - sLight.distance * distance;
+
+    diffuse *= attenuation;
+    specular *= attenuation;
+
+    return diffuse + specular;
 }

@@ -112,6 +112,7 @@ void SceneNode::Render(const glm::mat4& matrixPV)
             #endif  // DISPLAY_FC_RESULT
 
             std::shared_ptr<cmp::PointLight> pointLightPtr = this->gameObject->GetComponent<cmp::PointLight>();
+            std::shared_ptr<cmp::SpotLight> spotLightPtr = this->gameObject->GetComponent<cmp::SpotLight>();
             std::shared_ptr<cmp::Model> modelPtr = this->gameObject->GetComponent<cmp::Model>();
             std::shared_ptr<cmp::ModelInst> modelInstPtr = this->gameObject->GetComponent<cmp::ModelInst>();
 
@@ -122,6 +123,10 @@ void SceneNode::Render(const glm::mat4& matrixPV)
             if(pointLightPtr != nullptr)
             {
                 pointLightPtr->Use(shaderPtr);
+            }
+            else if(spotLightPtr != nullptr)
+            {
+                spotLightPtr->Use(shaderPtr);
             }
             else if(modelPtr != nullptr)
             {

@@ -37,7 +37,7 @@ Scene::Scene()
     go->GetComponent<cmp::Camera>()->Create(glm::vec3(0,3,10));
     go->GetComponent<cmp::Camera>()->SetSpeed(5);
 
-    collidersManager = new CollidersManager(go); //mened¿er koliderów
+    collidersManager = new CollidersManager(go); //menedï¿½er koliderï¿½w
     collidersManager->SetDistanceFromPlayer(10.0f);
 
     go->AddComponent(std::make_shared<BoxCollider>(false, false));
@@ -96,6 +96,30 @@ Scene::Scene()
         go->AddComponent(std::make_shared<cmp::Transform>());
         go->GetComponent<cmp::Transform>()->SetScale(0.1);
         world->FindNode("light2")->AddChild(go);
+    }
+    go = nullptr;
+
+    go = std::make_shared<GameObject>();
+    {
+        go->AddComponent(std::make_shared<cmp::SpotLight>());
+        go->GetComponent<cmp::SpotLight>()->Create();
+        go->GetComponent<cmp::SpotLight>()->SetPosition(glm::vec3(-5, 5, 17));
+        go->GetComponent<cmp::SpotLight>()->SetDirection(glm::vec3(-1, -1, 0));
+        go->AddComponent(std::make_shared<cmp::Name>("light3"));
+        go->AddComponent(shader_l);
+        world->AddChild(go);
+
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+            resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetScale(0.1);
+        world->FindNode("light3")->AddChild(go);
     }
     go = nullptr;
 
