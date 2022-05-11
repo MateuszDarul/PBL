@@ -29,7 +29,7 @@ bool PointLightComponent::Create()
     this->transform->SetPosition(glm::vec3(0,0,0));
     this->lightColor = glm::vec3(0.5,0.5,0.5);
     this->specularColor = glm::vec3(1,1,1);
-    this->distance = glm::vec3(1.f,0.25f,0.f);
+    this->distance = 0.04f;
 
     PointLightComponent::needUpdate = true;
     PointLightComponent::lightAmount++;
@@ -62,7 +62,7 @@ void PointLightComponent::Use(std::shared_ptr<ShaderComponent> shader)
     shader->SetVec3("pointLight[" + textID + "].position", this->transform->GetPosition());
     shader->SetVec3("pointLight[" + textID + "].lightColor", this->lightColor);
     shader->SetVec3("pointLight[" + textID + "].specularColor", this->specularColor);
-    shader->SetVec3("pointLight[" + textID + "].distanceVec", this->distance);
+    shader->SetFloat("pointLight[" + textID + "].distance", this->distance);
 
     if(PointLightComponent::thisLightID == PointLightComponent::lightAmount)
     {
@@ -114,15 +114,13 @@ glm::vec3 PointLightComponent::GetSpecularColor()
     return this->specularColor;
 }
 
-void PointLightComponent::SetRange(float constant, float linear, float quadratic)
+void PointLightComponent::SetRange(float distance)
 {
-    this->distance.x = constant;
-    this->distance.y = linear;
-    this->distance.z = quadratic;
+    this->distance = distance;
     PointLightComponent::needUpdate = true;
 }
 
-glm::vec3 PointLightComponent::GetRange()
+float PointLightComponent::GetRange()
 {
     return this->distance;
 }

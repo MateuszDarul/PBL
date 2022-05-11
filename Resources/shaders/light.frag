@@ -9,10 +9,7 @@ struct PointLight
     vec3 lightColor;
     vec3 specularColor;
 	
-    vec3 distanceVec;
-    // distanceVec.x = constant;
-    // distanceVec.y = linear;
-    // distanceVec.z = quadratic;
+    float distance;
 };
 
 struct SpotLight 
@@ -26,10 +23,7 @@ struct SpotLight
     float cutOff;
     float outerCutOff;
 	
-    vec3 distanceVec;
-    // distanceVec.x = constant;
-    // distanceVec.y = linear;
-    // distanceVec.z = quadratic;
+    float distance;
 };
 
 ///--------------------------------------------------------- IN
@@ -107,7 +101,7 @@ vec3 GetPointLight(PointLight pLight)
     vec3 specular = pLight.specularColor * spec * specularMAP;
 
     float distance = length(pLight.position - fragPos);
-    float attenuation = 1 - 0.04 * distance;
+    float attenuation = 1 - pLight.distance * distance;
 
     ambient *= attenuation;  
     diffuse *= attenuation;
@@ -129,10 +123,7 @@ vec3 GetSpotLight(SpotLight sLight)
     vec3 specular = vec3(0,0,0);
 
 
-    vec3 lightDir = normalize(sLight.position - fragPos);
-    float theta = dot(lightDir, normalize(-sLight.direction)); 
-    if(theta > sLight.cutOff)
-    {    
+        vec3 lightDir = normalize(sLight.position - fragPos);
         vec3 viewDir = normalize(cameraPos - fragPos);
 
         float diff = max(dot(normalMAP, lightDir), 0.0);
@@ -142,18 +133,18 @@ vec3 GetSpotLight(SpotLight sLight)
         float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32/*material.shininess*/);
         specular = sLight.specularColor * spec * specularMAP;  
         
+        float theta = dot(lightDir, normalize(-sLight.direction)); 
+        float epsilon = (sLight.cutOff - sLight.outerCutOff);
+        float intensity = clamp((theta - sLight.outerCutOff) / epsilon, 0.0, 1.0);
+        diffuse  *= intensity;
+        specular *= intensity;
+
         float distance = length(sLight.position - fragPos);
-        float attenuation = 1 - 0.04 * distance;
+        float attenuation = 1 - sLight.distance * distance;
 
         ambient *= attenuation;
         diffuse *= attenuation;
         specular *= attenuation;
-    }
-    else 
-    {
-        return ambient;
-    }
-
 
     return ambient + diffuse + specular;
 }

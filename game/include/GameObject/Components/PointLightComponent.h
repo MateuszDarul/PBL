@@ -23,7 +23,7 @@ private:
     std::shared_ptr<TransformComponent> transform;
     glm::vec3 lightColor;
     glm::vec3 specularColor;
-    glm::vec3 distance;
+    float distance;
 
 public:
     PointLightComponent();
@@ -35,14 +35,14 @@ public:
     void SetPosition(glm::vec3 position);
     void SetLightColor(glm::vec3 lightColor);
     void SetSpecularColor(glm::vec3 specularColor);
-    void SetRange(float constant, float linear, float quadratic);
+    void SetRange(float distance);
 
     void Move(glm::vec3 vector);
 
     glm::vec3 GetPosition();
     glm::vec3 GetLightColor();
     glm::vec3 GetSpecularColor();
-    glm::vec3 GetRange();
+    float GetRange();
 
     void Use(std::shared_ptr<ShaderComponent> shader);
 };
