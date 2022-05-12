@@ -75,7 +75,7 @@ void main()
 
     if(pointLightAmount == 0 && spotLightAmount == 0)
     {
-        pixelColor = texture(diffuseMapData, vertexTexture).rgb;
+        pixelColor = tm.colorMAP;
     }
     else
     {

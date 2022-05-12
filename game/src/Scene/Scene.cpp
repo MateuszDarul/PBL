@@ -49,7 +49,10 @@ Scene::Scene()
 
     ///***
 
-    MapLoader::Load("Resources/maps/world.map", world, shader_l, collidersManager);
+    std::shared_ptr<cmp::Shader> shader[2];
+    shader[0] = shader_l;
+    shader[1] = shader_i;
+    MapLoader::Load("Resources/maps/world.map", world, shader, collidersManager);
 
     ///***
 
@@ -80,7 +83,7 @@ Scene::Scene()
     {
         go->AddComponent(std::make_shared<cmp::PointLight>());
         go->GetComponent<cmp::PointLight>()->Create();
-        go->GetComponent<cmp::PointLight>()->SetPosition(glm::vec3(18, 5, 0));
+        go->GetComponent<cmp::PointLight>()->SetPosition(glm::vec3(13, 5, 0));
         go->AddComponent(std::make_shared<cmp::Name>("light2"));
         go->AddComponent(shader_l);
         world->AddChild(go);
@@ -103,7 +106,7 @@ Scene::Scene()
     {
         go->AddComponent(std::make_shared<cmp::SpotLight>());
         go->GetComponent<cmp::SpotLight>()->Create();
-        go->GetComponent<cmp::SpotLight>()->SetPosition(glm::vec3(-5, 5, 17));
+        go->GetComponent<cmp::SpotLight>()->SetPosition(glm::vec3(-5, 5, 13));
         go->GetComponent<cmp::SpotLight>()->SetDirection(glm::vec3(-1, -1, 0));
         go->AddComponent(std::make_shared<cmp::Name>("light3"));
         go->AddComponent(shader_l);
