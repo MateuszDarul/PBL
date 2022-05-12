@@ -50,7 +50,7 @@ bool PointLightComponent::Destroy()
     return false;
 }
 
-void PointLightComponent::Use(std::shared_ptr<ShaderComponent> shader)
+void PointLightComponent::Use()
 {
     if(!PointLightComponent::needUpdate || !this->wasCreated)
     {
@@ -58,11 +58,15 @@ void PointLightComponent::Use(std::shared_ptr<ShaderComponent> shader)
     }
 
     textID = std::to_string(PointLightComponent::thisLightID);
-    shader->SetInt("pointLightAmount", PointLightComponent::lightAmount);
-    shader->SetVec3("pointLight[" + textID + "].position", this->transform->GetPosition());
-    shader->SetVec3("pointLight[" + textID + "].lightColor", this->lightColor);
-    shader->SetVec3("pointLight[" + textID + "].specularColor", this->specularColor);
-    shader->SetFloat("pointLight[" + textID + "].distance", this->distance);
+    for(int i=0; i<shaders.size(); i++)
+    {
+        shaders[i]->Use();
+        shaders[i]->SetInt("pointLightAmount", PointLightComponent::lightAmount);
+        shaders[i]->SetVec3("pointLight[" + textID + "].position", this->transform->GetPosition());
+        shaders[i]->SetVec3("pointLight[" + textID + "].lightColor", this->lightColor);
+        shaders[i]->SetVec3("pointLight[" + textID + "].specularColor", this->specularColor);
+        shaders[i]->SetFloat("pointLight[" + textID + "].distance", this->distance);
+    }
 
     if(PointLightComponent::thisLightID == PointLightComponent::lightAmount)
     {

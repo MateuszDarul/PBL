@@ -11,6 +11,8 @@
 class LightComponent :public Component
 {
 protected:
+    std::vector<std::shared_ptr<ShaderComponent>> shaders;
+
     std::string textID;
     bool wasCreated;
 
@@ -25,7 +27,9 @@ public:
 
     virtual bool Create() = 0;
     virtual bool Destroy() = 0;
-    virtual void Use(std::shared_ptr<ShaderComponent> shader) = 0;
+    virtual void Use() = 0;
+
+    bool AddShader(std::shared_ptr<ShaderComponent> shader);
 };
 
 #endif // __LIGHT_COMPONENT_H__

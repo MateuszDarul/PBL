@@ -62,8 +62,9 @@ Scene::Scene()
         go->AddComponent(std::make_shared<cmp::PointLight>());
         go->GetComponent<cmp::PointLight>()->Create();
         go->GetComponent<cmp::PointLight>()->SetPosition(glm::vec3(-5, 4, 0));
+        go->GetComponent<cmp::PointLight>()->AddShader(shader_l);
+        go->GetComponent<cmp::PointLight>()->AddShader(shader_i);
         go->AddComponent(std::make_shared<cmp::Name>("light1"));
-        go->AddComponent(shader_l);
         world->AddChild(go);
 
         go = std::make_shared<GameObject>();
@@ -85,8 +86,9 @@ Scene::Scene()
         go->AddComponent(std::make_shared<cmp::PointLight>());
         go->GetComponent<cmp::PointLight>()->Create();
         go->GetComponent<cmp::PointLight>()->SetPosition(glm::vec3(13, 5, 0));
+        go->GetComponent<cmp::PointLight>()->AddShader(shader_l);
+        go->GetComponent<cmp::PointLight>()->AddShader(shader_i);
         go->AddComponent(std::make_shared<cmp::Name>("light2"));
-        go->AddComponent(shader_l);
         world->AddChild(go);
 
         go = std::make_shared<GameObject>();
@@ -109,8 +111,9 @@ Scene::Scene()
         go->GetComponent<cmp::SpotLight>()->Create();
         go->GetComponent<cmp::SpotLight>()->SetPosition(glm::vec3(-5, 5, 13));
         go->GetComponent<cmp::SpotLight>()->SetDirection(glm::vec3(-1, -1, 0));
+        go->GetComponent<cmp::SpotLight>()->AddShader(shader_l);
+        go->GetComponent<cmp::SpotLight>()->AddShader(shader_i);
         go->AddComponent(std::make_shared<cmp::Name>("light3"));
-        go->AddComponent(shader_l);
         world->AddChild(go);
 
         go = std::make_shared<GameObject>();
@@ -126,6 +129,8 @@ Scene::Scene()
         world->FindNode("light3")->AddChild(go);
     }
     go = nullptr;
+
+    ///***
 
     go = std::make_shared<GameObject>();
     {    
