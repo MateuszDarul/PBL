@@ -237,7 +237,7 @@ Scene::Scene()
     //- colider object
     go = std::make_shared<GameObject>();
     tc = std::make_shared<TransformComponent>();
-    tc->SetPosition(8.0f, 3.0f, 6.5f);
+    tc->SetPosition(8.0f, 3.0f, 0.5f);
     tc->SetRotation(0.0f, 15.0f, 0.0f);
     go->AddComponent(tc);
     mc = std::make_shared<ModelComponent>();
@@ -361,7 +361,7 @@ Scene::~Scene()
 
 void Scene::Update(float dt)
 {
-    //world->FindNode("ray target")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, 0.0f, dt * 2.71f);
+    world->FindNode("ray target")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, dt * 12.71f, 0.0f);
     
 
     

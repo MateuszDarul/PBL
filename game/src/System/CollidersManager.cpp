@@ -210,11 +210,11 @@ void CollidersManager::CheckTriggers()
 	}
 }
 
-#include "Components.h"
-#include "GameObject.h"
 bool CollidersManager::Raycast(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance, bool shouldHitTriggers/*, layer*/ )
 {
 	//FIXME: inefficient checks 
+
+	//TODO: Layers
 
 	bool hit = false;
 
