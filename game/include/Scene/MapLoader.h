@@ -25,7 +25,7 @@ public:
      * @return true - Poprawnie wczytano uklad SceneNodow.
      * @return false - Blad podczas wczytywania SceneNodow.
      */
-    static bool Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Shader> shader, CollidersManager* collisionManager);
+    static bool Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Shader> shader[2], CollidersManager* collisionManager);
 };
 
 #endif // __MAP_LOADER_H__
