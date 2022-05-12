@@ -31,7 +31,7 @@ public:
     glm::vec3 GetSpecularColor();
     float GetRange();
 
-    void Use(std::shared_ptr<ShaderComponent> shader);
+    void Use();
 };
 
 #endif // __POINT_LIGHT_COMPONNET_H__

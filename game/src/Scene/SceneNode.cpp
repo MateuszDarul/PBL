@@ -1,6 +1,5 @@
 #include "SceneNode.h"
 
-//#define DISPLAY_FC_RESULT
 Frustum SceneNode::cameraFrustum;
 
 SceneNode::SceneNode(std::shared_ptr<GameObject> gameObject)
@@ -39,18 +38,8 @@ void SceneNode::LoadScripts()
     }
 }
 
-#ifdef DISPLAY_FC_RESULT
-uint8_t all = 0;
-uint8_t rendered = 0;
-#endif  // DISPLAY_FC_RESULT
 void SceneNode::Update(float dt)
 {
-    #ifdef DISPLAY_FC_RESULT
-    std::cout << (int)rendered << " / " << (int)all << "\n";
-    all = 0;
-    rendered = 0;
-    #endif  // DISPLAY_FC_RESULT
-
     this->PrivateUpdate(dt, glm::mat4(1.f));
 
     SceneNode::cameraFrustum = 
@@ -94,10 +83,6 @@ void SceneNode::Render(const glm::mat4& matrixPV)
     std::shared_ptr<cmp::Shader> shaderPtr = this->gameObject->GetComponent<cmp::Shader>();
     if(shaderPtr != nullptr)
     {
-        #ifdef DISPLAY_FC_RESULT
-        all++;
-        #endif  // DISPLAY_FC_RESULT
-
         bool display = true;
         std::shared_ptr<FrustumCullingComponent> frustumCullingPtr = this->gameObject->GetComponent<FrustumCullingComponent>();
         if(frustumCullingPtr != nullptr)
@@ -107,50 +92,56 @@ void SceneNode::Render(const glm::mat4& matrixPV)
 
         if(display)
         {
-            #ifdef DISPLAY_FC_RESULT
-            rendered++;
-            #endif  // DISPLAY_FC_RESULT
-
-            std::shared_ptr<cmp::PointLight> pointLightPtr = this->gameObject->GetComponent<cmp::PointLight>();
-            std::shared_ptr<cmp::SpotLight> spotLightPtr = this->gameObject->GetComponent<cmp::SpotLight>();
-            std::shared_ptr<cmp::Model> modelPtr = this->gameObject->GetComponent<cmp::Model>();
-            std::shared_ptr<cmp::ModelInst> modelInstPtr = this->gameObject->GetComponent<cmp::ModelInst>();
-            std::shared_ptr<cmp::Text> textPtr = this->gameObject->GetComponent<cmp::Text>();
-            std::shared_ptr<cmp::Line> linePtr = this->gameObject->GetComponent<cmp::Line>();
-
             shaderPtr->Use();
-
-
-
-
             shaderPtr->SetMat4("transform", matrixPV);
             shaderPtr->SetMat4("model", this->globalTransformations);
 
-            if(pointLightPtr != nullptr)
-            {
-                pointLightPtr->Use(shaderPtr);
-            }
-            else if(spotLightPtr != nullptr)
-            {
-                spotLightPtr->Use(shaderPtr);
-            }
-            else if(modelPtr != nullptr)
+            std::shared_ptr<cmp::Model> modelPtr = this->gameObject->GetComponent<cmp::Model>();
+            if(modelPtr != nullptr)
             {
                 modelPtr->Draw(shaderPtr);
             }
-            else if(modelInstPtr != nullptr)
+            else
             {
-                modelInstPtr->Draw(shaderPtr);
+                std::shared_ptr<cmp::ModelInst> modelInstPtr = this->gameObject->GetComponent<cmp::ModelInst>();
+                if(modelInstPtr != nullptr)
+                {
+                    modelInstPtr->Draw(shaderPtr);
+                }
+                else 
+                {
+                    std::shared_ptr<cmp::Text> textPtr = this->gameObject->GetComponent<cmp::Text>();
+                    if(textPtr != nullptr)
+                    {
+                        shaderPtr->SetMat4("transform", glm::ortho(0.0f, 16.0f, 0.0f, 9.0f)); //ta kolejnosc naprawia tekst do góry nogami
+                        
+                        textPtr->Draw(shaderPtr);
+                    }
+                    else 
+                    {
+                        std::shared_ptr<cmp::Line> linePtr = this->gameObject->GetComponent<cmp::Line>();
+                        if(linePtr != nullptr)
+                        {
+                            linePtr->Draw(shaderPtr);
+                        }
+                    }
+                }
             }
-            else if (textPtr != nullptr)
+        }
+    }
+    else
+    {
+        std::shared_ptr<cmp::PointLight> pointLightPtr = this->gameObject->GetComponent<cmp::PointLight>();
+        if(pointLightPtr != nullptr)
+        {
+            pointLightPtr->Use();
+        }
+        else 
+        {
+            std::shared_ptr<cmp::SpotLight> spotLightPtr = this->gameObject->GetComponent<cmp::SpotLight>();
+            if(spotLightPtr != nullptr)
             {
-                shaderPtr->SetMat4("transform", glm::ortho(0.0f, 16.0f, 0.0f, 9.0f)); //ta kolejnosc naprawia tekst do góry nogami
-
-                textPtr->Draw(shaderPtr);
-            }
-            else if (linePtr != nullptr)
-            {
-                linePtr->Draw(shaderPtr);
+                spotLightPtr->Use();
             }
         }
     }
