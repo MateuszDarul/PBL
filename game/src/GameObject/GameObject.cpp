@@ -83,6 +83,8 @@ template std::shared_ptr<ShaderComponent> GameObject::GetComponent<ShaderCompone
 template std::shared_ptr<TransformComponent> GameObject::GetComponent<TransformComponent>();
 template std::shared_ptr<CameraComponent> GameObject::GetComponent<CameraComponent>();
 template std::shared_ptr<ScriptComponent> GameObject::GetComponent<ScriptComponent>();
+template std::shared_ptr<TextComponent> GameObject::GetComponent<TextComponent>();
+template std::shared_ptr<LineComponent> GameObject::GetComponent<LineComponent>();
 template std::shared_ptr<BoxCollider> GameObject::GetComponent<BoxCollider>();
 template std::shared_ptr<SphereCollider> GameObject::GetComponent<SphereCollider>();
 template std::shared_ptr<PointLightComponent> GameObject::GetComponent<PointLightComponent>();
@@ -97,6 +99,8 @@ template bool GameObject::RemoveComponent<ShaderComponent>();
 template bool GameObject::RemoveComponent<TransformComponent>();
 template bool GameObject::RemoveComponent<CameraComponent>();
 template bool GameObject::RemoveComponent<ScriptComponent>();
+template bool GameObject::RemoveComponent<TextComponent>();
+template bool GameObject::RemoveComponent<LineComponent>();
 template bool GameObject::RemoveComponent<BoxCollider>();
 template bool GameObject::RemoveComponent<SphereCollider>();
 template bool GameObject::RemoveComponent<PointLightComponent>();

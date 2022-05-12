@@ -115,8 +115,14 @@ void SceneNode::Render(const glm::mat4& matrixPV)
             std::shared_ptr<cmp::SpotLight> spotLightPtr = this->gameObject->GetComponent<cmp::SpotLight>();
             std::shared_ptr<cmp::Model> modelPtr = this->gameObject->GetComponent<cmp::Model>();
             std::shared_ptr<cmp::ModelInst> modelInstPtr = this->gameObject->GetComponent<cmp::ModelInst>();
+            std::shared_ptr<cmp::Text> textPtr = this->gameObject->GetComponent<cmp::Text>();
+            std::shared_ptr<cmp::Line> linePtr = this->gameObject->GetComponent<cmp::Line>();
 
             shaderPtr->Use();
+
+
+
+
             shaderPtr->SetMat4("transform", matrixPV);
             shaderPtr->SetMat4("model", this->globalTransformations);
 
@@ -135,6 +141,16 @@ void SceneNode::Render(const glm::mat4& matrixPV)
             else if(modelInstPtr != nullptr)
             {
                 modelInstPtr->Draw(shaderPtr);
+            }
+            else if (textPtr != nullptr)
+            {
+                shaderPtr->SetMat4("transform", glm::ortho(0.0f, 16.0f, 0.0f, 9.0f)); //ta kolejnosc naprawia tekst do góry nogami
+
+                textPtr->Draw(shaderPtr);
+            }
+            else if (linePtr != nullptr)
+            {
+                linePtr->Draw(shaderPtr);
             }
         }
     }

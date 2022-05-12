@@ -2,6 +2,7 @@
 
 #include "Scripts/TestScript.h"
 #include "Scripts/StatsScript.h"
+#include "Scripts/RaycastTest.h"
 
 Scene::Scene()
 {
@@ -230,6 +231,121 @@ Scene::Scene()
     }
     world->AddChild(go);
 
+
+    //=== ray test ===
+
+    //- colider object
+    go = std::make_shared<GameObject>();
+    tc = std::make_shared<TransformComponent>();
+    tc->SetPosition(8.0f, 3.0f, 0.5f);
+    tc->SetRotation(0.0f, 15.0f, 0.0f);
+    go->AddComponent(tc);
+    mc = std::make_shared<ModelComponent>();
+    mc->Create(
+        resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+        resMan->GetMaterial("Resources/models/floor/floor.mtl")
+    );
+    go->AddComponent(shader_d);
+    go->AddComponent(mc);
+    go->AddComponent(std::make_shared<cmp::Name>("ray target"));
+    go->AddComponent(std::make_shared<cmp::BoxCol>(false, false));
+    go->GetComponent<BoxCollider>()->AddToCollidersManager(collidersManager);
+    go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
+    go->AddComponent(std::make_shared<FrustumCullingComponent>());
+    go->GetComponent<cmp::FrustumCulling>()->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj")
+        );
+
+    world->AddChild(go);
+
+    //- colider object 2
+    go = std::make_shared<GameObject>();
+    tc = std::make_shared<TransformComponent>();
+    tc->SetPosition(1.0f, 3.0f, 9.0f);
+    tc->SetRotation(0.0f, 180.0f, 0.0f);
+    go->AddComponent(tc);
+    mc = std::make_shared<ModelComponent>();
+    mc->Create(
+        resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+        resMan->GetMaterial("Resources/models/floor/floor.mtl")
+    );
+    go->AddComponent(shader_d);
+    go->AddComponent(mc);
+    go->AddComponent(std::make_shared<cmp::Name>("ray target 2"));
+    go->AddComponent(std::make_shared<cmp::BoxCol>(false, false));
+    go->GetComponent<BoxCollider>()->AddToCollidersManager(collidersManager);
+    go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
+    go->AddComponent(std::make_shared<FrustumCullingComponent>());
+    go->GetComponent<cmp::FrustumCulling>()->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj")
+        );
+
+    world->AddChild(go);
+
+    //- raycaster object
+
+    go = std::make_shared<GameObject>();
+
+    tc = std::make_shared<TransformComponent>();
+    //tc->SetPosition(3.0f, 7.0f, 6.5f);
+    tc->SetPosition(0.0f, 1.0f, 0.0f);
+    go->AddComponent(tc);
+
+    go->AddComponent(std::make_shared<cmp::Name>("Raycaster"));
+
+    auto lineShader = std::make_shared<cmp::Shader>();
+    lineShader->Create("Resources/shaders/line.vert", "Resources/shaders/line.frag");
+    go->AddComponent(lineShader);
+
+    auto line = std::make_shared<cmp::Line>();
+    line->Create();
+    
+    line->Get(0) = {0.0f, 2.0f, 0.0f};
+    line->Get(1) = {0.0f, 4.0f, 0.0f};
+    go->AddComponent(line);
+
+    auto scriptHolder = std::make_shared<cmp::Scriptable>();
+    go->AddComponent(scriptHolder);
+
+    auto raycastScript = new RaycastTest();
+    scriptHolder->Add(raycastScript);
+    raycastScript->gameObject = go;
+    raycastScript->line = line.get();
+    raycastScript->collisionTarget = world->FindNode("ray target 2")->GetGameObject()->GetComponent<cmp::Transform>().get();
+    raycastScript->colMan = collidersManager;
+
+    world->AddChild(go);
+
+    //=== text
+
+    //renderowany jako ostatni bo inaczej sa te dziwne artefakty
+
+    Font* font = resMan->GetFont("Resources/fonts/arial.ttf");
+
+    go = std::make_shared<GameObject>();
+    tc = std::make_shared<TransformComponent>();
+    auto textComponent = std::make_shared<TextComponent>();
+    textComponent->Create("Hello world", font);
+    textComponent->alwaysSeen = true;
+    textComponent->color = {1.0f, 0.0f, 0.0f};
+
+    auto textShader = std::make_shared<ShaderComponent>();
+    textShader->Create("Resources/shaders/text.vert", "Resources/shaders/text.frag");
+
+    
+    go->AddComponent(textShader);
+    go->AddComponent(mc);
+    go->AddComponent(tc);
+    go->AddComponent(textComponent);
+
+    go->GetComponent<TransformComponent>()->SetPosition(1.0f, 1.0f, 0.1f);
+    go->AddComponent(std::make_shared<cmp::Name>("In world text"));
+    
+
+    world->AddChild(go);
+
+    //===
+   
     world->LoadScripts();
 }
 
@@ -242,13 +358,21 @@ Scene::~Scene()
     collidersManager = nullptr;
 }
 
+
 void Scene::Update(float dt)
 {
+    world->FindNode("ray target")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, dt * 12.71f, 0.0f);
+    
+
+    
     std::shared_ptr<GameObject> goCamera = world->FindNode("CAMERA")->GetGameObject();
     std::shared_ptr<TransformComponent> transformCamera = goCamera->GetComponent<cmp::Transform>();
 
     goCamera->GetComponent<CameraComponent>()->Update(GameApplication::GetInputManager(), dt);
     transformCamera->SetPosition(goCamera->GetComponent<CameraComponent>()->GetPosition());
+
+    
+    //world->FindNode("In world text")->GetGameObject()->GetComponent<cmp::Text>()->FaceCamera(goCamera->GetComponent<cmp::Camera>());
     
 
     transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();

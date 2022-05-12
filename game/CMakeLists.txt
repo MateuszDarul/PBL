@@ -21,11 +21,14 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/TransformComponent.cpp
 	src/GameObject/Components/ScriptComponent.cpp
 	src/GameObject/Components/CameraComponent.cpp
+	src/GameObject/Components/TextComponent.cpp
+	src/GameObject/Components/LineComponent.cpp
 	src/GameObject/Components/LightComponent.cpp
 	src/GameObject/Components/PointLightComponent.cpp
 	src/GameObject/Components/SpotLightComponent.cpp
 	src/GameObject/Components/FrustumCullingComponent.cpp
 
+	src/Resource/Font.cpp
 	src/Resource/Mesh.cpp
 	src/Resource/Material.cpp
 	src/Resource/ResourceManager.cpp
@@ -74,11 +77,14 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/Components/TransformComponent.h
 	include/GameObject/Components/ScriptComponent.h
 	include/GameObject/Components/CameraComponent.h
+	include/GameObject/Components/TextComponent.h
+	include/GameObject/Components/LineComponent.h
 	include/GameObject/Components/LightComponent.h
 	include/GameObject/Components/PointLightComponent.h
 	include/GameObject/Components/SpotLightComponent.h
 	include/GameObject/Components/FrustumCullingComponent.h
 
+	include/Resource/Font.h
 	include/Resource/Mesh.h
 	include/Resource/Material.h
 	include/Resource/ResourceManager.h

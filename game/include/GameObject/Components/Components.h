@@ -15,6 +15,8 @@
 
 #include "SphereCollider.h"             // UUID 11
 #include "BoxCollider.h"                // UUID 12
+#include "TextComponent.h"              // UUID 13
+#include "LineComponent.h"              // UUID 14
 
 #include "ScriptComponent.h"            // UUID 100
 
@@ -33,6 +35,9 @@ namespace cmp
 
     typedef SphereCollider SphereCol;
     typedef BoxCollider BoxCol;
+    typedef CameraComponent Camera;
+    typedef TextComponent Text;
+    typedef LineComponent Line;
 
     typedef ScriptComponent Scriptable;
 

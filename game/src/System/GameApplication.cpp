@@ -98,16 +98,16 @@ int GameApplication::Init()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
-    FT_Library ft;
-	if(FT_Init_FreeType(&ft))
-	{
-		std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
-		return -3;
-	}
-    else 
-    {
-        std::cout << "Successfully initialized FreeType" << std::endl;
-    }
+    //FT_Library ft;
+	//if(FT_Init_FreeType(&ft))
+	//{
+	//	std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+	//	return -3;
+	//}
+    //else 
+    //{
+    //    std::cout << "Successfully initialized FreeType" << std::endl;
+    //}
 
 
     const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";

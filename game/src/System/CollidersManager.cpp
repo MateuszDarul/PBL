@@ -83,9 +83,9 @@ void CollidersManager::CheckCollisions()
 		std::shared_ptr<ColliderComponent> firstCollider = dynamicColliders[i].lock();
 		bool firstOptimize = firstCollider->isOptimized;
 		std::shared_ptr<FrustumCullingComponent> firstFrustum = firstCollider->GetOwner()->GetComponent<FrustumCullingComponent>();
-		if (!firstOptimize //wykona siê jeœli nie jest optymalizowany
+		if (!firstOptimize //wykona siï¿½ jeï¿½li nie jest optymalizowany
 			|| (firstOptimize //lub jest optymalizowany
-				&& (glm::distance(firstCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer //i odleg³oœæ od gracza jest mniejsza ni¿ wartoœæ w managerze
+				&& (glm::distance(firstCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer //i odlegï¿½oï¿½ï¿½ od gracza jest mniejsza niï¿½ wartoï¿½ï¿½ w managerze
 			|| (firstFrustum != nullptr && //albo ma component frustum 
 				firstFrustum->IsVisible(frustum))))) // i jest w obszarze kamery
 		{
@@ -96,9 +96,9 @@ void CollidersManager::CheckCollisions()
 				std::shared_ptr<ColliderComponent> secondCollider = dynamicColliders[j].lock();
 				secondFrustum = secondCollider->GetOwner()->GetComponent<FrustumCullingComponent>();
 				secondOptimize = secondCollider->isOptimized;
-				if (!secondOptimize //wykona siê jeœli nie jest optymalizowany
+				if (!secondOptimize //wykona siï¿½ jeï¿½li nie jest optymalizowany
 					|| (secondOptimize //lub jest optymalizowany
-						&& (glm::distance(secondCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer //i odleg³oœæ od gracza jest mniejsza ni¿ wartoœæ w managerze
+						&& (glm::distance(secondCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer //i odlegï¿½oï¿½ï¿½ od gracza jest mniejsza niï¿½ wartoï¿½ï¿½ w managerze
 					|| (secondFrustum != nullptr && //albo ma component frustum 
 						secondFrustum->IsVisible(frustum))))) // i jest w obszarze kamery
 				{
@@ -109,9 +109,9 @@ void CollidersManager::CheckCollisions()
 			{
 				std::shared_ptr<ColliderComponent> secondCollider = staticColliders[j].lock();
 				secondOptimize = secondCollider->isOptimized;
-				if (!secondOptimize //wykona siê jeœli nie jest optymalizowany
+				if (!secondOptimize //wykona siï¿½ jeï¿½li nie jest optymalizowany
 					|| (secondOptimize //lub jest optymalizowany
-						&& (glm::distance(secondCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer //i odleg³oœæ od gracza jest mniejsza ni¿ wartoœæ w managerze
+						&& (glm::distance(secondCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer //i odlegï¿½oï¿½ï¿½ od gracza jest mniejsza niï¿½ wartoï¿½ï¿½ w managerze
 					|| (secondFrustum != nullptr && //albo ma component frustum 
 						secondFrustum->IsVisible(frustum))))) // i jest w obszarze kamery
 				{
@@ -122,9 +122,9 @@ void CollidersManager::CheckCollisions()
 			{
 				std::shared_ptr<ColliderComponent> secondCollider = dynamicTriggers[j].lock();
 				secondOptimize = secondCollider->isOptimized;
-				if (!secondOptimize //wykona siê jeœli nie jest optymalizowany
+				if (!secondOptimize //wykona siï¿½ jeï¿½li nie jest optymalizowany
 					|| (secondOptimize //lub jest optymalizowany
-						&& (glm::distance(secondCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer //i odleg³oœæ od gracza jest mniejsza ni¿ wartoœæ w managerze
+						&& (glm::distance(secondCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer //i odlegï¿½oï¿½ï¿½ od gracza jest mniejsza niï¿½ wartoï¿½ï¿½ w managerze
 					|| (secondFrustum != nullptr && //albo ma component frustum 
 						secondFrustum->IsVisible(frustum))))) // i jest w obszarze kamery
 				{
@@ -135,9 +135,9 @@ void CollidersManager::CheckCollisions()
 			{
 				std::shared_ptr<ColliderComponent> secondCollider = staticTriggers[j].lock();
 				secondOptimize = secondCollider->isOptimized;
-				if (!secondOptimize //wykona siê jeœli nie jest optymalizowany
+				if (!secondOptimize //wykona siï¿½ jeï¿½li nie jest optymalizowany
 					|| (secondOptimize //lub jest optymalizowany
-						&& (glm::distance(secondCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer //i odleg³oœæ od gracza jest mniejsza ni¿ wartoœæ w managerze
+						&& (glm::distance(secondCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer //i odlegï¿½oï¿½ï¿½ od gracza jest mniejsza niï¿½ wartoï¿½ï¿½ w managerze
 					|| (secondFrustum != nullptr && //albo ma component frustum 
 						secondFrustum->IsVisible(frustum))))) // i jest w obszarze kamery
 				{
@@ -158,9 +158,9 @@ void CollidersManager::CheckTriggers()
 		std::shared_ptr<ColliderComponent> firstCollider = dynamicColliders[i].lock();
 		bool firstOptimize = firstCollider->isOptimized;
 		std::shared_ptr<FrustumCullingComponent> firstFrustum = firstCollider->GetOwner()->GetComponent<FrustumCullingComponent>();
-		if (!firstOptimize //wykona siê jeœli nie jest optymalizowany
+		if (!firstOptimize //wykona siï¿½ jeï¿½li nie jest optymalizowany
 			|| (firstOptimize //lub jest optymalizowany
-				&& (glm::distance(firstCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer //i odleg³oœæ od gracza jest mniejsza ni¿ wartoœæ w managerze
+				&& (glm::distance(firstCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer //i odlegï¿½oï¿½ï¿½ od gracza jest mniejsza niï¿½ wartoï¿½ï¿½ w managerze
 			|| (firstFrustum != nullptr && //albo ma component frustum 
 				firstFrustum->IsVisible(frustum))))) // i jest w obszarze kamery
 		{
@@ -171,9 +171,9 @@ void CollidersManager::CheckTriggers()
 				std::shared_ptr<ColliderComponent> secondCollider = dynamicTriggers[j].lock();
 				secondFrustum = secondCollider->GetOwner()->GetComponent<FrustumCullingComponent>();
 				secondOptimize = secondCollider->isOptimized;
-				if (!secondOptimize //wykona siê jeœli nie jest optymalizowany
+				if (!secondOptimize //wykona siï¿½ jeï¿½li nie jest optymalizowany
 					|| (secondOptimize //lub jest optymalizowany
-						&& (glm::distance(secondCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer //i odleg³oœæ od gracza jest mniejsza ni¿ wartoœæ w managerze
+						&& (glm::distance(secondCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer //i odlegï¿½oï¿½ï¿½ od gracza jest mniejsza niï¿½ wartoï¿½ï¿½ w managerze
 					|| (secondFrustum != nullptr && //albo ma component frustum 
 						secondFrustum->IsVisible(frustum))))) // i jest w obszarze kamery
 				{
@@ -184,9 +184,9 @@ void CollidersManager::CheckTriggers()
 			{
 				std::shared_ptr<ColliderComponent> secondCollider = staticColliders[j].lock();
 				secondOptimize = secondCollider->isOptimized;
-				if (!secondOptimize //wykona siê jeœli nie jest optymalizowany
+				if (!secondOptimize //wykona siï¿½ jeï¿½li nie jest optymalizowany
 					|| (secondOptimize //lub jest optymalizowany
-						&& (glm::distance(secondCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer //i odleg³oœæ od gracza jest mniejsza ni¿ wartoœæ w managerze
+						&& (glm::distance(secondCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer //i odlegï¿½oï¿½ï¿½ od gracza jest mniejsza niï¿½ wartoï¿½ï¿½ w managerze
 					|| (secondFrustum != nullptr && //albo ma component frustum 
 					secondFrustum->IsVisible(frustum))))) // i jest w obszarze kamery
 				{
@@ -197,9 +197,9 @@ void CollidersManager::CheckTriggers()
 			{
 				std::shared_ptr<ColliderComponent> secondCollider = staticTriggers[j].lock();
 				secondOptimize = secondCollider->isOptimized;
-				if (!secondOptimize //wykona siê jeœli nie jest optymalizowany
+				if (!secondOptimize //wykona siï¿½ jeï¿½li nie jest optymalizowany
 					|| (secondOptimize //lub jest optymalizowany
-						&& (glm::distance(secondCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer //i odleg³oœæ od gracza jest mniejsza ni¿ wartoœæ w managerze
+						&& (glm::distance(secondCollider->GetOwner()->GetComponent<TransformComponent>()->GetPosition(), playerPos) <= distanceFromPlayer //i odlegï¿½oï¿½ï¿½ od gracza jest mniejsza niï¿½ wartoï¿½ï¿½ w managerze
 					|| (secondFrustum != nullptr && //albo ma component frustum 
 						secondFrustum->IsVisible(frustum))))) // i jest w obszarze kamery
 				{
@@ -210,6 +210,34 @@ void CollidersManager::CheckTriggers()
 	}
 }
 
+bool CollidersManager::Raycast(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance, bool shouldHitTriggers/*, layer*/ )
+{
+	//FIXME: inefficient checks 
+
+	//TODO: Layers
+
+	bool hit = false;
+
+
+	for (int i = 0; i<dynamicColliders.size(); i++)
+	{
+		std::shared_ptr<ColliderComponent> collider = dynamicColliders[i].lock();
+		hit |= collider->RayCollision(origin, dir, hitInfo, maxDistance);
+	}
+	//static ...
+	
+
+	if (shouldHitTriggers)
+	{
+		for (int i = 0; i<dynamicTriggers.size(); i++)
+		{
+			std::shared_ptr<ColliderComponent> collider = dynamicTriggers[i].lock();
+			hit |= collider->RayCollision(origin, dir, hitInfo, maxDistance);
+		}
+	}
+
+	return hit;
+}
 void CollidersManager::SetDistanceFromPlayer(float distance)
 {
 	distanceFromPlayer = distance;

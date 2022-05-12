@@ -3,7 +3,7 @@
 #include "ColliderComponent.h"
 #include <glm/glm.hpp>
 
-/** @brief Komponent sferycznych koliderów.
+/** @brief Komponent sferycznych koliderï¿½w.
  */
 class SphereCollider : public ColliderComponent
 {
@@ -12,14 +12,14 @@ private:
 
 public:
 
-	/** @brief Konstruktor komponentu koliderów.
-	 * @param gameObject - WskaŸnik na GameObject do którego nale¿y komponent.
+	/** @brief Konstruktor komponentu koliderï¿½w.
+	 * @param gameObject - Wskaï¿½nik na GameObject do ktï¿½rego naleï¿½y komponent.
 	 */
 	SphereCollider();
 
-	/** @brief Konstruktor komponent koliderów.
-	 * @param isTrigger - Czy ten kolider ma byæ wyzwalaczem.
-	 * @param isStatic -Czy ten kolider ma byæ statyczny.
+	/** @brief Konstruktor komponent koliderï¿½w.
+	 * @param isTrigger - Czy ten kolider ma byï¿½ wyzwalaczem.
+	 * @param isStatic -Czy ten kolider ma byï¿½ statyczny.
 	 */
 	SphereCollider(bool isTrigger, bool isStatic);
 
@@ -27,20 +27,21 @@ public:
 	 */
 	~SphereCollider();
 
-	/** @brief Metoda sprawdzaj¹ca kolizjê z innym obiektem.
-	* @param collider - wskaŸnik na kolider z którym trzeba sprawdziæ kolizjê.
-	* @return true - zasz³a kolizja.
-	* @return flase - nie zasz³a kolizja.
+	/** @brief Metoda sprawdzajï¿½ca kolizjï¿½ z innym obiektem.
+	* @param collider - wskaï¿½nik na kolider z ktï¿½rym trzeba sprawdziï¿½ kolizjï¿½.
+	* @return true - zaszï¿½a kolizja.
+	* @return flase - nie zaszï¿½a kolizja.
 	*/
 	bool virtual CheckCollision(std::shared_ptr<ColliderComponent> collider);
+	virtual bool RayCollision(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance);
 	
-	/** @brief Ustawia promieñ sferycznego kolidera.
-	* @param radius - Promieñ.
+	/** @brief Ustawia promieï¿½ sferycznego kolidera.
+	* @param radius - Promieï¿½.
 	*/
 	void SetRadius(float radius);
 
-	/** @brief Zwraca promieñ sferycznego kolidera.
-	* @return float - Promieñ.
+	/** @brief Zwraca promieï¿½ sferycznego kolidera.
+	* @return float - Promieï¿½.
 	*/
 	float GetRadius();
 };
