@@ -73,27 +73,27 @@ void CameraComponent::Update(InputManager* inputManager, const float& deltaTime)
 
     if(inputManager->Keyboard()->IsPressed(KeyboardKey::W))
     {
-        this->Move(CameraComponent::Movement::FORWARD, this->speedPerSec, deltaTime);
+        this->Move(Movement::FORWARD, this->speedPerSec, deltaTime);
     }
     if(inputManager->Keyboard()->IsPressed(KeyboardKey::S))
     {
-        this->Move(CameraComponent::Movement::BACKWARD, this->speedPerSec, deltaTime);
+        this->Move(Movement::BACKWARD, this->speedPerSec, deltaTime);
     }
     if(inputManager->Keyboard()->IsPressed(KeyboardKey::A))
     {
-        this->Move(CameraComponent::Movement::LEFT, this->speedPerSec, deltaTime);
+        this->Move(Movement::LEFT, this->speedPerSec, deltaTime);
     }
     if(inputManager->Keyboard()->IsPressed(KeyboardKey::D))
     {
-        this->Move(CameraComponent::Movement::RIGHT, this->speedPerSec, deltaTime);
+        this->Move(Movement::RIGHT, this->speedPerSec, deltaTime);
     }
     if(inputManager->Keyboard()->IsPressed(KeyboardKey::Q))
     {
-        this->Move(CameraComponent::Movement::UP, this->speedPerSec, deltaTime);
+        this->Move(Movement::UP, this->speedPerSec, deltaTime);
     }
     if(inputManager->Keyboard()->IsPressed(KeyboardKey::E))
     {
-        this->Move(CameraComponent::Movement::DOWN, this->speedPerSec, deltaTime);
+        this->Move(Movement::DOWN, this->speedPerSec, deltaTime);
     }
 }
 
@@ -160,4 +160,24 @@ glm::vec3 CameraComponent::GetPosition()
 void CameraComponent::SetPosition(const glm::vec3& position)
 {
     this->position = position;
+}
+
+
+Frustum CameraComponent::GetFrustum(float aspect, float fov, float nearPlane, float farPlane)
+{
+    Frustum frustum;
+    float halfVSide = farPlane * tanf(fov * 0.5f);
+    float halfHSide = halfVSide * aspect;
+    glm::vec3 frontMultFar = farPlane * this->front;
+
+    frustum.Create(
+        Plane(this->position, glm::cross(this->right, frontMultFar - this->up * halfVSide)),
+        Plane(this->position, glm::cross(frontMultFar + this->up * halfVSide, this->right)),
+        Plane(this->position, glm::cross(frontMultFar - this->right * halfHSide, this->up)),
+        Plane(this->position, glm::cross(this->up,frontMultFar + this->right * halfHSide)),
+        Plane(this->position + frontMultFar, -this->front),
+        Plane(this->position + nearPlane * this->front, this->front)
+    );
+
+    return frustum;
 }

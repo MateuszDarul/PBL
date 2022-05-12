@@ -80,8 +80,8 @@ public:
                 // if (hit.gameObject.layer == mirror)
                 // {
 
-                    printf("  old origin: %f, %f, %f\n", origin.x, origin.y, origin.z);
-                    printf("old dir: %f, %f, %f\n", dir.x, dir.y, dir.z);
+                    // printf("  old origin: %f, %f, %f\n", origin.x, origin.y, origin.z);
+                    // printf("old dir: %f, %f, %f\n", dir.x, dir.y, dir.z);
                     dir = glm::reflect(dir, hit.normal);
                     origin = hit.point;// + dir * 0.001f;
                 // }
@@ -93,10 +93,11 @@ public:
                 //     }
                 //     break;
                 // }
-                printf("New origin: %f, %f, %f\n", origin.x, origin.y, origin.z);
-                printf("New dir: %f, %f, %f\n", dir.x, dir.y, dir.z);
-                printf("New distance: %f\n", d);
-                printf("Hit count: %i\n", hits);
+                
+                // printf("New origin: %f, %f, %f\n", origin.x, origin.y, origin.z);
+                // printf("New dir: %f, %f, %f\n", dir.x, dir.y, dir.z);
+                // printf("New distance: %f\n", d);
+                // printf("Hit count: %i\n", hits);
             }
 
             if (line->Count() > hits + 2)

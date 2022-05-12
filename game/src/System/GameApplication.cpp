@@ -31,17 +31,27 @@ namespace rj = rapidjson;
 
 
 
+#define DEFAULT_FOV 83.0f
 #define DEFAULT_SCREEN_WIDTH 800
 #define DEFAULT_SCREEN_HEIGHT 600
-#define DEFAULT_FOV 83.0f
+#define DEFAULT_NEAR_PLANE 0.1f
+#define DEFAULT_FAR_PLANE 1000.f
 
+GLFWwindow* GameApplication::s_Window = nullptr;
+
+float GameApplication::s_Fov = DEFAULT_FOV;
 int GameApplication::s_ScreenWidth = DEFAULT_SCREEN_WIDTH;
 int GameApplication::s_ScreenHeight = DEFAULT_SCREEN_HEIGHT;
-GLFWwindow* GameApplication::s_Window = nullptr;
-glm::mat4 GameApplication::s_ProjectionMatrix = glm::perspective(DEFAULT_FOV, (float)DEFAULT_SCREEN_WIDTH/DEFAULT_SCREEN_HEIGHT, 0.1f, 1000.0f);
+float GameApplication::s_NearPlane = DEFAULT_NEAR_PLANE;
+float GameApplication::s_FarPlane = DEFAULT_FAR_PLANE;
+glm::mat4 GameApplication::s_ProjectionMatrix = glm::perspective(
+    DEFAULT_FOV, 
+    (float)DEFAULT_SCREEN_WIDTH/DEFAULT_SCREEN_HEIGHT, 
+    DEFAULT_NEAR_PLANE, 
+    DEFAULT_FAR_PLANE
+);
 
 Scene* GameApplication::s_Scene = nullptr;
-
 InputManager* GameApplication::s_InputManager = nullptr;
 ResourceManager* GameApplication::s_ResourceManager = nullptr;
 
@@ -167,7 +177,7 @@ void GameApplication::Run()
             glfwSetWindowShouldClose(s_Window, true);
         }
 
-        glClearColor(0.78f, 0.21f, 0.18f, 1.0f);
+        glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //get time step
@@ -222,7 +232,7 @@ void GameApplication::FramebufferResizeCallback(GLFWwindow* window, int width, i
     GameApplication::s_ScreenWidth = width;
     GameApplication::s_ScreenHeight = height;
 
-    s_ProjectionMatrix = glm::perspective(DEFAULT_FOV, (float)width/height, 0.1f, 1000.0f);
+    s_ProjectionMatrix = glm::perspective(s_Fov, (float)width/height, s_NearPlane, s_FarPlane);
 }
 
 GLFWwindow* const GameApplication::GetWindow()
@@ -243,4 +253,32 @@ ResourceManager* const GameApplication::GetResourceManager()
 const glm::mat4& GameApplication::GetProjection()
 {
     return s_ProjectionMatrix;
+}
+
+glm::uvec2 GameApplication::GetWindowSize()
+{
+    return glm::uvec2(s_ScreenWidth, s_ScreenHeight);
+}
+ 
+glm::vec2 GameApplication::GetProjectionRange()
+{
+    return glm::vec2(s_NearPlane, s_FarPlane);
+}
+
+void GameApplication::SetProjectionRange(float nearPlane, float farPlane)
+{
+    s_NearPlane = nearPlane;
+    s_FarPlane = farPlane;
+    s_ProjectionMatrix = glm::perspective(s_Fov, (float)s_ScreenWidth/s_ScreenHeight, s_NearPlane, s_FarPlane);
+}
+
+float GameApplication::GetFov()
+{
+    return s_Fov;
+}
+
+void GameApplication::SetFov(float fov)
+{
+    s_Fov = fov;
+    s_ProjectionMatrix = glm::perspective(s_Fov, (float)s_ScreenWidth/s_ScreenHeight, s_NearPlane, s_FarPlane);
 }

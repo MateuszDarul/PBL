@@ -1,13 +1,17 @@
 #ifndef __STATEMACHINE_H__
 #define __STATEMACHINE_H__
 
+#include <cassert>
+
+#include "State.h"
+
 template <class entity_type>
 class StateMachine
 {
 private:
 
 	//a pointer to the agent that owns this instance
-	entity_type* m_pOwner;
+	std::shared_ptr<entity_type> m_pOwner;
 	State<entity_type>* m_pCurrentState;
 	//a record of the last state the agent was in
 	State<entity_type>* m_pPreviousState;
@@ -15,7 +19,7 @@ private:
 	State<entity_type>* m_pGlobalState;
 
 public:
-	StateMachine(entity_type* owner) :	m_pOwner(owner),
+	StateMachine(std::shared_ptr<entity_type> owner) :	m_pOwner(owner),
 										m_pCurrentState(NULL),
 										m_pPreviousState(NULL),
 										m_pGlobalState(NULL){}
@@ -26,12 +30,12 @@ public:
 	void SetPreviousState(State<entity_type>* s) { m_pPreviousState = s; }
 
 	//call this to update the FSM
-	void Update()const
+	void Update(float dt)const
 	{
 		//if a global state exists, call its execute method
-		if (m_pGlobalState) m_pGlobalState->Execute(m_pOwner);
+		if (m_pGlobalState) m_pGlobalState->Execute(m_pOwner, dt);
 		//same for the current state
-		if (m_pCurrentState) m_pCurrentState->Execute(m_pOwner);
+		if (m_pCurrentState) m_pCurrentState->Execute(m_pOwner, dt);
 	}
 
 	//change to a new state
@@ -62,7 +66,7 @@ public:
 
 	//returns true if the current state’s type is equal to the type of the
 	//class passed as a parameter.
-	bool isInState(const State<entity_type>& st)const {return CurrentState == st};
+	bool isInState(const State<entity_type>& st)const { return CurrentState == st; }
 
 };
 

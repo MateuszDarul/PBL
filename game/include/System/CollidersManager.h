@@ -20,6 +20,8 @@ private:
 	std::vector<std::weak_ptr<ColliderComponent>> staticTriggers; //!< Lista statycznych wyzwalaczy.
 	std::vector<std::weak_ptr<ColliderComponent>> dynamicColliders; //!< Lista statycznych zderzaczy.
 	std::vector<std::weak_ptr<ColliderComponent>> dynamicTriggers; //!< Lista statycznych wyzwalaczy.
+	float distanceFromPlayer; //!< Dystans od gracza, do kt�rej optymalizowane kolidery s� sprawdzane.
+	std::shared_ptr<GameObject> player;
 
 	/** @brief Usuwa komponent kolider�w.
 	 * @param vector - Z kt�rej listy ma usun�� kolider.
@@ -30,7 +32,7 @@ public:
 
 	/** @brief Bazowy konstruktor.
 	 */
-	CollidersManager();
+	CollidersManager(std::shared_ptr<GameObject> player);
 
 	/** @brief Bazowy destruktor.
 	 */
@@ -86,5 +88,14 @@ public:
 
 
 	bool Raycast(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance = 100000.0f, bool shouldHitTriggers = false /*, layer*/ );
+	/** @brief Ustawia dystans od gracza, do kt�rego dla optymalizowanych kolider�w sprawdzana jest kolizja.
+	 * @param distance - Nowy dystans od gracza do optymalizacji kolizji.
+	 */
+	void SetDistanceFromPlayer(float distance);
+
+	/** @brief Zwraca dystans od gracza, do kt�rego dla optymalizowanych kolider�w sprawdzana jest kolizja.
+	 * @return float - Dystans od gracza do optymalizacji kolizji.
+	 */
+	float GetDistanceFromPlayer();
 };
 #endif

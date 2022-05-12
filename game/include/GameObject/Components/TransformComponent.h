@@ -91,7 +91,7 @@ public:
     glm::vec3 GetPosition();
 
     /**
-     * @brief Ustawia nowa rotacje obiektu (wartosci w st. Celsjusza).
+     * @brief Ustawia nowa rotacje obiektu (wartosci w stopniach).
      * @param x - Nowa wartosc obrotu po osi x.
      * @param y - Nowa wartosc obrotu po osi y.
      * @param z - Nowa wartosc obrotu po osi z.
@@ -99,13 +99,13 @@ public:
     void SetRotation(const float& x, const float& y, const float& z);
 
     /**
-     * @brief Obraca obiekt (wartosci w st. Celsjusza).
+     * @brief Obraca obiekt (wartosci w stopniach).
      * @param degrees - Nowe wartosci obrotu obiektu, (koleno po osiach X, Y i Z).
      */
     void SetRotation(const glm::vec3& degrees);
 
     /**
-     * @brief Obraca obiekt (wartosci w st. Celsjusza).
+     * @brief Obraca obiekt (wartosci w stopniach).
      * @param x - Wartości, o jakie obiekt zostanie obrocony po osi x.
      * @param y - Wartości, o jakie obiekt zostanie obrocony po osi y.
      * @param z - Wartości, o jakie obiekt zostanie obrocony po osi z.
@@ -119,7 +119,7 @@ public:
     void Rotate(const glm::vec3& degrees);
 
     /** @brief Pobiera informacje o obrocie obiektu.
-     * @return glm::vec3 - Obrot po osiach (w st. Celsjusza).
+     * @return glm::vec3 - Obrot po osiach (wartosci w stopniach).
      */
     glm::vec3 GetRotation();
 

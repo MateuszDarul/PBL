@@ -5,6 +5,9 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/System/GameApplication.cpp
 	src/System/CollidersManager.cpp
 
+	src/DataStructures/Plane.cpp
+	src/DataStructures/Frustum.cpp
+
 	src/GameObject/GameObject.cpp
 	src/GameObject/Components/Component.cpp
 	src/GameObject/Components/ColliderComponent.cpp
@@ -20,6 +23,10 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/CameraComponent.cpp
 	src/GameObject/Components/TextComponent.cpp
 	src/GameObject/Components/LineComponent.cpp
+	src/GameObject/Components/LightComponent.cpp
+	src/GameObject/Components/PointLightComponent.cpp
+	src/GameObject/Components/SpotLightComponent.cpp
+	src/GameObject/Components/FrustumCullingComponent.cpp
 
 	src/Resource/Font.cpp
 	src/Resource/Mesh.cpp
@@ -31,7 +38,12 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/Scene/MapLoader.cpp
 
 	src/AI/State.cpp
+	src/AI/FollowPathState.cpp
+
 	src/AI/StateMachine.cpp
+	src/AI/EnemyScript.cpp
+
+	src/AI/SteeringBehaviours.cpp
 
 	main.cpp
 
@@ -47,6 +59,9 @@ file(GLOB_RECURSE HEADER_FILES
 	include/System/InputManager.h
 	include/System/GameApplication.h
 	include/System/CollidersManager.h
+
+	include/DataStructures/Plane.h
+	include/DataStructures/Frustum.h
 
 	include/GameObject/GameObject.h
 	include/GameObject/Components/Components.h
@@ -64,6 +79,10 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/Components/CameraComponent.h
 	include/GameObject/Components/TextComponent.h
 	include/GameObject/Components/LineComponent.h
+	include/GameObject/Components/LightComponent.h
+	include/GameObject/Components/PointLightComponent.h
+	include/GameObject/Components/SpotLightComponent.h
+	include/GameObject/Components/FrustumCullingComponent.h
 
 	include/Resource/Font.h
 	include/Resource/Mesh.h
@@ -75,7 +94,14 @@ file(GLOB_RECURSE HEADER_FILES
 	include/Scene/MapLoader.h
 
 	include/AI/State.h
+	include/AI/FollowPathState.h
+
 	include/AI/StateMachine.h
+	include/AI/EnemyScript.h
+
+	include/AI/SteeringBehaviours.h
+
+	include/AI/Path.h
 
 	ImGui/include/*.h
 	ImGui/include/*.hpp
@@ -83,6 +109,7 @@ file(GLOB_RECURSE HEADER_FILES
 
 include_directories(include)
 include_directories(include/System)
+include_directories(include/DataStructures)
 include_directories(include/GameObject)
 include_directories(include/GameObject/Components)
 include_directories(include/Resource)

@@ -87,7 +87,9 @@ template std::shared_ptr<TextComponent> GameObject::GetComponent<TextComponent>(
 template std::shared_ptr<LineComponent> GameObject::GetComponent<LineComponent>();
 template std::shared_ptr<BoxCollider> GameObject::GetComponent<BoxCollider>();
 template std::shared_ptr<SphereCollider> GameObject::GetComponent<SphereCollider>();
-
+template std::shared_ptr<PointLightComponent> GameObject::GetComponent<PointLightComponent>();
+template std::shared_ptr<SpotLightComponent> GameObject::GetComponent<SpotLightComponent>();
+template std::shared_ptr<FrustumCullingComponent> GameObject::GetComponent<FrustumCullingComponent>();
 
 template bool GameObject::RemoveComponent<NameComponent>();
 template bool GameObject::RemoveComponent<ListComponent>();
@@ -101,3 +103,6 @@ template bool GameObject::RemoveComponent<TextComponent>();
 template bool GameObject::RemoveComponent<LineComponent>();
 template bool GameObject::RemoveComponent<BoxCollider>();
 template bool GameObject::RemoveComponent<SphereCollider>();
+template bool GameObject::RemoveComponent<PointLightComponent>();
+template bool GameObject::RemoveComponent<SpotLightComponent>();
+template bool GameObject::RemoveComponent<FrustumCullingComponent>();

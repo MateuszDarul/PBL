@@ -57,6 +57,7 @@ ColliderComponent::ColliderComponent(uint32_t UUID, bool isTrigger, bool isStati
 {
 	offset = glm::vec3(0.0f, 0.0f, 0.0f);
 	mass = 1.0f;
+	isOptimized = false;
 }
 
 ColliderComponent::~ColliderComponent()

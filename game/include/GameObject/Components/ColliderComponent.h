@@ -33,6 +33,7 @@ protected:
 public:
 	bool isStatic; //!< Czy ten kolider ma by� statyczny.
 	bool isTrigger; //!< Czy ten kolider ma by� wyzwalaczem.
+	bool isOptimized; //!< Czy ten kolider ma by� optymalizowany pod wzgl�dem odleg�o�ci od gracza.
 
 	/** @brief Konstruktor komponent kolider�w.
 	 * @param UUID - Unikalny indentyfikator klasy komponentu.

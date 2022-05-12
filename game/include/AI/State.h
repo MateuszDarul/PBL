@@ -1,22 +1,25 @@
 #ifndef __STATE_H__
 #define __STATE_H__
 
-template <class entity_type>
+#include <memory>
 
+template <class entity_type>
 class State
 {
-private:
+protected:
 
 	State() {}
+
+private:
 
 	State(const State&);
 	State& operator=(const State &);
 
 public:
 
-	virtual void Enter(entity_type*) = 0;
-	virtual void Execute(entity_type*) = 0;
-	virtual void Exit(entity_type*) = 0;
+	virtual void Enter(std::shared_ptr<entity_type>) = 0;
+	virtual void Execute(std::shared_ptr<entity_type>, float dt) = 0;
+	virtual void Exit(std::shared_ptr<entity_type>) = 0;
 	virtual ~State() {}
 
 	static State* Instance();

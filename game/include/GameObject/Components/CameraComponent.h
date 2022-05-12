@@ -7,6 +7,7 @@
 #include "Component.h"
 
 #include "InputManager.h"
+#include "Frustum.h"
 class GameObject;
 
 class CameraComponent :public Component
@@ -123,6 +124,8 @@ public:
      * @return glm::mat4 - Macierz widoku.
      */
     const glm::mat4& GetView();
+
+    Frustum GetFrustum(float aspect, float fov, float nearPlane, float farPlane);
 };
 
 #endif // __CAMERA_COMPONENT_H__
