@@ -232,32 +232,6 @@ Scene::Scene()
     world->AddChild(go);
 
 
-    //=== text
-
-    Font* font = resMan->GetFont("Resources/fonts/arial.ttf");
-
-    go = std::make_shared<GameObject>();
-    tc = std::make_shared<TransformComponent>();
-    auto textComponent = std::make_shared<TextComponent>();
-    textComponent->Create("Hello world", font);
-    //textComponent->alwaysSeen = true;
-    textComponent->color = {1.0f, 0.0f, 0.0f};
-
-    auto textShader = std::make_shared<ShaderComponent>();
-    textShader->Create("Resources/shaders/text.vert", "Resources/shaders/text.frag");
-
-    
-    go->AddComponent(textShader);
-    go->AddComponent(mc);
-    go->AddComponent(tc);
-    go->AddComponent(textComponent);
-
-    go->GetComponent<TransformComponent>()->SetPosition(0.0f, 5.0f, 0.0f);
-    go->AddComponent(std::make_shared<cmp::Name>("In world text"));
-    
-
-    world->AddChild(go);
-
     //=== ray test ===
 
     //- colider object
@@ -277,6 +251,10 @@ Scene::Scene()
     go->AddComponent(std::make_shared<cmp::BoxCol>(false, false));
     go->GetComponent<BoxCollider>()->AddToCollidersManager(collidersManager);
     go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
+    go->AddComponent(std::make_shared<FrustumCullingComponent>());
+    go->GetComponent<cmp::FrustumCulling>()->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj")
+        );
 
     world->AddChild(go);
 
@@ -297,6 +275,10 @@ Scene::Scene()
     go->AddComponent(std::make_shared<cmp::BoxCol>(false, false));
     go->GetComponent<BoxCollider>()->AddToCollidersManager(collidersManager);
     go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
+    go->AddComponent(std::make_shared<FrustumCullingComponent>());
+    go->GetComponent<cmp::FrustumCulling>()->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj")
+        );
 
     world->AddChild(go);
 
@@ -334,23 +316,35 @@ Scene::Scene()
 
     world->AddChild(go);
 
-    //===
+    //=== text
+
+    //renderowany jako ostatni bo inaczej sa te dziwne artefakty
+
+    Font* font = resMan->GetFont("Resources/fonts/arial.ttf");
+
     go = std::make_shared<GameObject>();
     tc = std::make_shared<TransformComponent>();
-    tc->SetPosition(8.0f, 3.0f, 4.0f);
-    mc = std::make_shared<ModelComponent>();
-    mc->Create(
-        resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-        resMan->GetMaterial("Resources/models/wall/wall.mtl")
-    );
-    go->AddComponent(shader_d);
+    auto textComponent = std::make_shared<TextComponent>();
+    textComponent->Create("Hello world", font);
+    textComponent->alwaysSeen = true;
+    textComponent->color = {1.0f, 0.0f, 0.0f};
+
+    auto textShader = std::make_shared<ShaderComponent>();
+    textShader->Create("Resources/shaders/text.vert", "Resources/shaders/text.frag");
+
+    
+    go->AddComponent(textShader);
     go->AddComponent(mc);
     go->AddComponent(tc);
-    go->AddComponent(std::make_shared<cmp::Name>("quicc test 1"));
+    go->AddComponent(textComponent);
+
+    go->GetComponent<TransformComponent>()->SetPosition(1.0f, 1.0f, 0.1f);
+    go->AddComponent(std::make_shared<cmp::Name>("In world text"));
+    
 
     world->AddChild(go);
 
-    //-
+    //===
    
     world->LoadScripts();
 }
@@ -378,7 +372,7 @@ void Scene::Update(float dt)
     transformCamera->SetPosition(goCamera->GetComponent<CameraComponent>()->GetPosition());
 
     
-    world->FindNode("In world text")->GetGameObject()->GetComponent<cmp::Text>()->FaceCamera(goCamera->GetComponent<cmp::Camera>());
+    //world->FindNode("In world text")->GetGameObject()->GetComponent<cmp::Text>()->FaceCamera(goCamera->GetComponent<cmp::Camera>());
     
 
     transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();
