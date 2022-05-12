@@ -79,6 +79,7 @@ template std::shared_ptr<NameComponent> GameObject::GetComponent<NameComponent>(
 template std::shared_ptr<ListComponent> GameObject::GetComponent<ListComponent>();
 template std::shared_ptr<ModelComponent> GameObject::GetComponent<ModelComponent>();
 template std::shared_ptr<ModelInstancesComponent> GameObject::GetComponent<ModelInstancesComponent>();
+template std::shared_ptr<ModelGuiComponent> GameObject::GetComponent<ModelGuiComponent>();
 template std::shared_ptr<ShaderComponent> GameObject::GetComponent<ShaderComponent>();
 template std::shared_ptr<TransformComponent> GameObject::GetComponent<TransformComponent>();
 template std::shared_ptr<CameraComponent> GameObject::GetComponent<CameraComponent>();
@@ -95,6 +96,7 @@ template bool GameObject::RemoveComponent<NameComponent>();
 template bool GameObject::RemoveComponent<ListComponent>();
 template bool GameObject::RemoveComponent<ModelComponent>();
 template bool GameObject::RemoveComponent<ModelInstancesComponent>();
+template bool GameObject::RemoveComponent<ModelGuiComponent>();
 template bool GameObject::RemoveComponent<ShaderComponent>();
 template bool GameObject::RemoveComponent<TransformComponent>();
 template bool GameObject::RemoveComponent<CameraComponent>();

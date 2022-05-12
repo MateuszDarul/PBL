@@ -18,6 +18,8 @@
 #include "TextComponent.h"              // UUID 13
 #include "LineComponent.h"              // UUID 14
 
+#include "ModelGuiComponent.h"          // UUID 50
+
 #include "ScriptComponent.h"            // UUID 100
 
 namespace cmp
@@ -26,6 +28,7 @@ namespace cmp
     typedef ListComponent List;
     typedef ModelComponent Model;
     typedef ModelInstancesComponent ModelInst;
+    typedef ModelGuiComponent ModelGui;
     typedef ShaderComponent Shader;
     typedef TransformComponent Transform;
     typedef CameraComponent Camera;

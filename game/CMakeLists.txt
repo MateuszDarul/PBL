@@ -17,6 +17,7 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/ListComponent.cpp
 	src/GameObject/Components/ModelComponent.cpp
 	src/GameObject/Components/ModelInstancesComponent.cpp
+	src/GameObject/Components/ModelGuiComponent.cpp
 	src/GameObject/Components/ShaderComponent.cpp
 	src/GameObject/Components/TransformComponent.cpp
 	src/GameObject/Components/ScriptComponent.cpp
@@ -73,6 +74,7 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/Components/ListComponent.h
 	include/GameObject/Components/ModelComponent.h
 	include/GameObject/Components/ModelInstancesComponent.h
+	include/GameObject/Components/ModelGuiComponent.h
 	include/GameObject/Components/ShaderComponent.h
 	include/GameObject/Components/TransformComponent.h
 	include/GameObject/Components/ScriptComponent.h
