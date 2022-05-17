@@ -145,8 +145,18 @@ Scene::Scene()
         go->GetComponent<cmp::Transform>()->SetPosition(0,0.5,-5);
         go->AddComponent(std::make_shared<cmp::FrustumCulling>());
         go->GetComponent<cmp::FrustumCulling>()->Create(
-            resMan->GetMesh("Resources/models/wieze/w1/w1.obj")
-        );
+            resMan->GetMesh("Resources/models/wieze/w1/w1.obj"));
+        go->AddComponent(std::make_shared<cmp::Particles>());
+        std::shared_ptr<cmp::Particles> particles = go->GetComponent<cmp::Particles>();
+        particles->Create(world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>());
+        particles->SetTexture("Resources/textures/particle.png");
+        particles->SetParticlesPerSecond(100);
+        particles->SetParticleMaxAmount(500);
+        particles->SetOffset(glm::vec3(0, 2.0f, 0));
+        particles->SetDirectionVar(45);
+        particles->SetParticleLifetime(5.0f);
+        particles->SetScale(0.1f);
+        particles->SetSpeed(5.0f);
     }
     world->AddChild(go);
 
@@ -387,7 +397,7 @@ void Scene::Update(float dt)
 
     world->FindNode("Crate1")->GetGameObject()->GetComponent<cmp::Transform>()->Move(5 * dt,0,0);
 
-    collidersManager->CheckCollisions();
+    collidersManager->CheckEverything();
     goCamera->GetComponent<CameraComponent>()->SetPosition(transformCamera->GetPosition());
     world->Update(dt);
 }

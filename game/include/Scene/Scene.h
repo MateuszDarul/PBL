@@ -7,7 +7,6 @@
 
 #include "SceneNode.h"
 #include "GameObject.h"
-#include "Components.h"
 #include "GameApplication.h"
 #include "ResourceManager.h"
 #include "InputManager.h"
