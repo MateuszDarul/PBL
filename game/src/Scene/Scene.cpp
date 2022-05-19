@@ -3,6 +3,8 @@
 #include "Scripts/TestScript.h"
 #include "Scripts/StatsScript.h"
 #include "Scripts/RaycastTest.h"
+#include "Scripts/GameManager.h"
+#include "Scripts/Resource.h"
 
 Scene::Scene()
 {
@@ -37,6 +39,11 @@ Scene::Scene()
     go->AddComponent(std::make_shared<CameraComponent>());
     go->GetComponent<cmp::Camera>()->Create(glm::vec3(0,3,10));
     go->GetComponent<cmp::Camera>()->SetSpeed(5);
+    go->AddComponent(std::make_shared<cmp::Scriptable>());
+    GameManager* gm = new GameManager();
+    go->GetComponent<cmp::Scriptable>()->Add(gm);
+    gm->gameObject = go;
+
 
     collidersManager = new CollidersManager(go); //mened�er kolider�w
     collidersManager->SetDistanceFromPlayer(10.0f);
@@ -249,6 +256,34 @@ Scene::Scene()
     }
     world->AddChild(go);
 
+    go = std::make_shared<GameObject>();
+    {
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+            resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(2, 0.5, 4);
+        go->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj")
+        );
+
+        go->AddComponent(std::make_shared<BoxCollider>(true, false));
+        go->GetComponent<cmp::BoxCol>()->setLengths(glm::vec3(2, 2, 2));
+        go->GetComponent<cmp::BoxCol>()->isOptimized = true;
+        go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
+
+        go->AddComponent(std::make_shared<cmp::Scriptable>());
+        Resource* resource = new Resource();
+        resource->energy = 150;
+        go->GetComponent<cmp::Scriptable>()->Add(resource);
+        resource->gameObject = go;
+    }
+    world->AddChild(go);
 
     //=== ray test ===
 
@@ -266,7 +301,7 @@ Scene::Scene()
     go->AddComponent(shader_d);
     go->AddComponent(mc);
     go->AddComponent(std::make_shared<cmp::Name>("ray target"));
-    go->AddComponent(std::make_shared<cmp::BoxCol>(false, false));
+    go->AddComponent(std::make_shared<cmp::BoxCol>(false,false));
     go->GetComponent<BoxCollider>()->AddToCollidersManager(collidersManager);
     go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
     go->AddComponent(std::make_shared<FrustumCullingComponent>());
@@ -343,7 +378,7 @@ Scene::Scene()
     go = std::make_shared<GameObject>();
     tc = std::make_shared<TransformComponent>();
     auto textComponent = std::make_shared<TextComponent>();
-    textComponent->Create("Hello world", font);
+    textComponent->Create("Energy: ", font);
     textComponent->alwaysSeen = true;
     textComponent->color = {1.0f, 0.0f, 0.0f};
 
@@ -357,7 +392,7 @@ Scene::Scene()
     go->AddComponent(textComponent);
 
     go->GetComponent<TransformComponent>()->SetPosition(1.0f, 1.0f, 0.1f);
-    go->AddComponent(std::make_shared<cmp::Name>("In world text"));
+    go->AddComponent(std::make_shared<cmp::Name>("EnergyText"));
     
 
     world->AddChild(go);
@@ -405,4 +440,9 @@ void Scene::Update(float dt)
 void Scene::Render()
 {
     world->Render(transform);
+}
+
+SceneNode* Scene::GetWorldNode()
+{
+    return world;
 }

@@ -6,6 +6,7 @@ SceneNode::SceneNode(std::shared_ptr<GameObject> gameObject)
     :parent(nullptr), gameObject(gameObject)
 {
     this->globalTransformations = glm::mat4(1.f);
+    gameObject->SetNode(this);
 }
 
 SceneNode::~SceneNode()

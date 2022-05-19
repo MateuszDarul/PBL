@@ -72,6 +72,16 @@ bool GameObject::Is(std::shared_ptr<GameObject> second)
     return this == second.get();
 }
 
+void GameObject::SetNode(SceneNode* node)
+{
+    this->node = node;
+}
+
+SceneNode* GameObject::GetNode()
+{
+    return node;
+}
+
 
 ///***
 

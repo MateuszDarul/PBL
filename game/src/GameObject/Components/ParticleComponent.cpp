@@ -136,7 +136,10 @@ void ParticleComponent::Update(float dt)
 			{
 				for (int i = 0; i < particlesToSpawn; i++)
 				{
-					particles.push_back(std::make_shared<Particle>(glm::vec3(0.0f, 0.0f, 0.0f), RandomDirection(), speed, particleLifetime));
+					if (particles.size() < particleMaxAmount)
+					{
+						particles.push_back(std::make_shared<Particle>(glm::vec3(0.0f, 0.0f, 0.0f), RandomDirection(), speed, particleLifetime));
+					}
 				}
 			}
 			spawnTimer += dt;

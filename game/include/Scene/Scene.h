@@ -39,6 +39,8 @@ public:
     /** @brief Metoda wyswietlajaca obiekty na ekranie.
      */
     void Render();
+
+    SceneNode* GetWorldNode();
 };
 
 #endif // __SCENE_H__

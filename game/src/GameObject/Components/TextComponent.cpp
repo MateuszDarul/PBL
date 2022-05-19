@@ -103,6 +103,16 @@ bool TextComponent::Draw(std::shared_ptr<ShaderComponent> shader)
     return true;
 }
 
+void TextComponent::SetText(std::string text)
+{
+    this->text = text;
+}
+
+std::string TextComponent::GetText()
+{
+    return text;
+}
+
 void TextComponent::FaceCamera(std::shared_ptr<CameraComponent> camera)
 {
     auto node = GetOwner();

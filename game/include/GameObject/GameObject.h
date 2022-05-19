@@ -15,6 +15,7 @@ class GameObject : public std::enable_shared_from_this<GameObject>
 {
 private:
     std::vector<std::shared_ptr<Component>> components; //!< Lista komponentow nalezacych to GameObjectu.
+    SceneNode* node;
 
 public:
     /** @brief Dodaje nowy komponent.
@@ -57,6 +58,10 @@ public:
      * @return false - Sa to rozne GameObject.
      */
     bool Is(std::shared_ptr<GameObject> second);
+
+    void SetNode(SceneNode* node);
+
+    SceneNode* GetNode();
 };
 
 #endif // __GAME_OBJECT_H__
