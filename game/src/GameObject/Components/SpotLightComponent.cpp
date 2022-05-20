@@ -124,7 +124,7 @@ glm::vec2 SpotLightComponent::GetCutOff()
     return this->cutOff;
 }
 
-void SpotLightComponent::Use(std::shared_ptr<ShaderComponent> shader)
+void SpotLightComponent::Use()
 {
     if(!SpotLightComponent::needUpdate || !this->wasCreated)
     {
@@ -132,14 +132,19 @@ void SpotLightComponent::Use(std::shared_ptr<ShaderComponent> shader)
     }
 
     textID = std::to_string(SpotLightComponent::thisLightID);
-    shader->SetInt("spotLightAmount", SpotLightComponent::lightAmount);
-    shader->SetVec3("spotLight[" + textID + "].position", this->transform->GetPosition());
-    shader->SetVec3("spotLight[" + textID + "].direction", this->transform->GetRotation());
-    shader->SetVec3("spotLight[" + textID + "].lightColor", this->lightColor);
-    shader->SetVec3("spotLight[" + textID + "].specularColor", this->specularColor);
-    shader->SetFloat("spotLight[" + textID + "].distance", this->distance);
-    shader->SetFloat("spotLight[" + textID + "].cutOff", glm::cos(glm::radians(this->cutOff.x)));
-    shader->SetFloat("spotLight[" + textID + "].outerCutOff", glm::cos(glm::radians(this->cutOff.y)));
+    for(int i=0; i<shaders.size(); i++)
+    {
+        shaders[i]->Use();
+        shaders[i]->SetInt("spotLightAmount", SpotLightComponent::lightAmount);
+        shaders[i]->SetVec3("spotLight[" + textID + "].position", this->transform->GetPosition());
+        shaders[i]->SetVec3("spotLight[" + textID + "].direction", this->transform->GetRotation());
+        shaders[i]->SetVec3("spotLight[" + textID + "].lightColor", this->lightColor);
+        shaders[i]->SetVec3("spotLight[" + textID + "].specularColor", this->specularColor);
+        shaders[i]->SetFloat("spotLight[" + textID + "].distance", this->distance);
+        shaders[i]->SetFloat("spotLight[" + textID + "].cutOff", glm::cos(glm::radians(this->cutOff.x)));
+        shaders[i]->SetFloat("spotLight[" + textID + "].outerCutOff", glm::cos(glm::radians(this->cutOff.y)));
+    }
+
 
     if(SpotLightComponent::thisLightID == SpotLightComponent::lightAmount)
     {

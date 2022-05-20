@@ -72,6 +72,16 @@ bool GameObject::Is(std::shared_ptr<GameObject> second)
     return this == second.get();
 }
 
+void GameObject::SetNode(SceneNode* node)
+{
+    this->node = node;
+}
+
+SceneNode* GameObject::GetNode()
+{
+    return node;
+}
+
 
 ///***
 
@@ -79,6 +89,7 @@ template std::shared_ptr<NameComponent> GameObject::GetComponent<NameComponent>(
 template std::shared_ptr<ListComponent> GameObject::GetComponent<ListComponent>();
 template std::shared_ptr<ModelComponent> GameObject::GetComponent<ModelComponent>();
 template std::shared_ptr<ModelInstancesComponent> GameObject::GetComponent<ModelInstancesComponent>();
+template std::shared_ptr<ModelGuiComponent> GameObject::GetComponent<ModelGuiComponent>();
 template std::shared_ptr<ShaderComponent> GameObject::GetComponent<ShaderComponent>();
 template std::shared_ptr<TransformComponent> GameObject::GetComponent<TransformComponent>();
 template std::shared_ptr<CameraComponent> GameObject::GetComponent<CameraComponent>();
@@ -90,11 +101,13 @@ template std::shared_ptr<SphereCollider> GameObject::GetComponent<SphereCollider
 template std::shared_ptr<PointLightComponent> GameObject::GetComponent<PointLightComponent>();
 template std::shared_ptr<SpotLightComponent> GameObject::GetComponent<SpotLightComponent>();
 template std::shared_ptr<FrustumCullingComponent> GameObject::GetComponent<FrustumCullingComponent>();
+template std::shared_ptr<ParticleComponent> GameObject::GetComponent<ParticleComponent>();
 
 template bool GameObject::RemoveComponent<NameComponent>();
 template bool GameObject::RemoveComponent<ListComponent>();
 template bool GameObject::RemoveComponent<ModelComponent>();
 template bool GameObject::RemoveComponent<ModelInstancesComponent>();
+template bool GameObject::RemoveComponent<ModelGuiComponent>();
 template bool GameObject::RemoveComponent<ShaderComponent>();
 template bool GameObject::RemoveComponent<TransformComponent>();
 template bool GameObject::RemoveComponent<CameraComponent>();
@@ -106,3 +119,4 @@ template bool GameObject::RemoveComponent<SphereCollider>();
 template bool GameObject::RemoveComponent<PointLightComponent>();
 template bool GameObject::RemoveComponent<SpotLightComponent>();
 template bool GameObject::RemoveComponent<FrustumCullingComponent>();
+template bool GameObject::RemoveComponent<ParticleComponent>();

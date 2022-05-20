@@ -5,6 +5,7 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/System/GameApplication.cpp
 	src/System/CollidersManager.cpp
 
+	src/DataStructures/Particle.cpp
 	src/DataStructures/Plane.cpp
 	src/DataStructures/Frustum.cpp
 
@@ -17,6 +18,7 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/ListComponent.cpp
 	src/GameObject/Components/ModelComponent.cpp
 	src/GameObject/Components/ModelInstancesComponent.cpp
+	src/GameObject/Components/ModelGuiComponent.cpp
 	src/GameObject/Components/ShaderComponent.cpp
 	src/GameObject/Components/TransformComponent.cpp
 	src/GameObject/Components/ScriptComponent.cpp
@@ -27,6 +29,7 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/PointLightComponent.cpp
 	src/GameObject/Components/SpotLightComponent.cpp
 	src/GameObject/Components/FrustumCullingComponent.cpp
+	src/GameObject/Components/ParticleComponent.cpp
 
 	src/Resource/Font.cpp
 	src/Resource/Mesh.cpp
@@ -60,6 +63,7 @@ file(GLOB_RECURSE HEADER_FILES
 	include/System/GameApplication.h
 	include/System/CollidersManager.h
 
+	include/DataStructures/Particle.h
 	include/DataStructures/Plane.h
 	include/DataStructures/Frustum.h
 	include/DataStructures/CollisionStructs.h
@@ -74,6 +78,7 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/Components/ListComponent.h
 	include/GameObject/Components/ModelComponent.h
 	include/GameObject/Components/ModelInstancesComponent.h
+	include/GameObject/Components/ModelGuiComponent.h
 	include/GameObject/Components/ShaderComponent.h
 	include/GameObject/Components/TransformComponent.h
 	include/GameObject/Components/ScriptComponent.h
@@ -84,6 +89,7 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/Components/PointLightComponent.h
 	include/GameObject/Components/SpotLightComponent.h
 	include/GameObject/Components/FrustumCullingComponent.h
+	include/GameObject/Components/ParticleComponent.cpp
 
 	include/Resource/Font.h
 	include/Resource/Mesh.h

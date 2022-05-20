@@ -7,7 +7,7 @@
 #include <memory>
 
 class GameObject;
-
+class ColliderComponent;
 /**
  * @brief Interfejs dla skryptow
  * 
@@ -27,6 +27,48 @@ public:
      * @param dt - krok czasu
      */
     virtual void Update(float dt) = 0;
+
+    /**
+     * @brief Metoda wykonywana na spotkaniu się koliderów, kiedy każdy z nich jest zderzaczem
+     *
+     * @param collision - zderzacz z którym doszło do kolizji
+     */
+    virtual void CollisionEnter(std::shared_ptr<ColliderComponent> collider);
+
+    /**
+     * @brief Metoda wykonywana kiedy kolidery się ze sobą zderzają, a każdy z nich jest zderzaczem
+     *
+     * @param collision - zderzacz z którym doszło do kolizji
+     */
+    virtual void CollisionStay(std::shared_ptr<ColliderComponent> collider);
+
+    /**
+     * @brief Metoda wykonywana na rozejściu się koliderów, kiedy każdy z nich jest zderzaczem
+     *
+     * @param collision - zderzacz z którym doszło do kolizji
+     */
+    virtual void CollisionExit(std::shared_ptr<ColliderComponent> collider);
+
+    /**
+     * @brief Metoda wykonywana na spotkaniu się koliderów, kiedy jeden z nich jest wyzwalaczem
+     *
+     * @param collision - wyzwalacz z którym doszło do kolizji
+     */
+    virtual void TriggerEnter(std::shared_ptr<ColliderComponent> collider);
+
+    /**
+     * @brief Metoda wykonywana kiedy kolidery się ze sobą zderzają, a jeden z nich jest wyzwalaczem
+     *
+     * @param collision - wyzwalacz z którym doszło do kolizji
+     */
+    virtual void TriggerStay(std::shared_ptr<ColliderComponent> collider);
+
+    /**
+     * @brief Metoda wykonywana na rozejściu się koliderów, kiedy jeden z nich jest wyzwalaczem
+     *
+     * @param collision - wyzwalacz z którym doszło do kolizji
+     */
+    virtual void TriggerExit(std::shared_ptr<ColliderComponent> collider);
     
     //On Destroy ?
 
@@ -87,6 +129,48 @@ public:
      * @param dt - krok czasu
      */
     void OnUpdate(float dt);
+
+    /**
+     * @brief Metoda wykonywana na spotkaniu się koliderów, kiedy każdy z nich jest zderzaczem
+     *
+     * @param collision - zderzacz z którym doszło do kolizji
+     */
+    void OnCollisionEnter(std::shared_ptr<ColliderComponent> collider);
+
+    /**
+     * @brief Metoda wykonywana kiedy kolidery się ze sobą zderzają, a każdy z nich jest zderzaczem
+     *
+     * @param collision - zderzacz z którym doszło do kolizji
+     */
+    void OnCollisionStay(std::shared_ptr<ColliderComponent> collider);
+
+    /**
+     * @brief Metoda wykonywana na rozejściu się koliderów, kiedy każdy z nich jest zderzaczem
+     *
+     * @param collision - zderzacz z którym doszło do kolizji
+     */
+    void OnCollisionExit(std::shared_ptr<ColliderComponent> collider);
+
+    /**
+     * @brief Metoda wykonywana na spotkaniu się koliderów, kiedy jeden z nich jest wyzwalaczem
+     *
+     * @param collision - wyzwalacz z którym doszło do kolizji
+     */
+    void OnTriggerEnter(std::shared_ptr<ColliderComponent> collider);
+
+    /**
+     * @brief Metoda wykonywana kiedy kolidery się ze sobą zderzają, a jeden z nich jest wyzwalaczem
+     *
+     * @param collision - wyzwalacz z którym doszło do kolizji
+     */
+    void OnTriggerStay(std::shared_ptr<ColliderComponent> collider);
+
+    /**
+     * @brief Metoda wykonywana na rozejściu się koliderów, kiedy jeden z nich jest wyzwalaczem
+     *
+     * @param collision - wyzwalacz z którym doszło do kolizji
+     */
+    void OnTriggerExit(std::shared_ptr<ColliderComponent> collider);
 
 private:
     std::vector<Script*> m_ScriptInstances;

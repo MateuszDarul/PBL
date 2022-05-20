@@ -24,7 +24,7 @@ void main()
 {
     fragPos = vec3(model * vec4(vPos, 1.0));
     vertexTexture = vTex;
-    normalVEC = vNor;
+    normalVEC =  mat3(transpose(inverse(model))) * vNor;
     model_transformations = model;
 
     gl_Position = transform * model * vec4(vPos, 1.0);

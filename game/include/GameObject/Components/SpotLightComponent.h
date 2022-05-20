@@ -37,7 +37,7 @@ public:
     float GetRange();
     glm::vec2 GetCutOff();
 
-    void Use(std::shared_ptr<ShaderComponent> shader);
+    void Use();
 };
 
 #endif // __SPOT_LIGHT_COMPONENT_H__

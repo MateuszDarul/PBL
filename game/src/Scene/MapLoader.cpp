@@ -1,6 +1,6 @@
 #include "MapLoader.h"
 
-bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Shader> shader, CollidersManager* collisionManager)
+bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Shader> shader[2], CollidersManager* collisionManager)
 {
     ResourceManager* resMan = GameApplication::GetResourceManager();
 
@@ -40,8 +40,10 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
                 nameCmp->Set(name);
             }
         }
-        else if(line == "Path:")
+        else if(line == "Model:")
         {
+            gameObject->AddComponent(shader[0]);
+
             std::string modelName;
 
             gameObject->AddComponent(std::make_shared<cmp::Model>());
@@ -66,6 +68,52 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
                     resMan->GetMesh("Resources/models/" + modelName + ".obj")
                 );
             }
+        }
+        else if(line == "Inst:")
+        {
+            gameObject->AddComponent(shader[1]);
+
+            std::string modelName;
+            int amount = 0;
+
+            gameObject->AddComponent(std::make_shared<cmp::ModelInst>());
+            std::shared_ptr<cmp::ModelInst> modelCmp = gameObject->GetComponent<cmp::ModelInst>();
+            {
+                file >> modelName;
+                line_id++;
+
+                file >> std::dec >> amount;
+                line_id++;
+
+                modelCmp->Create(
+                    amount,
+                    resMan->GetMesh("Resources/models/" + modelName + ".obj"),
+                    resMan->GetMaterial("Resources/models/" + modelName + ".mtl")
+                );
+            }
+
+            std::string command;
+            glm::vec3 position;
+            glm::vec3 rotation;
+            for(int i=0; i<amount; i++)
+            {
+                file >> command;
+
+                file >> std::dec >> position.x;
+                file >> std::dec >> position.y;
+                file >> std::dec >> position.z;
+
+                file >> std::dec >> rotation.x;
+                file >> std::dec >> rotation.y;
+                file >> std::dec >> rotation.z;
+
+                line_id += 7;
+
+                modelCmp->SetTransformation(i, 
+                    cmp::Transform::Transform(position, rotation, 1.f)
+                );
+            }
+            modelCmp->UpdateTransformations();
         }
         else if(line == "Transformations:")
         {
@@ -133,12 +181,11 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
         }
         else if(line == "END")
         {
-            gameObject->AddComponent(shader);
             root->AddChild(gameObject);
         }
         else
         {
-            std::cerr << "Unknown operation !\nline: " << line_id << " | cmd: " << line << std::endl;
+            std::cerr << "Unknown operation !\nline: " << line_id-1 << " | cmd: " << line << std::endl;
         }
     }
     file.close();

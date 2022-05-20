@@ -7,7 +7,6 @@
 
 #include "SceneNode.h"
 #include "GameObject.h"
-#include "Components.h"
 #include "GameApplication.h"
 #include "ResourceManager.h"
 #include "InputManager.h"
@@ -43,6 +42,7 @@ public:
 
     //void AddGameObject(GameObject* parent = nullptr);
     void AddGameObject(std::shared_ptr<GameObject> child, std::shared_ptr<GameObject> parent = std::shared_ptr<GameObject>());
+    SceneNode* GetWorldNode();
 };
 
 #endif // __SCENE_H__

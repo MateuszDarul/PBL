@@ -17,6 +17,9 @@
 #include "BoxCollider.h"                // UUID 12
 #include "TextComponent.h"              // UUID 13
 #include "LineComponent.h"              // UUID 14
+#include "ParticleComponent.h"          // UUID 15
+
+#include "ModelGuiComponent.h"          // UUID 50
 
 #include "ScriptComponent.h"            // UUID 100
 
@@ -26,12 +29,14 @@ namespace cmp
     typedef ListComponent List;
     typedef ModelComponent Model;
     typedef ModelInstancesComponent ModelInst;
+    typedef ModelGuiComponent ModelGui;
     typedef ShaderComponent Shader;
     typedef TransformComponent Transform;
     typedef CameraComponent Camera;
     typedef PointLightComponent PointLight;
     typedef SpotLightComponent SpotLight;
     typedef FrustumCullingComponent FrustumCulling;
+    typedef ParticleComponent Particles;
 
     typedef SphereCollider SphereCol;
     typedef BoxCollider BoxCol;

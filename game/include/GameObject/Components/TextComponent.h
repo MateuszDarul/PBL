@@ -56,6 +56,10 @@ public:
      */
     bool Draw(std::shared_ptr<ShaderComponent> shader);
 
+    void SetText(std::string text);
+
+    std::string GetText();
+
 private:
     unsigned int VAO; //!< Vertex Array Object.
     unsigned int VBO; //!< Vertex Buffer Object.
