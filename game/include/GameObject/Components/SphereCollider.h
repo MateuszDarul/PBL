@@ -20,6 +20,7 @@ public:
 	/** @brief Konstruktor komponent kolider�w.
 	 * @param isTrigger - Czy ten kolider ma by� wyzwalaczem.
 	 * @param isStatic -Czy ten kolider ma by� statyczny.
+	 * @param layer - warstwa kolidera.
 	 */
 	SphereCollider(bool isTrigger, bool isStatic, int layer = CollisionLayer::Default);
 
@@ -33,6 +34,10 @@ public:
 	* @return flase - nie zasz�a kolizja.
 	*/
 	bool virtual CheckCollision(std::shared_ptr<ColliderComponent> collider);
+
+	/*!
+	 * @copybrief ColliderComponent::RayCollision()
+	 */
 	virtual bool RayCollision(const glm::vec3& origin, const glm::vec3& dir, RayHitInfo& hitInfo, float maxDistance);
 	
 	/** @brief Ustawia promie� sferycznego kolidera.

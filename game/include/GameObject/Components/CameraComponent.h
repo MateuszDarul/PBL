@@ -25,17 +25,23 @@ public:
         BACKWARD = 5    //!< Tyl.
     };
 
+    /** @brief Zwraca kierunek patrzenia kamery
+     */
     glm::vec3 GetForward()
     {
         return front;
     }
 
+    /** @brief Zwraca kąt obrotu kamery w osi Y
+     */
     float GetYaw()
     {
         return yaw;
 
     }
 
+    /** @brief Zwraca kąt obrotu kamery w osi X
+     */
     float GetPitch()
     {
         return pitch;

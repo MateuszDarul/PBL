@@ -35,12 +35,13 @@ public:
 	bool isStatic; //!< Czy ten kolider ma by� statyczny.
 	bool isTrigger; //!< Czy ten kolider ma by� wyzwalaczem.
 	bool isOptimized; //!< Czy ten kolider ma by� optymalizowany pod wzgl�dem odleg�o�ci od gracza.
-	int layer;
+	int layer; //!< Warstwa kolidera.
 
 	/** @brief Konstruktor komponent kolider�w.
 	 * @param UUID - Unikalny indentyfikator klasy komponentu.
 	 * @param isTrigger - Czy ten kolider ma by� wyzwalaczem.
 	 * @param isStatic -Czy ten kolider ma by� statyczny.
+	 * @param layer - warstwa kolidera.
 	 */
 	ColliderComponent(uint32_t UUID, bool isTrigger, bool isStatic, int layer);
 	
@@ -70,6 +71,16 @@ public:
 	*/
 	bool virtual CheckCollision(std::shared_ptr<ColliderComponent> collider) = 0;
 
+	/**
+	 * @brief Metoda sprawdzajaca kolizje z promieniem.
+	 * 
+	 * @param origin poczatek promienia.
+	 * @param dir kierunek promienia.
+	 * @param hitInfo dane o punkcie kolizji
+	 * @param maxDistance maksymalna oldeglosc promienia.
+	 * @return true zaszla kolizja.
+	 * @return false nie zaszla kolizja.
+	 */
 	virtual bool RayCollision(const glm::vec3& origin, const glm::vec3& dir, RayHitInfo& hitInfo, float maxDistance) = 0;
 
 	/** @brief Metoda sprawdzaj�ca czy sfera znajduje si� mi�dzy dwoma r�wnoleg�ymi �cianami pude�ka na danej osi.
