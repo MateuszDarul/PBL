@@ -8,7 +8,7 @@
 #include <glm/gtx/intersect.hpp>
 
 BoxCollider::BoxCollider()
-	:ColliderComponent(12, false, false)
+	:ColliderComponent(12, false, false, CollisionLayer::Default)
 {
 	offset = glm::vec3(0.0f, 0.0f, 0.0f);
 	isStatic = false;
@@ -16,8 +16,8 @@ BoxCollider::BoxCollider()
 	lengths = { 1.0f, 1.0f, 1.0f };
 }
 
-BoxCollider::BoxCollider(bool isTrigger, bool isStatic)
-	:ColliderComponent(12, isTrigger, isStatic)
+BoxCollider::BoxCollider(bool isTrigger, bool isStatic, int layer)
+	:ColliderComponent(12, isTrigger, isStatic, layer)
 {
 	offset = glm::vec3(0.0f, 0.0f, 0.0f);
 	lengths = { 1.0f, 1.0f, 1.0f };
@@ -152,7 +152,7 @@ glm::uvec3 BoxCollider::getLengths()
 	return lengths;
 }
 
-bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance)
+bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, RayHitInfo& hitInfo, float maxDistance)
 {
 	auto transform = GetOwner()->GetComponent<cmp::Transform>();
 

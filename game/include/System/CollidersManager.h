@@ -3,13 +3,7 @@
 #include "ColliderComponent.h"
 #include <vector>
 
-struct RayHitInfo
-{
-	glm::vec3 point;
-	glm::vec3 normal;
-	float distance;
-	GameObject* gameObject;
-};
+
 
 /** @brief Menad�er kolizji.
  */
@@ -87,7 +81,7 @@ public:
 	void CheckTriggers();
 
 
-	bool Raycast(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance = 100000.0f, bool shouldHitTriggers = false /*, layer*/ );
+	bool Raycast(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance = 100000.0f, bool shouldHitTriggers = false, int layerMask = 0xffffffff);
 	/** @brief Ustawia dystans od gracza, do kt�rego dla optymalizowanych kolider�w sprawdzana jest kolizja.
 	 * @param distance - Nowy dystans od gracza do optymalizacji kolizji.
 	 */

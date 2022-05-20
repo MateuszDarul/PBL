@@ -210,34 +210,65 @@ void CollidersManager::CheckTriggers()
 	}
 }
 
-bool CollidersManager::Raycast(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance, bool shouldHitTriggers/*, layer*/ )
+bool CollidersManager::Raycast(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance, bool shouldHitTriggers, int layerMask)
 {
 	//FIXME: inefficient checks 
 
-	//TODO: Layers
-
 	bool hit = false;
-
+	RayHitInfo closestHit;
+	closestHit.distance = maxDistance;
 
 	for (int i = 0; i<dynamicColliders.size(); i++)
 	{
 		std::shared_ptr<ColliderComponent> collider = dynamicColliders[i].lock();
-		hit |= collider->RayCollision(origin, dir, hitInfo, maxDistance);
+
+		if ((collider->layer & layerMask) && collider->RayCollision(origin, dir, hitInfo, maxDistance) && (hitInfo.distance < closestHit.distance))
+		{
+			hit = true;
+			closestHit = hitInfo;
+		}
 	}
-	//static ...
-	
+
+	for (int i = 0; i<staticColliders.size(); i++)
+	{
+		std::shared_ptr<ColliderComponent> collider = staticColliders[i].lock();
+
+		if ((collider->layer & layerMask) && collider->RayCollision(origin, dir, hitInfo, maxDistance) && (hitInfo.distance < closestHit.distance))
+		{
+			hit = true;
+			closestHit = hitInfo;
+		}
+	}
 
 	if (shouldHitTriggers)
 	{
 		for (int i = 0; i<dynamicTriggers.size(); i++)
 		{
 			std::shared_ptr<ColliderComponent> collider = dynamicTriggers[i].lock();
-			hit |= collider->RayCollision(origin, dir, hitInfo, maxDistance);
+
+			if ((collider->layer & layerMask) && collider->RayCollision(origin, dir, hitInfo, maxDistance) && (hitInfo.distance < closestHit.distance))
+			{
+				hit = true;
+				closestHit = hitInfo;
+			}
+		}
+
+		for (int i = 0; i<staticTriggers.size(); i++)
+		{
+			std::shared_ptr<ColliderComponent> collider = staticTriggers[i].lock();
+
+			if ((collider->layer & layerMask) && collider->RayCollision(origin, dir, hitInfo, maxDistance) && (hitInfo.distance < closestHit.distance))
+			{
+				hit = true;
+				closestHit = hitInfo;
+			}
 		}
 	}
 
+	hitInfo = closestHit;
 	return hit;
 }
+
 void CollidersManager::SetDistanceFromPlayer(float distance)
 {
 	distanceFromPlayer = distance;
@@ -247,3 +278,61 @@ float CollidersManager::GetDistanceFromPlayer()
 {
 	return distanceFromPlayer;
 }
+
+/*bool hit = false;
+	hitInfo.distance = maxDistance;
+	RayHitInfo currentHit;
+
+
+	// for (int i = 0; i<dynamicColliders.size(); i++)
+	// {
+	// 	std::shared_ptr<ColliderComponent> collider = dynamicColliders[i].lock();
+		
+	// 	if (collider->RayCollision(origin, dir, currentHit, maxDistance))
+	// 	{
+	// 		if (currentHit.distance < hitInfo.distance) hitInfo = currentHit;
+	// 		hit = true;
+	// 	}
+	// }
+
+	for (int i = 0; i<staticColliders.size(); i++)
+	{
+		std::shared_ptr<ColliderComponent> collider = staticColliders[i].lock();
+		hit |= collider->RayCollision(origin, dir, currentHit, maxDistance);
+
+		if (collider->RayCollision(origin, dir, currentHit, maxDistance))
+		{
+			if (currentHit.distance < hitInfo.distance) hitInfo = currentHit;
+			hit = true;
+		}
+	}
+	
+	
+
+	if (shouldHitTriggers)
+	{
+		for (int i = 0; i<dynamicTriggers.size(); i++)
+		{
+			std::shared_ptr<ColliderComponent> collider = dynamicTriggers[i].lock();
+			hit |= collider->RayCollision(origin, dir, hitInfo, maxDistance);
+
+			if (collider->RayCollision(origin, dir, currentHit, maxDistance))
+			{
+				if (currentHit.distance < hitInfo.distance) hitInfo = currentHit;
+				hit = true;
+			}
+		}
+
+		for (int i = 0; i<staticTriggers.size(); i++)
+		{
+			std::shared_ptr<ColliderComponent> collider = staticTriggers[i].lock();
+			hit |= collider->RayCollision(origin, dir, hitInfo, maxDistance);
+
+			if (collider->RayCollision(origin, dir, currentHit, maxDistance))
+			{
+				if (currentHit.distance < hitInfo.distance) hitInfo = currentHit;
+				hit = true;
+			}
+		}
+	}
+	*/
