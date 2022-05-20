@@ -3,6 +3,7 @@
 #include "Scripts/TestScript.h"
 #include "Scripts/StatsScript.h"
 #include "Scripts/RaycastTest.h"
+#include "Scripts/PlayerPlaceTurret.h"
 
 Scene::Scene()
 {
@@ -23,6 +24,9 @@ Scene::Scene()
     std::shared_ptr<ShaderComponent> shader_l = std::make_shared<ShaderComponent>();
     shader_l->Create("Resources/shaders/light.vert", "Resources/shaders/light.frag");
 
+    auto lineShader = std::make_shared<cmp::Shader>();
+    lineShader->Create("Resources/shaders/line.vert", "Resources/shaders/line.frag");
+
     ///***
 
     world = new SceneNode(std::make_shared<GameObject>());
@@ -41,11 +45,35 @@ Scene::Scene()
     collidersManager = new CollidersManager(go); //mened�er kolider�w
     collidersManager->SetDistanceFromPlayer(10.0f);
 
-    go->AddComponent(std::make_shared<BoxCollider>(false, false));
+    go->AddComponent(std::make_shared<BoxCollider>(false, false, CollisionLayer::Player));
     go->GetComponent<cmp::BoxCol>()->setLengths(glm::vec3(1,3,1));
     go->GetComponent<cmp::BoxCol>()->SetOffset(glm::vec3(0,-1.5,0));
     go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
     world->AddChild(go);
+
+
+    //skrypty gracza
+    go->AddComponent(std::make_shared<ScriptComponent>());
+
+
+    auto debugLineGO = std::make_shared<GameObject>();
+    auto debugLineCmp = std::make_shared<cmp::Line>();
+    debugLineCmp->Create();
+    debugLineGO->AddComponent(debugLineCmp);
+    //debugLineGO->AddComponent(lineShader);
+    debugLineGO->AddComponent(std::make_shared<cmp::Transform>());
+    world->FindNode("CAMERA")->AddChild(debugLineGO);
+    
+    auto playerPlace = new PlayerPlaceTurret();
+    
+    playerPlace->line = debugLineCmp.get();
+    playerPlace->colMan = collidersManager;
+    playerPlace->resMan = resMan;
+    playerPlace->shader_l = shader_l;
+    playerPlace->scene = this;
+    
+    go->GetComponent<ScriptComponent>()->Add(playerPlace);
+
 
 
     ///***
@@ -229,9 +257,10 @@ Scene::Scene()
             resMan->GetMesh("Resources/models/Crate/Crate.obj")
         );
     }
-    world->AddChild(go);
+    world->AddChild(go); 
 
 
+    
     //=== ray test ===
 
     //- colider object
@@ -293,15 +322,13 @@ Scene::Scene()
 
     go->AddComponent(std::make_shared<cmp::Name>("Raycaster"));
 
-    auto lineShader = std::make_shared<cmp::Shader>();
-    lineShader->Create("Resources/shaders/line.vert", "Resources/shaders/line.frag");
     go->AddComponent(lineShader);
 
     auto line = std::make_shared<cmp::Line>();
     line->Create();
     
-    line->Get(0) = {0.0f, 2.0f, 0.0f};
-    line->Get(1) = {0.0f, 4.0f, 0.0f};
+    line->Set(0, {0.0f, 2.0f, 0.0f});
+    line->Set(1, {0.0f, 4.0f, 0.0f});
     go->AddComponent(line);
 
     auto scriptHolder = std::make_shared<cmp::Scriptable>();
@@ -388,3 +415,21 @@ void Scene::Render()
 {
     world->Render(transform);
 }
+
+
+void Scene::AddGameObject(std::shared_ptr<GameObject> child, std::shared_ptr<GameObject> parent)
+{
+    SceneNode* node = world->GetRoot();
+    
+    if (parent)
+    {
+        auto name = parent->GetComponent<cmp::Name>();
+        if (name)
+        {
+            node = world->FindNode(name->Get());
+        }
+    }
+    
+    node->AddChild(child);
+}
+

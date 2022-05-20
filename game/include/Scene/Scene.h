@@ -40,6 +40,9 @@ public:
     /** @brief Metoda wyswietlajaca obiekty na ekranie.
      */
     void Render();
+
+    //void AddGameObject(GameObject* parent = nullptr);
+    void AddGameObject(std::shared_ptr<GameObject> child, std::shared_ptr<GameObject> parent = std::shared_ptr<GameObject>());
 };
 
 #endif // __SCENE_H__

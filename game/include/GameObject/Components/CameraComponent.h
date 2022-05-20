@@ -25,6 +25,22 @@ public:
         BACKWARD = 5    //!< Tyl.
     };
 
+    glm::vec3 GetForward()
+    {
+        return front;
+    }
+
+    float GetYaw()
+    {
+        return yaw;
+
+    }
+
+    float GetPitch()
+    {
+        return pitch;
+    }
+
 private:
     glm::vec3 position; //!< Aktualna pozycja kamery.
 

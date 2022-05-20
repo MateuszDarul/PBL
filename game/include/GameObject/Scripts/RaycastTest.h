@@ -17,6 +17,9 @@ public:
     cmp::Transform* collisionTarget;
 
     CollidersManager* colMan;
+
+
+    int ignoreLayerMask = ~(CollisionLayer::Player);
  
     
     glm::vec3 dir = { 1.0f, 0.0f, 0.0f };
@@ -63,7 +66,7 @@ public:
             dir = { 1.0f, 0.0f, 0.0f };
 
             RayHitInfo hit;
-            while (hits < maxBounces && d > 0.0f && colMan->Raycast(origin, dir, hit, d))
+            while (hits < maxBounces && d > 0.0f && colMan->Raycast(origin, dir, hit, d, false, ignoreLayerMask))
             {
                 hits += 1;
                 d -= hit.distance;
@@ -74,30 +77,11 @@ public:
                 }
                 else
                 {
-                    line->Get(hits) = hit.point - transform->GetPosition();
+                    line->Set(hits, hit.point - transform->GetPosition());
                 }
 
-                // if (hit.gameObject.layer == mirror)
-                // {
-
-                    // printf("  old origin: %f, %f, %f\n", origin.x, origin.y, origin.z);
-                    // printf("old dir: %f, %f, %f\n", dir.x, dir.y, dir.z);
                     dir = glm::reflect(dir, hit.normal);
-                    origin = hit.point;// + dir * 0.001f;
-                // }
-                // else
-                // {
-                //     if (hit.gameObject.layer == activable)
-                //     {
-                //         hit.gameObject.dostuff;
-                //     }
-                //     break;
-                // }
-                
-                // printf("New origin: %f, %f, %f\n", origin.x, origin.y, origin.z);
-                // printf("New dir: %f, %f, %f\n", dir.x, dir.y, dir.z);
-                // printf("New distance: %f\n", d);
-                // printf("Hit count: %i\n", hits);
+                    origin = hit.point;
             }
 
             if (line->Count() > hits + 2)
@@ -110,7 +94,7 @@ public:
             }
             
 
-            line->Get(hits+1) = origin + dir * d - transform->GetPosition();
+            line->Set(hits+1, origin + dir * d - transform->GetPosition());
         }
     }
 };
