@@ -42,7 +42,9 @@ public:
     void RemoveLast(int count = 1);
     void RemoveAll();
 
-    glm::vec3& Get(int index);
+    const glm::vec3& Get(int index);
+    void Set(int index, float x, float y, float z);
+    void Set(int index, const glm::vec3& point);
 
     int Count();
 

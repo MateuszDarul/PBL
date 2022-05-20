@@ -83,12 +83,25 @@ void LineComponent::RemoveAll()
     pointsBuffer.clear();
 }
 
-glm::vec3& LineComponent::Get(int i)
+const glm::vec3& LineComponent::Get(int i)
 {
     if (i < pointsBuffer.size())
     {
         return pointsBuffer[i].pos;
     }
+}
+
+void LineComponent::Set(int i, const glm::vec3& point)
+{
+    if (i < pointsBuffer.size())
+    {
+        pointsBuffer[i].pos = point;
+    }
+}
+
+void LineComponent::Set(int i, float x, float y, float z)
+{
+    Set(i, {x, y, z});
 }
 
 int LineComponent::Count()
