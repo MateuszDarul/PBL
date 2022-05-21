@@ -40,6 +40,7 @@ void LineComponent::Clear()
 bool LineComponent::Draw(std::shared_ptr<ShaderComponent> shader)
 {
     shader->Use();
+    shader->SetMat4("model", glm::mat4(1.0f)); //make line always relative to (0,0,0)
     shader->SetVec3("u_Color1", color1);
     shader->SetVec3("u_Color2", color2);
 
