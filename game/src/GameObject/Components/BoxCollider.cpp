@@ -155,6 +155,16 @@ glm::uvec3 BoxCollider::getLengths()
 bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, RayHitInfo& hitInfo, float maxDistance)
 {
 	auto transform = GetOwner()->GetComponent<cmp::Transform>();
+	glm::mat4 transformMatrix;
+
+	if (isStatic)
+	{
+		transformMatrix = glm::translate(glm::mat4(1.0f), transform->GetPosition());
+	}
+	else
+	{
+		transformMatrix = transform->GetModelMatrix();
+	}
 
 	float d1, d2, d = maxDistance;
 	glm::vec3 normal;
@@ -162,251 +172,209 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 	glm::vec2 bary1, bary2;
 
 	// -X
-	normal = glm::vec3(transform->GetModelMatrix() * glm::vec4(-1.0f, 0.0f, 0.0f, 1.0f));
-    normal -= GetOwner()->GetComponent<cmp::Transform>()->GetPosition();
-    normal = glm::normalize(normal);
+	normal  = glm::vec3(transformMatrix * glm::vec4(-1.0f, 0.0f, 0.0f, 1.0f));
+	normal -= transform->GetPosition();
+	normal  = glm::normalize(normal);
 
-
-	v0 = glm::vec3(transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x,  0.5f * lengths.y,  0.5f * lengths.z, 1.0));
-	v1 = glm::vec3(transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x, -0.5f * lengths.y,  0.5f * lengths.z, 1.0));
-	v2 = glm::vec3(transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x, -0.5f * lengths.y, -0.5f * lengths.z, 1.0));
-	v3 = glm::vec3(transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x,  0.5f * lengths.y, -0.5f * lengths.z, 1.0));
-
-	
 	d1 = maxDistance;
 	d2 = maxDistance;
-	if (glm::dot(dir, normal) < 0 
-    && (glm::intersectRayTriangle(origin, dir, v0, v1, v2, bary1, d1)
-	||  glm::intersectRayTriangle(origin, dir, v2, v3, v0, bary2, d2)))	
+	if (glm::dot(dir, normal) < 0)
 	{
-		d = std::min(d1, d2);
-		if (d <= 0.0001f)
+		v0 = glm::vec3(transformMatrix * glm::vec4(-0.5f * lengths.x,  0.5f * lengths.y,  0.5f * lengths.z, 1.0));
+		v1 = glm::vec3(transformMatrix * glm::vec4(-0.5f * lengths.x, -0.5f * lengths.y,  0.5f * lengths.z, 1.0));
+		v2 = glm::vec3(transformMatrix * glm::vec4(-0.5f * lengths.x, -0.5f * lengths.y, -0.5f * lengths.z, 1.0));
+		v3 = glm::vec3(transformMatrix * glm::vec4(-0.5f * lengths.x,  0.5f * lengths.y, -0.5f * lengths.z, 1.0));
+		
+		if (glm::intersectRayTriangle(origin, dir, v0, v1, v2, bary1, d1)
+		||  glm::intersectRayTriangle(origin, dir, v2, v3, v0, bary2, d2))
 		{
-			d = maxDistance;
-		}
-		else
-		{
-			hitInfo.point = origin + dir * d;
-			hitInfo.normal = normal;
-			hitInfo.distance = d;
-			hitInfo.gameObject = GetOwner().get();
+			d = std::min(d1, d2);
+			if (d <= 0.0001f)
+			{
+				d = maxDistance;
+			}
+			else
+			{
+				hitInfo.point = origin + dir * d;
+				hitInfo.normal = normal;
+				hitInfo.distance = d;
+				hitInfo.gameObject = GetOwner().get();
 
-			return true;
+				return true;
+			}
 		}
 	}
 
 	// +X
-	normal = glm::vec3(transform->GetModelMatrix() * glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-    normal -= GetOwner()->GetComponent<cmp::Transform>()->GetPosition();
-    normal = glm::normalize(normal);
-
-
-	v0 = glm::vec3(transform->GetModelMatrix() * glm::vec4(0.5f * lengths.x,  0.5f * lengths.y,  0.5f * lengths.z, 1.0));
-	v1 = glm::vec3(transform->GetModelMatrix() * glm::vec4(0.5f * lengths.x, -0.5f * lengths.y,  0.5f * lengths.z, 1.0));
-	v2 = glm::vec3(transform->GetModelMatrix() * glm::vec4(0.5f * lengths.x, -0.5f * lengths.y, -0.5f * lengths.z, 1.0));
-	v3 = glm::vec3(transform->GetModelMatrix() * glm::vec4(0.5f * lengths.x,  0.5f * lengths.y, -0.5f * lengths.z, 1.0));
-
+	normal  = glm::vec3(transformMatrix * glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+	normal -= transform->GetPosition();
+	normal  = glm::normalize(normal);
 	
 	d1 = maxDistance;
 	d2 = maxDistance;
-	if (glm::dot(dir, normal) < 0 
-    && (glm::intersectRayTriangle(origin, dir, v0, v1, v2, bary1, d1)
-	||  glm::intersectRayTriangle(origin, dir, v2, v3, v0, bary2, d2)))	
+	if (glm::dot(dir, normal) < 0)
 	{
-		d = std::min(d1, d2);
-		if (d <= 0.0001f)
+		v0 = glm::vec3(transformMatrix * glm::vec4(0.5f * lengths.x,  0.5f * lengths.y,  0.5f * lengths.z, 1.0));
+		v1 = glm::vec3(transformMatrix * glm::vec4(0.5f * lengths.x, -0.5f * lengths.y,  0.5f * lengths.z, 1.0));
+		v2 = glm::vec3(transformMatrix * glm::vec4(0.5f * lengths.x, -0.5f * lengths.y, -0.5f * lengths.z, 1.0));
+		v3 = glm::vec3(transformMatrix * glm::vec4(0.5f * lengths.x,  0.5f * lengths.y, -0.5f * lengths.z, 1.0));
+	
+		if (glm::intersectRayTriangle(origin, dir, v0, v1, v2, bary1, d1)
+		||  glm::intersectRayTriangle(origin, dir, v2, v3, v0, bary2, d2))
 		{
-			d = maxDistance;
-		}
-		else
-		{
-			hitInfo.point = origin + dir * d;
-			hitInfo.normal = normal;
-			hitInfo.distance = d;
-			hitInfo.gameObject = GetOwner().get();
+			d = std::min(d1, d2);
+			if (d <= 0.0001f)
+			{
+				d = maxDistance;
+			}
+			else
+			{
+				hitInfo.point = origin + dir * d;
+				hitInfo.normal = normal;
+				hitInfo.distance = d;
+				hitInfo.gameObject = GetOwner().get();
 
-			return true;
+				return true;
+			}
 		}
 	}
 
 	// -Z
-	normal = glm::vec3(transform->GetModelMatrix() * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f));
-    normal -= GetOwner()->GetComponent<cmp::Transform>()->GetPosition();
-    normal = glm::normalize(normal);
-
-
-	v0 = glm::vec3(transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x,  0.5f * lengths.y, -0.5f * lengths.z, 1.0));
-	v1 = glm::vec3(transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x, -0.5f * lengths.y, -0.5f * lengths.z, 1.0));
-	v2 = glm::vec3(transform->GetModelMatrix() * glm::vec4( 0.5f * lengths.x, -0.5f * lengths.y, -0.5f * lengths.z, 1.0));
-	v3 = glm::vec3(transform->GetModelMatrix() * glm::vec4( 0.5f * lengths.x,  0.5f * lengths.y, -0.5f * lengths.z, 1.0));
-
+	normal  = glm::vec3(transformMatrix * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f));
+	normal -= transform->GetPosition();
+	normal  = glm::normalize(normal);
 	
 	d1 = maxDistance;
 	d2 = maxDistance;
-	if (glm::dot(dir, normal) < 0 
-    && (glm::intersectRayTriangle(origin, dir, v0, v1, v2, bary1, d1)
-	||  glm::intersectRayTriangle(origin, dir, v2, v3, v0, bary2, d2)))	
+	if (glm::dot(dir, normal) < 0)
 	{
-		d = std::min(d1, d2);
-		if (d <= 0.0001f)
-		{
-			d = maxDistance;
-		}
-		else
-		{
-			hitInfo.point = origin + dir * d;
-			hitInfo.normal = normal;
-			hitInfo.distance = d;
-			hitInfo.gameObject = GetOwner().get();
+		v0 = glm::vec3(transformMatrix * glm::vec4(-0.5f * lengths.x,  0.5f * lengths.y, -0.5f * lengths.z, 1.0));
+		v1 = glm::vec3(transformMatrix * glm::vec4(-0.5f * lengths.x, -0.5f * lengths.y, -0.5f * lengths.z, 1.0));
+		v2 = glm::vec3(transformMatrix * glm::vec4( 0.5f * lengths.x, -0.5f * lengths.y, -0.5f * lengths.z, 1.0));
+		v3 = glm::vec3(transformMatrix * glm::vec4( 0.5f * lengths.x,  0.5f * lengths.y, -0.5f * lengths.z, 1.0));
 
-			return true;
+		if (glm::intersectRayTriangle(origin, dir, v0, v1, v2, bary1, d1)
+		||  glm::intersectRayTriangle(origin, dir, v2, v3, v0, bary2, d2))
+		{
+			d = std::min(d1, d2);
+			if (d <= 0.0001f)
+			{
+				d = maxDistance;
+			}
+			else
+			{
+				hitInfo.point = origin + dir * d;
+				hitInfo.normal = normal;
+				hitInfo.distance = d;
+				hitInfo.gameObject = GetOwner().get();
+
+				return true;
+			}
 		}
 	}
 
 	// +Z
-	normal = glm::vec3(transform->GetModelMatrix() * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-    normal -= GetOwner()->GetComponent<cmp::Transform>()->GetPosition();
-    normal = glm::normalize(normal);
+	normal  = glm::vec3(transformMatrix * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+	normal -= transform->GetPosition();
+	normal  = glm::normalize(normal);
 
-
-	v0 = glm::vec3(transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x,  0.5f * lengths.y, 0.5f * lengths.z, 1.0));
-	v1 = glm::vec3(transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x, -0.5f * lengths.y, 0.5f * lengths.z, 1.0));
-	v2 = glm::vec3(transform->GetModelMatrix() * glm::vec4( 0.5f * lengths.x, -0.5f * lengths.y, 0.5f * lengths.z, 1.0));
-	v3 = glm::vec3(transform->GetModelMatrix() * glm::vec4( 0.5f * lengths.x,  0.5f * lengths.y, 0.5f * lengths.z, 1.0));
-
-	
 	d1 = maxDistance;
 	d2 = maxDistance;
-	if (glm::dot(dir, normal) < 0 
-    && (glm::intersectRayTriangle(origin, dir, v0, v1, v2, bary1, d1)
-	||  glm::intersectRayTriangle(origin, dir, v2, v3, v0, bary2, d2)))	
+	if (glm::dot(dir, normal) < 0)
 	{
-		d = std::min(d1, d2);
-		if (d <= 0.0001f)
-		{
-			d = maxDistance;
-		}
-		else
-		{
-			hitInfo.point = origin + dir * d;
-			hitInfo.normal = normal;
-			hitInfo.distance = d;
-			hitInfo.gameObject = GetOwner().get();
+		v0 = glm::vec3(transformMatrix * glm::vec4(-0.5f * lengths.x,  0.5f * lengths.y, 0.5f * lengths.z, 1.0));
+		v1 = glm::vec3(transformMatrix * glm::vec4(-0.5f * lengths.x, -0.5f * lengths.y, 0.5f * lengths.z, 1.0));
+		v2 = glm::vec3(transformMatrix * glm::vec4( 0.5f * lengths.x, -0.5f * lengths.y, 0.5f * lengths.z, 1.0));
+		v3 = glm::vec3(transformMatrix * glm::vec4( 0.5f * lengths.x,  0.5f * lengths.y, 0.5f * lengths.z, 1.0));	
 
-			return true;
+		if (glm::intersectRayTriangle(origin, dir, v0, v1, v2, bary1, d1)
+		||  glm::intersectRayTriangle(origin, dir, v2, v3, v0, bary2, d2))
+		{
+			d = std::min(d1, d2);
+			if (d <= 0.0001f)
+			{
+				d = maxDistance;
+			}
+			else
+			{
+				hitInfo.point = origin + dir * d;
+				hitInfo.normal = normal;
+				hitInfo.distance = d;
+				hitInfo.gameObject = GetOwner().get();
+
+				return true;
+			}
 		}
 	}
 
 	// -Y
-	normal = glm::vec3(transform->GetModelMatrix() * glm::vec4(0.0f, -1.0f, 0.0f, 1.0f));
-    normal -= GetOwner()->GetComponent<cmp::Transform>()->GetPosition();
-    normal = glm::normalize(normal);
+	normal  = glm::vec3(transformMatrix * glm::vec4(0.0f, -1.0f, 0.0f, 1.0f));
+	normal -= transform->GetPosition();
+	normal  = glm::normalize(normal);
 
-
-	v0 = glm::vec3(transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x, -0.5f * lengths.y,  0.5f * lengths.z, 1.0));
-	v1 = glm::vec3(transform->GetModelMatrix() * glm::vec4( 0.5f * lengths.x, -0.5f * lengths.y,  0.5f * lengths.z, 1.0));
-	v2 = glm::vec3(transform->GetModelMatrix() * glm::vec4( 0.5f * lengths.x, -0.5f * lengths.y, -0.5f * lengths.z, 1.0));
-	v3 = glm::vec3(transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x, -0.5f * lengths.y, -0.5f * lengths.z, 1.0));
-
-	
 	d1 = maxDistance;
 	d2 = maxDistance;
-	if (glm::dot(dir, normal) < 0 
-    && (glm::intersectRayTriangle(origin, dir, v0, v1, v2, bary1, d1)
-	||  glm::intersectRayTriangle(origin, dir, v2, v3, v0, bary2, d2)))	
+	if (glm::dot(dir, normal) < 0)
 	{
-		d = std::min(d1, d2);
-		if (d <= 0.0001f)
-		{
-			d = maxDistance;
-		}
-		else
-		{
-			hitInfo.point = origin + dir * d;
-			hitInfo.normal = normal;
-			hitInfo.distance = d;
-			hitInfo.gameObject = GetOwner().get();
+		v0 = glm::vec3(transformMatrix * glm::vec4(-0.5f * lengths.x, -0.5f * lengths.y,  0.5f * lengths.z, 1.0));
+		v1 = glm::vec3(transformMatrix * glm::vec4( 0.5f * lengths.x, -0.5f * lengths.y,  0.5f * lengths.z, 1.0));
+		v2 = glm::vec3(transformMatrix * glm::vec4( 0.5f * lengths.x, -0.5f * lengths.y, -0.5f * lengths.z, 1.0));
+		v3 = glm::vec3(transformMatrix * glm::vec4(-0.5f * lengths.x, -0.5f * lengths.y, -0.5f * lengths.z, 1.0));
 
-			return true;
+		if (glm::intersectRayTriangle(origin, dir, v0, v1, v2, bary1, d1)
+		||  glm::intersectRayTriangle(origin, dir, v2, v3, v0, bary2, d2))
+		{
+			d = std::min(d1, d2);
+			if (d <= 0.0001f)
+			{
+				d = maxDistance;
+			}
+			else
+			{
+				hitInfo.point = origin + dir * d;
+				hitInfo.normal = normal;
+				hitInfo.distance = d;
+				hitInfo.gameObject = GetOwner().get();
+
+				return true;
+			}
 		}
-	}
+	}	
 
 	// +Y
-	normal = glm::vec3(transform->GetModelMatrix() * glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-    normal -= GetOwner()->GetComponent<cmp::Transform>()->GetPosition();
-    normal = glm::normalize(normal);
-
-
-	v0 = glm::vec3(transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x, 0.5f * lengths.y,  0.5f * lengths.z, 1.0));
-	v1 = glm::vec3(transform->GetModelMatrix() * glm::vec4( 0.5f * lengths.x, 0.5f * lengths.y,  0.5f * lengths.z, 1.0));
-	v2 = glm::vec3(transform->GetModelMatrix() * glm::vec4( 0.5f * lengths.x, 0.5f * lengths.y, -0.5f * lengths.z, 1.0));
-	v3 = glm::vec3(transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x, 0.5f * lengths.y, -0.5f * lengths.z, 1.0));
-
+	normal  = glm::vec3(transformMatrix * glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+	normal -= transform->GetPosition();
+	normal  = glm::normalize(normal);
 	
 	d1 = maxDistance;
 	d2 = maxDistance;
-	if (glm::dot(dir, normal) < 0 
-    && (glm::intersectRayTriangle(origin, dir, v0, v1, v2, bary1, d1)
-	||  glm::intersectRayTriangle(origin, dir, v2, v3, v0, bary2, d2)))	
+	if (glm::dot(dir, normal) < 0)
 	{
-		d = std::min(d1, d2);
-		if (d <= 0.0001f)
+		v0 = glm::vec3(transformMatrix * glm::vec4(-0.5f * lengths.x, 0.5f * lengths.y,  0.5f * lengths.z, 1.0));
+		v1 = glm::vec3(transformMatrix * glm::vec4( 0.5f * lengths.x, 0.5f * lengths.y,  0.5f * lengths.z, 1.0));
+		v2 = glm::vec3(transformMatrix * glm::vec4( 0.5f * lengths.x, 0.5f * lengths.y, -0.5f * lengths.z, 1.0));
+		v3 = glm::vec3(transformMatrix * glm::vec4(-0.5f * lengths.x, 0.5f * lengths.y, -0.5f * lengths.z, 1.0));
+	
+		if (glm::intersectRayTriangle(origin, dir, v0, v1, v2, bary1, d1)
+		||  glm::intersectRayTriangle(origin, dir, v2, v3, v0, bary2, d2))
 		{
-			d = maxDistance;
-		}
-		else
-		{
-			hitInfo.point = origin + dir * d;
-			hitInfo.normal = normal;
-			hitInfo.distance = d;
-			hitInfo.gameObject = GetOwner().get();
+			d = std::min(d1, d2);
+			if (d <= 0.0001f)
+			{
+				d = maxDistance;
+			}
+			else
+			{
+				hitInfo.point = origin + dir * d;
+				hitInfo.normal = normal;
+				hitInfo.distance = d;
+				hitInfo.gameObject = GetOwner().get();
 
-			return true;
+				return true;
+			}
 		}
 	}
-
-
 
 
 	return false;
-	// auto transform = GetOwner()->GetComponent<cmp::Transform>();
-	// glm::vec3 normal(transform->GetModelMatrix() * glm::vec4(-1.0f, 0.0f, 0.0f, 1.0f));
-    // normal -= GetOwner()->GetComponent<cmp::Transform>()->GetPosition();
-    // normal = glm::normalize(normal);
-
-
-	// glm::vec4 v0_4 = transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x,  0.5f * lengths.y,  0.5f * lengths.z, 1.0);
-	// glm::vec4 v1_4 = transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x, -0.5f * lengths.y,  0.5f * lengths.z, 1.0);
-	// glm::vec4 v2_4 = transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x, -0.5f * lengths.y, -0.5f * lengths.z, 1.0);
-	// glm::vec4 v4_4 = transform->GetModelMatrix() * glm::vec4(-0.5f * lengths.x,  0.5f * lengths.y, -0.5f * lengths.z, 1.0);
-
-	// glm::vec3 v0(v0_4);
-	// glm::vec3 v1(v1_4);
-	// glm::vec3 v2(v2_4);
-	// glm::vec3 v4(v4_4);
-
-	// glm::vec2 bary1, bary2;
-	
-	// float d1 = maxDistance;
-	// float d2 = maxDistance;
-	// float d  = maxDistance;
-	// if (glm::intersectRayTriangle(origin, dir, v0, v1, v2, bary1, d1)
-	// 	|  glm::intersectRayTriangle(origin, dir, v2, v4, v0, bary2, d2))
-	// {
-	// 	d = std::min(d1, d2);
-	// 	if (d <= 0.0001f)
-	// 	{
-	// 		return false;
-	// 	}
-
-	// 	hitInfo.point = origin + dir * d;
-	// 	hitInfo.normal = normal;
-	// 	hitInfo.distance = d;
-	// 	hitInfo.gameObject = GetOwner().get();
-		
-
-	// 	return true;
-	// }
-	
-	// return false;
 }
