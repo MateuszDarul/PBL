@@ -361,6 +361,33 @@ Scene::Scene()
 
     world->AddChild(go);
 
+    //- door
+    {      
+        go = std::make_shared<GameObject>();
+        tc = std::make_shared<TransformComponent>();
+        tc->SetPosition(-2.5f, 3.0f, -10.5f);
+        tc->SetRotation(0.0f, 90.0f, 0.0f);
+        
+        go->AddComponent(tc);
+        mc = std::make_shared<ModelComponent>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/wall/wall.obj"),
+            resMan->GetMaterial("Resources/models/wall/wall.mtl")
+        );
+        go->AddComponent(shader_d);
+        go->AddComponent(mc);
+        go->AddComponent(std::make_shared<cmp::Name>("Door"));
+        go->AddComponent(std::make_shared<cmp::BoxCol>(false, true));
+        go->GetComponent<BoxCollider>()->AddToCollidersManager(collidersManager);
+        go->GetComponent<BoxCollider>()->setLengths({ 5.0f, 5.0f, 1.0f });
+        go->AddComponent(std::make_shared<FrustumCullingComponent>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(
+                resMan->GetMesh("Resources/models/wall/wall.obj")
+            );
+
+        world->AddChild(go);
+    }
+
     //- button
     {      
         go = std::make_shared<GameObject>();
@@ -389,6 +416,8 @@ Scene::Scene()
 
         auto doorScript = new DoorActivator();
         scriptHolder->Add(doorScript);
+
+        doorScript->doorTransform = world->FindNode("Door")->GetGameObject()->GetComponent<cmp::Transform>();
 
 
         world->AddChild(go);
@@ -471,7 +500,11 @@ Scene::~Scene()
 
 void Scene::Update(float dt)
 {
-    world->FindNode("Raycaster")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, 12.74f*dt, 0.0f);
+    float input = 0.0f;
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::Right)) input = -1.0f;
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::Left))  input =  1.0f;
+
+    world->FindNode("Raycaster")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, input *  12.74f*dt, 0.0f);
     
 
     
