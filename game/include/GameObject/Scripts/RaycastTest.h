@@ -3,6 +3,7 @@
 #include "GameApplication.h"
 #include "Components.h"
 
+#include "DoorActivator.h"
 
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/intersect.hpp>
@@ -13,88 +14,122 @@
 class RaycastTest : public Script
 {
 public:
-    cmp::Line* line;
-    cmp::Transform* collisionTarget;
+    
+    //adjust these
 
+    int ignoreLayerMask = ~(CollisionLayer::Player);
+    int maxBounces = 15;
+    float maxDistance = 50.0f;
+
+    const char* mirrorTag = "Mirror";
+
+
+    //set these in 'inspector'
+
+    cmp::Line* line;
     CollidersManager* colMan;
 
 
-    int ignoreLayerMask = ~(CollisionLayer::Player);
  
-    
+private:
+
     glm::vec3 dir = { 1.0f, 0.0f, 0.0f };
     glm::vec3 origin = { 0.0f, 0.0f, 0.0f };
    
     cmp::Transform* transform;
 
 
+public:
+
     void Start()
     {
         transform = gameObject->GetComponent<cmp::Transform>().get();
 
-        dir = normalize(dir);
+        // dir = normalize(dir);
 
-        if (line)
-        {
-            origin = line->Get(0) + transform->GetPosition();  
-            line->AddPoint(0, 0, 0);
-        }
+        // // if (line)
+        // // {
+        // //     origin = line->Get(0) + transform->GetPosition();  
+        // //     line->AddPoint(0, 0, 0);
+        // // }
     }
 
     void Update(float dt)
-    {
-        if (collisionTarget)
-        {
-            if(Input()->Keyboard()->IsPressed(KeyboardKey::Right))
-            {
-                collisionTarget->Rotate(0, -7.0f * dt, 0);
-            }
-            if(Input()->Keyboard()->IsPressed(KeyboardKey::Left))
-            {
-                collisionTarget->Rotate(0,  7.0f * dt, 0);
-            }
-        }
-
+    {	
         if (line)
         {
-            float maxDistance = 25.0f;
-            int maxBounces = 10;
+            //origin = line->Get(0) + transform->GetPosition();
+            origin = line->Get(0);
+            dir = glm::rotateY(glm::vec3(1.0f, 0.0f, 0.0f), glm::radians(transform->GetRotation().y));
+            // dir  = glm::vec3(transform->GetModelMatrix() * glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+            // dir -= transform->GetPosition();
+            // dir  = glm::normalize(dir);
 
-            origin = line->Get(0) + transform->GetPosition();
+
             float d = maxDistance;
             int hits = 0;
-            dir = { 1.0f, 0.0f, 0.0f };
+            int totalLinePoints = 2;
 
             RayHitInfo hit;
-            while (hits < maxBounces && d > 0.0f && colMan->Raycast(origin, dir, hit, d, false, ignoreLayerMask))
+            while (hits < maxBounces && d > 0.0f)
             {
-                hits += 1;
-                d -= hit.distance;
-
-                if (line->Count()-1 < hits)
+                if (colMan->Raycast(origin, dir, hit, d, false, ignoreLayerMask))
                 {
-                    line->AddPoint(hit.point - transform->GetPosition());
+                    hits += 1;
+                    d -= hit.distance;
+
+                    if (line->Count()-1 < hits)
+                    {
+                        //line->AddPoint(hit.point - transform->GetPosition());
+                        line->AddPoint(hit.point);
+                    }
+                    else
+                    {
+                        //line->Set(hits, hit.point - transform->GetPosition());
+                        line->Set(hits, hit.point);
+                    }
+
+                    auto nameCmp = hit.gameObject->GetComponent<cmp::Name>();
+                    if (!nameCmp) break;
+
+                    if (nameCmp->Get().compare(mirrorTag) == 0)
+                    {
+                        dir = glm::reflect(dir, hit.normal);
+                        origin = hit.point;
+                        totalLinePoints += 1;
+                        continue;
+                    }
+
+                    auto scriptHolder = hit.gameObject->GetComponent<cmp::Scriptable>();
+                    if (scriptHolder)
+                    {
+                        if (auto doorActivator = scriptHolder->Get<DoorActivator>())
+                        {
+                            doorActivator->Activate();
+                        }
+                    }
+                    
+                    break;
                 }
                 else
                 {
-                    line->Set(hits, hit.point - transform->GetPosition());
+                    if (line->Count() < totalLinePoints)
+                    {
+                        line->AddPoint(origin + dir * d);
+                    }  
+                    else
+                    {
+                        line->Set(totalLinePoints-1, origin + dir * d);
+                    }
+
+                    break;
                 }
-
-                    dir = glm::reflect(dir, hit.normal);
-                    origin = hit.point;
             }
 
-            if (line->Count() > hits + 2)
+            if (line->Count() > totalLinePoints)
             {
-                line->RemoveLast(line->Count() - hits - 2);
+                line->RemoveLast(line->Count() - totalLinePoints);
             }
-            else if (line->Count() < hits + 2)
-            {
-                line->AddPoint(0,0,0);
-            }
-            
-
-            line->Set(hits+1, origin + dir * d - transform->GetPosition());
         }
     }
 };

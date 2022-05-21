@@ -1,8 +1,7 @@
 #include "Scene.h"
 
-#include "Scripts/TestScript.h"
-#include "Scripts/StatsScript.h"
 #include "Scripts/RaycastTest.h"
+#include "Scripts/DoorActivator.h"
 #include "Scripts/PlayerPlaceTurret.h"
 #include "Scripts/GameManager.h"
 #include "Scripts/Resource.h"
@@ -316,7 +315,7 @@ Scene::Scene()
     
     //=== ray test ===
 
-    //- colider object
+    //- mirror 1
     go = std::make_shared<GameObject>();
     tc = std::make_shared<TransformComponent>();
     tc->SetPosition(8.0f, 3.0f, 0.5f);
@@ -329,7 +328,7 @@ Scene::Scene()
     );
     go->AddComponent(shader_d);
     go->AddComponent(mc);
-    go->AddComponent(std::make_shared<cmp::Name>("ray target"));
+    go->AddComponent(std::make_shared<cmp::Name>("Mirror"));
     go->AddComponent(std::make_shared<cmp::BoxCol>(false,false));
     go->GetComponent<BoxCollider>()->AddToCollidersManager(collidersManager);
     go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
@@ -340,7 +339,7 @@ Scene::Scene()
 
     world->AddChild(go);
 
-    //- colider object 2
+    //- mirror 2
     go = std::make_shared<GameObject>();
     tc = std::make_shared<TransformComponent>();
     tc->SetPosition(1.0f, 3.0f, 9.0f);
@@ -353,7 +352,7 @@ Scene::Scene()
     );
     go->AddComponent(shader_d);
     go->AddComponent(mc);
-    go->AddComponent(std::make_shared<cmp::Name>("ray target 2"));
+    go->AddComponent(std::make_shared<cmp::Name>("Mirror"));
     go->AddComponent(std::make_shared<cmp::BoxCol>(false, false));
     go->GetComponent<BoxCollider>()->AddToCollidersManager(collidersManager);
     go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
@@ -363,6 +362,40 @@ Scene::Scene()
         );
 
     world->AddChild(go);
+
+    //- button
+    {      
+        go = std::make_shared<GameObject>();
+        tc = std::make_shared<TransformComponent>();
+        tc->SetPosition(12.0f, 2.5f, -5.0f);
+        
+        go->AddComponent(tc);
+        mc = std::make_shared<ModelComponent>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+            resMan->GetMaterial("Resources/models/wall/wall.mtl")
+        );
+        go->AddComponent(shader_d);
+        go->AddComponent(mc);
+        go->AddComponent(std::make_shared<cmp::Name>("Button"));
+        go->AddComponent(std::make_shared<cmp::BoxCol>(false, true));
+        go->GetComponent<BoxCollider>()->AddToCollidersManager(collidersManager);
+        go->GetComponent<BoxCollider>()->setLengths({ 2.0f, 2.0f, 2.0f });
+        go->AddComponent(std::make_shared<FrustumCullingComponent>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(
+                resMan->GetMesh("Resources/models/Crate/Crate.obj")
+            );
+
+        auto scriptHolder = std::make_shared<cmp::Scriptable>();
+        go->AddComponent(scriptHolder);
+
+        auto doorScript = new DoorActivator();
+        scriptHolder->Add(doorScript);
+
+
+        world->AddChild(go);
+    }
+
 
     //- raycaster object
 
@@ -380,7 +413,7 @@ Scene::Scene()
     auto line = std::make_shared<cmp::Line>();
     line->Create();
     
-    line->Set(0, {0.0f, 2.0f, 0.0f});
+    line->Set(0, {0.0f, 3.0f, 0.0f});
     line->Set(1, {0.0f, 4.0f, 0.0f});
     go->AddComponent(line);
 
@@ -389,9 +422,7 @@ Scene::Scene()
 
     auto raycastScript = new RaycastTest();
     scriptHolder->Add(raycastScript);
-    raycastScript->gameObject = go;
     raycastScript->line = line.get();
-    raycastScript->collisionTarget = world->FindNode("ray target 2")->GetGameObject()->GetComponent<cmp::Transform>().get();
     raycastScript->colMan = collidersManager;
 
     world->AddChild(go);
@@ -438,10 +469,12 @@ Scene::~Scene()
     collidersManager = nullptr;
 }
 
-
+float qqqq = 0;
 void Scene::Update(float dt)
-{
-    world->FindNode("ray target")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, dt * 12.71f, 0.0f);
+{qqqq += dt;
+    //world->FindNode("ray target")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, dt * 12.71f, 0.0f);
+    world->FindNode("Raycaster")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, 12.74f*dt, 0.0f);
+    //world->FindNode("Raycaster")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<RaycastTest>()->line->Set(0, 0.5f * qqqq, 2.0f, 0.0f);
     
 
     
