@@ -175,7 +175,7 @@ void ParticleComponent::Draw(const glm::mat4& matrixPV)
 		shader->Use();
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-		shader->SetInt("texture", 0);
+		shader->SetInt("particleTexture", 0);
 		shader->SetMat4("matrixPV", matrixPV);
 		shader->SetMat4("cameraView", playerCamera->GetView());
 		shader->SetFloat("width", 1);

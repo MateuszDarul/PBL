@@ -4,11 +4,11 @@ in vec2 vertexTexture;
 
 out vec4 FragColor;
 
-uniform sampler2D texture;
+uniform sampler2D particleTexture;
 
 void main()
 {
-    vec4 frag = texture(texture, vertexTexture);
+    vec4 frag = texture(particleTexture, vertexTexture);
     if(frag.a < 0.5)
 	discard;
     FragColor = frag;
