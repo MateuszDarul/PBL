@@ -8,12 +8,15 @@ public:
 
     //adjust these
     glm::vec3 openedOffset = { 0.0f, 6.0f, 0.0f };
+    float doorSpeed = 7.0f;
 
     //set these in 'inspector'
 
     std::shared_ptr<cmp::Transform> doorTransform;
 
 private:
+
+    glm::vec3 targetPosition;
 
     bool isPrimed;
     bool isActivated;
@@ -24,6 +27,8 @@ public:
     {
         isPrimed = true;
         isActivated = false;
+
+        if (doorTransform) targetPosition = doorTransform->GetPosition();
     }
 
     void Update(float dt)
@@ -38,11 +43,17 @@ public:
         {
             isPrimed = true;
 
-            if (doorTransform) doorTransform->Move(-openedOffset);
+            if (doorTransform) targetPosition -= openedOffset;
         }
         else                //on being unpowered
         {
             
+        }
+
+        if (doorTransform)
+        {
+            glm::vec3 move = targetPosition - doorTransform->GetPosition();
+            doorTransform->Move(move * doorSpeed * dt);
         }
     }
 
@@ -52,7 +63,7 @@ public:
         {
             isPrimed = false;
 
-            if (doorTransform) doorTransform->Move(openedOffset);
+            if (doorTransform) targetPosition += openedOffset;
         }
 
         isActivated = true;
