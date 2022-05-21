@@ -35,4 +35,9 @@ public:
 		this->energy -= energy;
 		std::cout << this->energy << std::endl;
 	}
+
+	int GetCurrentEnergy()
+	{
+		return energy;
+	}
 };

@@ -42,10 +42,6 @@ Scene::Scene()
     go->AddComponent(std::make_shared<CameraComponent>());
     go->GetComponent<cmp::Camera>()->Create(glm::vec3(0,3,10));
     go->GetComponent<cmp::Camera>()->SetSpeed(5);
-    go->AddComponent(std::make_shared<cmp::Scriptable>());
-    GameManager* gm = new GameManager();
-    go->GetComponent<cmp::Scriptable>()->Add(gm);
-    gm->gameObject = go;
 
 
     collidersManager = new CollidersManager(go); //mened�er kolider�w
@@ -59,23 +55,25 @@ Scene::Scene()
 
 
     //skrypty gracza
-    go->AddComponent(std::make_shared<ScriptComponent>());
-
+    go->AddComponent(std::make_shared<cmp::Scriptable>());
+    GameManager* gm = new GameManager();
+    go->GetComponent<cmp::Scriptable>()->Add(gm);
+    
 
     auto debugLineGO = std::make_shared<GameObject>();
     auto debugLineCmp = std::make_shared<cmp::Line>();
     debugLineCmp->Create();
     debugLineGO->AddComponent(debugLineCmp);
-    //debugLineGO->AddComponent(lineShader);
     debugLineGO->AddComponent(std::make_shared<cmp::Transform>());
     world->FindNode("CAMERA")->AddChild(debugLineGO);
     
     auto playerPlace = new PlayerPlaceTurret();
     
-    playerPlace->line = debugLineCmp.get();
+    playerPlace->gameManager = gm;
+    playerPlace->line = debugLineCmp;
     playerPlace->colMan = collidersManager;
     playerPlace->resMan = resMan;
-    playerPlace->shader_l = shader_l;
+    playerPlace->turretShader = shader_l;
     playerPlace->scene = this;
     
     go->GetComponent<ScriptComponent>()->Add(playerPlace);
