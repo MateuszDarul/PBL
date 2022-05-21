@@ -52,6 +52,8 @@ bool TextComponent::Draw(std::shared_ptr<ShaderComponent> shader)
 
     // activate corresponding render state	
     shader->Use();
+    if (isGuiElement) shader->SetMat4("transform", GameApplication::GetOrthoProjection());
+
     shader->SetVec3("textColor", color);
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);

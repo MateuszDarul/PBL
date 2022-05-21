@@ -118,9 +118,7 @@ void SceneNode::Render(const glm::mat4& matrixPV)
                 {
                     std::shared_ptr<cmp::Text> textPtr = this->gameObject->GetComponent<cmp::Text>();
                     if(textPtr != nullptr)
-                    {
-                        shaderPtr->SetMat4("transform", glm::ortho(0.0f, 16.0f, 0.0f, 9.0f)); //ta kolejnosc naprawia tekst do góry nogami
-                        
+                    {  
                         textPtr->Draw(shaderPtr);
                     }
                     else 

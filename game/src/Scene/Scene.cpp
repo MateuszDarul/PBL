@@ -438,6 +438,7 @@ Scene::Scene()
     auto textComponent = std::make_shared<TextComponent>();
     textComponent->Create("Energy: ", font);
     textComponent->alwaysSeen = true;
+    textComponent->isGuiElement = true;
     textComponent->color = {1.0f, 0.0f, 0.0f};
 
     auto textShader = std::make_shared<ShaderComponent>();
@@ -449,7 +450,8 @@ Scene::Scene()
     go->AddComponent(tc);
     go->AddComponent(textComponent);
 
-    go->GetComponent<TransformComponent>()->SetPosition(1.0f, 1.0f, 0.1f);
+    go->GetComponent<TransformComponent>()->SetPosition(0.1f, 0.1f, 0.1f);
+    go->GetComponent<TransformComponent>()->SetScale(0.1f);
     go->AddComponent(std::make_shared<cmp::Name>("EnergyText"));
     
 
@@ -469,12 +471,9 @@ Scene::~Scene()
     collidersManager = nullptr;
 }
 
-float qqqq = 0;
 void Scene::Update(float dt)
-{qqqq += dt;
-    //world->FindNode("ray target")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, dt * 12.71f, 0.0f);
+{
     world->FindNode("Raycaster")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, 12.74f*dt, 0.0f);
-    //world->FindNode("Raycaster")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<RaycastTest>()->line->Set(0, 0.5f * qqqq, 2.0f, 0.0f);
     
 
     
