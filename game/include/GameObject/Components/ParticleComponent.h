@@ -7,7 +7,7 @@
 #include <vector>
 #include <memory>
 
-#include "Component.h";
+#include "Component.h"
 #include "Particle.h"
 
 class ShaderComponent;

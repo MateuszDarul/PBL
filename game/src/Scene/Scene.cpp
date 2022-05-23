@@ -81,7 +81,7 @@ void Scene::Update(float dt)
 
     transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();
 
-    collidersManager->CheckCollisions();
+    collidersManager->CheckEverything();
     goCamera->GetComponent<CameraComponent>()->SetPosition(transformCamera->GetPosition());
     world->Update(dt);
 }
