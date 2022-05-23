@@ -58,6 +58,8 @@ uniform PointLight pointLight[10];
 uniform int spotLightAmount;
 uniform SpotLight spotLight[10];
 
+uniform samplerCube depthMap;
+
 ///--------------------------------------------------------- CODE
 
 vec3 GetPointLight(TextureMaps textureMaps, PointLight pointLight);

@@ -27,7 +27,7 @@ void main()
 
     fragPos = vec3(fullTransformMatrix * vec4(vPos, 1.0));
     vertexTexture = vTex;
-    normalVEC =  mat3(transpose(inverse(fullTransformMatrix))) * vNor;
+    normalVEC = vNor;
     model_transformations = fullTransformMatrix;
 
     gl_Position = transform * fullTransformMatrix * vec4(vPos, 1.0);
