@@ -84,27 +84,30 @@ void SceneNode::PrivateUpdate(float dt, const glm::mat4& parentTransformations)
     
 }
 
-void SceneNode::RenderDeepthMap(const glm::mat4& matrixPV, std::shared_ptr<ShaderComponent> shader)
+void SceneNode::RenderDeepthMap(std::shared_ptr<ShaderComponent> shader)
 {
-    shader->Use();
-    shader->SetMat4("transform", matrixPV);
-    shader->SetMat4("model", this->globalTransformations);
-
-    std::shared_ptr<cmp::Model> modelPtr = this->gameObject->GetComponent<cmp::Model>();
-    std::shared_ptr<cmp::ModelInst> modelInstPtr = this->gameObject->GetComponent<cmp::ModelInst>();
-
-    if(modelPtr != nullptr)
+    std::shared_ptr<cmp::Shade> shadePtr = this->gameObject->GetComponent<cmp::Shade>();
+    if(shadePtr != nullptr && shadePtr->ShadowTest())
     {
-        modelPtr->Draw(shader);
-    }
-    else if(modelInstPtr != nullptr)
-    {
-        modelInstPtr->Draw(shader);
+        shader->Use();
+        shader->SetMat4("model", this->globalTransformations);
+
+        std::shared_ptr<cmp::Model> modelPtr = this->gameObject->GetComponent<cmp::Model>();
+        std::shared_ptr<cmp::ModelInst> modelInstPtr = this->gameObject->GetComponent<cmp::ModelInst>();
+
+        if(modelPtr != nullptr)
+        {
+            modelPtr->Draw(shader);
+        }
+        else if(modelInstPtr != nullptr)
+        {
+            modelInstPtr->Draw(shader);
+        }
     }
 
     for(unsigned short int i=0; i<this->children.size(); i++)
     {
-        this->children[i]->RenderDeepthMap(matrixPV, shader);
+        this->children[i]->RenderDeepthMap(shader);
     }
 }
 

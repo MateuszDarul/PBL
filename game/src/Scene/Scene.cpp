@@ -99,7 +99,6 @@ unsigned int depthCubemap;
 void prepare()
 {
     glGenFramebuffers(1, &depthMapFBO);
-    // create depth cubemap texture
     glGenTextures(1, &depthCubemap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
     for (unsigned int i = 0; i < 6; ++i)
@@ -109,24 +108,23 @@ void prepare()
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    // attach depth texture as FBO's depth buffer
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubemap, 0);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    
+    shader_l->Use();
+    shader_l->SetInt("depthMap", 3);
 }
 
 void Scene::Render()
 {
-    //shader_i->SetInt("depthMap", depthCubemap);
-    shader_l->Use();
-    shader_l->SetInt("depthMap", 3);
-
     glm::vec3 lightPos(0,5,0);
         
     float near_plane = 1.0f;
-    float far_plane = 25.0f;
+    float far_plane = 100.0f;
     glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, near_plane, far_plane);
     std::vector<glm::mat4> shadowTransforms;
     shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
@@ -142,9 +140,8 @@ void Scene::Render()
     shader_s->Use();
     for (unsigned int i = 0; i < 6; ++i)
         shader_s->SetMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
-    shader_s->SetFloat("far_plane", far_plane);
     shader_s->SetVec3("lightPos", lightPos);
-    world->RenderDeepthMap(transform, shader_s);
+    world->RenderDeepthMap(shader_s);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     shader_l->Use();

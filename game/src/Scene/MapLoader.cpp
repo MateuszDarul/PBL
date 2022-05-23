@@ -262,6 +262,18 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
             }
             modelCmp->UpdateTransformations();
         }
+        else if(line == "Shade:")
+        {
+            gameObject->AddComponent(std::make_shared<cmp::Shade>());
+            std::shared_ptr<cmp::Shade> shadeCmp = gameObject->GetComponent<cmp::Shade>();
+            {
+                int type = 0;
+                file >> std::dec >> type;
+                line_id++;
+
+                shadeCmp->Create(type);
+            }
+        }
         else if(line == "Transformations:")
         {
             gameObject->AddComponent(std::make_shared<cmp::Transform>());

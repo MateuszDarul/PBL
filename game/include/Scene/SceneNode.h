@@ -98,7 +98,7 @@ public:
      */
     SceneNode* GetRoot();
 
-    void RenderDeepthMap(const glm::mat4& matrixPV, std::shared_ptr<ShaderComponent> shader);
+    void RenderDeepthMap(std::shared_ptr<ShaderComponent> shader);
 
     /** @brief Porownuje SceneNode'y.
      * @param second - Wezel z ktorym chcemy porownac.

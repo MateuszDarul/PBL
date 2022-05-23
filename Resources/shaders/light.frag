@@ -93,7 +93,7 @@ void main()
     }
 
     pixelColor *= ShadowCalculation();
-    pixelColor += tm.colorMAP * 0.07;
+    //pixelColor += tm.colorMAP * 0.07;
 
     FragColor = vec4(pixelColor, 1.0f);
 }
@@ -152,10 +152,10 @@ vec3 GetSpotLight(TextureMaps textureMaps, SpotLight sLight)
 float ShadowCalculation()
 {
     vec3 fragToLight = fragPos - pointLight[0].position;
+
     float closestDepth = texture(depthMap, fragToLight).r;
-    closestDepth *= 25;
+    closestDepth *= 100;
     float currentDepth = length(fragToLight);
-    float bias = 0.05;
-    float shadow = currentDepth - bias > closestDepth ? 0.0 : 1.0;
+    float shadow = currentDepth - 0.1 > closestDepth ? 0.0 : 1.0;
     return shadow;
 }
