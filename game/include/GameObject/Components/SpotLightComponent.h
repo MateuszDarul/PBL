@@ -29,6 +29,7 @@ public:
     void SetCutOff(glm::vec2 cutOff);
 
     void Move(glm::vec3 vector);
+    void Rotate(glm::vec3 degrees);
 
     glm::vec3 GetPosition();
     glm::vec3 GetDirection();

@@ -26,11 +26,11 @@ bool SpotLightComponent::Create()
     }
 
     this->wasCreated = true;
-    this->transform->SetPosition(glm::vec3(0,0,0));
-    this->transform->SetRotation(glm::vec3(0,0,0));
-    this->lightColor = glm::vec3(0.5,0.5,0.5);
+    this->transform->SetPosition(glm::vec3(0,5,0));
+    this->transform->SetRotation(glm::vec3(0,-1,0));
+    this->lightColor = glm::vec3(1,1,1);
     this->specularColor = glm::vec3(1,1,1);
-    this->distance = 0.04f;
+    this->distance = 10;
     this->cutOff = glm::vec2(12.5f, 45.f);
 
     SpotLightComponent::needUpdate = true;
@@ -60,7 +60,7 @@ void SpotLightComponent::SetPosition(glm::vec3 position)
 
 void SpotLightComponent::SetDirection(glm::vec3 direction)
 {
-    this->transform->SetRotation(direction);
+    this->transform->SetRotation(glm::normalize(direction));
     SpotLightComponent::needUpdate = true;
 }
 
@@ -91,6 +91,16 @@ void SpotLightComponent::SetCutOff(glm::vec2 cutOff)
 void SpotLightComponent::Move(glm::vec3 vector)
 {
     this->transform->Move(vector);
+    SpotLightComponent::needUpdate = true;
+}
+
+void SpotLightComponent::Rotate(glm::vec3 degrees)
+{
+    glm::vec4 target(1,1,1,1);
+    target = glm::vec4(this->transform->GetRotation(), 1);
+    target = TransformComponent::Transform(glm::vec3(0,0,0), degrees, 1) * target;
+    
+    this->transform->SetRotation(glm::vec3(target.x, target.y, target.z));
     SpotLightComponent::needUpdate = true;
 }
 
@@ -132,7 +142,7 @@ void SpotLightComponent::Use()
     }
 
     textID = std::to_string(SpotLightComponent::thisLightID);
-    for(int i=0; i<shaders.size(); i++)
+    for(uint16_t i=0; i<shaders.size(); i++)
     {
         shaders[i]->Use();
         shaders[i]->SetInt("spotLightAmount", SpotLightComponent::lightAmount);
@@ -140,11 +150,10 @@ void SpotLightComponent::Use()
         shaders[i]->SetVec3("spotLight[" + textID + "].direction", this->transform->GetRotation());
         shaders[i]->SetVec3("spotLight[" + textID + "].lightColor", this->lightColor);
         shaders[i]->SetVec3("spotLight[" + textID + "].specularColor", this->specularColor);
-        shaders[i]->SetFloat("spotLight[" + textID + "].distance", this->distance);
+        shaders[i]->SetFloat("spotLight[" + textID + "].distance", this->distance * 0.004f);
         shaders[i]->SetFloat("spotLight[" + textID + "].cutOff", glm::cos(glm::radians(this->cutOff.x)));
         shaders[i]->SetFloat("spotLight[" + textID + "].outerCutOff", glm::cos(glm::radians(this->cutOff.y)));
     }
-
 
     if(SpotLightComponent::thisLightID == SpotLightComponent::lightAmount)
     {
