@@ -6,6 +6,7 @@ SceneNode::SceneNode(std::shared_ptr<GameObject> gameObject)
     :parent(nullptr), gameObject(gameObject)
 {
     this->globalTransformations = glm::mat4(1.f);
+    gameObject->SetNode(this);
 }
 
 SceneNode::~SceneNode()
@@ -69,6 +70,11 @@ void SceneNode::PrivateUpdate(float dt, const glm::mat4& parentTransformations)
         this->globalTransformations = parentTransformations;
     }
 
+    std::shared_ptr<cmp::Particles> particlePtr = this->gameObject->GetComponent<cmp::Particles>();
+    if (particlePtr != nullptr)
+    {
+        particlePtr->Update(dt);
+    }
     ///***
 
     for(unsigned short int i=0; i<children.size(); i++)
@@ -144,6 +150,12 @@ void SceneNode::Render(const glm::mat4& matrixPV)
                 spotLightPtr->Use();
             }
         }
+    }
+
+    std::shared_ptr<cmp::Particles> particlePtr = this->gameObject->GetComponent<cmp::Particles>();
+    if (particlePtr != nullptr)
+    {
+        particlePtr->Draw(matrixPV);
     }
 
     for(unsigned short int i=0; i<this->children.size(); i++)

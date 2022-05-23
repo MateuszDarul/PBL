@@ -72,6 +72,16 @@ bool GameObject::Is(std::shared_ptr<GameObject> second)
     return this == second.get();
 }
 
+void GameObject::SetNode(SceneNode* node)
+{
+    this->node = node;
+}
+
+SceneNode* GameObject::GetNode()
+{
+    return node;
+}
+
 
 ///***
 
@@ -91,6 +101,7 @@ template std::shared_ptr<SphereCollider> GameObject::GetComponent<SphereCollider
 template std::shared_ptr<PointLightComponent> GameObject::GetComponent<PointLightComponent>();
 template std::shared_ptr<SpotLightComponent> GameObject::GetComponent<SpotLightComponent>();
 template std::shared_ptr<FrustumCullingComponent> GameObject::GetComponent<FrustumCullingComponent>();
+template std::shared_ptr<ParticleComponent> GameObject::GetComponent<ParticleComponent>();
 
 template bool GameObject::RemoveComponent<NameComponent>();
 template bool GameObject::RemoveComponent<ListComponent>();
@@ -108,3 +119,4 @@ template bool GameObject::RemoveComponent<SphereCollider>();
 template bool GameObject::RemoveComponent<PointLightComponent>();
 template bool GameObject::RemoveComponent<SpotLightComponent>();
 template bool GameObject::RemoveComponent<FrustumCullingComponent>();
+template bool GameObject::RemoveComponent<ParticleComponent>();

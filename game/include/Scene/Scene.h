@@ -7,7 +7,6 @@
 
 #include "SceneNode.h"
 #include "GameObject.h"
-#include "Components.h"
 #include "GameApplication.h"
 #include "ResourceManager.h"
 #include "InputManager.h"
@@ -40,6 +39,8 @@ public:
     /** @brief Metoda wyswietlajaca obiekty na ekranie.
      */
     void Render();
+
+    SceneNode* GetWorldNode();
 };
 
 #endif // __SCENE_H__
