@@ -70,30 +70,37 @@ const glm::mat4& CameraComponent::GetView()
 void CameraComponent::Update(InputManager* inputManager, const float& deltaTime)
 {
     this->ProcessMouseMovement(inputManager->Mouse()->GetPosition());
+    float velocity = this->speedPerSec * deltaTime;
 
     if(inputManager->Keyboard()->IsPressed(KeyboardKey::W))
     {
-        this->Move(Movement::FORWARD, this->speedPerSec, deltaTime);
+        this->position += glm::normalize(glm::vec3(this->front.x, 0, this->front.z)) * velocity;
+        this->needUpdate = true;
     }
     if(inputManager->Keyboard()->IsPressed(KeyboardKey::S))
     {
-        this->Move(Movement::BACKWARD, this->speedPerSec, deltaTime);
+        this->position -= glm::normalize(glm::vec3(this->front.x, 0, this->front.z)) * velocity;
+        this->needUpdate = true;
     }
     if(inputManager->Keyboard()->IsPressed(KeyboardKey::A))
     {
-        this->Move(Movement::LEFT, this->speedPerSec, deltaTime);
+        this->position -= glm::normalize(glm::vec3(this->right.x, 0, this->right.z)) * velocity;
+        this->needUpdate = true;
     }
     if(inputManager->Keyboard()->IsPressed(KeyboardKey::D))
     {
-        this->Move(Movement::RIGHT, this->speedPerSec, deltaTime);
+        this->position += glm::normalize(glm::vec3(this->right.x, 0, this->right.z)) * velocity;
+        this->needUpdate = true;
     }
     if(inputManager->Keyboard()->IsPressed(KeyboardKey::Q))
     {
-        this->Move(Movement::UP, this->speedPerSec, deltaTime);
+        this->position += glm::normalize(glm::vec3(0, 1, 0)) * velocity;
+        this->needUpdate = true;
     }
     if(inputManager->Keyboard()->IsPressed(KeyboardKey::E))
     {
-        this->Move(Movement::DOWN, this->speedPerSec, deltaTime);
+        this->position -= glm::normalize(glm::vec3(0, 1, 0)) * velocity;
+        this->needUpdate = true;
     }
 }
 

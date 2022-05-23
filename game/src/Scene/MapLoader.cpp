@@ -40,6 +40,153 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
                 nameCmp->Set(name);
             }
         }
+        else if(line == "Light:")
+        {
+            std::string type;
+            file >> type;
+            line_id++;
+
+            std::string cmd;
+
+            if(type == "Point")
+            {
+                gameObject->AddComponent(std::make_shared<cmp::PointLight>());
+                std::shared_ptr<cmp::PointLight> lightCmp = gameObject->GetComponent<cmp::PointLight>();
+                {
+                    lightCmp->Create();
+                    lightCmp->AddShader(shader[0]);
+                    lightCmp->AddShader(shader[1]);
+
+                    for(int i=0; i<4; i++)
+                    {
+                        file >> cmd;
+                        line_id++;
+                        if(cmd == "Position:")
+                        {
+                            glm::vec3 position;
+                            file >> position.x;
+                            file >> position.y;
+                            file >> position.z;
+                            line_id+=3;
+                            lightCmp->SetPosition(position);
+                        }
+                        else if(cmd == "Color:")
+                        {
+                            glm::vec3 color;
+                            file >> color.x;
+                            file >> color.y;
+                            file >> color.z;
+                            line_id+=3;
+                            lightCmp->SetLightColor(color);
+                        }
+                        else if(cmd == "SpecularColor:")
+                        {
+                            glm::vec3 color;
+                            file >> color.x;
+                            file >> color.y;
+                            file >> color.z;
+                            line_id+=3;
+                            lightCmp->SetSpecularColor(color);
+                        }
+                        else if(cmd == "Range:")
+                        {
+                            float range;
+                            file >> range;
+                            line_id++;
+                            lightCmp->SetRange(range);
+                        }
+                        else
+                        {
+                            std::cerr << "Light error | Point | ";
+                            std::cerr << "Command: " << cmd << " | ";
+                            std::cerr << "Line: " << line_id-1 << std::endl;
+                        }
+                    }
+                }
+            }
+            else if(type == "Spot")
+            {
+                gameObject->AddComponent(std::make_shared<cmp::SpotLight>());
+                std::shared_ptr<cmp::SpotLight> lightCmp = gameObject->GetComponent<cmp::SpotLight>();
+                {
+                    lightCmp->Create();
+                    lightCmp->AddShader(shader[0]);
+                    lightCmp->AddShader(shader[1]);
+
+                    for(int i=0; i<6; i++)
+                    {
+                        file >> cmd;
+                        line_id++;
+                        if(cmd == "Position:")
+                        {
+                            glm::vec3 position;
+                            file >> position.x;
+                            file >> position.y;
+                            file >> position.z;
+                            line_id+=3;
+                            lightCmp->SetPosition(position);
+                        }
+                        else if(cmd == "Direction:")
+                        {
+                            glm::vec3 direction;
+                            file >> direction.x;
+                            file >> direction.y;
+                            file >> direction.z;
+                            line_id+=3;
+                            lightCmp->SetDirection(direction);
+                        }
+                        else if(cmd == "Rotation:")
+                        {
+                            glm::vec3 rotation;
+                            file >> rotation.x;
+                            file >> rotation.y;
+                            file >> rotation.z;
+                            line_id+=3;
+                            lightCmp->Rotate(rotation);
+                        }
+                        else if(cmd == "Color:")
+                        {
+                            glm::vec3 color;
+                            file >> color.x;
+                            file >> color.y;
+                            file >> color.z;
+                            line_id+=3;
+                            lightCmp->SetLightColor(color);
+                        }
+                        else if(cmd == "SpecularColor:")
+                        {
+                            glm::vec3 color;
+                            file >> color.x;
+                            file >> color.y;
+                            file >> color.z;
+                            line_id+=3;
+                            lightCmp->SetSpecularColor(color);
+                        }
+                        else if(cmd == "CutOff:")
+                        {
+                            glm::vec2 cutOff;
+                            file >> cutOff.x;
+                            file >> cutOff.y;
+                            line_id+=2;
+                            lightCmp->SetCutOff(cutOff);
+                        }
+                        else if(cmd == "Range:")
+                        {
+                            float range;
+                            file >> range;
+                            line_id++;
+                            lightCmp->SetRange(range);
+                        }
+                        else
+                        {
+                            std::cerr << "Light error | Spot | ";
+                            std::cerr << "Command: " << cmd << " | ";
+                            std::cerr << "Line: " << line_id-1 << std::endl;
+                        }
+                    }
+                }
+            }
+        }
         else if(line == "Model:")
         {
             gameObject->AddComponent(shader[0]);
