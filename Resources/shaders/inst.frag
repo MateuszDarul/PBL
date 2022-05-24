@@ -58,10 +58,18 @@ uniform PointLight pointLight[10];
 uniform int spotLightAmount;
 uniform SpotLight spotLight[10];
 
+uniform float brightness;
+uniform float gamma;
+uniform float contrast;
+
 ///--------------------------------------------------------- CODE
 
 vec3 GetPointLight(TextureMaps textureMaps, PointLight pointLight);
 vec3 GetSpotLight(TextureMaps textureMaps, SpotLight sLight);
+
+vec4 bright(vec4 colorIn, float brightnessVal);
+vec4 gam(vec4 colorIn, float gammaVal);
+vec4 cont(vec4 colorIn, float contrastVal);
 
 void main()
 {
@@ -91,6 +99,10 @@ void main()
     }
 
     FragColor = vec4(pixelColor, 1.0f);
+
+    FragColor = bright(FragColor, brightness);
+    FragColor = cont(FragColor, contrast);
+    FragColor = gam(FragColor, gamma);
 }
 
 vec3 GetPointLight(TextureMaps textureMaps, PointLight pLight)
@@ -142,4 +154,20 @@ vec3 GetSpotLight(TextureMaps textureMaps, SpotLight sLight)
     specular *= attenuation;
 
     return diffuse + specular;
+}
+
+vec4 bright(vec4 colorIn, float brightnessVal)
+{
+    return vec4(colorIn.x * brightnessVal, colorIn.y * brightnessVal, colorIn.z * brightnessVal, colorIn.a);
+}
+
+vec4 gam(vec4 colorIn, float gammaVal)
+{
+    return vec4(pow(colorIn.x, gammaVal), pow(colorIn.y, gammaVal), pow(colorIn.z, gammaVal), colorIn.a);
+}
+
+vec4 cont(vec4 colorIn, float contrastVal)
+{
+    float t = 0.5f - contrastVal * 0.5;
+    return vec4(colorIn.x * t, colorIn.y * t, colorIn.z * t, colorIn.a);
 }

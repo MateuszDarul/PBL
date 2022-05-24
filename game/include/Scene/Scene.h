@@ -22,6 +22,10 @@ private:
     CollidersManager* collidersManager;
     glm::mat4 transform; //!< Macierz transformacji widoku i kamery.
 
+    float brightness = 1.0f;
+    float gamma = 0.93f;
+    float contrast = 0.0f;
+
 public:
     /** @brief Domyslny konstruktor.
      */

@@ -16,18 +16,50 @@ Scene::Scene()
 
     ///***
 
+
     std::shared_ptr<ShaderComponent> shader_d = std::make_shared<ShaderComponent>();
     shader_d->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
+    shader_d->Use();
+    shader_d->SetFloat("brightness", brightness);
+    shader_d->SetFloat("gamma", gamma);
+    shader_d->SetFloat("contrast", contrast);
+
     std::shared_ptr<ShaderComponent> shader_i = std::make_shared<ShaderComponent>();
     shader_i->Create("Resources/shaders/inst.vert", "Resources/shaders/inst.frag");
+    shader_i->Use();
+    shader_i->SetFloat("brightness", brightness);
+    shader_i->SetFloat("gamma", gamma);
+    shader_i->SetFloat("contrast", contrast);
+
     std::shared_ptr<ShaderComponent> shader_l = std::make_shared<ShaderComponent>();
     shader_l->Create("Resources/shaders/light.vert", "Resources/shaders/light.frag");
+    shader_l->Use();
+    shader_l->SetFloat("brightness", brightness);
+    shader_l->SetFloat("gamma", gamma);
+    shader_l->SetFloat("contrast", contrast);
 
     ///***
 
     world = new SceneNode(std::make_shared<GameObject>());
     world->GetGameObject()->AddComponent(std::make_shared<cmp::Name>("ROOT"));
     world->GetGameObject()->AddComponent(std::make_shared<cmp::Transform>());
+
+    ///***
+
+    go = std::make_shared<GameObject>();
+    go->AddComponent(std::make_shared<NameComponent>("shader_d_obj"));
+    go->AddComponent(shader_d);
+    world->AddChild(go);
+
+    go = std::make_shared<GameObject>();
+    go->AddComponent(std::make_shared<NameComponent>("shader_i_obj"));
+    go->AddComponent(shader_i);
+    world->AddChild(go);
+
+    go = std::make_shared<GameObject>();
+    go->AddComponent(std::make_shared<NameComponent>("shader_l_obj"));
+    go->AddComponent(shader_l);
+    world->AddChild(go);
 
     ///***
 
@@ -73,6 +105,79 @@ Scene::~Scene()
 
 void Scene::Update(float dt)
 {
+    //postprocess
+    if (GameApplication::GetInputManager()->Keyboard()->IsPressed(KeyboardKey::T))
+    {
+        brightness -= 0.01f;
+        world->FindNode("shader_d_obj")->GetGameObject()->GetComponent<cmp::Shader>()->Use();
+        world->FindNode("shader_d_obj")->GetGameObject()->GetComponent<cmp::Shader>()->SetFloat("brightness", brightness);
+        world->FindNode("shader_i_obj")->GetGameObject()->GetComponent<cmp::Shader>()->Use();
+        world->FindNode("shader_i_obj")->GetGameObject()->GetComponent<cmp::Shader>()->SetFloat("brightness", brightness);
+        world->FindNode("shader_l_obj")->GetGameObject()->GetComponent<cmp::Shader>()->Use();
+        world->FindNode("shader_l_obj")->GetGameObject()->GetComponent<cmp::Shader>()->SetFloat("brightness", brightness);
+        std::cout << "b:" << brightness << std::endl;
+    }
+
+    if (GameApplication::GetInputManager()->Keyboard()->IsPressed(KeyboardKey::Y))
+    {
+        brightness += 0.01f;
+        world->FindNode("shader_d_obj")->GetGameObject()->GetComponent<cmp::Shader>()->Use();
+        world->FindNode("shader_d_obj")->GetGameObject()->GetComponent<cmp::Shader>()->SetFloat("brightness", brightness);
+        world->FindNode("shader_i_obj")->GetGameObject()->GetComponent<cmp::Shader>()->Use();
+        world->FindNode("shader_i_obj")->GetGameObject()->GetComponent<cmp::Shader>()->SetFloat("brightness", brightness);
+        world->FindNode("shader_l_obj")->GetGameObject()->GetComponent<cmp::Shader>()->Use();
+        world->FindNode("shader_l_obj")->GetGameObject()->GetComponent<cmp::Shader>()->SetFloat("brightness", brightness);
+        std::cout << "b:" << brightness << std::endl;
+    }
+
+    if (GameApplication::GetInputManager()->Keyboard()->IsPressed(KeyboardKey::G))
+    {
+        gamma -= 0.01f;
+        world->FindNode("shader_d_obj")->GetGameObject()->GetComponent<cmp::Shader>()->Use();
+        world->FindNode("shader_d_obj")->GetGameObject()->GetComponent<cmp::Shader>()->SetFloat("gamma", gamma);
+        world->FindNode("shader_i_obj")->GetGameObject()->GetComponent<cmp::Shader>()->Use();
+        world->FindNode("shader_i_obj")->GetGameObject()->GetComponent<cmp::Shader>()->SetFloat("gamma", gamma);
+        world->FindNode("shader_l_obj")->GetGameObject()->GetComponent<cmp::Shader>()->Use();
+        world->FindNode("shader_l_obj")->GetGameObject()->GetComponent<cmp::Shader>()->SetFloat("gamma", gamma);
+        std::cout << "g:" << gamma << std::endl;
+    }
+
+    if (GameApplication::GetInputManager()->Keyboard()->IsPressed(KeyboardKey::H))
+    {
+        gamma += 0.01f;
+        world->FindNode("shader_d_obj")->GetGameObject()->GetComponent<cmp::Shader>()->Use();
+        world->FindNode("shader_d_obj")->GetGameObject()->GetComponent<cmp::Shader>()->SetFloat("gamma", gamma);
+        world->FindNode("shader_i_obj")->GetGameObject()->GetComponent<cmp::Shader>()->Use();
+        world->FindNode("shader_i_obj")->GetGameObject()->GetComponent<cmp::Shader>()->SetFloat("gamma", gamma);
+        world->FindNode("shader_l_obj")->GetGameObject()->GetComponent<cmp::Shader>()->Use();
+        world->FindNode("shader_l_obj")->GetGameObject()->GetComponent<cmp::Shader>()->SetFloat("gamma", gamma);
+        std::cout << "g:" << gamma << std::endl;
+    }
+
+    if (GameApplication::GetInputManager()->Keyboard()->IsPressed(KeyboardKey::B))
+    {
+        contrast -= 0.01f;
+        world->FindNode("shader_d_obj")->GetGameObject()->GetComponent<cmp::Shader>()->Use();
+        world->FindNode("shader_d_obj")->GetGameObject()->GetComponent<cmp::Shader>()->SetFloat("contrast", contrast);
+        world->FindNode("shader_i_obj")->GetGameObject()->GetComponent<cmp::Shader>()->Use();
+        world->FindNode("shader_i_obj")->GetGameObject()->GetComponent<cmp::Shader>()->SetFloat("contrast", contrast);
+        world->FindNode("shader_l_obj")->GetGameObject()->GetComponent<cmp::Shader>()->Use();
+        world->FindNode("shader_l_obj")->GetGameObject()->GetComponent<cmp::Shader>()->SetFloat("contrast", contrast);
+        std::cout << "c:" << contrast << std::endl;
+    }
+
+    if (GameApplication::GetInputManager()->Keyboard()->IsPressed(KeyboardKey::N))
+    {
+        contrast += 0.01f;
+        world->FindNode("shader_d_obj")->GetGameObject()->GetComponent<cmp::Shader>()->Use();
+        world->FindNode("shader_d_obj")->GetGameObject()->GetComponent<cmp::Shader>()->SetFloat("contrast", contrast);
+        world->FindNode("shader_i_obj")->GetGameObject()->GetComponent<cmp::Shader>()->Use();
+        world->FindNode("shader_i_obj")->GetGameObject()->GetComponent<cmp::Shader>()->SetFloat("contrast", contrast);
+        world->FindNode("shader_l_obj")->GetGameObject()->GetComponent<cmp::Shader>()->Use();
+        world->FindNode("shader_l_obj")->GetGameObject()->GetComponent<cmp::Shader>()->SetFloat("contrast", contrast);
+        std::cout << "c:" << contrast << std::endl;
+    }
+
     std::shared_ptr<GameObject> goCamera = world->FindNode("CAMERA")->GetGameObject();
     std::shared_ptr<TransformComponent> transformCamera = goCamera->GetComponent<cmp::Transform>();
 
