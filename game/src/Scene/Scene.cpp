@@ -179,18 +179,24 @@ Scene::Scene()
         go->GetComponent<cmp::FrustumCulling>()->Create(
             resMan->GetMesh("Resources/models/wieze/w1/w1.obj"));
         go->AddComponent(std::make_shared<cmp::Particles>());
+        go->AddComponent(std::make_shared<cmp::Name>("Particle emitter"));
         std::shared_ptr<cmp::Particles> particles = go->GetComponent<cmp::Particles>();
         particles->Create(world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>());
         particles->SetTexture("Resources/textures/particle.png");
-        particles->SetParticlesPerSecond(100);
-        particles->SetParticleMaxAmount(500);
-        particles->SetOffset(glm::vec3(0, 2.0f, 0));
-        particles->SetDirectionVar(45);
-        particles->SetParticleLifetime(5.0f);
-        particles->SetScale(0.1f);
-        particles->SetSpeed(5.0f);
+        particles->SetParticlesPerSecond(10.0f);
+        particles->SetParticleMaxAmount(50);
+        particles->SetOffset(glm::vec3(1.5f, 2.5f, 0));
+        particles->SetDirection({0.0f, 1.0f, 0.0f});
+        particles->SetDirectionVar(25);  
+        particles->SetParticleLifetime(2.8f);
+        particles->SetScale(0.3f, 0.01f);
+        particles->SetSpeed(3.0f);
+
+        particles->SetColor({ 1.0f, 1.0f, 0.0f,   1.0f },   { 1.0f, 0.3f, 0.1f,   0.2f });
+        particles->SetForce({ 0.0f, -1.5f, 0.0f });
     }
-    world->AddChild(go);
+    //world->AddChild(go);
+    auto particlego = go;
 
     go = std::make_shared<GameObject>();
     {
@@ -454,6 +460,9 @@ Scene::Scene()
 
     world->AddChild(go);
 
+    //test - adding particle component last
+    world->AddChild(particlego);
+
     //=== text
 
     //renderowany jako ostatni bo inaczej sa te dziwne artefakty
@@ -505,7 +514,15 @@ void Scene::Update(float dt)
     if (Input()->Keyboard()->IsPressed(KeyboardKey::Left))  input =  1.0f;
 
     world->FindNode("Raycaster")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, input *  12.74f*dt, 0.0f);
+    // world->FindNode("Particle emitter")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, 12.74f*dt, 0.0f);
+    // world->FindNode("Particle emitter")->GetGameObject()->GetComponent<cmp::Transform>()->Move(input * dt * 5.0f, 0.0f, 0.0f);
     
+
+    glm::vec3 particleForce = {  0.0f, -1.1f,  0.0f };
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::Up))   particleForce.x += 2.0f;
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::Down)) particleForce.x -= 2.0f;
+
+    world->FindNode("Particle emitter")->GetGameObject()->GetComponent<cmp::Particles>()->SetForce(particleForce);
 
     
     std::shared_ptr<GameObject> goCamera = world->FindNode("CAMERA")->GetGameObject();

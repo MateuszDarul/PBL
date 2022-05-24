@@ -22,7 +22,9 @@ private:
 	glm::vec3 offset;
 	glm::vec3 direction;
 	float directionVar;
-	float scale;
+	float scaleStart, scaleEnd;
+	glm::vec4 colorStart, colorEnd;
+	glm::vec3 force;
 	float speed;
 	float spawnTimer;
 	float width;
@@ -35,7 +37,7 @@ private:
 	std::vector<glm::mat4> transformations;
 	unsigned int VAO;
 	unsigned int texture;
-	std::map<float, glm::vec3> sortedTransforms;
+	std::map<float, int> sortedTransforms; //second is particle index
 
 	glm::vec4 RandomDirection();
 
@@ -60,10 +62,18 @@ public:
 	float GetDirectionVar();
 	void SetSpeed(float speed);
 	float GetSpeed();
+	void SetForce(const glm::vec3& force);
+	void SetColor(float r, float g, float b, float a = 1.0f);
+	void SetColor(const glm::vec4& color);
+	void SetColor(const glm::vec4& colorStart, const glm::vec4& colorEnd);
+	void SetColorStart(float r, float g, float b, float a = 1.0f);
+	void SetColorStart(const glm::vec4& color);
+	void SetColorEnd(float r, float g, float b, float a = 1.0f);
+	void SetColorEnd(const glm::vec4& color);
 	void Play();
 	void Stop();
 	bool IsPlaying();
-	void SetScale(float scale);
+	void SetScale(float scaleStart, float scaleEnd = -1.0f);
 	float GetScale();
 };
 #endif

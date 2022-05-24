@@ -18,7 +18,7 @@ glm::vec4 ParticleComponent::RandomDirection()
 	return randomDir;
 }
 
-ParticleComponent::ParticleComponent() : Component(15), particlesPerSecond(2), particleMaxAmount(10), particleLifetime(1), isPlaying(true), direction(1.0f), speed(1.0f), offset(0.0f), scale(1.0f)
+ParticleComponent::ParticleComponent() : Component(15), particlesPerSecond(2), particleMaxAmount(10), particleLifetime(1), isPlaying(true), direction(1.0f), speed(1.0f), offset(0.0f), scaleStart(1.0f), scaleEnd(1.0f)
 {
 	spawnTimer = 0;
 	directionVar = 0;
@@ -128,7 +128,7 @@ void ParticleComponent::Update(float dt)
 {
 	if (isPlaying)
 	{
-		float timeBetweenParticles = 1 / particlesPerSecond;
+		//float timeBetweenParticles = 1 / particlesPerSecond;
 		if (particles.size() < particleMaxAmount)
 		{
 			float particlesToSpawn = std::floor(spawnTimer * particlesPerSecond - particles.size());
@@ -148,15 +148,22 @@ void ParticleComponent::Update(float dt)
 		sortedTransforms.clear();
 		for (int i = 0; i < particles.size(); i++)
 		{
-			particles[i]->UpdatePos(dt, RandomDirection());
+			particles[i]->UpdatePos(dt, RandomDirection(), force);
 			particles[i]->UpdateLifetime(dt);
 			float distance = glm::length(playerCamera->GetPosition() - particles[i]->position);
-			sortedTransforms[distance] = particles[i]->position;
+			sortedTransforms[distance] = i;
 		}
 		int i = 0;
-		for (std::map<float, glm::vec3>::reverse_iterator it = sortedTransforms.rbegin(); it != sortedTransforms.rend(); it++)
+		for (std::map<float, int>::reverse_iterator it = sortedTransforms.rbegin(); it != sortedTransforms.rend(); it++)
 		{
-			transformations[i] = glm::translate(glm::mat4(1.0f), it->second);
+			transformations[i] = glm::translate(glm::mat4(1.0f), particles[it->second]->position);
+
+			float lifePercent = 1.0f - particles[it->second]->lifetimeTimer / particles[it->second]->lifetime;		
+			
+			float scale = scaleStart * (1.0f - lifePercent) + scaleEnd * lifePercent;
+			transformations[i] = glm::scale(transformations[i], glm::vec3(scale, scale, scale));
+			
+			transformations[i][0][3] = lifePercent;
 			i++;
 		}
 
@@ -176,14 +183,19 @@ void ParticleComponent::Draw(const glm::mat4& matrixPV)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
 		shader->SetInt("particleTexture", 0);
+		shader->SetVec4("u_ColorStart", colorStart);
+		shader->SetVec4("u_ColorEnd", colorEnd);
+
 		shader->SetMat4("matrixPV", matrixPV);
 		shader->SetMat4("cameraView", playerCamera->GetView());
 		shader->SetFloat("width", 1);
 		shader->SetFloat("height", 1);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
+
 		glm::vec3 pos = offset + GetOwner()->GetComponent<TransformComponent>()->GetPosition();
-		shader->SetMat4("model", glm::translate(glm::mat4(1.0f), pos) * glm::scale(glm::mat4(1.f), glm::vec3(scale, scale, scale)));
+		//glm::mat4 model = glm::translate(GetOwner()->GetComponent<TransformComponent>()->GetModelMatrix(), offset);
+		shader->SetMat4("model", glm::translate(glm::mat4(1.0f), pos));// * glm::scale(glm::mat4(1.f), glm::vec3(scale, scale, scale)));
 		glBindVertexArray(this->VAO);
 		glDrawArraysInstanced(GL_TRIANGLES, 0, 6, particles.size());
 		glBindVertexArray(0);
@@ -328,13 +340,58 @@ bool ParticleComponent::IsPlaying()
 	return isPlaying;
 }
 
-void ParticleComponent::SetScale(float scale)
+void ParticleComponent::SetScale(float scaleStart, float scaleEnd)
 {
-	this->scale = scale;
+	if (scaleEnd < 0.0f) scaleEnd = scaleStart;
+
+	this->scaleStart = scaleStart;
+	this->scaleEnd = scaleEnd;
 }
 
 float ParticleComponent::GetScale()
 {
-	return scale;
+	return scaleStart;
 }
 
+void ParticleComponent::SetForce(const glm::vec3& force)
+{
+	this->force = force;
+}
+
+void ParticleComponent::SetColor(float r, float g, float b, float a)
+{
+	colorStart = { r, g, b, a };
+	colorEnd = colorStart;
+}
+
+void ParticleComponent::SetColor(const glm::vec4& color)
+{
+	colorStart = color;
+	colorEnd = color;
+}
+
+void ParticleComponent::SetColor(const glm::vec4& colorStart, const glm::vec4& colorEnd)
+{
+	this->colorStart = colorStart;
+	this->colorEnd = colorEnd;
+}
+
+void ParticleComponent::SetColorStart(float r, float g, float b, float a)
+{
+	colorStart = {r, g, b, a};
+}
+
+void ParticleComponent::SetColorStart(const glm::vec4& color)
+{
+	colorStart = color;
+}
+
+void ParticleComponent::SetColorEnd(float r, float g, float b, float a )
+{
+	colorEnd = { r, g, b, a };
+}
+
+void ParticleComponent::SetColorEnd(const glm::vec4& color)
+{
+	colorEnd = color;
+}
