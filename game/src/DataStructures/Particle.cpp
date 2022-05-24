@@ -1,7 +1,8 @@
 #include "Particle.h"
 
-Particle::Particle(glm::vec3 position, glm::vec3 direction, float speed, float lifetime):position(position), initPosition(position), direction(direction), speed(speed), lifetime(lifetime), lifetimeTimer(lifetime)
+Particle::Particle(glm::vec3 position, glm::vec3 direction, float speed, float lifetime, bool burst):position(position), initPosition(position), direction(direction), speed(speed), lifetime(lifetime), lifetimeTimer(lifetime), burst(burst)
 {
+	isDead = false;
 }
 
 void Particle::UpdatePos(float dt, glm::vec3 direction)
@@ -21,7 +22,14 @@ void Particle::UpdateLifetime(float dt)
 {
 	if (lifetimeTimer <= 0)
 	{
-		lifetimeTimer = lifetime;
+		if (burst)
+		{
+			isDead = true;
+		}
+		else
+		{
+			lifetimeTimer = lifetime;
+		}
 	}
 	lifetimeTimer -= dt;
 }
