@@ -101,7 +101,7 @@ void prepare()
     glGenFramebuffers(1, &depthMapFBO);
     glGenTextures(1, &depthCubemap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
-    for (unsigned int i = 0; i < 6; ++i)
+    for (unsigned int i=0; i<6; i++)
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -114,9 +114,11 @@ void prepare()
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    
     shader_l->Use();
     shader_l->SetInt("depthMap", 3);
+
+    shader_i->Use();
+    shader_i->SetInt("depthMap", 3);
 }
 
 void Scene::Render()
@@ -145,6 +147,10 @@ void Scene::Render()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     shader_l->Use();
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
+
+    shader_i->Use();
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
 

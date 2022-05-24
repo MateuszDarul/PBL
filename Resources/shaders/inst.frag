@@ -64,6 +64,7 @@ uniform samplerCube depthMap;
 
 vec3 GetPointLight(TextureMaps textureMaps, PointLight pointLight);
 vec3 GetSpotLight(TextureMaps textureMaps, SpotLight sLight);
+float ShadowCalculation();
 
 void main()
 {
@@ -73,7 +74,6 @@ void main()
     tm.normalMAP = normalize(mat3(transpose(inverse(model_transformations))) * normalVEC);
 
     vec3 pixelColor = vec3(0,0,0);
-    pixelColor += tm.colorMAP * 0.025;
 
     if(pointLightAmount == 0 && spotLightAmount == 0)
     {
@@ -91,6 +91,9 @@ void main()
             pixelColor += GetSpotLight(tm, spotLight[i]);
         }
     }
+    
+    pixelColor *= ShadowCalculation();
+    pixelColor += tm.colorMAP * 0.07;
 
     FragColor = vec4(pixelColor, 1.0f);
 }
@@ -144,4 +147,15 @@ vec3 GetSpotLight(TextureMaps textureMaps, SpotLight sLight)
     specular *= attenuation;
 
     return diffuse + specular;
+}
+
+float ShadowCalculation()
+{
+    vec3 fragToLight = fragPos - pointLight[0].position;
+
+    float closestDepth = texture(depthMap, fragToLight).r;
+    closestDepth *= 100;
+    float currentDepth = length(fragToLight);
+    float shadow = currentDepth - 0.1 > closestDepth ? 0.5 : 1.0;
+    return shadow;
 }

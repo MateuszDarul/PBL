@@ -93,7 +93,7 @@ void main()
     }
 
     pixelColor *= ShadowCalculation();
-    //pixelColor += tm.colorMAP * 0.07;
+    pixelColor += tm.colorMAP * 0.07;
 
     FragColor = vec4(pixelColor, 1.0f);
 }
@@ -156,6 +156,6 @@ float ShadowCalculation()
     float closestDepth = texture(depthMap, fragToLight).r;
     closestDepth *= 100;
     float currentDepth = length(fragToLight);
-    float shadow = currentDepth - 0.1 > closestDepth ? 0.0 : 1.0;
+    float shadow = currentDepth - 0.1 > closestDepth ? 0.5 : 1.0;
     return shadow;
 }
