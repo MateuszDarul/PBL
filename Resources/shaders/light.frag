@@ -94,7 +94,7 @@ void main()
 
     pixelColor *= ShadowCalculation(pointLight[0]);
     pixelColor += tm.colorMAP * 0.07;
-
+    
     FragColor = vec4(pixelColor, 1.0f);
 }
 

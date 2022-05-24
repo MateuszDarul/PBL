@@ -193,10 +193,7 @@ while i < all_elements:
     if "_NS" in bpy.data.objects[i].name:
         f.write(("0" + "\n"))
     else:
-        if "_Inst" in bpy.data.objects[i].name:
-            f.write(("0" + "\n"))
-        else:
-            f.write(("1" + "\n"))
+        f.write(("1" + "\n"))
     f.write(("END\n"))
     i += j
 
