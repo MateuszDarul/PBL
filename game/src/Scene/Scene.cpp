@@ -9,7 +9,6 @@ void prepare();
 std::shared_ptr<ShaderComponent> shader_d = std::make_shared<ShaderComponent>();
 std::shared_ptr<ShaderComponent> shader_i = std::make_shared<ShaderComponent>();
 std::shared_ptr<ShaderComponent> shader_l = std::make_shared<ShaderComponent>();
-std::shared_ptr<ShaderComponent> shader_s = std::make_shared<ShaderComponent>();
 
 Scene::Scene()
 {
@@ -26,7 +25,6 @@ Scene::Scene()
     shader_d->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
     shader_i->Create("Resources/shaders/inst.vert", "Resources/shaders/inst.frag");
     shader_l->Create("Resources/shaders/light.vert", "Resources/shaders/light.frag");
-    shader_s->Create("Resources/shaders/shadow.vert", "Resources/shaders/shadow.frag", "Resources/shaders/shadow.geom");
 
     ///***
 
@@ -96,8 +94,11 @@ void Scene::Update(float dt)
 const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 unsigned int depthMapFBO;
 unsigned int depthCubemap;
+std::shared_ptr<ShaderComponent> shader_s = std::make_shared<ShaderComponent>();
 void prepare()
 {
+    shader_s->Create("Resources/shaders/shadow.vert", "Resources/shaders/shadow.frag", "Resources/shaders/shadow.geom");
+
     glGenFramebuffers(1, &depthMapFBO);
     glGenTextures(1, &depthCubemap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);

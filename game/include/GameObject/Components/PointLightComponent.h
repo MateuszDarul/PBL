@@ -22,14 +22,14 @@ public:
     void SetPosition(glm::vec3 position);
     void SetLightColor(glm::vec3 lightColor);
     void SetSpecularColor(glm::vec3 specularColor);
-    void SetRange(float distance);
+    void SetDamping(float damping);
     
     void Move(glm::vec3 vector);
 
     glm::vec3 GetPosition();
     glm::vec3 GetLightColor();
     glm::vec3 GetSpecularColor();
-    float GetRange();
+    float GetDamping();
 
     void Use();
 };

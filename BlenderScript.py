@@ -135,7 +135,7 @@ while i < all_elements:
         f.write((str(round(bpy.data.objects[i].color[0], 3)) + "\n"))
         f.write((str(round(bpy.data.objects[i].color[1], 3)) + "\n"))
         f.write((str(round(bpy.data.objects[i].color[2], 3)) + "\n"))
-        f.write(("Range:\n"))
+        f.write(("Damping:\n"))
         f.write((str(10) + "\n"))
         if "SpotLight" in bpy.data.objects[i].name:
             f.write(("CutOff:\n"))

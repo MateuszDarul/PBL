@@ -19,7 +19,7 @@ protected:
     std::shared_ptr<TransformComponent> transform;
     glm::vec3 lightColor;
     glm::vec3 specularColor;
-    float distance;
+    float damping;
 
 public:
     LightComponent(uint32_t component_type_uuid);

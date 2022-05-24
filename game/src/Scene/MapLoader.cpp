@@ -88,12 +88,12 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
                             line_id+=3;
                             lightCmp->SetSpecularColor(color);
                         }
-                        else if(cmd == "Range:")
+                        else if(cmd == "Damping:")
                         {
-                            float range;
-                            file >> range;
+                            float damping;
+                            file >> damping;
                             line_id++;
-                            lightCmp->SetRange(range);
+                            lightCmp->SetDamping(damping);
                         }
                         else
                         {
@@ -170,12 +170,12 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
                             line_id+=2;
                             lightCmp->SetCutOff(cutOff);
                         }
-                        else if(cmd == "Range:")
+                        else if(cmd == "Damping:")
                         {
-                            float range;
-                            file >> range;
+                            float damping;
+                            file >> damping;
                             line_id++;
-                            lightCmp->SetRange(range);
+                            lightCmp->SetDamping(damping);
                         }
                         else
                         {
