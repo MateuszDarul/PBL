@@ -101,6 +101,7 @@ void SceneNode::Render(const glm::mat4& matrixPV)
             shaderPtr->Use();
             shaderPtr->SetMat4("transform", matrixPV);
             shaderPtr->SetMat4("model", this->globalTransformations);
+            shaderPtr->SetVec4("u_TintColor", {1, 1, 1, 1});
 
             std::shared_ptr<cmp::Model> modelPtr = this->gameObject->GetComponent<cmp::Model>();
             if(modelPtr != nullptr)

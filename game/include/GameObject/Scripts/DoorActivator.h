@@ -17,6 +17,7 @@ public:
 private:
 
     glm::vec3 targetPosition;
+    std::shared_ptr<cmp::Model> buttonModel;
 
     bool isPrimed;
     bool isActivated;
@@ -29,6 +30,7 @@ public:
         isActivated = false;
 
         if (doorTransform) targetPosition = doorTransform->GetPosition();
+        buttonModel = gameObject->GetComponent<cmp::Model>();
     }
 
     void Update(float dt)
@@ -44,6 +46,7 @@ public:
             isPrimed = true;
 
             if (doorTransform) targetPosition -= openedOffset;
+            if (buttonModel) buttonModel->SetTintColor({ 1.0f, 1.0f, 1.0f,  1.0f });
         }
         else                //on being unpowered
         {
@@ -64,6 +67,7 @@ public:
             isPrimed = false;
 
             if (doorTransform) targetPosition += openedOffset;
+            if (buttonModel) buttonModel->SetTintColor({ 0.2f, 1.0f, 0.2f,  1.0f });
         }
 
         isActivated = true;

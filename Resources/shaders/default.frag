@@ -8,7 +8,9 @@ uniform sampler2D diffuseMapData;
 uniform sampler2D specularMapData;
 uniform sampler2D normalMapData;
 
+uniform vec4 u_TintColor;
+
 void main()
 {
-    FragColor = texture(diffuseMapData, vertexTexture);
+    FragColor = texture(diffuseMapData, vertexTexture) * u_TintColor;
 }
