@@ -6,6 +6,7 @@
 #include "ShaderComponent.h"
 #include "TransformComponent.h"
 
+
 glm::vec4 ParticleComponent::RandomDirection()
 {
 	float randomX = float(rand()) / float(RAND_MAX) * directionVar * 2 - directionVar;
@@ -193,9 +194,10 @@ void ParticleComponent::Draw(const glm::mat4& matrixPV)
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
 
-		glm::vec3 pos = offset + GetOwner()->GetComponent<TransformComponent>()->GetPosition();
-		//glm::mat4 model = glm::translate(GetOwner()->GetComponent<TransformComponent>()->GetModelMatrix(), offset);
-		shader->SetMat4("model", glm::translate(glm::mat4(1.0f), pos));// * glm::scale(glm::mat4(1.f), glm::vec3(scale, scale, scale)));
+		glm::mat3 rotationMatrix = GetOwner()->GetComponent<TransformComponent>()->GetModelMatrix();
+		glm::vec3 newPos = rotationMatrix * offset + GetOwner()->GetComponent<TransformComponent>()->GetPosition();
+		shader->SetMat4("model", glm::translate(glm::mat4(1.0f), newPos));
+
 		glBindVertexArray(this->VAO);
 		glDrawArraysInstanced(GL_TRIANGLES, 0, 6, particles.size());
 		glBindVertexArray(0);
