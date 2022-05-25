@@ -8,6 +8,7 @@
 #include "Scripts/PlayerPlaceTurret.h"
 #include "Scripts/GameManager.h"
 #include "Scripts/Resource.h"
+#include "Scripts/PlayerInteract.h"
 
 Scene::Scene()
 {
@@ -98,7 +99,7 @@ Scene::Scene()
     world->FindNode("CAMERA")->AddChild(debugLineGO);
     
     auto playerPlace = new PlayerPlaceTurret();
-    
+
     playerPlace->gameManager = gm;
     playerPlace->line = debugLineCmp;
     playerPlace->colMan = collidersManager;
@@ -107,6 +108,18 @@ Scene::Scene()
     playerPlace->scene = this;
     
     go->GetComponent<ScriptComponent>()->Add(playerPlace);
+
+
+    auto playerInteract = new PlayerInteract();
+    
+    playerInteract->colMan = collidersManager;
+    playerInteract->camera = playerGO->GetComponent<cmp::Camera>();
+
+    auto energyTextComponentTEMP = std::make_shared<TextComponent>();
+    playerInteract->textTEMP = energyTextComponentTEMP;
+
+    go->GetComponent<ScriptComponent>()->Add(playerInteract);
+    
 
     //multi tool
     {
@@ -184,10 +197,9 @@ Scene::Scene()
 
 
     ///***
-    go = std::make_shared<GameObject>();
     {
-        go->AddComponent(std::make_shared<cmp::Name>("Crate1"));
         go = std::make_shared<GameObject>();
+        go->AddComponent(std::make_shared<cmp::Name>("Crate1"));
         std::shared_ptr<cmp::Refract> refr = std::make_shared<cmp::Refract>();
         refr->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"), 1.52f, skybox->GetTexture());
         go->AddComponent(refr);
@@ -195,8 +207,8 @@ Scene::Scene()
         go->AddComponent(std::make_shared<cmp::Transform>());
         go->GetComponent<cmp::Transform>()->SetPosition(-15.1, 3, 0);
         go->GetComponent<cmp::Transform>()->SetScale(glm::vec3(0.2, 2, 4));
+        world->AddChild(go);
     }
-    world->AddChild(go);
     
     ///***
 
@@ -209,34 +221,71 @@ Scene::Scene()
 
 
     
+    //=== pickupable resource
+    for (int i = 1; i <= 3; i++)
+    {
+        go = std::make_shared<GameObject>();
+        go->AddComponent(std::make_shared<cmp::Name>("Resource " + std::to_string(i)));
+        
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(14.5, 1.5, i * 2);
+        go->GetComponent<cmp::Transform>()->SetScale(0.5);
+
+        // !!! WARNING - needs bugix !!! 
+        // jak daje kolidery true,false (trigger, dynamiczny)
+        // to podczas update crashuje cos w funkcji CheckTriggers
+        go->AddComponent(std::make_shared<BoxCollider>(true, true));
+        go->GetComponent<cmp::BoxCol>()->setLengths({1.0, 1.0, 1.0});
+        go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
+
+        auto model = std::make_shared<cmp::Model>();
+        model->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+            resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+        );
+        go->AddComponent(model);
+        go->AddComponent(shader_d);
+
+        go->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+
+        auto resourceScript = new Resource();
+        go->AddComponent(std::make_shared<cmp::Scriptable>());
+        go->GetComponent<cmp::Scriptable>()->Add(resourceScript);
+
+    
+        world->AddChild(go);
+    }
+
     //=== text
 
     //renderowany jako ostatni bo inaczej sa te dziwne artefakty
 
-    // Font* font = resMan->GetFont("Resources/fonts/arial.ttf");
+    {
+        Font* font = resMan->GetFont("Resources/fonts/arial.ttf");
 
-    // go = std::make_shared<GameObject>();
-    // auto tc = std::make_shared<TransformComponent>();
-    // auto textComponent = std::make_shared<TextComponent>();
-    // textComponent->Create("Energy: ", font);
-    // textComponent->alwaysSeen = true;
-    // textComponent->isGuiElement = true;
-    // textComponent->color = {1.0f, 0.0f, 0.0f};
+        go = std::make_shared<GameObject>();
+        auto tc = std::make_shared<TransformComponent>();
+        // auto energyTextComponentTEMP = std::make_shared<TextComponent>();
+        energyTextComponentTEMP->Create("Energy: ", font);
+        energyTextComponentTEMP->alwaysSeen = true;
+        energyTextComponentTEMP->isGuiElement = true;
+        energyTextComponentTEMP->color = {1.0f, 0.0f, 0.0f};
 
-    // auto textShader = std::make_shared<ShaderComponent>();
-    // textShader->Create("Resources/shaders/text.vert", "Resources/shaders/text.frag");
+        auto textShader = std::make_shared<ShaderComponent>();
+        textShader->Create("Resources/shaders/text.vert", "Resources/shaders/text.frag");
 
-    
-    // go->AddComponent(textShader);
-    // go->AddComponent(mc);
-    // go->AddComponent(tc);
-    // go->AddComponent(textComponent);
+        
+        go->AddComponent(textShader);
+        go->AddComponent(tc);
+        go->AddComponent(energyTextComponentTEMP);
 
-    // go->GetComponent<TransformComponent>()->SetPosition(0.1f, 0.1f, 0.1f);
-    // go->GetComponent<TransformComponent>()->SetScale(0.1f);
-    // go->AddComponent(std::make_shared<cmp::Name>("EnergyText"));
-    
-    // world->AddChild(go);
+        go->GetComponent<TransformComponent>()->SetPosition(0.1f, 0.1f, 0.1f);
+        go->GetComponent<TransformComponent>()->SetScale(0.1f);
+        go->AddComponent(std::make_shared<cmp::Name>("EnergyText"));
+        
+        world->AddChild(go);
+    }
 
 
     //===

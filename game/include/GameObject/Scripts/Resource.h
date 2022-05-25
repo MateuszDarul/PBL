@@ -23,11 +23,10 @@ public:
 
 	}
 
-	void TriggerEnter(std::shared_ptr<ColliderComponent> collider)
+	void PickUp()
 	{
-		std::shared_ptr<GameObject> player = collider->GetOwner();
-		std::shared_ptr<cmp::Name> playerName = player->GetComponent<cmp::Name>();
-		if (playerName != nullptr && playerName->Get() == "CAMERA")
+		auto player = gameObject->GetNode()->GetRoot()->FindNode("CAMERA")->GetGameObject();
+		if (player)
 		{
 			player->GetComponent<cmp::Scriptable>()->Get<GameManager>()->IncreaseEnergy(energy);
 			gameObject->GetComponent<cmp::Transform>()->SetPosition(0, -100, 0);
