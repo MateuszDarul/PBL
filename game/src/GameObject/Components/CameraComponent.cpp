@@ -92,12 +92,12 @@ void CameraComponent::Update(InputManager* inputManager, const float& deltaTime)
         this->position += glm::normalize(glm::vec3(this->right.x, 0, this->right.z)) * velocity;
         this->needUpdate = true;
     }
-    if(inputManager->Keyboard()->IsPressed(KeyboardKey::Q))
+    if(inputManager->Keyboard()->IsPressed(KeyboardKey::Space))
     {
         this->position += glm::normalize(glm::vec3(0, 1, 0)) * velocity;
         this->needUpdate = true;
     }
-    if(inputManager->Keyboard()->IsPressed(KeyboardKey::E))
+    if(inputManager->Keyboard()->IsPressed(KeyboardKey::LControl))
     {
         this->position -= glm::normalize(glm::vec3(0, 1, 0)) * velocity;
         this->needUpdate = true;
