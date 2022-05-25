@@ -131,7 +131,7 @@ Scene::Scene()
         displayNode->AddChild(radialBar);
 
         multiToolScript->progressBar = radialBar;
-        
+
 
         for (int i = -1; i <= 1; i++)
         {
@@ -254,25 +254,8 @@ Scene::Scene()
         go->AddComponent(std::make_shared<cmp::FrustumCulling>());
         go->GetComponent<cmp::FrustumCulling>()->Create(
             resMan->GetMesh("Resources/models/wieze/w1/w1.obj"));
-        go->AddComponent(std::make_shared<cmp::Particles>());
-        go->AddComponent(std::make_shared<cmp::Name>("Particle emitter"));
-        std::shared_ptr<cmp::Particles> particles = go->GetComponent<cmp::Particles>();
-        particles->Create(world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>(), true, 3);
-        particles->SetTexture("Resources/textures/smoke.png");
-        particles->SetParticlesPerSecond(50.0f);
-        particles->SetOffset(glm::vec3(2.25f, 2.05f, 0));
-        particles->SetDirection({0.0f, 1.0f, 0.0f});
-        particles->SetDirectionVar(45);  
-        particles->SetParticleLifetime(0.6f);
-        particles->SetScale(0.9f, 0.6f);
-        particles->SetSpeed(0.4f);
-
-        // particles->SetColor({ 1.0f, 1.0f, 0.0f,   1.0f },   { 1.0f, 0.3f, 0.1f,   0.2f });
-        particles->SetColor({ 1.0f, 1.0f, 1.0f,   0.4f },   { 0.8f, 0.8f, 0.8f,   0.01f });
-        particles->SetForce({ 0.0f, -0.3f, 0.0f });
     }
-    //world->AddChild(go);
-    auto particlego = go;
+    world->AddChild(go);
 
     go = std::make_shared<GameObject>();
     {
@@ -536,130 +519,7 @@ Scene::Scene()
 
     world->AddChild(go);
 
-    //=displacement shader test
-    auto displShader = std::make_shared<ShaderComponent>();
-    displShader->Create("Resources/shaders/displ.vert", "Resources/shaders/displ.frag");
-
-    {      
-        go = std::make_shared<GameObject>();
-        tc = std::make_shared<TransformComponent>();
-        tc->SetPosition(-5.0f, 6.5f, -5.0f);
-        
-        go->AddComponent(tc);
-        mc = std::make_shared<ModelComponent>();
-        mc->Create(
-            resMan->GetMesh("Resources/models/displ/human.obj"),
-            resMan->GetMaterial("Resources/models/displ/human1.mtl")
-        );
-        go->AddComponent(displShader);
-        go->AddComponent(mc);
-        go->AddComponent(std::make_shared<cmp::Name>("Displaced enemy 1"));
-        go->AddComponent(std::make_shared<FrustumCullingComponent>());
-        go->GetComponent<cmp::FrustumCulling>()->Create(
-                resMan->GetMesh("Resources/models/displ/human.obj")
-            );
-
-        world->AddChild(go);
-    }
-    {      
-        go = std::make_shared<GameObject>();
-        tc = std::make_shared<TransformComponent>();
-        tc->SetPosition(-10.0f, 6.5f, -5.0f);
-        
-        go->AddComponent(tc);
-        mc = std::make_shared<ModelComponent>();
-        mc->Create(
-            resMan->GetMesh("Resources/models/displ/human.obj"),
-            resMan->GetMaterial("Resources/models/displ/human2.mtl")
-        );
-        go->AddComponent(displShader);
-        go->AddComponent(mc);
-        go->AddComponent(std::make_shared<cmp::Name>("Displaced enemy 2"));
-        go->AddComponent(std::make_shared<FrustumCullingComponent>());
-        go->GetComponent<cmp::FrustumCulling>()->Create(
-                resMan->GetMesh("Resources/models/displ/human.obj")
-            );
-
-        world->AddChild(go);
-    }
-    {      
-        go = std::make_shared<GameObject>();
-        tc = std::make_shared<TransformComponent>();
-        tc->SetPosition(0.0f, 6.5f, -5.0f);
-        
-        go->AddComponent(tc);
-        mc = std::make_shared<ModelComponent>();
-        mc->Create(
-            resMan->GetMesh("Resources/models/displ/human.obj"),
-            resMan->GetMaterial("Resources/models/displ/human3.mtl")
-        );
-        go->AddComponent(displShader);
-        go->AddComponent(mc);
-        go->AddComponent(std::make_shared<cmp::Name>("Displaced enemy 3"));
-        go->AddComponent(std::make_shared<FrustumCullingComponent>());
-        go->GetComponent<cmp::FrustumCulling>()->Create(
-                resMan->GetMesh("Resources/models/displ/human.obj")
-            );
-
-        world->AddChild(go);
-    }
-
-    //test - adding particle component last
-    auto partnode = world->AddChild(particlego);
-
-    {
-        go = std::make_shared<GameObject>();
-        tc = std::make_shared<TransformComponent>();
-        tc->SetPosition(0,0.5,-5);
-        
-        go->AddComponent(tc);
-        go->AddComponent(std::make_shared<cmp::Name>("muzzler"));
-
-        go->AddComponent(std::make_shared<cmp::Particles>());
-        std::shared_ptr<cmp::Particles> particles = go->GetComponent<cmp::Particles>();
-        particles->Create(world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>(), true, 3);
-        particles->SetTexture("Resources/textures/muzzle.png");
-        particles->SetParticlesPerSecond(50.0f);
-        particles->SetOffset(glm::vec3(2.01f, 1.95f, 0));
-        particles->SetDirection({0.0f, 1.0f, 0.0f});
-        particles->SetDirectionVar(45);  
-        particles->SetParticleLifetime(0.15f);
-        particles->SetScale(0.9f, 0.6f);
-        particles->SetSpeed(0.0f);
-
-        // particles->SetColor({ 1.0f, 1.0f, 0.0f,   1.0f },   { 1.0f, 0.3f, 0.1f,   0.2f });
-        particles->SetColor({ 1.0f, 1.0f, 0.5f,   0.8f },   { 0.8f, 0.8f, 0.4f,   0.01f });
-        // particles->SetForce({ 0.0f, -0.3f, 0.0f });
-
-        partnode->AddChild(go);
-    }
-
-    {
-        go = std::make_shared<GameObject>();
-        tc = std::make_shared<TransformComponent>();
-        tc->SetPosition(11,0.5,-5);
-        
-        go->AddComponent(tc);
-        go->AddComponent(std::make_shared<cmp::Name>("sparks"));
-
-        go->AddComponent(std::make_shared<cmp::Particles>());
-        std::shared_ptr<cmp::Particles> particles = go->GetComponent<cmp::Particles>();
-        particles->Create(world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>(), true, 10);
-        particles->SetTexture("Resources/textures/particle.png");
-        particles->SetParticlesPerSecond(50.0f);
-        particles->SetOffset(glm::vec3(0, 1.95f, 0));
-        particles->SetDirection({-1.0f, 0.4f, 0.0f});
-        particles->SetDirectionVar(45);  
-        particles->SetParticleLifetime(0.35f);
-        particles->SetScale(0.2f, 0.01f);
-        particles->SetSpeed(3.0f);
-
-        particles->SetColor({ 1.0f, 1.0f, 0.0f,   1.0f },   { 1.0f, 0.3f, 0.1f,   0.2f });
-        particles->SetForce({ 0.0f, -2.5f, 0.0f });
-
-        world->AddChild(go);
-    }
-
+    
     //=== text
 
     //renderowany jako ostatni bo inaczej sa te dziwne artefakty
@@ -706,19 +566,6 @@ Scene::~Scene()
 
 void Scene::Update(float dt)
 {
-    // world->FindNode("Raycaster")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, -inputHoriz * 12.74f * dt, 0.0f);
-    // world->FindNode("Particle emitter")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, -inputHoriz * 12.74f*dt, 0.0f);
-    // world->FindNode("Particle emitter")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(-inputVert * 12.74f*dt,0.0f, 0.0f);
-    // world->FindNode("Particle emitter")->GetGameObject()->GetComponent<cmp::Transform>()->Move(inputHoriz * dt * 5.0f, 0.0f, 0.0f);
-    if (Input()->Keyboard()->OnPressed(KeyboardKey::Space)) 
-    {
-        auto p = world->FindNode("Particle emitter");
-        p->GetGameObject()->GetComponent<cmp::Particles>()->Burst();
-        p->FindNode("muzzler")->GetGameObject()->GetComponent<cmp::Particles>()->Burst();
-        world->FindNode("sparks")->GetGameObject()->GetComponent<cmp::Particles>()->Burst();
-    }
-    
-
     std::shared_ptr<GameObject> goCamera = world->FindNode("CAMERA")->GetGameObject();
     std::shared_ptr<TransformComponent> transformCamera = goCamera->GetComponent<cmp::Transform>();
 
@@ -745,7 +592,6 @@ void Scene::Update(float dt)
 
 
 
-    
 
     transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();
 

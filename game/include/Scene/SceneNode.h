@@ -51,12 +51,12 @@ public:
     /** @brief Tworzy nowy wezel na podstawie otrzymanego GameObject'u i dodaje go do listy potomkow.
      * @param gameObject - Wskazanie na GameObject, ktory ma zostac umieszczony w wezle potomnym.
      */
-    void AddChild(std::shared_ptr<GameObject> gameObject);
+    std::shared_ptr<SceneNode> AddChild(std::shared_ptr<GameObject> gameObject);
     
     /** @brief Dodaje nowy wezel (potomek) do tego wezla.
      * @param sceneNode - Wskazanie na SceneNode, ktory ma zostac dodany jako potomek.
      */
-    void AddChild(std::shared_ptr<SceneNode> sceneNode);
+    std::shared_ptr<SceneNode> AddChild(std::shared_ptr<SceneNode> sceneNode);
 
     /** @brief Zwraca wskazanie na GameObject danego wezla.
      * @return GameObject* - Wskazanie na GameObject.
