@@ -8,23 +8,9 @@
 #include "GameObject.h"
 #include "ShaderComponent.h"
 #include "PointLightComponent.h"
+#include "Shadow.h"
 
-const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-
-class Shadow
-{
-public:
-    unsigned int depthMapFBO;
-    unsigned int depthCubemap;
-
-public:
-    Shadow();
-    ~Shadow();
-    void Create();
-    void Update(std::shared_ptr<ShaderComponent> shader_s, glm::vec3 lightPos, SceneNode* world);
-};
-
-///***
+const unsigned int MAX_SHADOW_MAPS = 10;
 
 class ShadowsManager
 {
@@ -37,11 +23,11 @@ private:
     std::vector<GameObject*> lights;
     std::vector<Shadow*> shadows;
 
-    int iterator;
+    uint8_t iterator;
 
-    bool enable[10];
-    glm::vec3 pos[10];
-    unsigned int depthCubemap[10];
+    bool enable[MAX_SHADOW_MAPS];
+    glm::vec3 pos[MAX_SHADOW_MAPS];
+    unsigned int depthCubemap[MAX_SHADOW_MAPS];
 
     void DisableAll();
     void Set(int id, bool enable, glm::vec3 pos, unsigned int depthCubemap);
