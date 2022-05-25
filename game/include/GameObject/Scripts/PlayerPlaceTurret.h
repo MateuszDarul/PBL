@@ -4,6 +4,7 @@
 #include "Components.h"
 
 #include "GameManager.h"
+#include "MultiToolController.h"
 
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/intersect.hpp>
@@ -24,6 +25,7 @@ public:
     //set these in 'inspector'
 
     GameManager* gameManager;
+    MultiToolController* multiTool;
 
     Scene* scene;
     CollidersManager* colMan;
@@ -31,6 +33,11 @@ public:
     std::shared_ptr<cmp::Line> line;
     
     std::shared_ptr<cmp::Shader> turretShader; //err, should be better solved by a prefab or smth
+
+    
+    //for public READ
+
+    bool isPlacing = false;
 
 
 private: 
@@ -40,7 +47,6 @@ private:
 
     std::shared_ptr<GameObject> turretToPlace;
 
-    bool isPlacing = false;
 
 public:
 
@@ -58,14 +64,81 @@ public:
         CreateTurret();
     }
 
+    int turretType = -1;
+
     void Update(float dt)
     {
-        if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr1))
+        bool needUpdate = false; 
+        // dziesiec if'ow ale ¯\_(ツ)_/¯
+        if (!isPlacing)
         {
-            isPlacing = !isPlacing;
+            if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr1))
+            {
+                isPlacing = true;
+                turretType = 0;
+                needUpdate = true;
+            }
+            else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr2))
+            {
+                isPlacing = true;
+                turretType = 1;
+                needUpdate = true;
+            }
+            else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr3))
+            {
+                isPlacing = true;
+                turretType = 2;
+                needUpdate = true;
+            }
+        }
+        else
+        {
+            if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr1))
+            {
+                if (turretType == 0) 
+                {
+                    isPlacing = false;
+                    turretType = -1;
+                }
+                else
+                {
+                    turretType = 0;
+                }
+                needUpdate = true;
+            }
+            else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr2))
+            {
+                if (turretType == 1) 
+                {
+                    isPlacing = false;
+                    turretType = -1;
+                }
+                else
+                {
+                    turretType = 1;
+                }
+                needUpdate = true;
+            }
+            else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr3))
+            {
+                if (turretType == 2) 
+                {
+                    isPlacing = false;
+                    turretType = -1;
+                }
+                else
+                {
+                    turretType = 2;
+                }
+                needUpdate = true;
+            }
+        }
+        if (needUpdate)
+        {
+            multiTool->SetActiveIcon(turretType);
         }
 
-        int indexToPlace = 2;
+        int lineIndexToPlace = 2;
 
         if (isPlacing)
         {
@@ -93,7 +166,7 @@ public:
             else
             {
                 line->Set(2, line->Get(1) + glm::vec3(0.0f, -1.0f, 0.0f));
-                indexToPlace = 1;
+                lineIndexToPlace = 1;
             }  
             
         }
@@ -103,7 +176,7 @@ public:
         if (turretToPlace)
         {
             glm::vec3 adjust = {0.0f, 0.0f, 0.0f};
-            turretToPlace->GetComponent<cmp::Transform>()->SetPosition(line->Get(indexToPlace) + transform->GetPosition() + adjust);
+            turretToPlace->GetComponent<cmp::Transform>()->SetPosition(line->Get(lineIndexToPlace) + transform->GetPosition() + adjust);
             turretToPlace->GetComponent<cmp::Transform>()->SetRotation(0.0f, -camera->GetYaw(), 0.0f);
         }
     }

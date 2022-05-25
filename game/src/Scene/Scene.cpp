@@ -28,6 +28,9 @@ Scene::Scene()
     auto lineShader = std::make_shared<cmp::Shader>();
     lineShader->Create("Resources/shaders/line.vert", "Resources/shaders/line.frag");
 
+    auto radialShader = std::make_shared<cmp::Shader>();
+    radialShader->Create("Resources/shaders/radial.vert", "Resources/shaders/radial.frag");
+
     ///***
 
     world = new SceneNode(std::make_shared<GameObject>());
@@ -53,6 +56,7 @@ Scene::Scene()
     go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
     world->AddChild(go);
 
+    auto playerGO = go;
 
     //skrypty gracza
     go->AddComponent(std::make_shared<cmp::Scriptable>());
@@ -77,6 +81,78 @@ Scene::Scene()
     playerPlace->scene = this;
     
     go->GetComponent<ScriptComponent>()->Add(playerPlace);
+
+    //multi tool
+    {
+        auto multiTool = std::make_shared<GameObject>();
+        multiTool->AddComponent(std::make_shared<cmp::Name>("MultiTool"));
+
+        multiTool->AddComponent(std::make_shared<cmp::Transform>());
+        multiTool->GetComponent<cmp::Transform>()->SetPosition(0.5f, -0.45f, -1.0f);
+
+        auto baseMesh = std::make_shared<cmp::Model>();
+        baseMesh->Create(
+            resMan->GetMesh("Resources/models/multitool/multitool.obj"),
+            resMan->GetMaterial("Resources/models/multitool/multitool.mtl")
+        );
+        multiTool->AddComponent(baseMesh);
+        multiTool->AddComponent(shader_l);
+
+        world->AddChild(multiTool);
+        auto multiToolNode = world->FindNode("MultiTool");
+
+
+        multiTool->AddComponent(std::make_shared<cmp::Scriptable>());
+
+        MultiToolController* multiToolScript = new MultiToolController();
+        multiTool->GetComponent<cmp::Scriptable>()->Add(multiToolScript);
+        playerGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->multiTool = multiToolScript;
+        
+
+
+        auto mutliToolDisplayHolder = std::make_shared<GameObject>();
+        mutliToolDisplayHolder->AddComponent(std::make_shared<cmp::Transform>());
+        mutliToolDisplayHolder->GetComponent<cmp::Transform>()->SetPosition(0, 0.2, 0.5);
+        mutliToolDisplayHolder->GetComponent<cmp::Transform>()->SetRotation(-10, 0, 0);
+        auto displayNode = multiToolNode->AddChild(mutliToolDisplayHolder);
+
+
+        auto radialBar = std::make_shared<GameObject>();
+        auto radialBarModel = std::make_shared<cmp::Model>();
+        radialBarModel->Create(
+            resMan->GetMesh("Resources/models/multitool/radial.obj"),
+            resMan->GetMaterial("Resources/models/multitool/radial.mtl")
+        );
+        radialBar->AddComponent(radialBarModel);
+        radialBar->AddComponent(radialShader);
+
+        radialBar->AddComponent(std::make_shared<cmp::Transform>());
+        radialBar->AddComponent(std::make_shared<cmp::Name>("radial"));
+        displayNode->AddChild(radialBar);
+
+        multiToolScript->progressBar = radialBar;
+        
+
+        for (int i = -1; i <= 1; i++)
+        {
+            auto icon = std::make_shared<GameObject>();
+            auto iconModel = std::make_shared<cmp::Model>();
+            iconModel->Create(
+                resMan->GetMesh("Resources/models/multitool/icon.obj"),
+                resMan->GetMaterial("Resources/models/multitool/icon.mtl")
+            );
+            icon->AddComponent(iconModel);
+            icon->AddComponent(shader_d);
+
+            iconModel->SetTintColor(0.17, 0.17, 0.17,  1.0);
+            multiToolScript->iconsGO[i+1] = icon;
+
+            icon->AddComponent(std::make_shared<cmp::Transform>());
+            icon->GetComponent<cmp::Transform>()->SetPosition(i * 0.06, 0.05, 0.0);
+
+            displayNode->AddChild(icon);
+        }
+    }
 
 
 
@@ -181,19 +257,19 @@ Scene::Scene()
         go->AddComponent(std::make_shared<cmp::Particles>());
         go->AddComponent(std::make_shared<cmp::Name>("Particle emitter"));
         std::shared_ptr<cmp::Particles> particles = go->GetComponent<cmp::Particles>();
-        particles->Create(world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>());
-        particles->SetTexture("Resources/textures/particle.png");
-        particles->SetParticlesPerSecond(10.0f);
-        particles->SetParticleMaxAmount(50);
-        particles->SetOffset(glm::vec3(1.5f, 2.5f, 0));
+        particles->Create(world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>(), true, 3);
+        particles->SetTexture("Resources/textures/smoke.png");
+        particles->SetParticlesPerSecond(50.0f);
+        particles->SetOffset(glm::vec3(2.25f, 2.05f, 0));
         particles->SetDirection({0.0f, 1.0f, 0.0f});
-        particles->SetDirectionVar(25);  
-        particles->SetParticleLifetime(2.8f);
-        particles->SetScale(0.3f, 0.01f);
-        particles->SetSpeed(3.0f);
+        particles->SetDirectionVar(45);  
+        particles->SetParticleLifetime(0.6f);
+        particles->SetScale(0.9f, 0.6f);
+        particles->SetSpeed(0.4f);
 
-        particles->SetColor({ 1.0f, 1.0f, 0.0f,   1.0f },   { 1.0f, 0.3f, 0.1f,   0.2f });
-        particles->SetForce({ 0.0f, -1.5f, 0.0f });
+        // particles->SetColor({ 1.0f, 1.0f, 0.0f,   1.0f },   { 1.0f, 0.3f, 0.1f,   0.2f });
+        particles->SetColor({ 1.0f, 1.0f, 1.0f,   0.4f },   { 0.8f, 0.8f, 0.8f,   0.01f });
+        particles->SetForce({ 0.0f, -0.3f, 0.0f });
     }
     //world->AddChild(go);
     auto particlego = go;
@@ -460,8 +536,129 @@ Scene::Scene()
 
     world->AddChild(go);
 
+    //=displacement shader test
+    auto displShader = std::make_shared<ShaderComponent>();
+    displShader->Create("Resources/shaders/displ.vert", "Resources/shaders/displ.frag");
+
+    {      
+        go = std::make_shared<GameObject>();
+        tc = std::make_shared<TransformComponent>();
+        tc->SetPosition(-5.0f, 6.5f, -5.0f);
+        
+        go->AddComponent(tc);
+        mc = std::make_shared<ModelComponent>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/displ/human.obj"),
+            resMan->GetMaterial("Resources/models/displ/human1.mtl")
+        );
+        go->AddComponent(displShader);
+        go->AddComponent(mc);
+        go->AddComponent(std::make_shared<cmp::Name>("Displaced enemy 1"));
+        go->AddComponent(std::make_shared<FrustumCullingComponent>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(
+                resMan->GetMesh("Resources/models/displ/human.obj")
+            );
+
+        world->AddChild(go);
+    }
+    {      
+        go = std::make_shared<GameObject>();
+        tc = std::make_shared<TransformComponent>();
+        tc->SetPosition(-10.0f, 6.5f, -5.0f);
+        
+        go->AddComponent(tc);
+        mc = std::make_shared<ModelComponent>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/displ/human.obj"),
+            resMan->GetMaterial("Resources/models/displ/human2.mtl")
+        );
+        go->AddComponent(displShader);
+        go->AddComponent(mc);
+        go->AddComponent(std::make_shared<cmp::Name>("Displaced enemy 2"));
+        go->AddComponent(std::make_shared<FrustumCullingComponent>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(
+                resMan->GetMesh("Resources/models/displ/human.obj")
+            );
+
+        world->AddChild(go);
+    }
+    {      
+        go = std::make_shared<GameObject>();
+        tc = std::make_shared<TransformComponent>();
+        tc->SetPosition(0.0f, 6.5f, -5.0f);
+        
+        go->AddComponent(tc);
+        mc = std::make_shared<ModelComponent>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/displ/human.obj"),
+            resMan->GetMaterial("Resources/models/displ/human3.mtl")
+        );
+        go->AddComponent(displShader);
+        go->AddComponent(mc);
+        go->AddComponent(std::make_shared<cmp::Name>("Displaced enemy 3"));
+        go->AddComponent(std::make_shared<FrustumCullingComponent>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(
+                resMan->GetMesh("Resources/models/displ/human.obj")
+            );
+
+        world->AddChild(go);
+    }
+
     //test - adding particle component last
-    world->AddChild(particlego);
+    auto partnode = world->AddChild(particlego);
+
+    {
+        go = std::make_shared<GameObject>();
+        tc = std::make_shared<TransformComponent>();
+        tc->SetPosition(0,0.5,-5);
+        
+        go->AddComponent(tc);
+        go->AddComponent(std::make_shared<cmp::Name>("muzzler"));
+
+        go->AddComponent(std::make_shared<cmp::Particles>());
+        std::shared_ptr<cmp::Particles> particles = go->GetComponent<cmp::Particles>();
+        particles->Create(world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>(), true, 3);
+        particles->SetTexture("Resources/textures/muzzle.png");
+        particles->SetParticlesPerSecond(50.0f);
+        particles->SetOffset(glm::vec3(2.01f, 1.95f, 0));
+        particles->SetDirection({0.0f, 1.0f, 0.0f});
+        particles->SetDirectionVar(45);  
+        particles->SetParticleLifetime(0.15f);
+        particles->SetScale(0.9f, 0.6f);
+        particles->SetSpeed(0.0f);
+
+        // particles->SetColor({ 1.0f, 1.0f, 0.0f,   1.0f },   { 1.0f, 0.3f, 0.1f,   0.2f });
+        particles->SetColor({ 1.0f, 1.0f, 0.5f,   0.8f },   { 0.8f, 0.8f, 0.4f,   0.01f });
+        // particles->SetForce({ 0.0f, -0.3f, 0.0f });
+
+        partnode->AddChild(go);
+    }
+
+    {
+        go = std::make_shared<GameObject>();
+        tc = std::make_shared<TransformComponent>();
+        tc->SetPosition(11,0.5,-5);
+        
+        go->AddComponent(tc);
+        go->AddComponent(std::make_shared<cmp::Name>("sparks"));
+
+        go->AddComponent(std::make_shared<cmp::Particles>());
+        std::shared_ptr<cmp::Particles> particles = go->GetComponent<cmp::Particles>();
+        particles->Create(world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>(), true, 10);
+        particles->SetTexture("Resources/textures/particle.png");
+        particles->SetParticlesPerSecond(50.0f);
+        particles->SetOffset(glm::vec3(0, 1.95f, 0));
+        particles->SetDirection({-1.0f, 0.4f, 0.0f});
+        particles->SetDirectionVar(45);  
+        particles->SetParticleLifetime(0.35f);
+        particles->SetScale(0.2f, 0.01f);
+        particles->SetSpeed(3.0f);
+
+        particles->SetColor({ 1.0f, 1.0f, 0.0f,   1.0f },   { 1.0f, 0.3f, 0.1f,   0.2f });
+        particles->SetForce({ 0.0f, -2.5f, 0.0f });
+
+        world->AddChild(go);
+    }
 
     //=== text
 
@@ -509,30 +706,45 @@ Scene::~Scene()
 
 void Scene::Update(float dt)
 {
-    float input = 0.0f;
-    if (Input()->Keyboard()->IsPressed(KeyboardKey::Right)) input = -1.0f;
-    if (Input()->Keyboard()->IsPressed(KeyboardKey::Left))  input =  1.0f;
-
-    world->FindNode("Raycaster")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, input *  12.74f*dt, 0.0f);
-    // world->FindNode("Particle emitter")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, 12.74f*dt, 0.0f);
-    // world->FindNode("Particle emitter")->GetGameObject()->GetComponent<cmp::Transform>()->Move(input * dt * 5.0f, 0.0f, 0.0f);
+    // world->FindNode("Raycaster")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, -inputHoriz * 12.74f * dt, 0.0f);
+    // world->FindNode("Particle emitter")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0f, -inputHoriz * 12.74f*dt, 0.0f);
+    // world->FindNode("Particle emitter")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(-inputVert * 12.74f*dt,0.0f, 0.0f);
+    // world->FindNode("Particle emitter")->GetGameObject()->GetComponent<cmp::Transform>()->Move(inputHoriz * dt * 5.0f, 0.0f, 0.0f);
+    if (Input()->Keyboard()->OnPressed(KeyboardKey::Space)) 
+    {
+        auto p = world->FindNode("Particle emitter");
+        p->GetGameObject()->GetComponent<cmp::Particles>()->Burst();
+        p->FindNode("muzzler")->GetGameObject()->GetComponent<cmp::Particles>()->Burst();
+        world->FindNode("sparks")->GetGameObject()->GetComponent<cmp::Particles>()->Burst();
+    }
     
 
-    glm::vec3 particleForce = {  0.0f, -1.1f,  0.0f };
-    if (Input()->Keyboard()->IsPressed(KeyboardKey::Up))   particleForce.x += 2.0f;
-    if (Input()->Keyboard()->IsPressed(KeyboardKey::Down)) particleForce.x -= 2.0f;
-
-    world->FindNode("Particle emitter")->GetGameObject()->GetComponent<cmp::Particles>()->SetForce(particleForce);
-
-    
     std::shared_ptr<GameObject> goCamera = world->FindNode("CAMERA")->GetGameObject();
     std::shared_ptr<TransformComponent> transformCamera = goCamera->GetComponent<cmp::Transform>();
 
     goCamera->GetComponent<CameraComponent>()->Update(GameApplication::GetInputManager(), dt);
     transformCamera->SetPosition(goCamera->GetComponent<CameraComponent>()->GetPosition());
 
+
+    //Position multitool
+
+    auto mtTransform = world->FindNode("MultiTool")->GetGameObject()->GetComponent<cmp::Transform>();
+    auto m = glm::inverse(goCamera->GetComponent<cmp::Camera>()->GetView());
     
-    //world->FindNode("In world text")->GetGameObject()->GetComponent<cmp::Text>()->FaceCamera(goCamera->GetComponent<cmp::Camera>());
+    // printf("Inverse view pos: %f %f %f\n", m[3][0], m[3][1], m[3][2]);
+    // printf("Inverse view right: %f %f %f\n", m[0][0], m[1][0], m[2][0]);
+    // printf("Inverse view up: %f %f %f\n", m[0][1], m[1][1], m[2][1]);
+    // printf("Inverse view forward: %f %f %f\n", m[0][2], m[1][2], m[2][2]);
+
+    glm::vec4 mtNewPosition = m * glm::vec4(mtTransform->GetPosition(), 1.0f);
+
+    m[3][0] = mtNewPosition.x;
+    m[3][1] = mtNewPosition.y;
+    m[3][2] = mtNewPosition.z;
+    mtTransform->SetModelMatrix(m);
+
+
+
     
 
     transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();
