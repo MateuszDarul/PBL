@@ -294,3 +294,8 @@ void GameApplication::SetFov(float fov)
     s_Fov = fov;
     s_ProjectionMatrix = glm::perspective(s_Fov, (float)s_ScreenWidth/s_ScreenHeight, s_NearPlane, s_FarPlane);
 }
+
+float GameApplication::GetAspectRatio()
+{
+    return s_AspectRatio;
+}

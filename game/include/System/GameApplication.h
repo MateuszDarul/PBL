@@ -92,6 +92,8 @@ public:
      */
     static glm::uvec2 GetWindowSize();
 
+    static float GetAspectRatio();
+
     /**
      * @brief Get the Projection Range
      * @return glm::vec2::x - Near plane
