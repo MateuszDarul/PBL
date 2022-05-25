@@ -23,6 +23,8 @@ ParticleComponent::ParticleComponent() : Component(15), particlesPerSecond(2), p
 {
 	spawnTimer = 0;
 	directionVar = 0;
+	burst = false;
+	bursted = false;
 }
 
 ParticleComponent::~ParticleComponent()
@@ -32,10 +34,12 @@ ParticleComponent::~ParticleComponent()
 	glDeleteBuffers(1, &this->VBOinstances);
 }
 
-void ParticleComponent::Create(std::shared_ptr<CameraComponent> playerCam)
+void ParticleComponent::Create(std::shared_ptr<CameraComponent> playerCam, bool isBurst, int maxAmount)
 {
 	srand(time(NULL));
+	particleMaxAmount = maxAmount;
 	playerCamera = playerCam;
+	burst = isBurst;
 	for (int i = 0; i < particleMaxAmount; i++)
 	{
 		transformations.push_back(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f)));
@@ -129,8 +133,7 @@ void ParticleComponent::Update(float dt)
 {
 	if (isPlaying)
 	{
-		//float timeBetweenParticles = 1 / particlesPerSecond;
-		if (particles.size() < particleMaxAmount)
+		if (!burst && particles.size() < particleMaxAmount)
 		{
 			float particlesToSpawn = std::floor(spawnTimer * particlesPerSecond - particles.size());
 			if (particlesToSpawn > 0)
@@ -139,21 +142,35 @@ void ParticleComponent::Update(float dt)
 				{
 					if (particles.size() < particleMaxAmount)
 					{
-						particles.push_back(std::make_shared<Particle>(glm::vec3(0.0f, 0.0f, 0.0f), RandomDirection(), speed, particleLifetime));
+						particles.push_back(std::make_shared<Particle>(glm::vec3(0.0f, 0.0f, 0.0f), RandomDirection(), speed, particleLifetime, false));
 					}
 				}
 			}
 			spawnTimer += dt;
 		}
+		else if (burst && !bursted && particles.size() < particleMaxAmount)
+		{
+			bursted = true;
+			for (int i = 0; i < particleMaxAmount; i++)
+			{
+				particles.push_back(std::make_shared<Particle>(glm::vec3(0.0f, 0.0f, 0.0f), RandomDirection(), speed, particleLifetime, true));
+			}
+		}
 
 		sortedTransforms.clear();
-		for (int i = 0; i < particles.size(); i++)
+		int size = particles.size();
+		for (int i = 0; i < size; i++)
 		{
 			particles[i]->UpdatePos(dt, RandomDirection(), force);
 			particles[i]->UpdateLifetime(dt);
-			float distance = glm::length(playerCamera->GetPosition() - particles[i]->position);
-			sortedTransforms[distance] = i;
+			if (!burst || !particles[i]->isDead)
+			{
+				float distance = glm::length(playerCamera->GetPosition() - particles[i]->position);
+				sortedTransforms[distance] = i;
+			}
 		}
+		particles.erase(std::remove_if(particles.begin(), particles.end(), [](std::shared_ptr<Particle> particle) {return particle->isDead; }), particles.end());
+
 		int i = 0;
 		for (std::map<float, int>::reverse_iterator it = sortedTransforms.rbegin(); it != sortedTransforms.rend(); it++)
 		{
@@ -340,6 +357,11 @@ void ParticleComponent::Stop()
 bool ParticleComponent::IsPlaying()
 {
 	return isPlaying;
+}
+
+void ParticleComponent::Burst()
+{
+	bursted = false;
 }
 
 void ParticleComponent::SetScale(float scaleStart, float scaleEnd)

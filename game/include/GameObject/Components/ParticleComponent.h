@@ -19,6 +19,8 @@ private:
 	float particleMaxAmount;
 	float particleLifetime;
 	bool isPlaying;
+	bool burst;
+	bool bursted;
 	glm::vec3 offset;
 	glm::vec3 direction;
 	float directionVar;
@@ -44,7 +46,7 @@ private:
 public:
 	ParticleComponent();
 	~ParticleComponent();
-	void Create(std::shared_ptr<CameraComponent> playerCam);
+	void Create(std::shared_ptr<CameraComponent> playerCam, bool isBurst, int maxAmount);
 	void SetTexture(const std::string& path);
 	void Update(float dt);
 	void Draw(const glm::mat4& matrixPV);
@@ -73,6 +75,7 @@ public:
 	void Play();
 	void Stop();
 	bool IsPlaying();
+	void Burst();
 	void SetScale(float scaleStart, float scaleEnd = -1.0f);
 	float GetScale();
 };
