@@ -15,7 +15,7 @@ private:
 
     glm::vec3 position; //!< Pozycja obiektu.
     glm::vec3 rotation; //!< Rotacja obiektu.
-    float scale; //!< Skala obiektu.
+    glm::vec3 scale; //!< Skala obiektu.
 
 private:
     /** @brief Oblicza nowa macierz modelu dla aktualnych wartosci pozycji, rotacji i skali.
@@ -47,6 +47,11 @@ public:
      */
     void SetScale(const float& scale);
 
+    /** @brief Ustala nowa skale obiektu.
+     * @param scale - Nowa skala.
+     */
+    void SetScale(const glm::vec3 scale);
+
     /** @brief Zmienia aktualna skale obiektu o podana wartosc.
      * @param scale - Wartosc, o ktora nalezy zeskalowac obiekt.
      */
@@ -56,6 +61,11 @@ public:
      * @return float - Aktualna wartosc skali obiektu.
      */
     float GetScale();
+
+    /** @brief Pobiera informacjie o wartosci, o jaka obiekt jest zeskalowany.
+     * @return glm::vec3 - Aktualna wartosc skali obiektu.
+     */
+    glm::vec3 GetScaleVec();
 
     /**
      * @brief Ustawia nowa pozycje obiektu.

@@ -18,6 +18,7 @@
 #include "TextComponent.h"              // UUID 13
 #include "LineComponent.h"              // UUID 14
 #include "ParticleComponent.h"          // UUID 15
+#include "RefractiveGlassComponent.h"   // UUID 16
 
 #include "ModelGuiComponent.h"          // UUID 50
 
@@ -37,6 +38,7 @@ namespace cmp
     typedef SpotLightComponent SpotLight;
     typedef FrustumCullingComponent FrustumCulling;
     typedef ParticleComponent Particles;
+    typedef RefractiveGlassComponent Refract;
 
     typedef SphereCollider SphereCol;
     typedef BoxCollider BoxCol;

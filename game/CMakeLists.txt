@@ -30,6 +30,7 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/SpotLightComponent.cpp
 	src/GameObject/Components/FrustumCullingComponent.cpp
 	src/GameObject/Components/ParticleComponent.cpp
+	src/GameObject/Components/RefractiveGlassComponent.cpp
 
 	src/Resource/Font.cpp
 	src/Resource/Mesh.cpp
@@ -38,6 +39,7 @@ file(GLOB_RECURSE SOURCE_FILES
 
 	src/Scene/Scene.cpp
 	src/Scene/SceneNode.cpp
+	src/Scene/Skybox.cpp
 	src/Scene/MapLoader.cpp
 
 	src/AI/State.cpp
@@ -89,6 +91,7 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/Components/SpotLightComponent.h
 	include/GameObject/Components/FrustumCullingComponent.h
 	include/GameObject/Components/ParticleComponent.cpp
+	include/GameObject/Components/RefractiveGlassComponent.cpp
 
 	include/Resource/Font.h
 	include/Resource/Mesh.h
@@ -97,6 +100,7 @@ file(GLOB_RECURSE HEADER_FILES
 
 	include/Scene/Scene.h
 	include/Scene/SceneNode.h
+	include/Scene/Skybox.h
 	include/Scene/MapLoader.h
 
 	include/AI/State.h

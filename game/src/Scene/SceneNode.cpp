@@ -109,26 +109,36 @@ void SceneNode::Render(const glm::mat4& matrixPV)
             }
             else
             {
-                std::shared_ptr<cmp::ModelInst> modelInstPtr = this->gameObject->GetComponent<cmp::ModelInst>();
-                if(modelInstPtr != nullptr)
+                std::shared_ptr<cmp::Refract> refractPtr = this->gameObject->GetComponent<cmp::Refract>();
+                if (refractPtr != nullptr)
                 {
-                    modelInstPtr->Draw(shaderPtr);
+                    glm::vec3 camPos = this->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>()->GetPosition();
+                    shaderPtr->SetVec3("cameraPos", camPos);
+                    refractPtr->Draw(shaderPtr);
                 }
-                else 
+                else
                 {
-                    std::shared_ptr<cmp::Text> textPtr = this->gameObject->GetComponent<cmp::Text>();
-                    if(textPtr != nullptr)
+                    std::shared_ptr<cmp::ModelInst> modelInstPtr = this->gameObject->GetComponent<cmp::ModelInst>();
+                    if (modelInstPtr != nullptr)
                     {
-                        shaderPtr->SetMat4("transform", glm::ortho(0.0f, 16.0f, 0.0f, 9.0f)); //ta kolejnosc naprawia tekst do góry nogami
-                        
-                        textPtr->Draw(shaderPtr);
+                        modelInstPtr->Draw(shaderPtr);
                     }
-                    else 
+                    else
                     {
-                        std::shared_ptr<cmp::Line> linePtr = this->gameObject->GetComponent<cmp::Line>();
-                        if(linePtr != nullptr)
+                        std::shared_ptr<cmp::Text> textPtr = this->gameObject->GetComponent<cmp::Text>();
+                        if (textPtr != nullptr)
                         {
-                            linePtr->Draw(shaderPtr);
+                            shaderPtr->SetMat4("transform", glm::ortho(0.0f, 16.0f, 0.0f, 9.0f)); //ta kolejnosc naprawia tekst do góry nogami
+
+                            textPtr->Draw(shaderPtr);
+                        }
+                        else
+                        {
+                            std::shared_ptr<cmp::Line> linePtr = this->gameObject->GetComponent<cmp::Line>();
+                            if (linePtr != nullptr)
+                            {
+                                linePtr->Draw(shaderPtr);
+                            }
                         }
                     }
                 }
