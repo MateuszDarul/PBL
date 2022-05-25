@@ -5,6 +5,8 @@
 
 #include "LightComponent.h"
 
+#define DAMPING_MUL 0.004f
+
 class SpotLightComponent :public LightComponent
 {
 private:
@@ -25,7 +27,7 @@ public:
     void SetDirection(glm::vec3 direction);
     void SetLightColor(glm::vec3 lightColor);
     void SetSpecularColor(glm::vec3 specularColor);
-    void SetRange(float distance);
+    void SetDamping(float damping);
     void SetCutOff(glm::vec2 cutOff);
 
     void Move(glm::vec3 vector);
@@ -35,7 +37,7 @@ public:
     glm::vec3 GetDirection();
     glm::vec3 GetLightColor();
     glm::vec3 GetSpecularColor();
-    float GetRange();
+    float GetDamping();
     glm::vec2 GetCutOff();
 
     void Use();

@@ -29,7 +29,7 @@ bool PointLightComponent::Create()
     this->transform->SetPosition(glm::vec3(0,0,0));
     this->lightColor = glm::vec3(1,1,1);
     this->specularColor = glm::vec3(1,1,1);
-    this->distance = 10;
+    this->damping = 10;
 
     PointLightComponent::needUpdate = true;
     PointLightComponent::lightAmount++;
@@ -65,7 +65,7 @@ void PointLightComponent::Use()
         shaders[i]->SetVec3("pointLight[" + textID + "].position", this->transform->GetPosition());
         shaders[i]->SetVec3("pointLight[" + textID + "].lightColor", this->lightColor);
         shaders[i]->SetVec3("pointLight[" + textID + "].specularColor", this->specularColor);
-        shaders[i]->SetFloat("pointLight[" + textID + "].distance", this->distance * 0.004f);
+        shaders[i]->SetFloat("pointLight[" + textID + "].distance", this->damping * DAMPING_MUL);
     }
 
     if(PointLightComponent::thisLightID == PointLightComponent::lightAmount)
@@ -118,13 +118,13 @@ glm::vec3 PointLightComponent::GetSpecularColor()
     return this->specularColor;
 }
 
-void PointLightComponent::SetRange(float distance)
+void PointLightComponent::SetDamping(float damping)
 {
-    this->distance = distance;
+    this->damping = damping;
     PointLightComponent::needUpdate = true;
 }
 
-float PointLightComponent::GetRange()
+float PointLightComponent::GetDamping()
 {
-    return this->distance;
+    return this->damping;
 }

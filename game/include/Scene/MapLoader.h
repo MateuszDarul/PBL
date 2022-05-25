@@ -12,6 +12,8 @@
 #include "Components.h"
 #include "CollidersManager.h"
 
+class ShadowsManager;
+
 /** @brief Klasa odpowiedzialana za wczytanie zewnetrznego pliku z ukladem sceny i odtworzeniem tej sceny.
  */
 class MapLoader
@@ -25,7 +27,7 @@ public:
      * @return true - Poprawnie wczytano uklad SceneNodow.
      * @return false - Blad podczas wczytywania SceneNodow.
      */
-    static bool Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Shader> shader[2], CollidersManager* collisionManager);
+    static bool Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Shader> shader, CollidersManager* collisionManager, ShadowsManager* shadowsManager);
 };
 
 #endif // __MAP_LOADER_H__

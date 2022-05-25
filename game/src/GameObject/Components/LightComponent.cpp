@@ -24,3 +24,8 @@ bool LightComponent::AddShader(std::shared_ptr<ShaderComponent> shader)
     shaders.push_back(shader);
     return true;
 }
+
+std::vector<std::shared_ptr<ShaderComponent>> LightComponent::GetShaders()
+{
+    return this->shaders;
+}

@@ -88,6 +88,7 @@ bool ModelInstancesComponent::Draw(std::shared_ptr<ShaderComponent> shader)
     }
 
     shader->Use();
+    shader->SetBool("inst", true);
 
     if(this->material != nullptr)
     {

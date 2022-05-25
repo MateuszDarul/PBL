@@ -60,6 +60,7 @@ bool ModelComponent::Draw(std::shared_ptr<ShaderComponent> shader)
     }
 
     shader->Use();
+    shader->SetBool("inst", false);
 
     if(this->material != nullptr)
     {
