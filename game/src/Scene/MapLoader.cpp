@@ -1,6 +1,8 @@
 #include "MapLoader.h"
 
-bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Shader> shader[2], CollidersManager* collisionManager)
+#include "ShadowsManager.h"
+
+bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Shader> shader, CollidersManager* collisionManager, ShadowsManager* shadowsManager)
 {
     ResourceManager* resMan = GameApplication::GetResourceManager();
 
@@ -54,8 +56,7 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
                 std::shared_ptr<cmp::PointLight> lightCmp = gameObject->GetComponent<cmp::PointLight>();
                 {
                     lightCmp->Create();
-                    lightCmp->AddShader(shader[0]);
-                    lightCmp->AddShader(shader[1]);
+                    lightCmp->AddShader(shader);
 
                     for(int i=0; i<4; i++)
                     {
@@ -103,6 +104,7 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
                         }
                     }
                 }
+                shadowsManager->AddLight(gameObject.get());
             }
             else if(type == "Spot")
             {
@@ -110,8 +112,7 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
                 std::shared_ptr<cmp::SpotLight> lightCmp = gameObject->GetComponent<cmp::SpotLight>();
                 {
                     lightCmp->Create();
-                    lightCmp->AddShader(shader[0]);
-                    lightCmp->AddShader(shader[1]);
+                    lightCmp->AddShader(shader);
 
                     for(int i=0; i<6; i++)
                     {
@@ -189,7 +190,7 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
         }
         else if(line == "Model:")
         {
-            gameObject->AddComponent(shader[0]);
+            gameObject->AddComponent(shader);
 
             std::string modelName;
 
@@ -218,7 +219,7 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
         }
         else if(line == "Inst:")
         {
-            gameObject->AddComponent(shader[1]);
+            gameObject->AddComponent(shader);
 
             std::string modelName;
             int amount = 0;

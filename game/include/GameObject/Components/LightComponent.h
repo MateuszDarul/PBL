@@ -30,6 +30,7 @@ public:
     virtual void Use() = 0;
 
     bool AddShader(std::shared_ptr<ShaderComponent> shader);
+    std::vector<std::shared_ptr<ShaderComponent>> GetShaders();
 };
 
 #endif // __LIGHT_COMPONENT_H__

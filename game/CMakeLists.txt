@@ -36,6 +36,7 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/Resource/Mesh.cpp
 	src/Resource/Material.cpp
 	src/Resource/ResourceManager.cpp
+	src/Resource/ShadowsManager.cpp
 
 	src/Scene/Scene.cpp
 	src/Scene/SceneNode.cpp
@@ -96,6 +97,7 @@ file(GLOB_RECURSE HEADER_FILES
 	include/Resource/Mesh.h
 	include/Resource/Material.h
 	include/Resource/ResourceManager.h
+	include/Resource/ShadowsManager.h
 
 	include/Scene/Scene.h
 	include/Scene/SceneNode.h
