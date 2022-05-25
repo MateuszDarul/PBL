@@ -76,7 +76,7 @@ ShadowsManager::ShadowsManager(SceneNode* world, std::shared_ptr<ShaderComponent
 
 ShadowsManager::~ShadowsManager()
 {
-    for(int i=0; i<shadows.size(); i++)
+    for(uint32_t i=0; i<shadows.size(); i++)
     {
         delete shadows[i];
     }
@@ -111,7 +111,7 @@ bool ShadowsManager::AddLight(GameObject* light)
         return false;
     }
         
-    for(int i=0; i<lights.size(); i++)
+    for(uint32_t i=0; i<lights.size(); i++)
     {
         if(light == lights[i])
         {
@@ -139,7 +139,7 @@ bool ShadowsManager::RemoveLight(GameObject* light)
         return false;
     }
         
-    for(int i=0; i<lights.size(); i++)
+    for(uint32_t i=0; i<lights.size(); i++)
     {
         if(light == lights[i])
         {
@@ -159,10 +159,13 @@ bool ShadowsManager::RemoveLight(GameObject* light)
     return false;
 }
 
-#include <iostream>
-
 void ShadowsManager::Update()
 {
+    if(shadows.size() == 0)
+    {
+        return;
+    }
+
     if(iterator >= shadows.size())
     {
         iterator = 0;
@@ -186,7 +189,6 @@ void ShadowsManager::Update()
     else
     {
         Set(CPUID[iterator], true, pos, shadows[iterator]->depthCubemap);
-        std::cout << CPUID[iterator] << std::endl;
     }
 
     iterator++;
