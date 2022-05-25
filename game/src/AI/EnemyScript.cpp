@@ -53,14 +53,27 @@ void EnemyScript::Update(float dt)
 
 	gameObject->GetComponent<TransformComponent>()->Move(velocity * dt);
 
-	//std::cout << velocity.x << ", " << velocity.y << ", " << velocity.z << std::endl;
-
-	//std::cout << gameObject->GetComponent<TransformComponent>()->GetPosition().x << ", " << gameObject->GetComponent<TransformComponent>()->GetPosition().y <<
-	//	", " << gameObject->GetComponent<TransformComponent>()->GetPosition().z << std::endl;
-
 	if (glm::length(velocity) > 0.0000001f)
 	{
 		heading = glm::normalize(velocity);
+	}
+
+	//check if attacked by flashlight
+	glm::vec3 fl_pos = player->GetComponent<CameraComponent>()->GetPosition();
+	glm::vec3 fl_forward = player->GetComponent<CameraComponent>()->GetForward();
+	glm::vec3 mypos = gameObject->GetComponent<TransformComponent>()->GetPosition();
+
+	float distance = glm::length(fl_pos - mypos);
+	float dot = glm::dot(glm::normalize(mypos - fl_pos), glm::normalize(fl_forward));
+
+	//std::cout << fl_pos.x << std::endl;
+	//std::cout << fl_forward.x << std::endl;
+	//std::cout << mypos.x << std::endl;
+	//std::cout << dot << std::endl;
+
+	if (dot > 0.7f)
+	{
+		std::cout << "I am taking dmg" << std::endl;
 	}
 
 }
