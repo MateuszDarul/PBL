@@ -294,43 +294,69 @@ void CollidersManager::CheckEverything()
 	recentCollisions = currentCollisions;
 }
 
-bool CollidersManager::Raycast(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance, bool shouldHitTriggers/*, layer*/ )
+bool CollidersManager::Raycast(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance, bool shouldHitTriggers, int layerMask)
 {
 	//FIXME: inefficient checks 
 
-	//TODO: Layers
-
 	bool hit = false;
+	RayHitInfo closestHit;
+	closestHit.distance = maxDistance;
 
-	std::shared_ptr<CameraComponent> playerCam = player->GetComponent<CameraComponent>();
-	Frustum frustum = SceneNode::cameraFrustum;
-	glm::vec3 playerPos = playerCam->GetPosition();
+	// std::shared_ptr<CameraComponent> playerCam = player->GetComponent<CameraComponent>();
+	// Frustum frustum = SceneNode::cameraFrustum;
+	// glm::vec3 playerPos = playerCam->GetPosition();
 
-	for (int i = 0; i<dynamicColliders.size(); i++)
+	for (unsigned int i = 0; i<dynamicColliders.size(); i++)
 	{
 		std::shared_ptr<ColliderComponent> collider = dynamicColliders[i].lock();
-		if (CheckOptimalization(collider, frustum, playerPos))
+
+		if ((collider->layer & layerMask) && collider->RayCollision(origin, dir, hitInfo, maxDistance) && (hitInfo.distance < closestHit.distance))
 		{
-			hit |= collider->RayCollision(origin, dir, hitInfo, maxDistance);
+			hit = true;
+			closestHit = hitInfo;
 		}
 	}
-	//static ...
-	
+
+	for (unsigned int i = 0; i<staticColliders.size(); i++)
+	{
+		std::shared_ptr<ColliderComponent> collider = staticColliders[i].lock();
+
+		if ((collider->layer & layerMask) && collider->RayCollision(origin, dir, hitInfo, maxDistance) && (hitInfo.distance < closestHit.distance))
+		{
+			hit = true;
+			closestHit = hitInfo;
+		}
+	}
 
 	if (shouldHitTriggers)
 	{
-		for (int i = 0; i<dynamicTriggers.size(); i++)
+		for (unsigned int i = 0; i<dynamicTriggers.size(); i++)
 		{
 			std::shared_ptr<ColliderComponent> collider = dynamicTriggers[i].lock();
-			if(CheckOptimalization(collider, frustum, playerPos))
+
+			if ((collider->layer & layerMask) && collider->RayCollision(origin, dir, hitInfo, maxDistance) && (hitInfo.distance < closestHit.distance))
 			{
-				hit |= collider->RayCollision(origin, dir, hitInfo, maxDistance);
+				hit = true;
+				closestHit = hitInfo;
+			}
+		}
+
+		for (unsigned int i = 0; i<staticTriggers.size(); i++)
+		{
+			std::shared_ptr<ColliderComponent> collider = staticTriggers[i].lock();
+
+			if ((collider->layer & layerMask) && collider->RayCollision(origin, dir, hitInfo, maxDistance) && (hitInfo.distance < closestHit.distance))
+			{
+				hit = true;
+				closestHit = hitInfo;
 			}
 		}
 	}
 
+	hitInfo = closestHit;
 	return hit;
 }
+
 void CollidersManager::SetDistanceFromPlayer(float distance)
 {
 	distanceFromPlayer = distance;

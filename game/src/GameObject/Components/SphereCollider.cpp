@@ -6,13 +6,13 @@
 #include <glm/gtx/intersect.hpp>
 
 SphereCollider::SphereCollider()
-	:ColliderComponent(11, false, false)
+	:ColliderComponent(11, false, false, CollisionLayer::Default)
 {
 	radius = 1.0f;
 }
 
-SphereCollider::SphereCollider(bool isTrigger, bool isStatic)
-	:ColliderComponent(11, isTrigger, isStatic)
+SphereCollider::SphereCollider(bool isTrigger, bool isStatic, int layer)
+	:ColliderComponent(11, isTrigger, isStatic, layer)
 {
 	radius = 1.0f;
 }
@@ -147,7 +147,7 @@ float SphereCollider::GetRadius()
 	return radius;
 }
 
-bool SphereCollider::RayCollision(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance)
+bool SphereCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, RayHitInfo& hitInfo, float maxDistance)
 {
 	hitInfo.distance = maxDistance;
 

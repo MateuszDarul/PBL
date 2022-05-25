@@ -67,6 +67,7 @@ bool ModelComponent::Draw(std::shared_ptr<ShaderComponent> shader)
         shader->SetInt("diffuseMapData", 0);
         shader->SetInt("specularMapData", 1);
         shader->SetInt("normalMapData", 2);
+        shader->SetVec4("u_TintColor", this->tintColor);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, this->material->diffuse_texture_id);
@@ -83,4 +84,19 @@ bool ModelComponent::Draw(std::shared_ptr<ShaderComponent> shader)
     glActiveTexture(GL_TEXTURE0);
 
     return true;
+}
+
+void ModelComponent::SetTintColor(const glm::vec4& color)
+{
+    this->tintColor = color;
+}
+
+void ModelComponent::SetTintColor(float r, float g, float b, float a)
+{
+    this->tintColor = {r, g, b, a};
+}
+
+const glm::vec4& ModelComponent::GetTintColor()
+{
+    return this->tintColor;
 }

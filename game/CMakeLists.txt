@@ -74,6 +74,7 @@ file(GLOB_RECURSE HEADER_FILES
 	include/DataStructures/Particle.h
 	include/DataStructures/Plane.h
 	include/DataStructures/Frustum.h
+	include/DataStructures/CollisionStructs.h
 
 	include/GameObject/GameObject.h
 	include/GameObject/Components/Components.h

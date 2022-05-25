@@ -18,6 +18,7 @@ class TextComponent :public Component
 public:
     glm::vec3 color = {1.0f, 1.0f, 1.0f}; //!< Kolor tekstu
     bool alwaysSeen = false; //!< Flaga, czy widac przez sciany
+    bool isGuiElement = false; //<! Flaga, czy uzywac projekcji prostokatnej
 
 public:
 

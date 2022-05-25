@@ -40,15 +40,20 @@ namespace rj = rapidjson;
 GLFWwindow* GameApplication::s_Window = nullptr;
 
 float GameApplication::s_Fov = DEFAULT_FOV;
+float GameApplication::s_AspectRatio = (float)DEFAULT_SCREEN_WIDTH/DEFAULT_SCREEN_HEIGHT;
 int GameApplication::s_ScreenWidth = DEFAULT_SCREEN_WIDTH;
 int GameApplication::s_ScreenHeight = DEFAULT_SCREEN_HEIGHT;
 float GameApplication::s_NearPlane = DEFAULT_NEAR_PLANE;
 float GameApplication::s_FarPlane = DEFAULT_FAR_PLANE;
 glm::mat4 GameApplication::s_ProjectionMatrix = glm::perspective(
     DEFAULT_FOV, 
-    (float)DEFAULT_SCREEN_WIDTH/DEFAULT_SCREEN_HEIGHT, 
+    s_AspectRatio,
     DEFAULT_NEAR_PLANE, 
     DEFAULT_FAR_PLANE
+);
+glm::mat4 GameApplication::s_OrthographicMatrix = glm::ortho(
+    0.0f, s_AspectRatio,
+    0.0f, 1.0f
 );
 
 Scene* GameApplication::s_Scene = nullptr;
@@ -232,7 +237,9 @@ void GameApplication::FramebufferResizeCallback(GLFWwindow* window, int width, i
     GameApplication::s_ScreenWidth = width;
     GameApplication::s_ScreenHeight = height;
 
-    s_ProjectionMatrix = glm::perspective(s_Fov, (float)width/height, s_NearPlane, s_FarPlane);
+    s_AspectRatio = (float)width/height;
+    s_ProjectionMatrix = glm::perspective(s_Fov, s_AspectRatio, s_NearPlane, s_FarPlane);
+    s_OrthographicMatrix = glm::ortho(0.0f, s_AspectRatio, 0.0f, 1.0f);
 }
 
 GLFWwindow* const GameApplication::GetWindow()
@@ -253,6 +260,11 @@ ResourceManager* const GameApplication::GetResourceManager()
 const glm::mat4& GameApplication::GetProjection()
 {
     return s_ProjectionMatrix;
+}
+
+const glm::mat4& GameApplication::GetOrthoProjection()
+{
+    return s_OrthographicMatrix;
 }
 
 glm::uvec2 GameApplication::GetWindowSize()
@@ -281,4 +293,9 @@ void GameApplication::SetFov(float fov)
 {
     s_Fov = fov;
     s_ProjectionMatrix = glm::perspective(s_Fov, (float)s_ScreenWidth/s_ScreenHeight, s_NearPlane, s_FarPlane);
+}
+
+float GameApplication::GetAspectRatio()
+{
+    return s_AspectRatio;
 }

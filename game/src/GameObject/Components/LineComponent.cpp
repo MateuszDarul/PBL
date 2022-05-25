@@ -40,6 +40,7 @@ void LineComponent::Clear()
 bool LineComponent::Draw(std::shared_ptr<ShaderComponent> shader)
 {
     shader->Use();
+    shader->SetMat4("model", glm::mat4(1.0f)); //make line always relative to (0,0,0)
     shader->SetVec3("u_Color1", color1);
     shader->SetVec3("u_Color2", color2);
 
@@ -83,12 +84,25 @@ void LineComponent::RemoveAll()
     pointsBuffer.clear();
 }
 
-glm::vec3& LineComponent::Get(int i)
+const glm::vec3& LineComponent::Get(int i)
 {
     if (i < pointsBuffer.size())
     {
         return pointsBuffer[i].pos;
     }
+}
+
+void LineComponent::Set(int i, const glm::vec3& point)
+{
+    if (i < pointsBuffer.size())
+    {
+        pointsBuffer[i].pos = point;
+    }
+}
+
+void LineComponent::Set(int i, float x, float y, float z)
+{
+    Set(i, {x, y, z});
 }
 
 int LineComponent::Count()

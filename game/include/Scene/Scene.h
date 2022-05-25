@@ -11,7 +11,7 @@
 #include "ResourceManager.h"
 #include "InputManager.h"
 #include "MapLoader.h"
-#include "Skybox.h";
+#include "Skybox.h"
 #include "CollidersManager.h"
 
 class ShadowsManager;
@@ -45,6 +45,8 @@ public:
      */
     void Render();
 
+    //void AddGameObject(GameObject* parent = nullptr);
+    void AddGameObject(std::shared_ptr<GameObject> child, std::shared_ptr<GameObject> parent = std::shared_ptr<GameObject>());
     SceneNode* GetWorldNode();
 };
 

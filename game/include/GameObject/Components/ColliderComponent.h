@@ -1,13 +1,13 @@
 #ifndef __COLLIDER_COMPONENT_H__
 #define __COLLIDER_COMPONENT_H__
 #include "Component.h"
+#include "CollisionStructs.h"
 
 #include <glm/glm.hpp>
 
 
 class CollidersManager;
-class GameObject;
-class RayHitInfo;
+
 
 /** @brief Abstrakcyjny komponent kolider�w.
  */
@@ -16,6 +16,7 @@ class ColliderComponent : public Component
 protected:
 	glm::vec3 offset; //!< Przesuni�cie kolidera wzgl�dem bazowego obiektu.
 	float mass; //!< Masa obiektu do kt�rego podczepiony jest kolider.
+
 
 	/** @brief Zwraca indeks najmniejszej warto�ci z tablicy z d�ugo�ciami wektor�w rozsuni�cia.
 	 * @param array - Tablica z 6 d�ugo�ciami potencjalnych wektor�w rozsuni�cia.
@@ -34,13 +35,15 @@ public:
 	bool isStatic; //!< Czy ten kolider ma by� statyczny.
 	bool isTrigger; //!< Czy ten kolider ma by� wyzwalaczem.
 	bool isOptimized; //!< Czy ten kolider ma by� optymalizowany pod wzgl�dem odleg�o�ci od gracza.
+	int layer; //!< Warstwa kolidera.
 
 	/** @brief Konstruktor komponent kolider�w.
 	 * @param UUID - Unikalny indentyfikator klasy komponentu.
 	 * @param isTrigger - Czy ten kolider ma by� wyzwalaczem.
 	 * @param isStatic -Czy ten kolider ma by� statyczny.
+	 * @param layer - warstwa kolidera.
 	 */
-	ColliderComponent(uint32_t UUID, bool isTrigger, bool isStatic);
+	ColliderComponent(uint32_t UUID, bool isTrigger, bool isStatic, int layer);
 	
 	/** @brief Bazowy destruktor
 	*/
@@ -68,7 +71,17 @@ public:
 	*/
 	bool virtual CheckCollision(std::shared_ptr<ColliderComponent> collider) = 0;
 
-	virtual bool RayCollision(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance) = 0;
+	/**
+	 * @brief Metoda sprawdzajaca kolizje z promieniem.
+	 * 
+	 * @param origin poczatek promienia.
+	 * @param dir kierunek promienia.
+	 * @param hitInfo dane o punkcie kolizji
+	 * @param maxDistance maksymalna oldeglosc promienia.
+	 * @return true zaszla kolizja.
+	 * @return false nie zaszla kolizja.
+	 */
+	virtual bool RayCollision(const glm::vec3& origin, const glm::vec3& dir, RayHitInfo& hitInfo, float maxDistance) = 0;
 
 	/** @brief Metoda sprawdzaj�ca czy sfera znajduje si� mi�dzy dwoma r�wnoleg�ymi �cianami pude�ka na danej osi.
 	* @param spherePos - warto�� X, Y lub z �rodka sfery.
