@@ -14,6 +14,8 @@
 #include "Skybox.h";
 #include "CollidersManager.h"
 
+class ShadowsManager;
+
 /** @brief Scena do zarzadzania SceneNode'ami
  */
 class Scene
@@ -22,6 +24,7 @@ private:
     SceneNode* world; //!< Swiat gry.
     Skybox* skybox;
     CollidersManager* collidersManager;
+    ShadowsManager* shadowsManager;
     glm::mat4 transform; //!< Macierz transformacji widoku i kamery.
 
 public:

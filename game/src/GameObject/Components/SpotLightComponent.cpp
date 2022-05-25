@@ -30,7 +30,7 @@ bool SpotLightComponent::Create()
     this->transform->SetRotation(glm::vec3(0,-1,0));
     this->lightColor = glm::vec3(1,1,1);
     this->specularColor = glm::vec3(1,1,1);
-    this->distance = 10;
+    this->damping = 10;
     this->cutOff = glm::vec2(12.5f, 45.f);
 
     SpotLightComponent::needUpdate = true;
@@ -76,9 +76,9 @@ void SpotLightComponent::SetSpecularColor(glm::vec3 specularColor)
     SpotLightComponent::needUpdate = true;
 }
 
-void SpotLightComponent::SetRange(float distance)
+void SpotLightComponent::SetDamping(float damping)
 {
-    this->distance = distance;
+    this->damping = damping;
     SpotLightComponent::needUpdate = true;
 }
 
@@ -124,9 +124,9 @@ glm::vec3 SpotLightComponent::GetSpecularColor()
     return this->specularColor;
 }
 
-float SpotLightComponent::GetRange()
+float SpotLightComponent::GetDamping()
 {
-    return this->distance;
+    return this->damping;
 }
 
 glm::vec2 SpotLightComponent::GetCutOff()
@@ -150,7 +150,7 @@ void SpotLightComponent::Use()
         shaders[i]->SetVec3("spotLight[" + textID + "].direction", this->transform->GetRotation());
         shaders[i]->SetVec3("spotLight[" + textID + "].lightColor", this->lightColor);
         shaders[i]->SetVec3("spotLight[" + textID + "].specularColor", this->specularColor);
-        shaders[i]->SetFloat("spotLight[" + textID + "].distance", this->distance * 0.004f);
+        shaders[i]->SetFloat("spotLight[" + textID + "].distance", this->damping * DAMPING_MUL);
         shaders[i]->SetFloat("spotLight[" + textID + "].cutOff", glm::cos(glm::radians(this->cutOff.x)));
         shaders[i]->SetFloat("spotLight[" + textID + "].outerCutOff", glm::cos(glm::radians(this->cutOff.y)));
     }

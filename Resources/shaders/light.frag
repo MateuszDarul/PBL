@@ -1,6 +1,6 @@
 #version 450 core
 
-///--------------------------------------------------------- STRUCTURS
+///--------------------------------------------------------- STRUCTURES
 
 struct TextureMaps
 {
@@ -38,7 +38,7 @@ struct SpotLight
 in vec2 vertexTexture;
 in vec3 fragPos;
 in vec3 normalVEC;
-in mat4 model_transformations;
+in mat4 modelTransformations;
 
 ///--------------------------------------------------------- OUT
 
@@ -58,20 +58,26 @@ uniform PointLight pointLight[10];
 uniform int spotLightAmount;
 uniform SpotLight spotLight[10];
 
+uniform bool depthMapStatus[10];
+uniform vec3 depthMapPosition[10];
+uniform samplerCube depthMap[10];
+
+
+
 ///--------------------------------------------------------- CODE
 
 vec3 GetPointLight(TextureMaps textureMaps, PointLight pointLight);
 vec3 GetSpotLight(TextureMaps textureMaps, SpotLight sLight);
+float ShadowCalculation(int id, vec3 lightPos);
 
 void main()
 {
     TextureMaps tm;
     tm.colorMAP = texture(diffuseMapData, vertexTexture).rgb;
     tm.specularMAP = texture(specularMapData, vertexTexture).rgb;
-    tm.normalMAP = normalize(mat3(transpose(inverse(model_transformations))) * normalVEC);
+    tm.normalMAP = normalize(mat3(transpose(inverse(modelTransformations))) * normalVEC);
 
     vec3 pixelColor = vec3(0,0,0);
-    pixelColor += tm.colorMAP * 0.025;
 
     if(pointLightAmount == 0 && spotLightAmount == 0)
     {
@@ -88,8 +94,24 @@ void main()
         {
             pixelColor += GetSpotLight(tm, spotLight[i]);
         }
+
+        float mul = 0;
+        for(int i=0; i<10; i++)
+        {
+            if(depthMapStatus[i] == true)
+            {
+                mul += ShadowCalculation(i, depthMapPosition[i]);
+            }
+        }
+        if(mul < 0.5)
+        {
+            pixelColor *= 0.5;
+        }
+
     }
 
+    pixelColor += tm.colorMAP * 0.07;
+    
     FragColor = vec4(pixelColor, 1.0f);
 }
 
@@ -142,4 +164,17 @@ vec3 GetSpotLight(TextureMaps textureMaps, SpotLight sLight)
     specular *= attenuation;
 
     return diffuse + specular;
+}
+
+float ShadowCalculation(int id, vec3 lightPos)
+{
+    vec3 fragToLight = fragPos - lightPos;
+
+    float closestDepth = texture(depthMap[id], fragToLight).r;
+    closestDepth *= 100;
+
+    float currentDepth = length(fragToLight);
+    float shadow = currentDepth - 0.1 > closestDepth ? 0.0 : 1.0;
+    
+    return shadow;
 }

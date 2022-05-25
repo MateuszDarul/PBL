@@ -29,6 +29,7 @@ ExportAssets(modlesDir)
 # Atrybuty obiektow (dodawac w nazwie)
     # _UN - (Use Name) - zapisuje nazwe obiektu
     # _NF - (No Frustum) - wylacza frustum culling dla obiektu
+    # _NS - (No Shade) - wylacza rzucanie cieni przez model
     # _NC - (No Collider) - wylacza kolizje dla obiektu
     # _Inst - (Instancing) - wczytuje jako modeling instancionowany
     
@@ -134,7 +135,7 @@ while i < all_elements:
         f.write((str(round(bpy.data.objects[i].color[0], 3)) + "\n"))
         f.write((str(round(bpy.data.objects[i].color[1], 3)) + "\n"))
         f.write((str(round(bpy.data.objects[i].color[2], 3)) + "\n"))
-        f.write(("Range:\n"))
+        f.write(("Damping:\n"))
         f.write((str(10) + "\n"))
         if "SpotLight" in bpy.data.objects[i].name:
             f.write(("CutOff:\n"))
@@ -188,6 +189,11 @@ while i < all_elements:
     if "_Inst" not in bpy.data.objects[i].name and "_NC" not in bpy.data.objects[i].name:
         f.write(("Collider:\n"))
         f.write((GetCollider(bpy.data.objects[i].name, rotation) + "\n"))
+    f.write(("Shade:\n"))
+    if "_NS" in bpy.data.objects[i].name:
+        f.write(("0" + "\n"))
+    else:
+        f.write(("1" + "\n"))
     f.write(("END\n"))
     i += j
 

@@ -103,6 +103,7 @@ template std::shared_ptr<SpotLightComponent> GameObject::GetComponent<SpotLightC
 template std::shared_ptr<FrustumCullingComponent> GameObject::GetComponent<FrustumCullingComponent>();
 template std::shared_ptr<ParticleComponent> GameObject::GetComponent<ParticleComponent>();
 template std::shared_ptr<RefractiveGlassComponent> GameObject::GetComponent<RefractiveGlassComponent>();
+template std::shared_ptr<ShadowComponent> GameObject::GetComponent<ShadowComponent>();
 
 template bool GameObject::RemoveComponent<NameComponent>();
 template bool GameObject::RemoveComponent<ListComponent>();
@@ -122,4 +123,4 @@ template bool GameObject::RemoveComponent<SpotLightComponent>();
 template bool GameObject::RemoveComponent<FrustumCullingComponent>();
 template bool GameObject::RemoveComponent<ParticleComponent>();
 template bool GameObject::RemoveComponent<RefractiveGlassComponent>();
-
+template bool GameObject::RemoveComponent<ShadowComponent>();

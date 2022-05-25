@@ -19,7 +19,7 @@ protected:
     std::shared_ptr<TransformComponent> transform;
     glm::vec3 lightColor;
     glm::vec3 specularColor;
-    float distance;
+    float damping;
 
 public:
     LightComponent(uint32_t component_type_uuid);
@@ -30,6 +30,7 @@ public:
     virtual void Use() = 0;
 
     bool AddShader(std::shared_ptr<ShaderComponent> shader);
+    std::vector<std::shared_ptr<ShaderComponent>> GetShaders();
 };
 
 #endif // __LIGHT_COMPONENT_H__

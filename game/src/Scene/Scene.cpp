@@ -1,18 +1,22 @@
 #include "Scene.h"
 
+#include "ShadowsManager.h"
+
 #include "Scripts/TestScript.h"
 #include "Scripts/StatsScript.h"
 #include "Scripts/RaycastTest.h"
+
 
 Scene::Scene()
 {
     glfwSetInputMode(GameApplication::GetWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     ResourceManager* resMan = GameApplication::GetResourceManager();
 
+    ///***
+
+    std::shared_ptr<GameObject> go;
     std::shared_ptr<cmp::Model> mc;
     std::shared_ptr<cmp::ModelInst> mic;
-    std::shared_ptr<GameObject> go;
-    std::shared_ptr<cmp::Transform> tc;
 
     ///***
 
@@ -32,10 +36,8 @@ Scene::Scene()
     /// ***
 
     std::shared_ptr<ShaderComponent> shader_d = std::make_shared<ShaderComponent>();
-    shader_d->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
-    std::shared_ptr<ShaderComponent> shader_i = std::make_shared<ShaderComponent>();
-    shader_i->Create("Resources/shaders/inst.vert", "Resources/shaders/inst.frag");
     std::shared_ptr<ShaderComponent> shader_l = std::make_shared<ShaderComponent>();
+    shader_d->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
     shader_l->Create("Resources/shaders/light.vert", "Resources/shaders/light.frag");
     std::shared_ptr<ShaderComponent> shader_r = std::make_shared<ShaderComponent>();
     shader_r->Create("Resources/shaders/refraction.vert", "Resources/shaders/refraction.frag");
@@ -45,6 +47,10 @@ Scene::Scene()
     world = new SceneNode(std::make_shared<GameObject>());
     world->GetGameObject()->AddComponent(std::make_shared<cmp::Name>("ROOT"));
     world->GetGameObject()->AddComponent(std::make_shared<cmp::Transform>());
+    
+    ///***
+
+    shadowsManager = new ShadowsManager(world, shader_l);
 
     ///***
 
@@ -110,10 +116,7 @@ Scene::Scene()
     world->AddChild(go);
     ///***
 
-    std::shared_ptr<cmp::Shader> shader[2];
-    shader[0] = shader_l;
-    shader[1] = shader_i;
-    MapLoader::Load("Resources/maps/world.map", world, shader, collidersManager);
+    MapLoader::Load("Resources/maps/world.map", world, shader_l, collidersManager, shadowsManager);
 
     ///***
    
@@ -125,10 +128,12 @@ Scene::~Scene()
     delete world;
     world = nullptr;
 
+    delete shadowsManager;
+    shadowsManager = nullptr;
+
     delete collidersManager;
     collidersManager = nullptr;
 }
-
 
 void Scene::Update(float dt)
 {
@@ -147,10 +152,13 @@ void Scene::Update(float dt)
     }
     goCamera->GetComponent<CameraComponent>()->SetPosition(transformCamera->GetPosition());
     world->Update(dt);
+
+    shadowsManager->Update();
 }
 
 void Scene::Render()
 {
+    glViewport(0, 0, GameApplication::GetWindowSize().x, GameApplication::GetWindowSize().y);
     std::shared_ptr<GameObject> goCamera = world->FindNode("CAMERA")->GetGameObject();
     glm::mat4 skyboxTransform = GameApplication::GetProjection() * glm::mat4(glm::mat3(goCamera->GetComponent<CameraComponent>()->GetView()));
     skybox->Render(skyboxTransform);

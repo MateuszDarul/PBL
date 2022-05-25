@@ -84,6 +84,35 @@ void SceneNode::PrivateUpdate(float dt, const glm::mat4& parentTransformations)
     
 }
 
+void SceneNode::RenderDepthMap(std::shared_ptr<ShaderComponent> shader)
+{
+    std::shared_ptr<cmp::Shade> shadePtr = this->gameObject->GetComponent<cmp::Shade>();
+    if(shadePtr != nullptr && shadePtr->ShadowTest())
+    {
+        shader->Use();
+        shader->SetMat4("model", this->globalTransformations);
+
+        std::shared_ptr<cmp::Model> modelPtr = this->gameObject->GetComponent<cmp::Model>();
+        std::shared_ptr<cmp::ModelInst> modelInstPtr = this->gameObject->GetComponent<cmp::ModelInst>();
+
+        if(modelPtr != nullptr)
+        {
+            shader->SetBool("inst", false);
+            modelPtr->Draw(shader);
+        }
+        else if(modelInstPtr != nullptr)
+        {
+            shader->SetBool("inst", true);
+            modelInstPtr->Draw(shader);
+        }
+    }
+
+    for(unsigned short int i=0; i<this->children.size(); i++)
+    {
+        this->children[i]->RenderDepthMap(shader);
+    }
+}
+
 void SceneNode::Render(const glm::mat4& matrixPV)
 {
     std::shared_ptr<cmp::Shader> shaderPtr = this->gameObject->GetComponent<cmp::Shader>();

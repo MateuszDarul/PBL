@@ -20,7 +20,7 @@ public:
     ShaderComponent();
     ~ShaderComponent();
 
-    bool Create(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
+    bool Create(const std::string& vertexShaderPath, const std::string& fragmentShaderPath, const std::string& geometryPath = "");
 
     void Use();
 
