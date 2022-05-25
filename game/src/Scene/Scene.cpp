@@ -87,6 +87,8 @@ Scene::Scene()
         go->AddComponent(std::make_shared<cmp::FrustumCulling>());
         go->GetComponent<cmp::FrustumCulling>()->Create(
             resMan->GetMesh("Resources/models/wieze/w1/w1.obj"));
+        go->AddComponent(std::make_shared<cmp::Shade>());
+        go->GetComponent<cmp::Shade>()->Create(1);
         go->AddComponent(std::make_shared<cmp::Particles>());
         std::shared_ptr<cmp::Particles> particles = go->GetComponent<cmp::Particles>();
         particles->Create(world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>(), true, 200);
