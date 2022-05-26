@@ -202,6 +202,32 @@ Scene::Scene()
 
     MapLoader::Load("Resources/maps/world.map", world, shader_l, collidersManager, shadowsManager);
 
+
+    //===displacement
+    auto displShader = std::make_shared<ShaderComponent>();
+    displShader->Create("Resources/shaders/displ.vert", "Resources/shaders/displ.frag");
+    {      
+        go = std::make_shared<GameObject>();
+        auto tc = std::make_shared<TransformComponent>();
+        tc->SetPosition(-5.0f, 6.5f, -5.0f);
+        
+        go->AddComponent(tc);
+        mc = std::make_shared<ModelComponent>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/displacement test/capsule.obj"),
+            resMan->GetMaterial("Resources/models/displacement test/capsule.mtl")
+        );
+        go->AddComponent(displShader);
+        go->AddComponent(mc);
+        go->AddComponent(std::make_shared<cmp::Name>("Displaced capsule"));
+        go->AddComponent(std::make_shared<FrustumCullingComponent>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(
+                resMan->GetMesh("Resources/models/displacement test/capsule.obj")
+            );
+
+        world->AddChild(go);
+    }
+
     
     // //=== ray test ===
 
