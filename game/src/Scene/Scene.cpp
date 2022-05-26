@@ -269,7 +269,7 @@ Scene::Scene()
 for (int i = 0; i < 3; i++)
     {
         go = std::make_shared<GameObject>();
-        go->AddComponent(std::make_shared<cmp::Name>("Resource " + std::to_string(i)));
+        go->AddComponent(std::make_shared<cmp::Name>("Blueprint " + std::to_string(i)));
         
         go->AddComponent(std::make_shared<cmp::Transform>());
         go->GetComponent<cmp::Transform>()->SetPosition(14.5, 1.5, i * 2 - 8);
