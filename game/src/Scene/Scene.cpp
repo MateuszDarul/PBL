@@ -106,6 +106,7 @@ Scene::Scene()
     playerPlace->colMan = collidersManager;
     playerPlace->resMan = resMan;
     playerPlace->turretShader = shader_l;
+    playerPlace->lineShader = lineShader;
 
     //to fix rendering order
     auto turretsHolderGO = std::make_shared<GameObject>();
