@@ -30,6 +30,12 @@ public:
     void Start()
     {
         currentFlashlightCharge = maxFlashlightCharge;
+
+        for (int i = 0; i < 3; i++)
+        {
+            // 'disabling' icons
+            iconsGO[i]->GetComponent<cmp::Transform>()->Move(0.0f, 0.0f, -0.2f);
+        }
     }
 
     void Update(float dt)
@@ -65,5 +71,10 @@ public:
                 }
             }
         }
+    }
+
+    void Unlock(int index)
+    {
+        iconsGO[index]->GetComponent<cmp::Transform>()->Move(0.0f, 0.0f, 0.2f);
     }
 };

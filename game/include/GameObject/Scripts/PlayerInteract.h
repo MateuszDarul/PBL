@@ -4,6 +4,7 @@
 #include "Components.h"
 
 #include "Resource.h"
+#include "Blueprint.h"
 
 
 class PlayerInteract : public Script
@@ -12,7 +13,7 @@ public:
 
     //adjust these
 
-    float interactRange = 3.5f;
+    float interactRange = 4.0f;
 
     int ignoreLayerMask = ~(CollisionLayer::Player | CollisionLayer::GUI);
 
@@ -53,6 +54,15 @@ public:
                     {
                         printf("Picked resource\n");
                         resource->PickUp();
+                    }
+                }
+                else if (auto blueprint = scriptable->Get<Blueprint>())
+                {
+                    textTEMP->color = { 0.0f, 1.0f, 0.0f };
+                    if (shouldInteract)
+                    {
+                        printf("Picked blueprint\n");
+                        blueprint->PickUp();
                     }
                 }
             }

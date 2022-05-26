@@ -26,7 +26,7 @@ public:
 	void Update(float dt)
 	{
 		if (energyText)
-			energyText->SetText("Energy: " + std::to_string(energy));
+			energyText->SetText("Resources: " + std::to_string(energy));
 	}
 
 	void IncreaseEnergy(int energy)

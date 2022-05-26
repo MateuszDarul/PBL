@@ -22,6 +22,9 @@ public:
     int ignoreLayerMask = ~(CollisionLayer::Player);
 
 
+    bool unlocked[3] = { false, false, false };
+
+
     //set these in 'inspector'
 
     GameManager* gameManager;
@@ -72,19 +75,19 @@ public:
         // dziesiec if'ow ale ¯\_(ツ)_/¯
         if (!isPlacing)
         {
-            if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr1))
+            if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr1) && unlocked[0])
             {
                 isPlacing = true;
                 turretType = 0;
                 needUpdate = true;
             }
-            else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr2))
+            else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr2) && unlocked[1])
             {
                 isPlacing = true;
                 turretType = 1;
                 needUpdate = true;
             }
-            else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr3))
+            else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr3)  && unlocked[2])
             {
                 isPlacing = true;
                 turretType = 2;
@@ -93,7 +96,7 @@ public:
         }
         else
         {
-            if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr1))
+            if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr1)  && unlocked[0])
             {
                 if (turretType == 0) 
                 {
@@ -106,7 +109,7 @@ public:
                 }
                 needUpdate = true;
             }
-            else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr2))
+            else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr2) && unlocked[1])
             {
                 if (turretType == 1) 
                 {
@@ -119,7 +122,7 @@ public:
                 }
                 needUpdate = true;
             }
-            else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr3))
+            else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr3) && unlocked[2])
             {
                 if (turretType == 2) 
                 {
