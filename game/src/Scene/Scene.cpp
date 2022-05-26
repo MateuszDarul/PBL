@@ -106,7 +106,13 @@ Scene::Scene()
     playerPlace->colMan = collidersManager;
     playerPlace->resMan = resMan;
     playerPlace->turretShader = shader_l;
-    playerPlace->scene = this;
+
+    //to fix rendering order
+    auto turretsHolderGO = std::make_shared<GameObject>();
+    turretsHolderGO->AddComponent(std::make_shared<cmp::Transform>());
+    auto turretsHolderNode = world->AddChild(turretsHolderGO);
+
+    playerPlace->turretsHolder = turretsHolderNode.get();
     
     go->GetComponent<ScriptComponent>()->Add(playerPlace);
 
