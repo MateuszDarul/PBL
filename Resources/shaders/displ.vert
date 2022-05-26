@@ -34,21 +34,23 @@ void main()
     /* ===== TEXTURES
 
     diffuse:
-     rgba - color
+     rgba - main color
+
+    bump (normal):
+     rgba - fresnel color
 
     specular:
-     r - highlight
+     r - 'electricity' highlight on/off
      g - vertex displacement noise (main shape)
-     b - vertex displacement offset (for the shell around)
+     b - unused ? (gives almost unnoticeably small effect)
      a - highlight noise
 
     ==================*/
 
     vec4 pnoise = texture(specularMapData, rotMat(u_Time) * Normal.xy + vPos.y * vPos.z);
-    // vec4 pnoise = texture(specularMapData, rotMat(u_Time) * vPos.xy);
     Noise = pnoise.g;
 
-    vec3 d = Normal * (pnoise.g * 2.0 - 1.0) * 0.2 + Normal * pnoise.b * 0.05;
+    vec3 d = Normal * (pnoise.g * 2.0 - 1.0) * 0.2 ;//+ Normal * pnoise.b * 0.05;
     vec3 newPos = vPos + d;
     VertexPos = newPos;
 
