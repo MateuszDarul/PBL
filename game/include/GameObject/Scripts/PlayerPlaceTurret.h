@@ -156,11 +156,7 @@ public:
             {
                 if (auto scriptHolder = turretPrefabs[selectedTurretType]->GetComponent<cmp::Scriptable>())
                 {
-                    scriptHolder->OnStart();
-                    if (auto s = scriptHolder->Get<TurretLaser>())
-                    {
-                        s->isActive = true;
-                    }
+                    scriptHolder->EnableAll();
                 }
                 CreateTurret(selectedTurretType);
                 gameManager->DescreaseEnergy(turretCosts[selectedTurretType]);
@@ -281,14 +277,14 @@ public:
         TurretType type = TurretType::Laser;
         turretPrefabs[type] = std::make_shared<GameObject>();
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::Transform>());
-        
+
 
         auto scriptHolder = std::make_shared<cmp::Scriptable>();
         turretPrefabs[type]->AddComponent(scriptHolder);
 
         auto turretScript = new TurretLaser();
         turretScript->colMan = colMan;
-        turretScript->isActive = false;
+        turretScript->SetEnabled(false);
         
         auto line = std::make_shared<cmp::Line>();
         line->Create();

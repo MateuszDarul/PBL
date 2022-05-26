@@ -28,8 +28,6 @@ public:
     cmp::Line* line;
     CollidersManager* colMan;
 
-    bool isActive = false;
-
  
 private:
 
@@ -48,7 +46,6 @@ public:
 
     void Update(float dt)
     {	
-        if(!isActive) return;
         if (line)
         {
             origin = transform->GetPosition() + originOffset;
