@@ -345,6 +345,7 @@ for (int i = 0; i < 3; i++)
         crosshairTextTEMP->alwaysSeen = true;
         crosshairTextTEMP->isGuiElement = true;
         crosshairTextTEMP->color = {1.0f, 0.0f, 0.0f};
+        crosshairTextTEMP->isCentered = true;
 
         auto textShader = std::make_shared<ShaderComponent>();
         textShader->Create("Resources/shaders/text.vert", "Resources/shaders/text.frag");
