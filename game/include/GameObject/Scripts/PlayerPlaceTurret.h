@@ -214,8 +214,6 @@ public:
         default:
             break;
         }
-
-        turretsHolder->AddChild(turretPrefabs[type]);
     }
 
     void CreateLanternTurret()
@@ -223,10 +221,12 @@ public:
         TurretType type = TurretType::Lantern;
         turretPrefabs[type] = std::make_shared<GameObject>();
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::Transform>());
+        turretPrefabs[type]->AddComponent(std::make_shared<cmp::Name>(";antern"));
 
 
         auto gfxGO = std::make_shared<GameObject>();
         gfxGO->AddComponent(std::make_shared<cmp::Transform>());
+        gfxGO->AddComponent(std::make_shared<cmp::Name>("gfx"));
 
         auto mc = std::make_shared<cmp::Model>();
         mc->Create(
@@ -240,7 +240,6 @@ public:
             resMan->GetMesh("Resources/models/wieze/w2/w2.obj")
         );
         gfxGO->AddComponent(turretShader);
-
 
         turretsHolder->AddChild(turretPrefabs[type])->AddChild(gfxGO);
     }
@@ -288,6 +287,9 @@ public:
         
         auto line = std::make_shared<cmp::Line>();
         line->Create();
+        line->thickness = 2.0f;
+        line->color1 = { 1.0f, 1.0f, 0.0f };
+        line->color2 = { 1.0f, 0.1f, 0.0f };
 
         turretPrefabs[type]->AddComponent(line);
         turretPrefabs[type]->AddComponent(lineShader);
