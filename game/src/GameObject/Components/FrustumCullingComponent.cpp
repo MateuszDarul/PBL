@@ -1,6 +1,7 @@
 #include "FrustumCullingComponent.h"
 
 #include "GameObject.h"
+#include "SceneNode.h"
 
 FrustumCullingComponent::FrustumCullingComponent()
     :Component(10)
@@ -55,7 +56,9 @@ bool FrustumCullingComponent::IsVisible(Frustum frustum)
         this->transformComponentPtr = std::make_shared<cmp::Transform>();
 
     scaledRadius *= this->transformComponentPtr->GetScale();
-    position = this->transformComponentPtr->GetPosition();
+    // position = this->transformComponentPtr->GetPosition();
+    auto& m = this->GetOwner()->GetNode()->GetGlobalTransformations();
+    position = { m[3][0], m[3][1], m[3][2] };
 
     if(frustum.topFace.Distance(position) > -scaledRadius && 
         frustum.bottomFace.Distance(position) > -scaledRadius && 
