@@ -30,11 +30,8 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/SpotLightComponent.cpp
 	src/GameObject/Components/FrustumCullingComponent.cpp
 	src/GameObject/Components/ParticleComponent.cpp
-<<<<<<< HEAD
 	src/GameObject/Components/RefractiveGlassComponent.cpp
-=======
 	src/GameObject/Components/ShadowComponent.cpp
->>>>>>> fe4d3ec476df765d1e0421e4b81d666bb23043c0
 
 	src/Resource/Font.cpp
 	src/Resource/Mesh.cpp
@@ -97,13 +94,9 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/Components/PointLightComponent.h
 	include/GameObject/Components/SpotLightComponent.h
 	include/GameObject/Components/FrustumCullingComponent.h
-<<<<<<< HEAD
 	include/GameObject/Components/ParticleComponent.cpp
 	include/GameObject/Components/RefractiveGlassComponent.cpp
-=======
-	include/GameObject/Components/ParticleComponent.h
 	include/GameObject/Components/ShadowComponent.h
->>>>>>> fe4d3ec476df765d1e0421e4b81d666bb23043c0
 
 	include/Resource/Font.h
 	include/Resource/Mesh.h
