@@ -5,6 +5,7 @@
 
 #include "Resource.h"
 #include "Blueprint.h"
+#include "MirrorRotate.h"
 
 
 class PlayerInteract : public Script
@@ -42,6 +43,7 @@ public:
         }
 
         textTEMP->color = { 1.0f, 0.0f, 0.0f };
+        textTEMP->SetText("+");
         RayHitInfo hit;
         if (colMan->Raycast(camera->GetPosition(), camera->GetForward(), hit, interactRange, true, ignoreLayerMask))
         {
@@ -63,6 +65,15 @@ public:
                     {
                         printf("Picked blueprint\n");
                         blueprint->PickUp();
+                    }
+                }
+                else if (auto mirror = scriptable->Get<MirrorRotate>())
+                {
+                    textTEMP->color = { 0.0f, 1.0f, 0.0f };
+                    textTEMP->SetText("<>");
+                    if (shouldInteract)
+                    {
+                        
                     }
                 }
             }

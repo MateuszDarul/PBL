@@ -16,7 +16,7 @@ public:
 
     int ignoreLayerMask = ~(CollisionLayer::Player);
     int maxBounces = 15;
-    float maxDistance = 50.0f;
+    float maxDistance = 150.0f;
 
     const char* mirrorTag = "Mirror";
 

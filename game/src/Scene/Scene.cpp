@@ -266,7 +266,7 @@ Scene::Scene()
     }
 
     //blueprints
-for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         go = std::make_shared<GameObject>();
         go->AddComponent(std::make_shared<cmp::Name>("Blueprint " + std::to_string(i)));
@@ -299,6 +299,40 @@ for (int i = 0; i < 3; i++)
         go->GetComponent<cmp::Scriptable>()->Add(resourceScript);
 
     
+        world->AddChild(go);
+    }
+
+    //mirrors
+    {
+        go = std::make_shared<GameObject>();
+        go->AddComponent(std::make_shared<cmp::Name>("Mirror"));
+
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(2.5, 2.5, -28.3);
+        //go->GetComponent<cmp::Transform>()->SetRotation(0.0, 45.0, 0.0);
+        go->GetComponent<cmp::Transform>()->SetScale(1.0);
+
+        go->AddComponent(std::make_shared<BoxCollider>(false, false));
+        go->GetComponent<cmp::BoxCol>()->setLengths({2.0, 2.0, 2.0});
+        go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
+
+        auto model = std::make_shared<cmp::Model>();
+        model->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+            resMan->GetMaterial("Resources/models/floor/floor.mtl")
+        );
+        go->AddComponent(model);
+        go->AddComponent(shader_d);
+
+        go->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+
+
+        auto mirrorScript = new MirrorRotate();
+        
+        go->AddComponent(std::make_shared<cmp::Scriptable>());
+        go->GetComponent<cmp::Scriptable>()->Add(mirrorScript);
+
         world->AddChild(go);
     }
 
@@ -409,7 +443,7 @@ void Scene::Update(float dt)
 
     //crosshair
     world->FindNode("CROSSHAIR")->GetGameObject()->GetComponent<cmp::Transform>()->SetPosition(GameApplication::GetAspectRatio() * 0.5f, 0.5f, 0.1f);
-
+world->FindNode("Mirror")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0, 12 * dt, 0.0);
 
 
 
