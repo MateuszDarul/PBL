@@ -309,11 +309,11 @@ Scene::Scene()
 
         go->AddComponent(std::make_shared<cmp::Transform>());
         go->GetComponent<cmp::Transform>()->SetPosition(2.5, 2.5, -28.3);
-        //go->GetComponent<cmp::Transform>()->SetRotation(0.0, 45.0, 0.0);
         go->GetComponent<cmp::Transform>()->SetScale(1.0);
 
         go->AddComponent(std::make_shared<BoxCollider>(false, false));
         go->GetComponent<cmp::BoxCol>()->setLengths({2.0, 2.0, 2.0});
+        go->GetComponent<cmp::BoxCol>()->SetMass(999999999.9f);
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
         auto model = std::make_shared<cmp::Model>();
@@ -416,6 +416,10 @@ Scene::~Scene()
 
 void Scene::Update(float dt)
 {
+    world->FindNode("CROSSHAIR")->GetGameObject()->GetComponent<cmp::Transform>()->SetPosition(GameApplication::GetAspectRatio() * 0.5f, 0.5f, 0.1f);
+
+
+    //Update camera
     std::shared_ptr<GameObject> goCamera = world->FindNode("CAMERA")->GetGameObject();
     std::shared_ptr<TransformComponent> transformCamera = goCamera->GetComponent<cmp::Transform>();
 
@@ -423,15 +427,19 @@ void Scene::Update(float dt)
     transformCamera->SetPosition(goCamera->GetComponent<CameraComponent>()->GetPosition());
 
 
+    //Detect collision
+    collidersManager->CheckEverything();
+
+
+    //Prevent camera jiggle and set correct position
+    goCamera->GetComponent<CameraComponent>()->SetPosition(transformCamera->GetPosition());
+    transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();
+
+    
     //Position multitool
 
     auto mtTransform = world->FindNode("MultiTool")->GetGameObject()->GetComponent<cmp::Transform>();
     auto m = glm::inverse(goCamera->GetComponent<cmp::Camera>()->GetView());
-    
-    // printf("Inverse view pos: %f %f %f\n", m[3][0], m[3][1], m[3][2]);
-    // printf("Inverse view right: %f %f %f\n", m[0][0], m[1][0], m[2][0]);
-    // printf("Inverse view up: %f %f %f\n", m[0][1], m[1][1], m[2][1]);
-    // printf("Inverse view forward: %f %f %f\n", m[0][2], m[1][2], m[2][2]);
 
     glm::vec4 mtNewPosition = m * glm::vec4(mtTransform->GetPosition(), 1.0f);
 
@@ -441,16 +449,8 @@ void Scene::Update(float dt)
     mtTransform->SetModelMatrix(m);
 
 
-    //crosshair
-    world->FindNode("CROSSHAIR")->GetGameObject()->GetComponent<cmp::Transform>()->SetPosition(GameApplication::GetAspectRatio() * 0.5f, 0.5f, 0.1f);
-world->FindNode("Mirror")->GetGameObject()->GetComponent<cmp::Transform>()->Rotate(0.0, 12 * dt, 0.0);
+    //Update scene
 
-
-
-    transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();
-
-    collidersManager->CheckEverything();
-    goCamera->GetComponent<CameraComponent>()->SetPosition(transformCamera->GetPosition());
     world->Update(dt);
 
     shadowsManager->Update();

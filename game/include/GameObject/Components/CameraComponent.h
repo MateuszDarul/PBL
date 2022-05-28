@@ -50,6 +50,12 @@ public:
 private:
     glm::vec3 position; //!< Aktualna pozycja kamery.
 
+    float verticalVelocity;
+    float gravity;
+    float jumpVelocity;
+    float jumpHeight;
+    float jumpTimeToPeak;
+
     glm::mat4 view; //!< Macierz widoku kamery.
 
     bool needUpdate; //!< Wartosc informujaca kiedy nalezy obliczyc nowa macierz widoku.
@@ -71,6 +77,8 @@ private:
     /** @brief Aktualizuje wektory kierunkowe (gora, prawo, przod).
      */
     void UpdateVectors();
+
+    void CalculateJumpParams();
 
 public:
     /** @brief Konstruktor ustawiajacy parametry poczatkowe kamery.
@@ -123,6 +131,17 @@ public:
      * @param speedPerSec - Nowa predkosc na sekunde.
      */
     void SetSpeed(const float& speedPerSec);
+
+    
+    float GetGravity();
+    float GetJumpVelocity();
+    
+    float GetJumpHeight();
+    void  SetJumpHeight(float newHeight);
+    
+    float GetJumpTimeToPeak();
+    void  SetJumpTimeToPeak(float newTime);
+
 
     /** @brief Pozwala na przemieszczanie kamery w wybranym kierunku.
      * @param direction - Kierunek w krorym kamera zostanie przesunieta.
