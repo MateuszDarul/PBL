@@ -38,6 +38,7 @@ bool CameraComponent::Create(const glm::vec3& position)
     this->pitch = 0;
 
     CalculateJumpParams();
+    isEnabledMovement = true;
     
     this->position = position;
 
@@ -97,27 +98,31 @@ void CameraComponent::Update(InputManager* inputManager, const float& deltaTime)
 
 
     this->ProcessMouseMovement(inputManager->Mouse()->GetPosition());
-    float velocity = this->speedPerSec * deltaTime;
 
-    if(inputManager->Keyboard()->IsPressed(KeyboardKey::W))
-    {
-        this->position += glm::normalize(glm::vec3(this->front.x, 0, this->front.z)) * velocity;
-        this->needUpdate = true;
-    }
-    if(inputManager->Keyboard()->IsPressed(KeyboardKey::S))
-    {
-        this->position -= glm::normalize(glm::vec3(this->front.x, 0, this->front.z)) * velocity;
-        this->needUpdate = true;
-    }
-    if(inputManager->Keyboard()->IsPressed(KeyboardKey::A))
-    {
-        this->position -= glm::normalize(glm::vec3(this->right.x, 0, this->right.z)) * velocity;
-        this->needUpdate = true;
-    }
-    if(inputManager->Keyboard()->IsPressed(KeyboardKey::D))
-    {
-        this->position += glm::normalize(glm::vec3(this->right.x, 0, this->right.z)) * velocity;
-        this->needUpdate = true;
+    if (isEnabledMovement)
+    {        
+        float velocity = this->speedPerSec * deltaTime;
+
+        if(inputManager->Keyboard()->IsPressed(KeyboardKey::W))
+        {
+            this->position += glm::normalize(glm::vec3(this->front.x, 0, this->front.z)) * velocity;
+            this->needUpdate = true;
+        }
+        if(inputManager->Keyboard()->IsPressed(KeyboardKey::S))
+        {
+            this->position -= glm::normalize(glm::vec3(this->front.x, 0, this->front.z)) * velocity;
+            this->needUpdate = true;
+        }
+        if(inputManager->Keyboard()->IsPressed(KeyboardKey::A))
+        {
+            this->position -= glm::normalize(glm::vec3(this->right.x, 0, this->right.z)) * velocity;
+            this->needUpdate = true;
+        }
+        if(inputManager->Keyboard()->IsPressed(KeyboardKey::D))
+        {
+            this->position += glm::normalize(glm::vec3(this->right.x, 0, this->right.z)) * velocity;
+            this->needUpdate = true;
+        }
     }
 
 
@@ -133,7 +138,7 @@ void CameraComponent::Update(InputManager* inputManager, const float& deltaTime)
         // printf("is grounded\n");
         verticalVelocity = gravity * deltaTime;
     
-        if(inputManager->Keyboard()->IsPressed(KeyboardKey::Space))
+        if(inputManager->Keyboard()->IsPressed(KeyboardKey::Space) && isEnabledMovement)
         {
             verticalVelocity = jumpVelocity;
             JUMP_TIMER = 2 * jumpTimeToPeak;     
@@ -259,4 +264,14 @@ void  CameraComponent::SetJumpTimeToPeak(float newTime)
 {
     jumpTimeToPeak = std::max(0.1f, newTime);
     CalculateJumpParams();
+}
+
+bool CameraComponent::GetMovementEnabled()
+{
+    return isEnabledMovement;
+}
+
+void CameraComponent::SetMovementEnable(bool enabled)
+{
+    isEnabledMovement = enabled;
 }

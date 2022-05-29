@@ -10,6 +10,7 @@
 #include "Scripts/Resource.h"
 #include "Scripts/Blueprint.h"
 #include "Scripts/PlayerInteract.h"
+// #include "Scripts/PlayerGroundCheck.h"
 
 Scene::Scene()
 {
@@ -85,6 +86,40 @@ Scene::Scene()
     world->AddChild(go);
 
     auto playerGO = go;
+
+    //ground check
+    /*{
+        auto groundCheckGO = std::make_shared<GameObject>();
+        groundCheckGO->AddComponent(std::make_shared<cmp::Transform>());
+        // groundCheckGO->GetComponent<cmp::Transform>()->SetPosition(2.5, 5.5, -28.3);
+        groundCheckGO->GetComponent<cmp::Transform>()->SetPosition(13.5, 5.5, -8);
+
+        // groundCheckGO->AddComponent(std::make_shared<SphereCollider>(true, false));
+        // groundCheckGO->GetComponent<cmp::SphereCol>()->SetRadius(1.0f);
+        // groundCheckGO->GetComponent<cmp::SphereCol>()->AddToCollidersManager(collidersManager);
+        groundCheckGO->AddComponent(std::make_shared<BoxCollider>(false, false));
+        groundCheckGO->GetComponent<cmp::BoxCol>()->setLengths({2,2,2});
+        groundCheckGO->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
+
+        groundCheckGO->AddComponent(std::make_shared<cmp::Scriptable>());
+
+        auto groundCheckScript = new PlayerGroundCheck();
+        groundCheckGO->GetComponent<cmp::Scriptable>()->Add(groundCheckScript);
+        groundCheckScript->player = playerGO->GetComponent<cmp::Camera>();
+
+        // world->FindNode("CAMERA")->AddChild(groundCheckGO);
+
+        groundCheckGO->AddComponent(std::make_shared<cmp::Name>("GroundCheck"));
+        auto model = std::make_shared<cmp::Model>();
+        model->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+            resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+        );
+        groundCheckGO->AddComponent(model);
+        groundCheckGO->AddComponent(shader_d);
+
+        world->AddChild(groundCheckGO);
+    }*/
 
     //skrypty gracza
     go->AddComponent(std::make_shared<cmp::Scriptable>());
@@ -328,9 +363,44 @@ Scene::Scene()
         go->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
 
 
-        auto mirrorScript = new MirrorRotate();
-        
         go->AddComponent(std::make_shared<cmp::Scriptable>());
+
+        auto mirrorScript = new MirrorRotate();
+        mirrorScript->SetEnabled(false);
+        go->GetComponent<cmp::Scriptable>()->Add(mirrorScript);
+
+        world->AddChild(go);
+    }
+
+    {
+        go = std::make_shared<GameObject>();
+        go->AddComponent(std::make_shared<cmp::Name>("Mirror"));
+
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(7.5, 2.5, -20.3);
+        go->GetComponent<cmp::Transform>()->SetScale(1.0);
+
+        go->AddComponent(std::make_shared<BoxCollider>(false, false));
+        go->GetComponent<cmp::BoxCol>()->setLengths({2.0, 2.0, 2.0});
+        go->GetComponent<cmp::BoxCol>()->SetMass(999999999.9f);
+        go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
+
+        auto model = std::make_shared<cmp::Model>();
+        model->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+            resMan->GetMaterial("Resources/models/floor/floor.mtl")
+        );
+        go->AddComponent(model);
+        go->AddComponent(shader_d);
+
+        go->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+
+
+        go->AddComponent(std::make_shared<cmp::Scriptable>());
+
+        auto mirrorScript = new MirrorRotate();
+        mirrorScript->SetEnabled(false);
         go->GetComponent<cmp::Scriptable>()->Add(mirrorScript);
 
         world->AddChild(go);
@@ -417,7 +487,7 @@ Scene::~Scene()
 void Scene::Update(float dt)
 {
     world->FindNode("CROSSHAIR")->GetGameObject()->GetComponent<cmp::Transform>()->SetPosition(GameApplication::GetAspectRatio() * 0.5f, 0.5f, 0.1f);
-
+    // world->FindNode("GroundCheck")->GetGameObject()->GetComponent<cmp::Transform>()->Move(0, -dt, 0);
 
     //Update camera
     std::shared_ptr<GameObject> goCamera = world->FindNode("CAMERA")->GetGameObject();

@@ -26,6 +26,9 @@ public:
 
     std::shared_ptr<cmp::Text> textTEMP;
 
+private:
+
+    MirrorRotate* selectedMirror = nullptr;
 
 public:
 
@@ -54,6 +57,7 @@ public:
                     textTEMP->color = { 0.0f, 1.0f, 0.0f };
                     if (shouldInteract)
                     {
+                        shouldInteract = false;
                         printf("Picked resource\n");
                         resource->PickUp();
                     }
@@ -63,6 +67,7 @@ public:
                     textTEMP->color = { 0.0f, 1.0f, 0.0f };
                     if (shouldInteract)
                     {
+                        shouldInteract = false;
                         printf("Picked blueprint\n");
                         blueprint->PickUp();
                     }
@@ -70,13 +75,33 @@ public:
                 else if (auto mirror = scriptable->Get<MirrorRotate>())
                 {
                     textTEMP->color = { 0.0f, 1.0f, 0.0f };
-                    textTEMP->SetText("<>");
                     if (shouldInteract)
                     {
-                        
+                        shouldInteract = false;
+                        if (selectedMirror) selectedMirror->SetEnabled(false);
+                        else camera->SetMovementEnable(!camera->GetMovementEnabled());
+
+
+                        selectedMirror = mirror;
+                        selectedMirror->SetEnabled(!camera->GetMovementEnabled());
                     }
                 }
             }
+        }
+
+        if (shouldInteract)
+        {
+            // pressed Interact button and no interactable was found
+            
+            // removing focus from selected mirror - if any
+            if (selectedMirror) selectedMirror->SetEnabled(false);
+            selectedMirror = nullptr;
+            camera->SetMovementEnable(true);
+        }
+
+        if (selectedMirror)
+        {
+            textTEMP->SetText("<>");
         }
     }
 };

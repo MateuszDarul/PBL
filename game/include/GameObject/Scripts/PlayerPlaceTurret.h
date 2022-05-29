@@ -289,7 +289,7 @@ public:
         line->Create();
         line->thickness = 2.0f;
         line->color1 = { 1.0f, 1.0f, 0.0f };
-        line->color2 = { 1.0f, 0.1f, 0.0f };
+        line->color2 = { 1.0f, 0.7f, 0.0f };
 
         turretPrefabs[type]->AddComponent(line);
         turretPrefabs[type]->AddComponent(lineShader);

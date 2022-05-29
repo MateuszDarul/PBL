@@ -55,6 +55,7 @@ private:
     float jumpVelocity;
     float jumpHeight;
     float jumpTimeToPeak;
+    bool isEnabledMovement;
 
     glm::mat4 view; //!< Macierz widoku kamery.
 
@@ -141,6 +142,9 @@ public:
     
     float GetJumpTimeToPeak();
     void  SetJumpTimeToPeak(float newTime);
+
+    bool GetMovementEnabled();
+    void SetMovementEnable(bool enabled);
 
 
     /** @brief Pozwala na przemieszczanie kamery w wybranym kierunku.
