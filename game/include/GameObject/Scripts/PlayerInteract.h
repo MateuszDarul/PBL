@@ -78,12 +78,35 @@ public:
                     if (shouldInteract)
                     {
                         shouldInteract = false;
-                        if (selectedMirror) selectedMirror->SetEnabled(false);
-                        else camera->SetMovementEnable(!camera->GetMovementEnabled());
+
+                        if (selectedMirror)
+                        {
+                            if (selectedMirror == mirror)
+                            {
+                                camera->SetMovementEnable(true);
+                                selectedMirror->SetEnabled(false);
+                                selectedMirror = nullptr;
+                            }
+                            else
+                            {
+                                selectedMirror->SetEnabled(false);
+                                selectedMirror = mirror;
+                                selectedMirror->SetEnabled(true);
+                            }
+                        }
+                        else
+                        {
+                            camera->SetMovementEnable(false);
+                            selectedMirror = mirror;
+                            selectedMirror->SetEnabled(true);
+                        }
+
+                        // if (selectedMirror) selectedMirror->SetEnabled(false);
+                        // else camera->SetMovementEnable(!camera->GetMovementEnabled());
 
 
-                        selectedMirror = mirror;
-                        selectedMirror->SetEnabled(!camera->GetMovementEnabled());
+                        // selectedMirror = mirror;
+                        // selectedMirror->SetEnabled(!camera->GetMovementEnabled());
                     }
                 }
             }
