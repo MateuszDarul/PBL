@@ -61,13 +61,11 @@ public:
             currentFlashlightCharge -= dt;
             currentFlashlightCharge = std::max(0.0f, currentFlashlightCharge);
 
-            // flashlight->SetDamping(10.0f);
-            flashlight->SetLightColor({1.0f, 0.5f, 0.9f});
+            flashlight->SetDamping(10.0f);
         }
         else
         {
-            flashlight->SetLightColor({0.0f, 0.0f, 0.0f});
-            // flashlight->SetDamping(1000.0f);
+            flashlight->SetDamping(1000.0f);
         }
 
         float progress = currentFlashlightCharge / maxFlashlightCharge;

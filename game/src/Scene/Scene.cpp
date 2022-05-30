@@ -13,6 +13,14 @@
 #include "Scripts/Health.h"
 #include "EnemyScript.h"
 
+
+// for quick access in Update
+static std::shared_ptr<GameObject> GO_CAMERA;
+static std::shared_ptr<GameObject> GO_MULTITOOL;
+static std::shared_ptr<GameObject> GO_FLASHLIGHT;
+static std::shared_ptr<GameObject> GO_CROSSHAIR;
+
+
 Scene::Scene()
 {
     glfwSetInputMode(GameApplication::GetWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -90,6 +98,7 @@ Scene::Scene()
     world->AddChild(go);
 
     auto playerGO = go;
+    GO_CAMERA = go;
 
     //ground check
     {
@@ -233,10 +242,14 @@ Scene::Scene()
         lightCmp->AddShader(shader_l);
         lightCmp->SetPosition(multiTool->GetComponent<cmp::Transform>()->GetPosition());
         lightCmp->SetLightColor({1.0f, 0.5f, 0.9f});
+        lightCmp->SetCutOff({38.5f, 40.0f});
         flashLightGO->AddComponent(std::make_shared<cmp::Name>("Flashlight"));
         world->AddChild(flashLightGO);
 
         multiToolScript->flashlight = lightCmp;
+
+        GO_MULTITOOL = multiTool;
+        GO_FLASHLIGHT = flashLightGO;
     }
 
     go = std::make_shared<GameObject>();
@@ -573,6 +586,8 @@ Scene::Scene()
         go->AddComponent(std::make_shared<cmp::Name>("CROSSHAIR"));
         
         world->AddChild(go);
+
+        GO_CROSSHAIR = go;
     }
 
 
@@ -608,10 +623,10 @@ Scene::~Scene()
 
 void Scene::Update(float dt)
 {
-    world->FindNode("CROSSHAIR")->GetGameObject()->GetComponent<cmp::Transform>()->SetPosition(GameApplication::GetAspectRatio() * 0.5f, 0.5f, 0.1f);
+    GO_CROSSHAIR->GetComponent<cmp::Transform>()->SetPosition(GameApplication::GetAspectRatio() * 0.5f, 0.5f, 0.1f);
 
     //Update camera
-    std::shared_ptr<GameObject> goCamera = world->FindNode("CAMERA")->GetGameObject();
+    std::shared_ptr<GameObject> goCamera = GO_CAMERA;
     std::shared_ptr<TransformComponent> transformCamera = goCamera->GetComponent<cmp::Transform>();
 
     goCamera->GetComponent<CameraComponent>()->Update(GameApplication::GetInputManager(), dt);
@@ -632,7 +647,7 @@ void Scene::Update(float dt)
     
     //Position multitool
 
-    auto mtTransform = world->FindNode("MultiTool")->GetGameObject()->GetComponent<cmp::Transform>();
+    auto mtTransform = GO_MULTITOOL->GetComponent<cmp::Transform>();
     auto m = glm::inverse(goCamera->GetComponent<cmp::Camera>()->GetView());
 
     glm::vec4 mtNewPosition = m * glm::vec4(mtTransform->GetPosition(), 1.0f);
@@ -643,7 +658,7 @@ void Scene::Update(float dt)
     mtTransform->SetModelMatrix(m);
 
 
-    auto flashLight = world->FindNode("Flashlight")->GetGameObject()->GetComponent<cmp::SpotLight>();
+    auto flashLight = GO_FLASHLIGHT->GetComponent<cmp::SpotLight>();
     flashLight->SetPosition({ mtNewPosition.x, mtNewPosition.y, mtNewPosition.z });
     flashLight->SetDirection(goCamera->GetComponent<cmp::Camera>()->GetForward());
 
@@ -658,7 +673,7 @@ void Scene::Update(float dt)
 void Scene::Render()
 {
     glViewport(0, 0, GameApplication::GetWindowSize().x, GameApplication::GetWindowSize().y);
-    std::shared_ptr<GameObject> goCamera = world->FindNode("CAMERA")->GetGameObject();
+    std::shared_ptr<GameObject> goCamera = GO_CAMERA;
     glm::mat4 skyboxTransform = GameApplication::GetProjection() * glm::mat4(glm::mat3(goCamera->GetComponent<CameraComponent>()->GetView()));
     skybox->Render(skyboxTransform);
     world->Render(transform);

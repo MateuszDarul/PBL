@@ -158,7 +158,7 @@ vec3 GetSpotLight(TextureMaps textureMaps, SpotLight sLight)
     specular *= intensity;
 
     float distance = length(sLight.position - fragPos);
-    float attenuation = 1 - sLight.distance * distance;
+    float attenuation = max(0.0, 1 - sLight.distance * distance);
 
     diffuse *= attenuation;
     specular *= attenuation;
