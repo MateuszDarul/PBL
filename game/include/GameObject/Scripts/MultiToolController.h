@@ -18,6 +18,8 @@ public:
     std::shared_ptr<GameObject> iconsGO[3];
     std::shared_ptr<GameObject> progressBar;
 
+    std::shared_ptr<cmp::SpotLight> flashlight;
+
 
     //for public read
     bool isFlashlightOn = false;
@@ -45,10 +47,27 @@ public:
             isFlashlightOn = !isFlashlightOn;
         }
 
+        if (currentFlashlightCharge < 0.00001f)
+        {
+            isFlashlightOn = false;
+        }
+        if (Input()->Keyboard()->OnPressed(KeyboardKey::R))
+        {
+            currentFlashlightCharge = maxFlashlightCharge;
+        }
+
         if (isFlashlightOn)
         {
             currentFlashlightCharge -= dt;
             currentFlashlightCharge = std::max(0.0f, currentFlashlightCharge);
+
+            // flashlight->SetDamping(10.0f);
+            flashlight->SetLightColor({1.0f, 0.5f, 0.9f});
+        }
+        else
+        {
+            flashlight->SetLightColor({0.0f, 0.0f, 0.0f});
+            // flashlight->SetDamping(1000.0f);
         }
 
         float progress = currentFlashlightCharge / maxFlashlightCharge;

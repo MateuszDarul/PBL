@@ -224,6 +224,19 @@ Scene::Scene()
 
             displayNode->AddChild(icon);
         }
+
+        //multitool light
+        auto flashLightGO = std::make_shared<GameObject>();
+        flashLightGO->AddComponent(std::make_shared<cmp::SpotLight>());
+        auto lightCmp = flashLightGO->GetComponent<cmp::SpotLight>();
+        lightCmp->Create();
+        lightCmp->AddShader(shader_l);
+        lightCmp->SetPosition(multiTool->GetComponent<cmp::Transform>()->GetPosition());
+        lightCmp->SetLightColor({1.0f, 0.5f, 0.9f});
+        flashLightGO->AddComponent(std::make_shared<cmp::Name>("Flashlight"));
+        world->AddChild(flashLightGO);
+
+        multiToolScript->flashlight = lightCmp;
     }
 
     go = std::make_shared<GameObject>();
@@ -628,6 +641,11 @@ void Scene::Update(float dt)
     m[3][1] = mtNewPosition.y;
     m[3][2] = mtNewPosition.z;
     mtTransform->SetModelMatrix(m);
+
+
+    auto flashLight = world->FindNode("Flashlight")->GetGameObject()->GetComponent<cmp::SpotLight>();
+    flashLight->SetPosition({ mtNewPosition.x, mtNewPosition.y, mtNewPosition.z });
+    flashLight->SetDirection(goCamera->GetComponent<cmp::Camera>()->GetForward());
 
 
     //Update scene
