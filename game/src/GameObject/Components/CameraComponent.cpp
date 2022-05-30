@@ -77,7 +77,7 @@ const glm::mat4& CameraComponent::GetView()
 }
 
 
-float JUMP_TIMER = 0.0f; //temporary 'is grounded' check
+//float JUMP_TIMER = 0.0f; //temporary 'is grounded' check
 
 void CameraComponent::CalculateJumpParams()
 {
@@ -127,11 +127,12 @@ void CameraComponent::Update(InputManager* inputManager, const float& deltaTime)
 
 
 
-    if (JUMP_TIMER > 0.0f)
+    //if (JUMP_TIMER > 0.0f)
+    if (!isGrounded)
     {
         // printf("is jumping\n");
         verticalVelocity += gravity * deltaTime;
-        JUMP_TIMER -= deltaTime;
+        //JUMP_TIMER -= deltaTime;
     }
     else
     {
@@ -141,7 +142,7 @@ void CameraComponent::Update(InputManager* inputManager, const float& deltaTime)
         if(inputManager->Keyboard()->IsPressed(KeyboardKey::Space) && isEnabledMovement)
         {
             verticalVelocity = jumpVelocity;
-            JUMP_TIMER = 2 * jumpTimeToPeak;     
+            //JUMP_TIMER = 2 * jumpTimeToPeak;     
         }
     }
 
@@ -274,4 +275,14 @@ bool CameraComponent::GetMovementEnabled()
 void CameraComponent::SetMovementEnable(bool enabled)
 {
     isEnabledMovement = enabled;
+}
+
+bool CameraComponent::GetIsGrounded()
+{
+    return this->isGrounded;
+}
+
+void CameraComponent::SetIsGrounded(bool grounded)
+{
+    this->isGrounded = grounded;
 }

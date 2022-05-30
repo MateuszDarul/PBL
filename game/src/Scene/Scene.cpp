@@ -9,7 +9,7 @@
 #include "Scripts/Resource.h"
 #include "Scripts/Blueprint.h"
 #include "Scripts/PlayerInteract.h"
-// #include "Scripts/PlayerGroundCheck.h"
+#include "Scripts/PlayerGroundCheck.h"
 #include "Scripts/Health.h"
 
 Scene::Scene()
@@ -69,7 +69,7 @@ Scene::Scene()
     go->AddComponent(std::make_shared<cmp::Transform>());
     go->AddComponent(std::make_shared<NameComponent>("CAMERA"));
     go->AddComponent(std::make_shared<CameraComponent>());
-    go->GetComponent<cmp::Camera>()->Create(glm::vec3(0,3,10));
+    go->GetComponent<cmp::Camera>()->Create(glm::vec3(0,3.5,10));
     go->GetComponent<cmp::Camera>()->SetSpeed(5);
     collidersManager = new CollidersManager(go); //mened�er kolider�w
     collidersManager->SetDistanceFromPlayer(10.0f);
@@ -78,28 +78,25 @@ Scene::Scene()
     go->GetComponent<cmp::BoxCol>()->SetOffset(glm::vec3(0,-1,0));
     go->GetComponent<cmp::BoxCol>()->layer = CollisionLayer::Player;
     go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
-    go->AddComponent(std::make_shared<SphereCollider>(false, false));
-    go->GetComponent<cmp::SphereCol>()->SetRadius(0.5);
-    go->GetComponent<cmp::SphereCol>()->SetOffset(glm::vec3(0,-2.5,0));
-    go->GetComponent<cmp::SphereCol>()->layer = CollisionLayer::Player;
-    go->GetComponent<cmp::SphereCol>()->AddToCollidersManager(collidersManager);
+    // go->AddComponent(std::make_shared<SphereCollider>(false, false));
+    // go->GetComponent<cmp::SphereCol>()->SetRadius(0.5);
+    // go->GetComponent<cmp::SphereCol>()->SetOffset(glm::vec3(0,-2.5,0));
+    // go->GetComponent<cmp::SphereCol>()->layer = CollisionLayer::Player;
+    // go->GetComponent<cmp::SphereCol>()->AddToCollidersManager(collidersManager);
     world->AddChild(go);
 
     auto playerGO = go;
 
     //ground check
-    /*{
+    {
         auto groundCheckGO = std::make_shared<GameObject>();
         groundCheckGO->AddComponent(std::make_shared<cmp::Transform>());
-        // groundCheckGO->GetComponent<cmp::Transform>()->SetPosition(2.5, 5.5, -28.3);
-        groundCheckGO->GetComponent<cmp::Transform>()->SetPosition(13.5, 5.5, -8);
+        groundCheckGO->GetComponent<cmp::Transform>()->SetPosition(0.0, -2.5, 0.0);
+        // groundCheckGO->GetComponent<cmp::Transform>()->SetPosition(13.5, 5.5, -8);
 
-        // groundCheckGO->AddComponent(std::make_shared<SphereCollider>(true, false));
-        // groundCheckGO->GetComponent<cmp::SphereCol>()->SetRadius(1.0f);
-        // groundCheckGO->GetComponent<cmp::SphereCol>()->AddToCollidersManager(collidersManager);
-        groundCheckGO->AddComponent(std::make_shared<BoxCollider>(false, false));
-        groundCheckGO->GetComponent<cmp::BoxCol>()->setLengths({2,2,2});
-        groundCheckGO->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
+        groundCheckGO->AddComponent(std::make_shared<SphereCollider>(true, false));
+        groundCheckGO->GetComponent<cmp::SphereCol>()->SetRadius(0.3f);
+        groundCheckGO->GetComponent<cmp::SphereCol>()->AddToCollidersManager(collidersManager);
 
         groundCheckGO->AddComponent(std::make_shared<cmp::Scriptable>());
 
@@ -107,19 +104,8 @@ Scene::Scene()
         groundCheckGO->GetComponent<cmp::Scriptable>()->Add(groundCheckScript);
         groundCheckScript->player = playerGO->GetComponent<cmp::Camera>();
 
-        // world->FindNode("CAMERA")->AddChild(groundCheckGO);
-
-        groundCheckGO->AddComponent(std::make_shared<cmp::Name>("GroundCheck"));
-        auto model = std::make_shared<cmp::Model>();
-        model->Create(
-            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-            resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
-        );
-        groundCheckGO->AddComponent(model);
-        groundCheckGO->AddComponent(shader_d);
-
-        world->AddChild(groundCheckGO);
-    }*/
+        world->FindNode("CAMERA")->AddChild(groundCheckGO);
+    }
 
     //skrypty gracza
     go->AddComponent(std::make_shared<cmp::Scriptable>());
@@ -334,13 +320,7 @@ Scene::Scene()
         world->AddChild(go);
     }
 
-    
-    // //=== ray test ===
-
-    // tu byly lustra, czujnik i laser ale usunalem bo zrobie to teraz 'na czysto'
-
-
-    
+        
     //=== pickupable resource
     for (int i = 0; i < 3; i++)
     {
@@ -351,9 +331,6 @@ Scene::Scene()
         go->GetComponent<cmp::Transform>()->SetPosition(14.5, 1.5, i * 2);
         go->GetComponent<cmp::Transform>()->SetScale(0.5);
 
-        // !!! WARNING - needs bugix !!! 
-        // jak daje kolidery true,false (trigger, dynamiczny)
-        // to podczas update crashuje cos w funkcji CheckTriggers
         go->AddComponent(std::make_shared<BoxCollider>(true, true));
         go->GetComponent<cmp::BoxCol>()->setLengths({1.0, 1.0, 1.0});
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
@@ -387,9 +364,6 @@ Scene::Scene()
         go->GetComponent<cmp::Transform>()->SetPosition(14.5, 1.5, i * 2 - 8);
         go->GetComponent<cmp::Transform>()->SetScale(0.5);
 
-        // !!! WARNING - needs bugix !!! 
-        // jak daje kolidery true,false (trigger, dynamiczny)
-        // to podczas update crashuje cos w funkcji CheckTriggers
         go->AddComponent(std::make_shared<BoxCollider>(true, true));
         go->GetComponent<cmp::BoxCol>()->setLengths({1.0, 1.0, 1.0});
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
@@ -693,6 +667,7 @@ void Scene::Update(float dt)
 
 
     //Detect collision
+    goCamera->GetNode()->ResetGlobalTransformations();
     collidersManager->CheckEverything();
 
 

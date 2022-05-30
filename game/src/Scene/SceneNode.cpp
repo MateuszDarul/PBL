@@ -222,6 +222,11 @@ const glm::mat4& SceneNode::GetGlobalTransformations()
     return this->globalTransformations;
 }
 
+void SceneNode::ResetGlobalTransformations()
+{
+    this->globalTransformations = glm::mat4(1.0f) * GetLocalTransformations()->GetModelMatrix();
+}
+
 SceneNode* SceneNode::FindNode(const std::string& name)
 {
     SceneNode* lastSearchedNode = nullptr;

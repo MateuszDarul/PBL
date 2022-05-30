@@ -56,6 +56,7 @@ private:
     float jumpHeight;
     float jumpTimeToPeak;
     bool isEnabledMovement;
+    bool isGrounded;
 
     glm::mat4 view; //!< Macierz widoku kamery.
 
@@ -145,6 +146,9 @@ public:
 
     bool GetMovementEnabled();
     void SetMovementEnable(bool enabled);
+
+    bool GetIsGrounded();
+    void SetIsGrounded(bool grounded);
 
 
     /** @brief Pozwala na przemieszczanie kamery w wybranym kierunku.
