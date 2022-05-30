@@ -12,7 +12,7 @@
 
 /** @brief Wezly, ktore pozwalaja na hierarchizacje GameObject'ow w aplikacji.
  */
-class SceneNode
+class SceneNode : public std::enable_shared_from_this<SceneNode>
 {
 private:
 
@@ -51,12 +51,12 @@ public:
     /** @brief Tworzy nowy wezel na podstawie otrzymanego GameObject'u i dodaje go do listy potomkow.
      * @param gameObject - Wskazanie na GameObject, ktory ma zostac umieszczony w wezle potomnym.
      */
-    void AddChild(std::shared_ptr<GameObject> gameObject);
+    std::shared_ptr<SceneNode> AddChild(std::shared_ptr<GameObject> gameObject);
     
     /** @brief Dodaje nowy wezel (potomek) do tego wezla.
      * @param sceneNode - Wskazanie na SceneNode, ktory ma zostac dodany jako potomek.
      */
-    void AddChild(std::shared_ptr<SceneNode> sceneNode);
+    std::shared_ptr<SceneNode> AddChild(std::shared_ptr<SceneNode> sceneNode);
 
     /** @brief Zwraca wskazanie na GameObject danego wezla.
      * @return GameObject* - Wskazanie na GameObject.
@@ -87,6 +87,20 @@ public:
      * @return nullptr - Nie znaleziono wezla z GameObject'em o podanej nazwie.
      */
     SceneNode* FindNode(const std::string& name);
+
+    /** @brief Usuwa wskazany wezel ze swoich dzieci.
+     * @param node - Wskazanie na wezel do usuniecia.
+     * @return true - Usunięto wezel.
+     * @return false - Nie usunięto wezla.
+     */
+    bool RemoveNode(std::shared_ptr<SceneNode> node);
+
+    /** @brief Usuwa wskazany wezel ze swoich dzieci.
+     * @param node - Wskazanie na wezel do usuniecia.
+     * @return true - Usunięto wezel.
+     * @return false - Nie usunięto wezla.
+     */
+    bool RemoveNode(SceneNode* node);
 
     /** @brief Zwraca wskazanie na rodzica danego wezla.
      * @return SceneNode* - rodzic.

@@ -20,10 +20,10 @@ private:
 
     static GLFWwindow* s_Window;
 
-    static float s_Fov;
+    static float s_Fov, s_AspectRatio;
     static int s_ScreenWidth, s_ScreenHeight;
     static float s_NearPlane, s_FarPlane;
-    static glm::mat4 s_ProjectionMatrix;
+    static glm::mat4 s_ProjectionMatrix, s_OrthographicMatrix;
 
     static Scene* s_Scene;
     static InputManager* s_InputManager;
@@ -72,11 +72,18 @@ public:
     static ResourceManager* const GetResourceManager();
 
     /**
-     * @brief Zwraca macierz projection
+     * @brief Zwraca macierz projection (perspektywa)
      * 
-     * @return glm::mat4* 
+     * @return const glm::mat4&
      */
     static const glm::mat4& GetProjection();
+
+    /**
+     * @brief Zwraca macierz projection (prostokatna)
+     * 
+     * @return const glm::mat4& 
+     */
+    static const glm::mat4& GetOrthoProjection();
 
     /**
      * @brief Zwraca rozmiar okna
@@ -84,6 +91,8 @@ public:
      * @return glm::uvec2 - Rozmiar okna.
      */
     static glm::uvec2 GetWindowSize();
+
+    static float GetAspectRatio();
 
     /**
      * @brief Get the Projection Range

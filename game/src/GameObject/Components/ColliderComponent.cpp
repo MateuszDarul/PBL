@@ -52,8 +52,8 @@ void ColliderComponent::GetSeparationVectors(float array[6], glm::vec3& boxMoveV
 	}
 }
 
-ColliderComponent::ColliderComponent(uint32_t UUID, bool isTrigger, bool isStatic)
-	:Component(UUID), isTrigger(isTrigger), isStatic(isStatic)
+ColliderComponent::ColliderComponent(uint32_t UUID, bool isTrigger, bool isStatic, int layer)
+	:Component(UUID), isTrigger(isTrigger), isStatic(isStatic), layer(layer)
 {
 	offset = glm::vec3(0.0f, 0.0f, 0.0f);
 	mass = 1.0f;

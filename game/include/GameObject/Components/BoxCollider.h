@@ -4,6 +4,8 @@
 
 #include <glm/glm.hpp>
 
+
+
 /** @brief Komponent pude�kowych kolider�w.
  */
 class BoxCollider : public ColliderComponent
@@ -19,8 +21,9 @@ public:
 	/** @brief Konstruktor komponent kolider�w.
 	 * @param isTrigger - Czy ten kolider ma by� wyzwalaczem.
 	 * @param isStatic -Czy ten kolider ma by� statyczny.
+	 * @param layer - warstwa kolidera.
 	 */
-	BoxCollider(bool isTrigger, bool isStatic);
+	BoxCollider(bool isTrigger, bool isStatic, int layer = CollisionLayer::Default);
 
 	/** @brief Bazowy destruktor.
 	 */
@@ -32,7 +35,11 @@ public:
 	* @return flase - nie zasz�a kolizja.
 	*/
 	bool virtual CheckCollision(std::shared_ptr<ColliderComponent> collider);
-	virtual bool RayCollision(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance);
+
+	/*!
+	 * @copybrief ColliderComponent::RayCollision()
+	 */
+	virtual bool RayCollision(const glm::vec3& origin, const glm::vec3& dir, RayHitInfo& hitInfo, float maxDistance);
 
 	/** @brief Metoda ustawiaj�ca nowe d�ugo�ci kraw�dzi pude�kowego kolidera.
 	* @param lengths - nowe d�ugo�ci kraw�dzi pude�kowego kolidera.

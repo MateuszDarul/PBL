@@ -16,7 +16,8 @@ bool ScriptComponent::Add(Script* newScript)
             return false;
         }
     }
-
+    
+    newScript->gameObject = GetOwner();
     m_ScriptInstances.push_back(newScript);
     return true;
 }

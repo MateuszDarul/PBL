@@ -22,6 +22,7 @@ private:
     Mesh* mesh; //!< Wskazanie na siatke, z ktorej korzysta model.
     Material* material; //!< Wskazanie na material, z ktorego korzysta model.
 
+    glm::vec4 tintColor = {1,1,1,1};
 public:
     /** @brief Domyslny konstruktor.
      */
@@ -49,6 +50,11 @@ public:
      * @return false - Nie udalo sie wyswietlic modelu.
      */
     bool Draw(std::shared_ptr<ShaderComponent> shader);
+
+
+    void SetTintColor(const glm::vec4& color);
+    void SetTintColor(float r, float g, float b, float a = 1.0f);
+    const glm::vec4& GetTintColor();
 };
 
 #endif // __MODEL_COMPONENT_H__

@@ -14,15 +14,18 @@ SceneNode::~SceneNode()
 
 }
 
-void SceneNode::AddChild(std::shared_ptr<GameObject> gameObject)
+std::shared_ptr<SceneNode> SceneNode::AddChild(std::shared_ptr<GameObject> gameObject)
 {
-    this->AddChild(std::make_shared<SceneNode>(gameObject));
+    auto node = std::make_shared<SceneNode>(gameObject);
+    this->AddChild(node);
+    return node;
 }
 
-void SceneNode::AddChild(std::shared_ptr<SceneNode> sceneNode)
+std::shared_ptr<SceneNode> SceneNode::AddChild(std::shared_ptr<SceneNode> sceneNode)
 {
     sceneNode->SetParent(this);
     this->children.push_back(sceneNode);
+    return sceneNode;
 }
 
 void SceneNode::LoadScripts()
@@ -38,9 +41,10 @@ void SceneNode::LoadScripts()
         this->children[i]->LoadScripts();
     }
 }
-
+static float GlobalElapsedTime = 0.0f;
 void SceneNode::Update(float dt)
 {
+    GlobalElapsedTime += dt;
     this->PrivateUpdate(dt, glm::mat4(1.f));
 
     SceneNode::cameraFrustum = 
@@ -130,6 +134,9 @@ void SceneNode::Render(const glm::mat4& matrixPV)
             shaderPtr->Use();
             shaderPtr->SetMat4("transform", matrixPV);
             shaderPtr->SetMat4("model", this->globalTransformations);
+            shaderPtr->SetVec4("u_TintColor", {1, 1, 1, 1});
+            shaderPtr->SetFloat("u_Time", GlobalElapsedTime);
+            shaderPtr->SetVec3("u_CameraPos", GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Transform>()->GetPosition());
 
             std::shared_ptr<cmp::Model> modelPtr = this->gameObject->GetComponent<cmp::Model>();
             if(modelPtr != nullptr)
@@ -218,6 +225,28 @@ SceneNode* SceneNode::FindNode(const std::string& name)
     SceneNode* lastSearchedNode = nullptr;
     FindByName(name, &lastSearchedNode);
     return lastSearchedNode;
+}
+
+bool SceneNode::RemoveNode(std::shared_ptr<SceneNode> node)
+{
+    return RemoveNode(node.get());;
+}
+
+bool SceneNode::RemoveNode(SceneNode* node)
+{
+    if (node != nullptr && !this->Is(node))
+    {
+        for (unsigned short int i = 0; i < this->children.size(); i++)
+        {
+            if (this->children[i] && this->children[i]->Is(node))
+            {
+                this->children[i].reset();
+                this->children.erase(children.begin() + i, children.begin() + i + 1);
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void SceneNode::FindByName(const std::string& name, SceneNode** result)

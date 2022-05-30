@@ -5,11 +5,12 @@ Particle::Particle(glm::vec3 position, glm::vec3 direction, float speed, float l
 	isDead = false;
 }
 
-void Particle::UpdatePos(float dt, glm::vec3 direction)
+void Particle::UpdatePos(float dt, glm::vec3 direction, const glm::vec3& force)
 {
 	if (lifetimeTimer > 0)
 	{
 		position += this->direction * speed * dt;
+		this->direction += force * dt;
 	}
 	else
 	{

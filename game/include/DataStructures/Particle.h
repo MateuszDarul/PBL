@@ -14,7 +14,7 @@ public:
 	bool burst;
 	bool isDead;
 	Particle(glm::vec3 position, glm::vec3 direction, float speed, float lifetime, bool burst);
-	void UpdatePos(float dt, glm::vec3 direction);
+	void UpdatePos(float dt, glm::vec3 direction, const glm::vec3& force);
 	void UpdateLifetime(float dt);
 };
 #endif

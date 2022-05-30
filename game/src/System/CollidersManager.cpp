@@ -6,21 +6,21 @@
 #include "CameraComponent.h"
 #include <iostream>
 
-void CollidersManager::RemoveFromVector(std::vector<std::weak_ptr<ColliderComponent>> vector, std::shared_ptr<ColliderComponent> col)
+void CollidersManager::RemoveFromVector(std::vector<std::weak_ptr<ColliderComponent>> *vector, std::shared_ptr<ColliderComponent> col)
 {
-	int size = vector.size();
+	int size = vector->size();
 	for (int i = 0; i < size; i++)
 	{
-		std::shared_ptr<ColliderComponent> collider = vector[i].lock();
+		std::shared_ptr<ColliderComponent> collider = vector->at(i).lock();
 		if (collider == col)
 		{
-			vector.erase(vector.begin() + i);
+			vector->erase(vector->begin() + i, vector->begin() + i + 1);
 			break;
 		}
 	}
 }
 
-void CollidersManager::ExecuteOnCollidingScripts(std::vector<std::pair<std::shared_ptr<ColliderComponent>, std::shared_ptr<ColliderComponent>>> currentCollisions, 
+void CollidersManager::ExecuteOnCollidingScripts(std::vector<std::pair<std::shared_ptr<ColliderComponent>, std::shared_ptr<ColliderComponent>>> *currentCollisions,
 	std::shared_ptr<ColliderComponent> firstCollider, std::shared_ptr<ColliderComponent> secondCollider, bool areColliding, CollidingType type)
 {
 	std::pair<std::shared_ptr<ColliderComponent>, std::shared_ptr<ColliderComponent>> pair1 = std::make_pair(firstCollider, secondCollider);
@@ -39,7 +39,7 @@ void CollidersManager::ExecuteOnCollidingScripts(std::vector<std::pair<std::shar
 	{
 		if (areColliding)
 		{
-			currentCollisions.push_back(pair1);
+			currentCollisions->push_back(pair1);
 			script = firstCollider->GetOwner()->GetComponent<cmp::Scriptable>();
 			if (script != nullptr)
 			{
@@ -97,7 +97,7 @@ void CollidersManager::ExecuteOnCollidingScripts(std::vector<std::pair<std::shar
 	{
 		if (areColliding)
 		{
-			currentCollisions.push_back(pair1); 
+			currentCollisions->push_back(pair1); 
 			script = firstCollider->GetOwner()->GetComponent<cmp::Scriptable>();
 			if (script != nullptr)
 			{
@@ -120,6 +120,47 @@ void CollidersManager::ExecuteOnCollidingScripts(std::vector<std::pair<std::shar
 				else if (type == trigger)
 				{
 					script->OnTriggerEnter(firstCollider);
+				}
+			}
+		}
+	}
+}
+
+void CollidersManager::OnRemoveExecuteScript(std::vector<std::pair<std::shared_ptr<ColliderComponent>, std::shared_ptr<ColliderComponent>>>* currentCollisions,
+	std::shared_ptr<ColliderComponent> removedCollider)
+{
+	std::shared_ptr<cmp::Scriptable> script = nullptr;
+	std::pair<std::shared_ptr<ColliderComponent>, std::shared_ptr<ColliderComponent>> pair;
+	for (int i = 0; i < currentCollisions->size(); i++)
+	{
+		pair = currentCollisions->at(i);
+		if (pair.first == removedCollider) 
+		{
+			script = pair.second->GetOwner()->GetComponent<cmp::Scriptable>();
+			if (script != nullptr)
+			{
+				if (pair.first->isTrigger || pair.second->isTrigger)
+				{
+					script->OnTriggerExit(pair.first);
+				}
+				else
+				{
+					script->OnCollisionExit(pair.first);
+				}
+			}
+		}
+		else if (pair.second == removedCollider)
+		{
+			script = pair.first->GetOwner()->GetComponent<cmp::Scriptable>();
+			if (script != nullptr)
+			{
+				if (pair.first->isTrigger || pair.second->isTrigger)
+				{
+					script->OnTriggerExit(pair.second);
+				}
+				else
+				{
+					script->OnCollisionExit(pair.second);
 				}
 			}
 		}
@@ -174,27 +215,31 @@ void CollidersManager::AddDynamicTrigger(std::shared_ptr<ColliderComponent> trig
 	dynamicTriggers.push_back(trigger);
 }
 
-void CollidersManager::RemoveDynamicColllider(std::shared_ptr<ColliderComponent> collider)
+void CollidersManager::RemoveDynamicCollider(std::shared_ptr<ColliderComponent> collider)
 {
-	RemoveFromVector(dynamicColliders, collider);
+	OnRemoveExecuteScript(&recentCollisions, collider);
+	RemoveFromVector(&dynamicColliders, collider);
 }
 
 void CollidersManager::RemoveStaticColllider(std::shared_ptr<ColliderComponent> collider)
 {
-	RemoveFromVector(staticColliders, collider);
+	OnRemoveExecuteScript(&recentCollisions, collider);
+	RemoveFromVector(&staticColliders, collider);
 }
 
 void CollidersManager::RemoveDynamicTrigger(std::shared_ptr<ColliderComponent> trigger)
 {
-	RemoveFromVector(dynamicTriggers, trigger);
+	OnRemoveExecuteScript(&recentCollisions, trigger);
+	RemoveFromVector(&dynamicTriggers, trigger);
 }
 
 void CollidersManager::RemoveStaticTrigger(std::shared_ptr<ColliderComponent> trigger)
 {
-	RemoveFromVector(staticTriggers, trigger);
+	OnRemoveExecuteScript(&recentCollisions, trigger);
+	RemoveFromVector(&staticTriggers, trigger);
 }
 
-void CollidersManager::CheckCollisions(std::vector<std::pair<std::shared_ptr<ColliderComponent>, std::shared_ptr<ColliderComponent>>> currentCollisions)
+void CollidersManager::CheckCollisions(std::vector<std::pair<std::shared_ptr<ColliderComponent>, std::shared_ptr<ColliderComponent>>> *currentCollisions)
 {
 	std::shared_ptr<CameraComponent> playerCam = player->GetComponent<CameraComponent>();
 	Frustum frustum = SceneNode::cameraFrustum;
@@ -245,14 +290,14 @@ void CollidersManager::CheckCollisions(std::vector<std::pair<std::shared_ptr<Col
 	}
 }
 
-void CollidersManager::CheckTriggers(std::vector<std::pair<std::shared_ptr<ColliderComponent>, std::shared_ptr<ColliderComponent>>> currentCollisions)
+void CollidersManager::CheckTriggers(std::vector<std::pair<std::shared_ptr<ColliderComponent>, std::shared_ptr<ColliderComponent>>> *currentCollisions)
 {
 	std::shared_ptr<CameraComponent> playerCam= player->GetComponent<CameraComponent>();
 	Frustum frustum = SceneNode::cameraFrustum;
 	glm::vec3 playerPos = playerCam->GetPosition();
 	for (unsigned int i = 0; i < dynamicTriggers.size(); i++)
 	{
-		std::shared_ptr<ColliderComponent> firstCollider = dynamicColliders[i].lock();
+		std::shared_ptr<ColliderComponent> firstCollider = dynamicTriggers[i].lock();
 		if (CheckOptimalization(firstCollider, frustum, playerPos))
 		{
 			for (unsigned int j = i + 1; j < dynamicTriggers.size(); j++)
@@ -289,48 +334,74 @@ void CollidersManager::CheckTriggers(std::vector<std::pair<std::shared_ptr<Colli
 void CollidersManager::CheckEverything()
 {
 	std::vector<std::pair<std::shared_ptr<ColliderComponent>, std::shared_ptr<ColliderComponent>>> currentCollisions;
-	CheckCollisions(currentCollisions);
-	CheckTriggers(currentCollisions);
+	CheckCollisions(&currentCollisions);
+	CheckTriggers(&currentCollisions);
 	recentCollisions = currentCollisions;
 }
 
-bool CollidersManager::Raycast(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance, bool shouldHitTriggers/*, layer*/ )
+bool CollidersManager::Raycast(const glm::vec3& origin, const glm::vec3 dir, RayHitInfo& hitInfo, float maxDistance, bool shouldHitTriggers, int layerMask)
 {
 	//FIXME: inefficient checks 
 
-	//TODO: Layers
-
 	bool hit = false;
+	RayHitInfo closestHit;
+	closestHit.distance = maxDistance;
 
-	std::shared_ptr<CameraComponent> playerCam = player->GetComponent<CameraComponent>();
-	Frustum frustum = SceneNode::cameraFrustum;
-	glm::vec3 playerPos = playerCam->GetPosition();
+	// std::shared_ptr<CameraComponent> playerCam = player->GetComponent<CameraComponent>();
+	// Frustum frustum = SceneNode::cameraFrustum;
+	// glm::vec3 playerPos = playerCam->GetPosition();
 
-	for (int i = 0; i<dynamicColliders.size(); i++)
+	for (unsigned int i = 0; i<dynamicColliders.size(); i++)
 	{
 		std::shared_ptr<ColliderComponent> collider = dynamicColliders[i].lock();
-		if (CheckOptimalization(collider, frustum, playerPos))
+
+		if ((collider->layer & layerMask) && collider->RayCollision(origin, dir, hitInfo, maxDistance) && (hitInfo.distance < closestHit.distance))
 		{
-			hit |= collider->RayCollision(origin, dir, hitInfo, maxDistance);
+			hit = true;
+			closestHit = hitInfo;
 		}
 	}
-	//static ...
-	
+
+	for (unsigned int i = 0; i<staticColliders.size(); i++)
+	{
+		std::shared_ptr<ColliderComponent> collider = staticColliders[i].lock();
+
+		if ((collider->layer & layerMask) && collider->RayCollision(origin, dir, hitInfo, maxDistance) && (hitInfo.distance < closestHit.distance))
+		{
+			hit = true;
+			closestHit = hitInfo;
+		}
+	}
 
 	if (shouldHitTriggers)
 	{
-		for (int i = 0; i<dynamicTriggers.size(); i++)
+		for (unsigned int i = 0; i<dynamicTriggers.size(); i++)
 		{
 			std::shared_ptr<ColliderComponent> collider = dynamicTriggers[i].lock();
-			if(CheckOptimalization(collider, frustum, playerPos))
+
+			if ((collider->layer & layerMask) && collider->RayCollision(origin, dir, hitInfo, maxDistance) && (hitInfo.distance < closestHit.distance))
 			{
-				hit |= collider->RayCollision(origin, dir, hitInfo, maxDistance);
+				hit = true;
+				closestHit = hitInfo;
+			}
+		}
+
+		for (unsigned int i = 0; i<staticTriggers.size(); i++)
+		{
+			std::shared_ptr<ColliderComponent> collider = staticTriggers[i].lock();
+
+			if ((collider->layer & layerMask) && collider->RayCollision(origin, dir, hitInfo, maxDistance) && (hitInfo.distance < closestHit.distance))
+			{
+				hit = true;
+				closestHit = hitInfo;
 			}
 		}
 	}
 
+	hitInfo = closestHit;
 	return hit;
 }
+
 void CollidersManager::SetDistanceFromPlayer(float distance)
 {
 	distanceFromPlayer = distance;
