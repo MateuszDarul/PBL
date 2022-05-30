@@ -70,6 +70,7 @@ int GameApplication::Init()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_SAMPLES, 4);
 
     s_Window = glfwCreateWindow(s_ScreenWidth, s_ScreenHeight, "Enlite Game Engine", NULL, NULL);
     if(s_Window == NULL)
@@ -97,6 +98,9 @@ int GameApplication::Init()
     {
         std::cout << "Successfully initialized GLAD" << std::endl;
     }
+    
+    
+    glEnable(GL_MULTISAMPLE); 
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
