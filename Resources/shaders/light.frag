@@ -175,7 +175,7 @@ float ShadowCalculation(int id, vec3 lightPos)
     vec3 fragToLight = fragPos - lightPos;
 
     float closestDepth = texture(depthMap[id], fragToLight).r;
-    closestDepth *= 100;
+    closestDepth *= 25;
 
     float currentDepth = length(fragToLight);
     float shadow = currentDepth - 0.1 > closestDepth ? 0.0 : 1.0;

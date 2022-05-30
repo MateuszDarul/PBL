@@ -54,11 +54,17 @@ Scene::Scene()
 
     world = new SceneNode(std::make_shared<GameObject>());
     world->GetGameObject()->AddComponent(std::make_shared<cmp::Name>("ROOT"));
+    std::shared_ptr<SceneNode> main = std::make_shared<SceneNode>(std::make_shared<GameObject>());
+    main->GetGameObject()->AddComponent(std::make_shared<cmp::Name>("MAIN"));
+    world->FindNode("ROOT")->AddChild(main);
+    std::shared_ptr<SceneNode> gui = std::make_shared<SceneNode>(std::make_shared<GameObject>());
+    gui->GetGameObject()->AddComponent(std::make_shared<cmp::Name>("GUI"));
+    world->FindNode("ROOT")->AddChild(gui);
     world->GetGameObject()->AddComponent(std::make_shared<cmp::Transform>());
     
     ///***
 
-    shadowsManager = new ShadowsManager(world, shader_l);
+    shadowsManager = new ShadowsManager(world->FindNode("MAIN"), shader_l);
 
     ///***
 
@@ -80,7 +86,11 @@ Scene::Scene()
     go->GetComponent<cmp::SphereCol>()->SetOffset(glm::vec3(0,-2.5,0));
     go->GetComponent<cmp::SphereCol>()->layer = CollisionLayer::Player;
     go->GetComponent<cmp::SphereCol>()->AddToCollidersManager(collidersManager);
-    world->AddChild(go);
+    world->FindNode("MAIN")->AddChild(go);
+
+    MapLoader::Load("Resources/maps/world.map", world->FindNode("MAIN"), shader_l, collidersManager, shadowsManager);
+
+    ///***
 
     auto playerGO = go;
 
@@ -95,7 +105,7 @@ Scene::Scene()
     debugLineCmp->Create();
     debugLineGO->AddComponent(debugLineCmp);
     debugLineGO->AddComponent(std::make_shared<cmp::Transform>());
-    world->FindNode("CAMERA")->AddChild(debugLineGO);
+    world->FindNode("MAIN")->FindNode("CAMERA")->AddChild(debugLineGO);
     
     auto playerPlace = new PlayerPlaceTurret();
     
@@ -125,8 +135,8 @@ Scene::Scene()
         multiTool->AddComponent(baseMesh);
         multiTool->AddComponent(shader_l);
 
-        world->AddChild(multiTool);
-        auto multiToolNode = world->FindNode("MultiTool");
+        world->FindNode("MAIN")->AddChild(multiTool);
+        auto multiToolNode = world->FindNode("MAIN")->FindNode("MultiTool");
 
 
         multiTool->AddComponent(std::make_shared<cmp::Scriptable>());
@@ -211,7 +221,7 @@ Scene::Scene()
         health->scene = this;
         go->GetComponent<cmp::Scriptable>()->Add(health);
     }
-    world->AddChild(go);
+    world->FindNode("MAIN")->AddChild(go);
 
     /* 
         go->AddComponent(mc);
@@ -237,9 +247,6 @@ Scene::Scene()
     */
 
 
-    MapLoader::Load("Resources/maps/world.map", world, shader_l, collidersManager, shadowsManager);
-
-
     //===displacement
     auto displShader = std::make_shared<ShaderComponent>();
     displShader->Create("Resources/shaders/displ.vert", "Resources/shaders/displ.frag");
@@ -262,7 +269,7 @@ Scene::Scene()
                 resMan->GetMesh("Resources/models/displacement test/capsule.obj")
             );
 
-        world->AddChild(go);
+        world->FindNode("MAIN")->AddChild(go);
     }
 
     
@@ -303,27 +310,6 @@ Scene::Scene()
 
 
     //===
-   
-
-    go = std::make_shared<GameObject>();
-    {
-        mc = std::make_shared<cmp::Model>();
-        mc->Create(
-            resMan->GetMesh("Resources/models/Dekoracje/Krzeslo.obj"),
-            resMan->GetMaterial("Resources/models/Dekoracje/Krzeslo.mtl")
-        );
-        go->AddComponent(mc);
-        go->AddComponent(shader_l);
-
-        go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(-2, 4, 0);
-
-        go->AddComponent(std::make_shared<FrustumCullingComponent>());
-        go->GetComponent<cmp::FrustumCulling>()->Create(
-            resMan->GetMesh("Resources/models/Dekoracje/Krzeslo.obj")
-        );
-    }
-    world->AddChild(go);
 
     world->LoadScripts();
 }
