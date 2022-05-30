@@ -222,6 +222,11 @@ const glm::mat4& SceneNode::GetGlobalTransformations()
     return this->globalTransformations;
 }
 
+void SceneNode::SetGlobalTransformations(const glm::mat4& newTransformations)
+{
+    this->globalTransformations = newTransformations;
+}
+
 void SceneNode::ResetGlobalTransformations()
 {
     this->globalTransformations = glm::mat4(1.0f) * GetLocalTransformations()->GetModelMatrix();

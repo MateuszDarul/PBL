@@ -74,6 +74,11 @@ public:
     const glm::mat4& GetGlobalTransformations();
 
     /**
+     * @brief Ustawia globalna macierz na zadana macierz przeksztalcen.
+     */
+    void SetGlobalTransformations(const glm::mat4& newTransformations);
+
+    /**
      * @brief Ustawia globalna macierz na iloczyn lokalnej macierzy z macierza jednostkowa.
      */
     void ResetGlobalTransformations();
