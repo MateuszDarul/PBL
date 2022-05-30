@@ -229,6 +229,28 @@ SceneNode* SceneNode::FindNode(const std::string& name)
     return lastSearchedNode;
 }
 
+bool SceneNode::RemoveNode(std::shared_ptr<SceneNode> node)
+{
+    return RemoveNode(node.get());;
+}
+
+bool SceneNode::RemoveNode(SceneNode* node)
+{
+    if (node != nullptr && !this->Is(node))
+    {
+        for (unsigned short int i = 0; i < this->children.size(); i++)
+        {
+            if (this->children[i] && this->children[i]->Is(node))
+            {
+                this->children[i].reset();
+                this->children.erase(children.begin() + i, children.begin() + i + 1);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 void SceneNode::FindByName(const std::string& name, SceneNode** result)
 {
     if(this->gameObject->GetComponent<cmp::Name>() != nullptr &&

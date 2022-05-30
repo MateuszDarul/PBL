@@ -2,7 +2,6 @@
 
 #include "ShadowsManager.h"
 
-
 #include "Scripts/RaycastTest.h"
 #include "Scripts/DoorActivator.h"
 #include "Scripts/PlayerPlaceTurret.h"
@@ -11,6 +10,7 @@
 #include "Scripts/Blueprint.h"
 #include "Scripts/PlayerInteract.h"
 // #include "Scripts/PlayerGroundCheck.h"
+#include "Scripts/Health.h"
 
 Scene::Scene()
 {
@@ -177,6 +177,7 @@ Scene::Scene()
             resMan->GetMesh("Resources/models/multitool/multitool.obj"),
             resMan->GetMaterial("Resources/models/multitool/multitool.mtl")
         );
+       
         multiTool->AddComponent(baseMesh);
         multiTool->AddComponent(shader_l);
 
@@ -214,7 +215,6 @@ Scene::Scene()
 
         multiToolScript->progressBar = radialBar;
 
-
         for (int i = -1; i <= 1; i++)
         {
             auto icon = std::make_shared<GameObject>();
@@ -236,8 +236,59 @@ Scene::Scene()
         }
     }
 
+    go = std::make_shared<GameObject>();
+    {
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+            resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_l);
 
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(0, 2, 5);
 
+        go->AddComponent(std::make_shared<cmp::Name>("Crate1"));
+
+        go->AddComponent(std::make_shared<BoxCollider>(true, false, CollisionLayer::ENEMY));
+        go->GetComponent<cmp::BoxCol>()->setLengths(glm::vec3(2, 2, 2));
+        go->GetComponent<cmp::BoxCol>()->isOptimized = false;
+        go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
+
+        go->AddComponent(std::make_shared<FrustumCullingComponent>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj")
+        );
+
+        go->AddComponent(std::make_shared<cmp::Scriptable>());
+        Health* health = new Health();
+        health->SetMaxHealth(50.0f);
+        health->scene = this;
+        go->GetComponent<cmp::Scriptable>()->Add(health);
+    }
+    world->AddChild(go);
+
+    /* go->AddComponent(mc);
+        go->AddComponent(shader_l);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->AddComponent(std::make_shared<cmp::Name>("wieza"));
+        go->GetComponent<cmp::Transform>()->SetPosition(0, 0.5, -5);
+        go->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(
+            resMan->GetMesh("Resources/models/wieze/w1/w1.obj"));
+        go->AddComponent(std::make_shared<cmp::Shade>());
+        go->GetComponent<cmp::Shade>()->Create(1);
+        go->AddComponent(std::make_shared<cmp::Particles>());
+        std::shared_ptr<cmp::Particles> particles = go->GetComponent<cmp::Particles>();
+        particles->Create(world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>(), true, 200);
+        particles->SetTexture("Resources/textures/particle.png");
+        particles->SetParticlesPerSecond(100);
+        particles->SetOffset(glm::vec3(0, 2.0f, 0));
+        particles->SetDirectionVar(45);
+        particles->SetParticleLifetime(1.0f);
+        particles->SetScale(0.1f);
+        particles->SetSpeed(20.0f);*/
 
     ///***
     {
@@ -256,6 +307,32 @@ Scene::Scene()
     ///***
 
     MapLoader::Load("Resources/maps/world.map", world, shader_l, collidersManager, shadowsManager);
+
+
+    //===displacement
+    auto displShader = std::make_shared<ShaderComponent>();
+    displShader->Create("Resources/shaders/displ.vert", "Resources/shaders/displ.frag");
+    {      
+        go = std::make_shared<GameObject>();
+        auto tc = std::make_shared<TransformComponent>();
+        tc->SetPosition(-5.0f, 6.5f, -5.0f);
+        
+        go->AddComponent(tc);
+        mc = std::make_shared<ModelComponent>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/displacement test/capsule.obj"),
+            resMan->GetMaterial("Resources/models/displacement test/capsule.mtl")
+        );
+        go->AddComponent(displShader);
+        go->AddComponent(mc);
+        go->AddComponent(std::make_shared<cmp::Name>("Displaced capsule"));
+        go->AddComponent(std::make_shared<FrustumCullingComponent>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(
+                resMan->GetMesh("Resources/models/displacement test/capsule.obj")
+            );
+
+        world->AddChild(go);
+    }
 
     
     // //=== ray test ===
@@ -592,7 +669,6 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-    delete world;
     world = nullptr;
 
     delete shadowsManager;
@@ -675,4 +751,9 @@ void Scene::AddGameObject(std::shared_ptr<GameObject> child, std::shared_ptr<Gam
 SceneNode* Scene::GetWorldNode()
 {
     return world;
+}
+
+CollidersManager* Scene::GetCollidersManager()
+{
+    return collidersManager;
 }

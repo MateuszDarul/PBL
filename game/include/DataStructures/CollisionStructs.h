@@ -15,5 +15,6 @@ enum CollisionLayer     //tu mozna dodawac kolejne warstwy w miare potrzeb
 {
 	Default	= 0b0000000000000001,
 	Player 	= 0b0000000000000010,
-	GUI		= 0b0000000000000100
+	GUI		= 0b0000000000000100,
+	ENEMY	= 0b0000000000001000,
 };

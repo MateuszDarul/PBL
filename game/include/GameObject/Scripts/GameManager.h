@@ -16,7 +16,7 @@ public:
 
 	void Start()
 	{
-		energy = 100;
+		energy = 500;
 		if (auto energyGuiNode = gameObject->GetNode()->GetParent()->FindNode("EnergyText"))
 		{
 			energyText = energyGuiNode->GetGameObject()->GetComponent<cmp::Text>();

@@ -31,7 +31,7 @@ private:
 	 * @param vector - Z kt�rej listy ma usun�� kolider.
 	 * @param col - Wska�nik kolideru do usuni�cia.
 	 */
-	void RemoveFromVector(std::vector<std::weak_ptr<ColliderComponent>> vector, std::shared_ptr<ColliderComponent> col);
+	void RemoveFromVector(std::vector<std::weak_ptr<ColliderComponent>> *vector, std::shared_ptr<ColliderComponent> col);
 	
 	/** @brief Sprawdza czy kolider jest optymalizowany i czy powinien być sprawdzony.
 	 * @param collider - potencjalny kolider do sprawdzenia optymalizacji.
@@ -49,8 +49,11 @@ private:
 	 * @param areColliding - Czy oba kolidery się kolidują.
 	 * @param type - typ kolizji na którego podstawie mają się wykonać odpowiednie skrypty (zderzacz lub wyzwalacz).
 	 */
-	void ExecuteOnCollidingScripts(std::vector<std::pair<std::shared_ptr<ColliderComponent>, std::shared_ptr<ColliderComponent>>> currentCollisions,
+	void ExecuteOnCollidingScripts(std::vector<std::pair<std::shared_ptr<ColliderComponent>, std::shared_ptr<ColliderComponent>>> *currentCollisions,
 		std::shared_ptr<ColliderComponent> firstCollider, std::shared_ptr<ColliderComponent> secondCollider, bool areColliding, CollidingType type);
+
+	void OnRemoveExecuteScript(std::vector<std::pair<std::shared_ptr<ColliderComponent>, std::shared_ptr<ColliderComponent>>>* currentCollisions, 
+		std::shared_ptr<ColliderComponent> removedCollider);
 
 public:
 
@@ -85,7 +88,7 @@ public:
 	/** @brief Usuwa wska�nik dynamicznego zderzacza z listy.
 	 * @param col - Wska�nik na dynamiczny zderzacz do usuni�cia.
 	 */
-	void RemoveDynamicColllider(std::shared_ptr<ColliderComponent> collider);
+	void RemoveDynamicCollider(std::shared_ptr<ColliderComponent> collider);
 
 	/** @brief Usuwa wska�nik statycznego zderzacza z listy.
 	 * @param col - Wska�nik na statyczny zderzacz do usuni�cia.
@@ -105,12 +108,12 @@ public:
 	/** @brief Sprawdza kolizje kolejno: dynamicze zderzacze z dynamicznymi zderzaczami, dynamicze zderzacze ze statycznymi zderzaczami, dynamicze zderzacze z dynamicznymi wyzwalaczami, dynamicze zderzacze ze statycznymi wyzwalaczami.
 	 * @param currentCollisions - Lista kolizji które zaszły w tej iteracji pętli gry.
 	 */
-	void CheckCollisions(std::vector<std::pair<std::shared_ptr<ColliderComponent>, std::shared_ptr<ColliderComponent>>> currentCollisions);
+	void CheckCollisions(std::vector<std::pair<std::shared_ptr<ColliderComponent>, std::shared_ptr<ColliderComponent>>> *currentCollisions);
 
 	/** @brief Sprawdza kolizje kolejno: dynamicze wyzwalacze z dynamicznymi wyzwalaczami, dynamicze wyzwalacze ze statycznymi zderzaczami, dynamicze zderzacze ze statycznymi wyzwalaczami.
 	 * @param currentCollisions - Lista kolizji które zaszły w tej iteracji pętli gry.
 	 */
-	void CheckTriggers(std::vector<std::pair<std::shared_ptr<ColliderComponent>, std::shared_ptr<ColliderComponent>>> currentCollisions);
+	void CheckTriggers(std::vector<std::pair<std::shared_ptr<ColliderComponent>, std::shared_ptr<ColliderComponent>>> *currentCollisions);
 
 	/** @brief Sprawdza kolizje zderzaczy i wyzwalaczy.
 	 */

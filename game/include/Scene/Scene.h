@@ -48,6 +48,7 @@ public:
     //void AddGameObject(GameObject* parent = nullptr);
     void AddGameObject(std::shared_ptr<GameObject> child, std::shared_ptr<GameObject> parent = std::shared_ptr<GameObject>());
     SceneNode* GetWorldNode();
+    CollidersManager* GetCollidersManager();
 };
 
 #endif // __SCENE_H__
