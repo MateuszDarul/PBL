@@ -38,6 +38,12 @@ public:
 	{
 		if (isPut)
 		{
+			if (enemies.size() > 0)
+			{
+				float angle = Angle(gameObject->GetComponent<cmp::Transform>()->GetPosition(), enemies[0]->gameObject->GetComponent<cmp::Transform>()->GetPosition());
+				gameObject->GetComponent<cmp::Transform>()->SetRotation(0, glm::degrees(angle), 0);
+			}
+
 			if (shootTimer < shootCd)
 			{
 				shootTimer += dt;
@@ -46,8 +52,6 @@ public:
 			{
 				if (enemies.size() > 0)
 				{
-					float angle = Angle(gameObject->GetComponent<cmp::Transform>()->GetPosition(), enemies[0]->gameObject->GetComponent<cmp::Transform>()->GetPosition());
-					gameObject->GetComponent<cmp::Transform>()->SetRotation(0, glm::degrees(angle), 0);
 					enemies[0]->DecreaseHealth(damage);
 					shootTimer = 0.0f;
 				}

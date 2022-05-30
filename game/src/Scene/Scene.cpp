@@ -11,6 +11,7 @@
 #include "Scripts/PlayerInteract.h"
 #include "Scripts/PlayerGroundCheck.h"
 #include "Scripts/Health.h"
+#include "EnemyScript.h"
 
 Scene::Scene()
 {
@@ -52,6 +53,9 @@ Scene::Scene()
 
     auto radialShader = std::make_shared<cmp::Shader>();
     radialShader->Create("Resources/shaders/radial.vert", "Resources/shaders/radial.frag");
+
+    auto displShader = std::make_shared<ShaderComponent>();
+    displShader->Create("Resources/shaders/displ.vert", "Resources/shaders/displ.frag");
 
     ///***
 
@@ -224,57 +228,40 @@ Scene::Scene()
 
     go = std::make_shared<GameObject>();
     {
-        mc = std::make_shared<cmp::Model>();
+        mc = std::make_shared<ModelComponent>();
         mc->Create(
-            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-            resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+            resMan->GetMesh("Resources/models/displacement test/capsule.obj"),
+            resMan->GetMaterial("Resources/models/displacement test/capsule.mtl")
         );
+        go->AddComponent(displShader);
         go->AddComponent(mc);
-        go->AddComponent(shader_l);
+
+        go->AddComponent(std::make_shared<FrustumCullingComponent>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(
+                resMan->GetMesh("Resources/models/displacement test/capsule.obj")
+            );
 
         go->AddComponent(std::make_shared<cmp::Transform>());
         go->GetComponent<cmp::Transform>()->SetPosition(0, 2, 5);
 
-        go->AddComponent(std::make_shared<cmp::Name>("Crate1"));
+        go->AddComponent(std::make_shared<cmp::Name>("Enemy"));
 
         go->AddComponent(std::make_shared<BoxCollider>(true, false, CollisionLayer::ENEMY));
         go->GetComponent<cmp::BoxCol>()->setLengths(glm::vec3(2, 2, 2));
         go->GetComponent<cmp::BoxCol>()->isOptimized = false;
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
-        go->AddComponent(std::make_shared<FrustumCullingComponent>());
-        go->GetComponent<cmp::FrustumCulling>()->Create(
-            resMan->GetMesh("Resources/models/Crate/Crate.obj")
-        );
 
         go->AddComponent(std::make_shared<cmp::Scriptable>());
         Health* health = new Health();
         health->SetMaxHealth(50.0f);
         health->scene = this;
         go->GetComponent<cmp::Scriptable>()->Add(health);
+
+        auto enemyScript = new EnemyScript(std::shared_ptr<SceneNode>(world), playerGO);
+        go->GetComponent<cmp::Scriptable>()->Add(enemyScript);
     }
     world->AddChild(go);
-
-    /* go->AddComponent(mc);
-        go->AddComponent(shader_l);
-        go->AddComponent(std::make_shared<cmp::Transform>());
-        go->AddComponent(std::make_shared<cmp::Name>("wieza"));
-        go->GetComponent<cmp::Transform>()->SetPosition(0, 0.5, -5);
-        go->AddComponent(std::make_shared<cmp::FrustumCulling>());
-        go->GetComponent<cmp::FrustumCulling>()->Create(
-            resMan->GetMesh("Resources/models/wieze/w1/w1.obj"));
-        go->AddComponent(std::make_shared<cmp::Shade>());
-        go->GetComponent<cmp::Shade>()->Create(1);
-        go->AddComponent(std::make_shared<cmp::Particles>());
-        std::shared_ptr<cmp::Particles> particles = go->GetComponent<cmp::Particles>();
-        particles->Create(world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>(), true, 200);
-        particles->SetTexture("Resources/textures/particle.png");
-        particles->SetParticlesPerSecond(100);
-        particles->SetOffset(glm::vec3(0, 2.0f, 0));
-        particles->SetDirectionVar(45);
-        particles->SetParticleLifetime(1.0f);
-        particles->SetScale(0.1f);
-        particles->SetSpeed(20.0f);*/
 
     ///***
     {
@@ -293,32 +280,6 @@ Scene::Scene()
     ///***
 
     MapLoader::Load("Resources/maps/world.map", world, shader_l, collidersManager, shadowsManager);
-
-
-    //===displacement
-    auto displShader = std::make_shared<ShaderComponent>();
-    displShader->Create("Resources/shaders/displ.vert", "Resources/shaders/displ.frag");
-    {      
-        go = std::make_shared<GameObject>();
-        auto tc = std::make_shared<TransformComponent>();
-        tc->SetPosition(-5.0f, 6.5f, -5.0f);
-        
-        go->AddComponent(tc);
-        mc = std::make_shared<ModelComponent>();
-        mc->Create(
-            resMan->GetMesh("Resources/models/displacement test/capsule.obj"),
-            resMan->GetMaterial("Resources/models/displacement test/capsule.mtl")
-        );
-        go->AddComponent(displShader);
-        go->AddComponent(mc);
-        go->AddComponent(std::make_shared<cmp::Name>("Displaced capsule"));
-        go->AddComponent(std::make_shared<FrustumCullingComponent>());
-        go->GetComponent<cmp::FrustumCulling>()->Create(
-                resMan->GetMesh("Resources/models/displacement test/capsule.obj")
-            );
-
-        world->AddChild(go);
-    }
 
         
     //=== pickupable resource
@@ -395,40 +356,6 @@ Scene::Scene()
 
         go->AddComponent(std::make_shared<cmp::Transform>());
         go->GetComponent<cmp::Transform>()->SetPosition(2.5, 2.5, -28.3);
-        go->GetComponent<cmp::Transform>()->SetScale(1.0);
-
-        go->AddComponent(std::make_shared<BoxCollider>(false, false));
-        go->GetComponent<cmp::BoxCol>()->setLengths({2.0, 2.0, 2.0});
-        go->GetComponent<cmp::BoxCol>()->SetMass(999999999.9f);
-        go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
-
-        auto model = std::make_shared<cmp::Model>();
-        model->Create(
-            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-            resMan->GetMaterial("Resources/models/floor/floor.mtl")
-        );
-        go->AddComponent(model);
-        go->AddComponent(shader_d);
-
-        go->AddComponent(std::make_shared<cmp::FrustumCulling>());
-        go->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
-
-
-        go->AddComponent(std::make_shared<cmp::Scriptable>());
-
-        auto mirrorScript = new MirrorRotate();
-        mirrorScript->SetEnabled(false);
-        go->GetComponent<cmp::Scriptable>()->Add(mirrorScript);
-
-        world->AddChild(go);
-    }
-
-    {
-        go = std::make_shared<GameObject>();
-        go->AddComponent(std::make_shared<cmp::Name>("Mirror"));
-
-        go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(7.5, 2.5, 0.3);
         go->GetComponent<cmp::Transform>()->SetScale(1.0);
 
         go->AddComponent(std::make_shared<BoxCollider>(false, false));
