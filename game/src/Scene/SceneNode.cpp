@@ -17,8 +17,7 @@ SceneNode::~SceneNode()
 std::shared_ptr<SceneNode> SceneNode::AddChild(std::shared_ptr<GameObject> gameObject)
 {
     auto node = std::make_shared<SceneNode>(gameObject);
-    this->AddChild(node);
-    return node;
+    return this->AddChild(node);
 }
 
 std::shared_ptr<SceneNode> SceneNode::AddChild(std::shared_ptr<SceneNode> sceneNode)
@@ -218,6 +217,11 @@ std::shared_ptr<GameObject> SceneNode::GetGameObject()
 std::shared_ptr<TransformComponent> SceneNode::GetLocalTransformations()
 {
     return this->gameObject->GetComponent<cmp::Transform>();
+}
+
+const glm::mat4& SceneNode::GetGlobalTransformations()
+{
+    return this->globalTransformations;
 }
 
 SceneNode* SceneNode::FindNode(const std::string& name)

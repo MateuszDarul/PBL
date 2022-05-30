@@ -68,6 +68,11 @@ public:
      */
     std::shared_ptr<TransformComponent> GetLocalTransformations();
     
+    /** @brief Pobiera macierz globalnych transformacji danego wezla.
+     * @return const glm::mat4& - Macierz globalnych transformacji.
+     */
+    const glm::mat4& GetGlobalTransformations();
+
     /** @brief Wyswietla wszystkie GameObject'y, ktore mogą zostac wyswietlone.
      * @param matrixPV - Iloczyn macierzy transformacji perspektywy i kamery.
      */
