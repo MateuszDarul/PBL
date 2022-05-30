@@ -32,8 +32,8 @@ public:
         float modifier = (Input()->Keyboard()->IsPressed(KeyboardKey::LShift)) ? rotationSpeedModifier : 1.0f;
         float rotationAmount = rotationSpeed * modifier * dt;
 
-        if (Input()->Keyboard()->IsPressed(KeyboardKey::W)) currentRotationX -= rotationAmount;
-        if (Input()->Keyboard()->IsPressed(KeyboardKey::S)) currentRotationX += rotationAmount;
+        if (Input()->Keyboard()->IsPressed(KeyboardKey::W)) currentRotationX += rotationAmount;
+        if (Input()->Keyboard()->IsPressed(KeyboardKey::S)) currentRotationX -= rotationAmount;
         if (Input()->Keyboard()->IsPressed(KeyboardKey::D)) currentRotationY -= rotationAmount;
         if (Input()->Keyboard()->IsPressed(KeyboardKey::A)) currentRotationY += rotationAmount;
 

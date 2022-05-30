@@ -1,6 +1,7 @@
 #include "BoxCollider.h"
 #include "Components.h"
 #include "GameObject.h"
+#include "SceneNode.h"
 
 #include "CollidersManager.h"
 
@@ -154,17 +155,14 @@ glm::uvec3 BoxCollider::getLengths()
 
 bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, RayHitInfo& hitInfo, float maxDistance)
 {
-	auto transform = GetOwner()->GetComponent<cmp::Transform>();
-	glm::mat4 transformMatrix;
+	glm::mat4 transformMatrix = GetOwner()->GetNode()->GetGlobalTransformations();
+	glm::vec3 position = { transformMatrix[3][0], transformMatrix[3][1], transformMatrix[3][2] };
 
 	if (isStatic)
 	{
-		transformMatrix = glm::translate(glm::mat4(1.0f), transform->GetPosition());
+		transformMatrix = glm::translate(glm::mat4(1.0f), position);
 	}
-	else
-	{
-		transformMatrix = transform->GetModelMatrix();
-	}
+	
 
 	float d1, d2, d = maxDistance;
 	glm::vec3 normal;
@@ -173,7 +171,7 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 
 	// -X
 	normal  = glm::vec3(transformMatrix * glm::vec4(-1.0f, 0.0f, 0.0f, 1.0f));
-	normal -= transform->GetPosition();
+	normal -= position;
 	normal  = glm::normalize(normal);
 
 	d1 = maxDistance;
@@ -207,7 +205,7 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 
 	// +X
 	normal  = glm::vec3(transformMatrix * glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-	normal -= transform->GetPosition();
+	normal -= position;
 	normal  = glm::normalize(normal);
 	
 	d1 = maxDistance;
@@ -241,7 +239,7 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 
 	// -Z
 	normal  = glm::vec3(transformMatrix * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f));
-	normal -= transform->GetPosition();
+	normal -= position;
 	normal  = glm::normalize(normal);
 	
 	d1 = maxDistance;
@@ -275,7 +273,7 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 
 	// +Z
 	normal  = glm::vec3(transformMatrix * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-	normal -= transform->GetPosition();
+	normal -= position;
 	normal  = glm::normalize(normal);
 
 	d1 = maxDistance;
@@ -309,7 +307,7 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 
 	// -Y
 	normal  = glm::vec3(transformMatrix * glm::vec4(0.0f, -1.0f, 0.0f, 1.0f));
-	normal -= transform->GetPosition();
+	normal -= position;
 	normal  = glm::normalize(normal);
 
 	d1 = maxDistance;
@@ -343,7 +341,7 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 
 	// +Y
 	normal  = glm::vec3(transformMatrix * glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-	normal -= transform->GetPosition();
+	normal -= position;
 	normal  = glm::normalize(normal);
 	
 	d1 = maxDistance;

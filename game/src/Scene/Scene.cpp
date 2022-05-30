@@ -377,7 +377,7 @@ Scene::Scene()
         go->AddComponent(std::make_shared<cmp::Name>("Mirror"));
 
         go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(7.5, 2.5, -20.3);
+        go->GetComponent<cmp::Transform>()->SetPosition(7.5, 2.5, 0.3);
         go->GetComponent<cmp::Transform>()->SetScale(1.0);
 
         go->AddComponent(std::make_shared<BoxCollider>(false, false));
@@ -402,6 +402,124 @@ Scene::Scene()
         auto mirrorScript = new MirrorRotate();
         mirrorScript->SetEnabled(false);
         go->GetComponent<cmp::Scriptable>()->Add(mirrorScript);
+
+        world->AddChild(go);
+    }
+
+    {
+        //rotator
+        auto mirrorHolderGO = std::make_shared<GameObject>();
+
+        mirrorHolderGO->AddComponent(std::make_shared<cmp::Transform>());
+        mirrorHolderGO->GetComponent<cmp::Transform>()->SetPosition(8.5, 0.5, -20.3);
+
+        mirrorHolderGO->AddComponent(std::make_shared<cmp::Scriptable>());
+
+        auto mirrorScript = new MirrorRotate();
+        mirrorScript->SetEnabled(false);
+        mirrorHolderGO->GetComponent<cmp::Scriptable>()->Add(mirrorScript);
+
+
+        auto mirrorHolder = world->AddChild(mirrorHolderGO);
+
+
+        //mirror itself
+        go = std::make_shared<GameObject>();
+        go->AddComponent(std::make_shared<cmp::Name>("Mirror"));
+
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(0.0, 2.0, 0.0);
+        go->GetComponent<cmp::Transform>()->SetScale(1.0);
+
+        go->AddComponent(std::make_shared<BoxCollider>(false, false));
+        go->GetComponent<cmp::BoxCol>()->setLengths({2.0, 2.0, 2.0});
+        go->GetComponent<cmp::BoxCol>()->SetMass(999999999.9f);
+        go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
+
+        auto model = std::make_shared<cmp::Model>();
+        model->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+            resMan->GetMaterial("Resources/models/floor/floor.mtl")
+        );
+        go->AddComponent(model);
+        go->AddComponent(shader_d);
+
+        go->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+
+
+        mirrorHolder->AddChild(go);
+    }
+    
+    //doors and activators
+    struct DoorAndActivatorPair
+    {
+        glm::vec3 doorPosition;
+        float doorRotationY;
+        glm::vec3 activatorPosition;
+    };
+
+    std::vector<DoorAndActivatorPair> doorsAndButtons = {
+        { {  0.0, 3.0, -10.5 }, 90.0f,   {  6.0, 2.5,  -9.5 } },
+        { { 10.0, 3.0, -36.5 }, 90.0f,   {  3.5, 2.5, -36.0 } },
+        { { 35.5, 3.0, -47.5 },  0.0f,   { 35.0, 2.5, -54.0 } },
+    };
+
+    for (auto& [doorPosition, doorRotation, activatorPosition] : doorsAndButtons)
+    {
+        //create door
+        go = std::make_shared<GameObject>();
+
+        auto doorTransform = std::make_shared<cmp::Transform>();
+        doorTransform->SetPosition(doorPosition);
+        doorTransform->SetRotation(0, doorRotation, 0);
+        go->AddComponent(doorTransform);
+
+        go->AddComponent(std::make_shared<BoxCollider>(false, true));
+        if (doorRotation < 0.001f) go->GetComponent<cmp::BoxCol>()->setLengths({1.0, 5.0, 5.0});
+        else go->GetComponent<cmp::BoxCol>()->setLengths({5.0, 5.0, 1.0});
+        go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
+
+        auto model = std::make_shared<cmp::Model>();
+        model->Create(
+            resMan->GetMesh("Resources/models/wall/wall.obj"),
+            resMan->GetMaterial("Resources/models/wall/wall.mtl")
+        );
+        model->SetTintColor(1.0, 0.5, 0.0);
+        go->AddComponent(model);
+        go->AddComponent(shader_d);
+
+        world->AddChild(go);
+
+        //create activator
+        go = std::make_shared<GameObject>();
+        go->AddComponent(std::make_shared<cmp::Name>("Door activator"));
+
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(activatorPosition);
+        go->GetComponent<cmp::Transform>()->SetScale(0.5);
+
+        go->AddComponent(std::make_shared<BoxCollider>(false, true));
+        go->GetComponent<cmp::BoxCol>()->setLengths({1.0, 1.0, 1.0});
+        go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
+
+        model = std::make_shared<cmp::Model>();
+        model->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+            resMan->GetMaterial("Resources/models/wall/wall.mtl")
+        );
+        go->AddComponent(model);
+        go->AddComponent(shader_d);
+
+        go->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+
+
+        go->AddComponent(std::make_shared<cmp::Scriptable>());
+
+        auto activator = new DoorActivator();
+        activator->doorTransform = doorTransform;
+        go->GetComponent<cmp::Scriptable>()->Add(activator);
 
         world->AddChild(go);
     }
@@ -489,6 +607,7 @@ void Scene::Update(float dt)
     world->FindNode("CROSSHAIR")->GetGameObject()->GetComponent<cmp::Transform>()->SetPosition(GameApplication::GetAspectRatio() * 0.5f, 0.5f, 0.1f);
     // world->FindNode("GroundCheck")->GetGameObject()->GetComponent<cmp::Transform>()->Move(0, -dt, 0);
 
+
     //Update camera
     std::shared_ptr<GameObject> goCamera = world->FindNode("CAMERA")->GetGameObject();
     std::shared_ptr<TransformComponent> transformCamera = goCamera->GetComponent<cmp::Transform>();
@@ -504,6 +623,8 @@ void Scene::Update(float dt)
     //Prevent camera jiggle and set correct position
     goCamera->GetComponent<CameraComponent>()->SetPosition(transformCamera->GetPosition());
     transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();
+    // auto pos = transformCamera->GetPosition();
+    // printf("%f %f %f\n", pos.x, pos.y, pos.z);
 
     
     //Position multitool

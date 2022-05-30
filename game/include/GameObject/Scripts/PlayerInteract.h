@@ -50,7 +50,9 @@ public:
         RayHitInfo hit;
         if (colMan->Raycast(camera->GetPosition(), camera->GetForward(), hit, interactRange, true, ignoreLayerMask))
         {
-            if (auto scriptable = hit.gameObject->GetComponent<cmp::Scriptable>())
+            auto scriptable = hit.gameObject->GetComponent<cmp::Scriptable>();
+            if (!scriptable) scriptable = hit.gameObject->GetNode()->GetParent()->GetGameObject()->GetComponent<cmp::Scriptable>();
+            if (scriptable)
             {
                 if (auto resource = scriptable->Get<Resource>())
                 {
