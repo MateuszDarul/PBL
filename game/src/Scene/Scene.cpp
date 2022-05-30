@@ -479,7 +479,7 @@ Scene::Scene()
         go->AddComponent(std::make_shared<cmp::Name>("Mirror"));
 
         go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(0.0, 2.0, 0.0);
+        go->GetComponent<cmp::Transform>()->SetPosition(0.0, 1.0, 0.0);
         go->GetComponent<cmp::Transform>()->SetScale(1.0);
 
         go->AddComponent(std::make_shared<BoxCollider>(false, false));
@@ -639,6 +639,20 @@ Scene::Scene()
     //===
    
     world->LoadScripts();
+
+
+    // PREVENT CAMERA AND MIRRORS FROM GOING TO INFINITY
+    std::shared_ptr<GameObject> goCamera = world->FindNode("CAMERA")->GetGameObject();
+    std::shared_ptr<TransformComponent> transformCamera = goCamera->GetComponent<cmp::Transform>();
+
+    goCamera->GetComponent<CameraComponent>()->Update(GameApplication::GetInputManager(), 0.0f);
+    transformCamera->SetPosition(goCamera->GetComponent<CameraComponent>()->GetPosition());
+    goCamera->GetNode()->ResetGlobalTransformations();
+
+    goCamera->GetComponent<CameraComponent>()->SetPosition(transformCamera->GetPosition());
+    transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();
+
+    world->Update(0.0f); 
 }
 
 Scene::~Scene()
@@ -655,8 +669,6 @@ Scene::~Scene()
 void Scene::Update(float dt)
 {
     world->FindNode("CROSSHAIR")->GetGameObject()->GetComponent<cmp::Transform>()->SetPosition(GameApplication::GetAspectRatio() * 0.5f, 0.5f, 0.1f);
-    // world->FindNode("GroundCheck")->GetGameObject()->GetComponent<cmp::Transform>()->Move(0, -dt, 0);
-
 
     //Update camera
     std::shared_ptr<GameObject> goCamera = world->FindNode("CAMERA")->GetGameObject();
@@ -675,7 +687,7 @@ void Scene::Update(float dt)
     goCamera->GetComponent<CameraComponent>()->SetPosition(transformCamera->GetPosition());
     transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();
     // auto pos = transformCamera->GetPosition();
-    // printf("%f %f %f\n", pos.x, pos.y, pos.z);
+    // printf("camera %f %f %f\n", pos.x, pos.y, pos.z);
 
     
     //Position multitool
