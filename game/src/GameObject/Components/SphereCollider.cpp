@@ -1,6 +1,7 @@
 #include "SphereCollider.h"
 #include "Components.h"
 #include "GameObject.h"
+#include "SceneNode.h"
 
 #include "CollidersManager.h"
 #include <glm/gtx/intersect.hpp>
@@ -25,10 +26,16 @@ bool SphereCollider::CheckCollision(std::shared_ptr<ColliderComponent> collider)
 {
 	std::shared_ptr<TransformComponent> thisTransform = this->GetOwner()->GetComponent<TransformComponent>();
 	std::shared_ptr<TransformComponent> otherTransform = collider->GetOwner()->GetComponent<TransformComponent>();
-	glm::mat4 thisModelMat = thisTransform->GetModelMatrix();
+	// glm::mat4 thisModelMat = thisTransform->GetModelMatrix();
+	// glm::vec3 thisPos = glm::vec3(thisModelMat[3][0], thisModelMat[3][1], thisModelMat[3][2]) + this->offset;
+	// glm::mat4 otherModelMat = otherTransform->GetModelMatrix();
+	// glm::vec3 otherPos = glm::vec3(otherModelMat[3][0], otherModelMat[3][1], otherModelMat[3][2]) + collider->GetOffset();
+
+	const glm::mat4& thisModelMat = this->GetOwner()->GetNode()->GetGlobalTransformations();
+	const glm::mat4& otherModelMat = collider->GetOwner()->GetNode()->GetGlobalTransformations();
 	glm::vec3 thisPos = glm::vec3(thisModelMat[3][0], thisModelMat[3][1], thisModelMat[3][2]) + this->offset;
-	glm::mat4 otherModelMat = otherTransform->GetModelMatrix();
 	glm::vec3 otherPos = glm::vec3(otherModelMat[3][0], otherModelMat[3][1], otherModelMat[3][2]) + collider->GetOffset();
+
 	if (collider->GetClassUUID() == 11)
 	{
 		std::shared_ptr<SphereCollider> other = std::dynamic_pointer_cast<SphereCollider>(collider);
