@@ -13,13 +13,11 @@
 #include "Scripts/Health.h"
 #include "EnemyScript.h"
 
-
-// for quick access in Update
-static std::shared_ptr<GameObject> GO_CAMERA;
-static std::shared_ptr<GameObject> GO_MULTITOOL;
-static std::shared_ptr<GameObject> GO_FLASHLIGHT;
-static std::shared_ptr<GameObject> GO_CROSSHAIR;
-
+// for quick access (avoiding string comparisions in FindNode)
+std::shared_ptr<GameObject> GO_CAMERA;
+std::shared_ptr<GameObject> GO_MULTITOOL;
+std::shared_ptr<GameObject> GO_FLASHLIGHT;
+std::shared_ptr<GameObject> GO_CROSSHAIR;
 
 Scene::Scene()
 {
