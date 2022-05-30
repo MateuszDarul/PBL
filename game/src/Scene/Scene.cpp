@@ -213,7 +213,8 @@ Scene::Scene()
     }
     world->AddChild(go);
 
-    /* go->AddComponent(mc);
+    /* 
+        go->AddComponent(mc);
         go->AddComponent(shader_l);
         go->AddComponent(std::make_shared<cmp::Transform>());
         go->AddComponent(std::make_shared<cmp::Name>("wieza"));
@@ -232,24 +233,9 @@ Scene::Scene()
         particles->SetDirectionVar(45);
         particles->SetParticleLifetime(1.0f);
         particles->SetScale(0.1f);
-        particles->SetSpeed(20.0f);*/
+        particles->SetSpeed(20.0f);
+    */
 
-    ///***
-    go = std::make_shared<GameObject>();
-    {
-        go->AddComponent(std::make_shared<cmp::Name>("Crate1"));
-        go = std::make_shared<GameObject>();
-        std::shared_ptr<cmp::Refract> refr = std::make_shared<cmp::Refract>();
-        refr->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"), 1.52f, skybox->GetTexture());
-        go->AddComponent(refr);
-        go->AddComponent(shader_r);
-        go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(-15.1, 3, 0);
-        go->GetComponent<cmp::Transform>()->SetScale(glm::vec3(0.2, 2, 4));
-    }
-    world->AddChild(go);
-    
-    ///***
 
     MapLoader::Load("Resources/maps/world.map", world, shader_l, collidersManager, shadowsManager);
 
@@ -318,6 +304,27 @@ Scene::Scene()
 
     //===
    
+
+    go = std::make_shared<GameObject>();
+    {
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/Dekoracje/Krzeslo.obj"),
+            resMan->GetMaterial("Resources/models/Dekoracje/Krzeslo.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_l);
+
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(-2, 4, 0);
+
+        go->AddComponent(std::make_shared<FrustumCullingComponent>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(
+            resMan->GetMesh("Resources/models/Dekoracje/Krzeslo.obj")
+        );
+    }
+    world->AddChild(go);
+
     world->LoadScripts();
 }
 

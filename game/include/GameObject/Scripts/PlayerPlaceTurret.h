@@ -190,8 +190,8 @@ public:
     
         auto mc = std::make_shared<cmp::Model>();
         mc->Create(
-            resMan->GetMesh("Resources/models/wieze/w1/w1.obj"),
-            resMan->GetMaterial("Resources/models/wieze/w1/w1.mtl")
+            resMan->GetMesh("Resources/models/wieze/Strzelajaca.obj"),
+            resMan->GetMaterial("Resources/models/wieze/Strzelajaca.mtl")
         );
         turretToPlace->AddComponent(mc);
         turretToPlace->AddComponent(turretShader);
@@ -199,7 +199,7 @@ public:
         turretToPlace->GetComponent<cmp::Transform>()->SetPosition(0,0.5,-5);
         turretToPlace->AddComponent(std::make_shared<cmp::FrustumCulling>());
         turretToPlace->GetComponent<cmp::FrustumCulling>()->Create(
-            resMan->GetMesh("Resources/models/wieze/w1/w1.obj"));
+            resMan->GetMesh("Resources/models/wieze/Strzelajaca.obj"));
         turretToPlace->AddComponent(std::make_shared<cmp::SphereCol>(true, true));
         std::shared_ptr<cmp::SphereCol> col = turretToPlace->GetComponent<cmp::SphereCol>();
         col->SetRadius(shootingTurretRange);
