@@ -159,10 +159,13 @@ public:
                 if (auto scriptHolder = turretPrefabs[selectedTurretType]->GetComponent<cmp::Scriptable>())
                 {
                     scriptHolder->EnableAll();
-
-                    if(auto shooting = scriptHolder->Get<TurretShoot>())
+                    
+                    std::shared_ptr<ColliderComponent> col = nullptr;
+                    col = turretPrefabs[selectedTurretType]->GetComponent<cmp::SphereCol>();
+                    if (!col) col = turretPrefabs[selectedTurretType]->GetComponent<cmp::BoxCol>();
+                    if(col)
                     {
-                        shooting->isPut = true;
+                        col->AddToCollidersManager(colMan);
                     }
                 }
                 CreateTurret(selectedTurretType);
@@ -228,7 +231,6 @@ public:
         TurretType type = TurretType::Lantern;
         turretPrefabs[type] = std::make_shared<GameObject>();
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::Transform>());
-        turretPrefabs[type]->AddComponent(std::make_shared<cmp::Name>(";antern"));
 
 
         auto gfxGO = std::make_shared<GameObject>();
@@ -271,37 +273,14 @@ public:
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::SphereCol>(true, true));
         std::shared_ptr<cmp::SphereCol> col = turretPrefabs[type]->GetComponent<cmp::SphereCol>();
         col->SetRadius(shootingTurretRange);
-        col->AddToCollidersManager(colMan);
+        // col->AddToCollidersManager(colMan);
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::Scriptable>());
         TurretShoot* script = new TurretShoot();
-        script->isPut = false;
-        // script->SetEnabled(false);
+        script->isPut = true;
+        script->SetEnabled(false);
         turretPrefabs[type]->GetComponent<cmp::Scriptable>()->Add(script);
 
         turretsHolder->AddChild(turretPrefabs[type]);
-        // TurretType type = TurretType::Shooting;
-        // turretPrefabs[type] = std::make_shared<GameObject>();
-        // turretPrefabs[type]->AddComponent(std::make_shared<cmp::Transform>());
-
-
-        // auto gfxGO = std::make_shared<GameObject>();
-        // gfxGO->AddComponent(std::make_shared<cmp::Transform>());
-
-        // auto mc = std::make_shared<cmp::Model>();
-        // mc->Create(
-        //     resMan->GetMesh("Resources/models/wieze/w1/w1.obj"),
-        //     resMan->GetMaterial("Resources/models/wieze/w1/w1.mtl")
-        // );
-        // gfxGO->AddComponent(mc);
-        
-        // gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
-        // gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
-        //     resMan->GetMesh("Resources/models/wieze/w1/w1.obj")
-        // );
-        // gfxGO->AddComponent(turretShader);
-
-
-        // turretsHolder->AddChild(turretPrefabs[type])->AddChild(gfxGO);
     }
 
     void CreateLaserTurret()
