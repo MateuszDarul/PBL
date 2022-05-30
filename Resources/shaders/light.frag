@@ -87,12 +87,16 @@ void main()
     {
         for(int i=0; i<pointLightAmount; i++)
         {
-            pixelColor += GetPointLight(tm, pointLight[i]);
+            vec3 col = GetPointLight(tm, pointLight[i]);
+            if(col.x > 0.02 || col.y > 0.02 || col.z > 0.02)
+                pixelColor += col;
         }
 
         for(int i=0; i<spotLightAmount; i++)
         {
-            pixelColor += GetSpotLight(tm, spotLight[i]);
+            vec3 col = GetSpotLight(tm, spotLight[i]);
+            if(col.x > 0.02 || col.y > 0.02 || col.z > 0.02)
+                pixelColor += col;
         }
 
         float mul = 0;
@@ -105,7 +109,7 @@ void main()
         }
         if(mul < 0.5)
         {
-            pixelColor *= 0.5;
+            pixelColor *= 0.25;
         }
 
     }

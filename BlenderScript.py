@@ -5,7 +5,7 @@ import math
 
 filename = "world.map"
 modlesDir = "Exported\\"
-workingDir = "C:\\Users\\MDarul\\Desktop\\swiat"
+workingDir = "C:\\Users\\MDarul\\Desktop"
 
 os.chdir(workingDir)
 
@@ -62,12 +62,13 @@ ObjMap = [
     ["Sufit.NR2","Exported/Sufit.NR2",[7.0,0.5,8.0]],
     ["Sufit.NR3","Exported/Sufit.NR3",[40.0,0.5,15.0]],
     ["Sufit.NR4","Exported/Sufit.NR4",[40.0,0.5,56.0]],
-    ["Wall.NR1","Exported/Wall.NR1",[1.0,6.0,10.0]],
-    ["Wall.NR2","Exported/Wall.NR2",[1.0,6.0,5.0]],
-    ["Wall.NR3","Exported/Wall.NR3",[1.0,2.0,10.0]],
-    ["Wall.NR4","Exported/Wall.NR4",[1.0,6.0,8.0]],
-    ["Wall.NR5","Exported/Wall.NR5",[2.0,2.0,1.0]],
-    ["Wall.NR6","Exported/Wall.NR6",[2.0,1.0,1.0]],
+    ["Wall.NR1","Exported/Sciana.NR1",[1.0,6.0,10.0]],
+    ["Wall.NR2","Exported/Sciana.NR2",[1.0,6.0,5.0]],
+    ["Wall.NR3","Exported/Sciana.NR3",[1.0,2.0,10.0]],
+    ["Wall.NR4","Exported/Sciana.NR4",[1.0,6.0,8.0]],
+    ["Wall.NR5","Exported/Sciana.NR5",[2.0,2.0,1.0]],
+    ["Wall.NR6","Exported/Sciana.NR6",[2.0,1.0,1.0]],
+    ["Tablica","Dekoracje/Tablica",[0.25,5.0,5.8]],
 ]
 #Cube example ["xCube","xCube/xCube",[1.0,1.0,1.0]],
 #Sphere example ["xSphere","xSphere/xSphere",[1.0]],
@@ -105,6 +106,25 @@ def GetCollider(string, rotation):
                 result += str(size[2])
                 break
     return result
+
+def GetColFromName(string):
+    col = [0,0,0,0]
+    if string[0] == 'S':
+        col[0] = 1
+    col_str = ""
+    cut = False
+    for i in range(len(string)):
+        if string[i] == ']':
+            cut = False
+        if cut == True:
+            col_str += string[i]
+        if string[i] == '[':
+            cut = True
+    col_str = col_str.split()
+    col[1] = float(col_str[0])
+    col[3] = float(col_str[1])
+    col[2] = float(col_str[2])
+    return col
 
 f = open(filename, "w")
 
@@ -197,7 +217,42 @@ while i < all_elements:
     f.write(("END\n"))
     i += j
 
+for collection in bpy.data.collections:
+    if collection.name == "Collisions":
+        for obj in collection.all_objects:        
+            bpy.context.view_layer.objects.active = obj
+            obj.hide_set(False)
+            obj.select_set(True)
+            f.write(("NEW\n"))
+            f.write(("Transformations:\n"))
+            f.write((str(round(-obj.location.x, 3)) + "\n"))
+            f.write((str(round(obj.location.z, 3)) + "\n"))
+            f.write((str(round(obj.location.y, 3)) + "\n"))
+            f.write((str(0) + "\n"))
+            f.write((str(0) + "\n"))
+            f.write((str(0) + "\n"))
+            f.write(("Collider:\n"))
+            col_size = GetColFromName(obj.name)
+            f.write((str(col_size[0]) + "\n"))
+            if col_size[0] == 0:
+                f.write((str(col_size[1]) + "\n"))
+                f.write((str(col_size[2]) + "\n"))
+                f.write((str(col_size[3]) + "\n"))
+            if col_size[0] == 1:
+                f.write((str(col_size[1]) + "\n"))
+            f.write(("END\n"))
+            obj.hide_set(True)
+            obj.select_set(False)
+
 f.close()
 print("File created: ", os.getcwd(), "\\", filename, sep="")
+
+
+
+for collection in bpy.data.collections:
+    if collection.name == "Collisions":
+        for obj in collection.all_objects:  
+            obj.hide_set(False)
+            obj.hide_set(True)
 
 
