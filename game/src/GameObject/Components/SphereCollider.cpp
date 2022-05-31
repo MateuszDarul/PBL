@@ -1,6 +1,7 @@
 #include "SphereCollider.h"
 #include "Components.h"
 #include "GameObject.h"
+#include "SceneNode.h"
 
 #include "CollidersManager.h"
 #include <glm/gtx/intersect.hpp>
@@ -25,10 +26,16 @@ bool SphereCollider::CheckCollision(std::shared_ptr<ColliderComponent> collider)
 {
 	std::shared_ptr<TransformComponent> thisTransform = this->GetOwner()->GetComponent<TransformComponent>();
 	std::shared_ptr<TransformComponent> otherTransform = collider->GetOwner()->GetComponent<TransformComponent>();
-	glm::mat4 thisModelMat = thisTransform->GetModelMatrix();
+	// glm::mat4 thisModelMat = thisTransform->GetModelMatrix();
+	// glm::vec3 thisPos = glm::vec3(thisModelMat[3][0], thisModelMat[3][1], thisModelMat[3][2]) + this->offset;
+	// glm::mat4 otherModelMat = otherTransform->GetModelMatrix();
+	// glm::vec3 otherPos = glm::vec3(otherModelMat[3][0], otherModelMat[3][1], otherModelMat[3][2]) + collider->GetOffset();
+
+	glm::mat4 thisModelMat = this->GetOwner()->GetNode()->GetGlobalTransformations();
+	glm::mat4 otherModelMat = collider->GetOwner()->GetNode()->GetGlobalTransformations();
 	glm::vec3 thisPos = glm::vec3(thisModelMat[3][0], thisModelMat[3][1], thisModelMat[3][2]) + this->offset;
-	glm::mat4 otherModelMat = otherTransform->GetModelMatrix();
 	glm::vec3 otherPos = glm::vec3(otherModelMat[3][0], otherModelMat[3][1], otherModelMat[3][2]) + collider->GetOffset();
+
 	if (collider->GetClassUUID() == 11)
 	{
 		std::shared_ptr<SphereCollider> other = std::dynamic_pointer_cast<SphereCollider>(collider);
@@ -53,16 +60,32 @@ bool SphereCollider::CheckCollision(std::shared_ptr<ColliderComponent> collider)
 					otherVec *= thisMass / massSum * -radiusDiff / radius;
 					thisTransform->SetPosition(thisTransform->GetPosition() + otherVec);
 					otherTransform->SetPosition(otherTransform->GetPosition() + thisVec);
+					thisModelMat[3][0] += thisVec.x;
+					thisModelMat[3][1] += thisVec.y;
+					thisModelMat[3][2] += thisVec.z;
+					this->GetOwner()->GetNode()->SetGlobalTransformations(thisModelMat);
+					otherModelMat[3][0] += otherVec.x;
+					otherModelMat[3][1] += otherVec.y;
+					otherModelMat[3][2] += otherVec.z;
+					collider->GetOwner()->GetNode()->SetGlobalTransformations(otherModelMat);
 				}
 				else if (thisMoves)
 				{
 					otherVec *= -radiusDiff / radius;
 					thisTransform->SetPosition(thisTransform->GetPosition() + otherVec);
+					thisModelMat[3][0] += otherVec.x;	//czy to na pewno powinno byc other?
+					thisModelMat[3][1] += otherVec.y;	//daje tak bo wyzej tak jest
+					thisModelMat[3][2] += otherVec.z;	//w kolizji z boxem jest inaczej
+					this->GetOwner()->GetNode()->SetGlobalTransformations(thisModelMat);
 				}
 				else if (otherMoves)
 				{
 					thisVec *= -radiusDiff / radius;
 					otherTransform->SetPosition(otherTransform->GetPosition() + thisVec);
+					otherModelMat[3][0] += thisVec.x;
+					otherModelMat[3][1] += thisVec.y;
+					otherModelMat[3][2] += thisVec.z;
+					collider->GetOwner()->GetNode()->SetGlobalTransformations(otherModelMat);
 				}
 			}
 			return true;
@@ -112,16 +135,34 @@ bool SphereCollider::CheckCollision(std::shared_ptr<ColliderComponent> collider)
 					float thisMass = this->GetMass();
 					float otherMass = other->GetMass();
 					float massSum = thisMass + otherMass;
-					thisTransform->SetPosition(thisTransform->GetPosition() + thisMoveVec * otherMass / massSum);
-					otherTransform->SetPosition(otherTransform->GetPosition() + otherMoveVec * thisMass / massSum);
+					thisMoveVec *= otherMass / massSum;
+					otherMoveVec *= thisMass / massSum;
+					thisTransform->SetPosition(thisTransform->GetPosition() + thisMoveVec);
+					otherTransform->SetPosition(otherTransform->GetPosition() + otherMoveVec);
+					thisModelMat[3][0] += thisMoveVec.x;
+					thisModelMat[3][1] += thisMoveVec.y;
+					thisModelMat[3][2] += thisMoveVec.z;
+					this->GetOwner()->GetNode()->SetGlobalTransformations(thisModelMat);
+					otherModelMat[3][0] += otherMoveVec.x;
+					otherModelMat[3][1] += otherMoveVec.y;
+					otherModelMat[3][2] += otherMoveVec.z;
+					collider->GetOwner()->GetNode()->SetGlobalTransformations(otherModelMat);
 				}
 				else if (thisMoves)
 				{
 					thisTransform->SetPosition(thisTransform->GetPosition() + thisMoveVec);
+					thisModelMat[3][0] += thisMoveVec.x;
+					thisModelMat[3][1] += thisMoveVec.y;
+					thisModelMat[3][2] += thisMoveVec.z;
+					this->GetOwner()->GetNode()->SetGlobalTransformations(thisModelMat);
 				}
 				else if (otherMoves)
 				{
 					otherTransform->SetPosition(otherTransform->GetPosition() + otherMoveVec);
+					otherModelMat[3][0] += otherMoveVec.x;
+					otherModelMat[3][1] += otherMoveVec.y;
+					otherModelMat[3][2] += otherMoveVec.z;
+					collider->GetOwner()->GetNode()->SetGlobalTransformations(otherModelMat);
 				}
 			}
 			return true;

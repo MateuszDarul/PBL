@@ -1,6 +1,7 @@
 #include "BoxCollider.h"
 #include "Components.h"
 #include "GameObject.h"
+#include "SceneNode.h"
 
 #include "CollidersManager.h"
 
@@ -32,9 +33,14 @@ bool BoxCollider::CheckCollision(std::shared_ptr<ColliderComponent> collider)
 {
 	std::shared_ptr<TransformComponent> thisTransform = this->GetOwner()->GetComponent<TransformComponent>();
 	std::shared_ptr<TransformComponent> otherTransform = collider->GetOwner()->GetComponent<TransformComponent>();
-	glm::mat4 thisModelMat = thisTransform->GetModelMatrix();
+	// glm::mat4 thisModelMat = thisTransform->GetModelMatrix();
+	// glm::vec3 thisPos = glm::vec3(thisModelMat[3][0], thisModelMat[3][1], thisModelMat[3][2]) + this->offset;
+	// glm::mat4 otherModelMat = otherTransform->GetModelMatrix();
+	// glm::vec3 otherPos = glm::vec3(otherModelMat[3][0], otherModelMat[3][1], otherModelMat[3][2]) + collider->GetOffset();
+
+	glm::mat4 thisModelMat = this->GetOwner()->GetNode()->GetGlobalTransformations();
+	glm::mat4 otherModelMat = collider->GetOwner()->GetNode()->GetGlobalTransformations();
 	glm::vec3 thisPos = glm::vec3(thisModelMat[3][0], thisModelMat[3][1], thisModelMat[3][2]) + this->offset;
-	glm::mat4 otherModelMat = otherTransform->GetModelMatrix();
 	glm::vec3 otherPos = glm::vec3(otherModelMat[3][0], otherModelMat[3][1], otherModelMat[3][2]) + collider->GetOffset();
 
 	glm::uvec3 thisLenghts = this->getLengths();
@@ -81,16 +87,34 @@ bool BoxCollider::CheckCollision(std::shared_ptr<ColliderComponent> collider)
 					float thisMass = this->GetMass();
 					float otherMass = other->GetMass();
 					float massSum = thisMass + otherMass;
-					thisTransform->SetPosition(thisTransform->GetPosition() + thisMoveVec * otherMass / massSum);
-					otherTransform->SetPosition(otherTransform->GetPosition() + otherMoveVec * thisMass / massSum);
+					thisMoveVec *= otherMass / massSum;
+					otherMoveVec *= thisMass / massSum;
+					thisTransform->SetPosition(thisTransform->GetPosition() + thisMoveVec);
+					otherTransform->SetPosition(otherTransform->GetPosition() + otherMoveVec);
+					thisModelMat[3][0] += thisMoveVec.x;
+					thisModelMat[3][1] += thisMoveVec.y;
+					thisModelMat[3][2] += thisMoveVec.z;
+					this->GetOwner()->GetNode()->SetGlobalTransformations(thisModelMat);
+					otherModelMat[3][0] += otherMoveVec.x;
+					otherModelMat[3][1] += otherMoveVec.y;
+					otherModelMat[3][2] += otherMoveVec.z;
+					collider->GetOwner()->GetNode()->SetGlobalTransformations(otherModelMat);
 				}
 				else if (thisMoves)
 				{
 					thisTransform->SetPosition(thisTransform->GetPosition() + thisMoveVec);
+					thisModelMat[3][0] += thisMoveVec.x;
+					thisModelMat[3][1] += thisMoveVec.y;
+					thisModelMat[3][2] += thisMoveVec.z;
+					this->GetOwner()->GetNode()->SetGlobalTransformations(thisModelMat);
 				}
 				else if (otherMoves)
 				{
 					otherTransform->SetPosition(otherTransform->GetPosition() + otherMoveVec);
+					otherModelMat[3][0] += otherMoveVec.x;
+					otherModelMat[3][1] += otherMoveVec.y;
+					otherModelMat[3][2] += otherMoveVec.z;
+					collider->GetOwner()->GetNode()->SetGlobalTransformations(otherModelMat);
 				}
 			}
 			return true;
@@ -124,16 +148,34 @@ bool BoxCollider::CheckCollision(std::shared_ptr<ColliderComponent> collider)
 					float thisMass = this->GetMass();
 					float otherMass = other->GetMass();
 					float massSum = thisMass + otherMass;
-					thisTransform->SetPosition(thisTransform->GetPosition() + thisMoveVec * otherMass / massSum);
-					otherTransform->SetPosition(otherTransform->GetPosition() + otherMoveVec * thisMass / massSum);
+					thisMoveVec *= otherMass / massSum;
+					otherMoveVec *= thisMass / massSum;
+					thisTransform->SetPosition(thisTransform->GetPosition() + thisMoveVec);
+					otherTransform->SetPosition(otherTransform->GetPosition() + otherMoveVec);
+					thisModelMat[3][0] += thisMoveVec.x;
+					thisModelMat[3][1] += thisMoveVec.y;
+					thisModelMat[3][2] += thisMoveVec.z;
+					this->GetOwner()->GetNode()->SetGlobalTransformations(thisModelMat);
+					otherModelMat[3][0] += otherMoveVec.x;
+					otherModelMat[3][1] += otherMoveVec.y;
+					otherModelMat[3][2] += otherMoveVec.z;
+					collider->GetOwner()->GetNode()->SetGlobalTransformations(otherModelMat);
 				}
 				else if (thisMoves)
 				{
 					thisTransform->SetPosition(thisTransform->GetPosition() + thisMoveVec);
+					thisModelMat[3][0] += thisMoveVec.x;
+					thisModelMat[3][1] += thisMoveVec.y;
+					thisModelMat[3][2] += thisMoveVec.z;
+					this->GetOwner()->GetNode()->SetGlobalTransformations(thisModelMat);
 				}
 				else if (otherMoves)
 				{
 					otherTransform->SetPosition(otherTransform->GetPosition() + otherMoveVec);
+					otherModelMat[3][0] += otherMoveVec.x;
+					otherModelMat[3][1] += otherMoveVec.y;
+					otherModelMat[3][2] += otherMoveVec.z;
+					collider->GetOwner()->GetNode()->SetGlobalTransformations(otherModelMat);
 				}
 			}
 			return true;
@@ -154,17 +196,14 @@ glm::uvec3 BoxCollider::getLengths()
 
 bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, RayHitInfo& hitInfo, float maxDistance)
 {
-	auto transform = GetOwner()->GetComponent<cmp::Transform>();
-	glm::mat4 transformMatrix;
+	glm::mat4 transformMatrix = GetOwner()->GetNode()->GetGlobalTransformations();
+	glm::vec3 position = { transformMatrix[3][0], transformMatrix[3][1], transformMatrix[3][2] };
 
 	if (isStatic)
 	{
-		transformMatrix = glm::translate(glm::mat4(1.0f), transform->GetPosition());
+		transformMatrix = glm::translate(glm::mat4(1.0f), position);
 	}
-	else
-	{
-		transformMatrix = transform->GetModelMatrix();
-	}
+	
 
 	float d1, d2, d = maxDistance;
 	glm::vec3 normal;
@@ -173,7 +212,7 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 
 	// -X
 	normal  = glm::vec3(transformMatrix * glm::vec4(-1.0f, 0.0f, 0.0f, 1.0f));
-	normal -= transform->GetPosition();
+	normal -= position;
 	normal  = glm::normalize(normal);
 
 	d1 = maxDistance;
@@ -207,7 +246,7 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 
 	// +X
 	normal  = glm::vec3(transformMatrix * glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-	normal -= transform->GetPosition();
+	normal -= position;
 	normal  = glm::normalize(normal);
 	
 	d1 = maxDistance;
@@ -241,7 +280,7 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 
 	// -Z
 	normal  = glm::vec3(transformMatrix * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f));
-	normal -= transform->GetPosition();
+	normal -= position;
 	normal  = glm::normalize(normal);
 	
 	d1 = maxDistance;
@@ -275,7 +314,7 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 
 	// +Z
 	normal  = glm::vec3(transformMatrix * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-	normal -= transform->GetPosition();
+	normal -= position;
 	normal  = glm::normalize(normal);
 
 	d1 = maxDistance;
@@ -309,7 +348,7 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 
 	// -Y
 	normal  = glm::vec3(transformMatrix * glm::vec4(0.0f, -1.0f, 0.0f, 1.0f));
-	normal -= transform->GetPosition();
+	normal -= position;
 	normal  = glm::normalize(normal);
 
 	d1 = maxDistance;
@@ -343,7 +382,7 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 
 	// +Y
 	normal  = glm::vec3(transformMatrix * glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-	normal -= transform->GetPosition();
+	normal -= position;
 	normal  = glm::normalize(normal);
 	
 	d1 = maxDistance;

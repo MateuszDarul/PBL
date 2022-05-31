@@ -73,7 +73,8 @@ void EnemyScript::Update(float dt)
 
 	if (dot > 0.7f)
 	{
-		std::cout << "I am taking dmg" << std::endl;
+		// player looks at me
+		// std::cout << "I am taking dmg" << std::endl;
 	}
 
 }
