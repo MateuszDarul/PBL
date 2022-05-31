@@ -27,8 +27,6 @@ std::shared_ptr<GameObject> GO_CROSSHAIR;
 std::shared_ptr<SceneNode> NODE_MAIN;
 std::shared_ptr<SceneNode> NODE_GUI;
 
-DoorActivator* afterEnemy;
-
 
 Scene::Scene()
 {
@@ -497,8 +495,8 @@ MultiToolController* multiToolScript;
     };
 
     int i = 0;
-    DoorActivator* asdsada = nullptr;
-    afterEnemy = nullptr;
+    DoorActivator* cutsceneDoorActivator = nullptr;
+    DoorActivator* openDoorAfterEnemyDies = nullptr;
     for (auto& [doorPosition, doorRotation, activatorPosition] : doorsAndButtons)
     {
         //create door
@@ -559,8 +557,8 @@ MultiToolController* multiToolScript;
         activator->openedOffset = { 0.0f, 10.1f, 0.0f };
         go->GetComponent<cmp::Scriptable>()->Add(activator);
 
-        if (i == 1) asdsada = activator;
-        if (i == 2) afterEnemy = activator;
+        if (i == 1) cutsceneDoorActivator = activator;
+        if (i == 2) openDoorAfterEnemyDies = activator;
         i++;
 
         world->FindNode("MAIN")->AddChild(go);
@@ -573,10 +571,10 @@ MultiToolController* multiToolScript;
         
         go->AddComponent(std::make_shared<cmp::Transform>());
         go->GetComponent<cmp::Transform>()->SetPosition(-83.0f, 2.5f, 69.5f );
-        //go->GetComponent<cmp::Transform>()->SetScale(0.5);
+        go->GetComponent<cmp::Transform>()->SetScale(2.5);
 
         go->AddComponent(std::make_shared<BoxCollider>(true, true));
-        go->GetComponent<cmp::BoxCol>()->setLengths({3.0, 3.0, 3.0});
+        go->GetComponent<cmp::BoxCol>()->setLengths({5.0, 5.0, 5.0});
         go->GetComponent<cmp::BoxCol>()->layer = CollisionLayer::Ignore;
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
@@ -594,8 +592,10 @@ MultiToolController* multiToolScript;
 
 
         auto cutscene = new Cutscenexd();
-        cutscene->activator = asdsada;
-
+        cutscene->doorsToShut = cutsceneDoorActivator;
+        cutscene->doorsToOpen = openDoorAfterEnemyDies;
+        cutscene->lightShader = shader_l;
+        cutscene->enemyHealth = world->FindNode("Enemy")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<Health>();
         go->GetComponent<cmp::Scriptable>()->Add(cutscene);
         
         
@@ -670,6 +670,7 @@ MultiToolController* multiToolScript;
 
 
     // PREVENT CAMERA AND MIRRORS FROM GOING TO INFINITY 
+    //(i tak raz na ktores uruchomienie kamera jest w 0 1312321321312 -10;  trzeba to ogarnac)
     std::shared_ptr<GameObject> goCamera = world->FindNode("CAMERA")->GetGameObject();
     std::shared_ptr<TransformComponent> transformCamera = goCamera->GetComponent<cmp::Transform>();
 
@@ -693,11 +694,10 @@ Scene::~Scene()
     delete collidersManager;
     collidersManager = nullptr;
 }
-extern float GlobalElapsedTime;
+
 void Scene::Update(float dt)
 {
     GO_CROSSHAIR->GetComponent<cmp::Transform>()->SetPosition(GameApplication::GetAspectRatio() * 0.5f, 0.5f, 0.1f);
-    world->FindNode("cutscene")->GetGameObject()->GetComponent<cmp::Transform>()->SetPosition( 5 * sin(GlobalElapsedTime) -83.0f, 2.5f, 69.5f);
 
     //Update camera
     std::shared_ptr<GameObject> goCamera = GO_CAMERA;
@@ -741,12 +741,6 @@ void Scene::Update(float dt)
 
 
     //Update scene
-
-    if(!world->FindNode("Enemy"))
-    {
-        afterEnemy->Activate();
-    }
-
     world->Update(dt);
 
     shadowsManager->Update();

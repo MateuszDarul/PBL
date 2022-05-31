@@ -14,20 +14,24 @@ public:
 
     std::shared_ptr<cmp::Transform> doorTransform;
 
-    glm::vec3 targetPosition;
+
 private:
 
     std::shared_ptr<cmp::Model> buttonModel;
 
     bool isPrimed;
     bool isActivated;
+    bool isShutdown;
 
+    glm::vec3 targetPosition;
+    
 public:
 
     void Start()
     {
         isPrimed = true;
         isActivated = false;
+        isShutdown = false;
 
         if (doorTransform) targetPosition = doorTransform->GetPosition();
         buttonModel = gameObject->GetComponent<cmp::Model>();
@@ -35,6 +39,8 @@ public:
 
     void Update(float dt)
     {
+        if (isShutdown) isActivated = false;
+
         if (isActivated)    //on being powered
         {
             isActivated = false;
@@ -71,5 +77,10 @@ public:
         }
 
         isActivated = true;
+    }
+
+    void ForceShutdown(bool shutdown = true)
+    {
+        isShutdown = shutdown;
     }
 };
