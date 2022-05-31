@@ -8,6 +8,8 @@
 
 class GameObject;
 class ColliderComponent;
+class ScriptComponent;
+
 /**
  * @brief Interfejs dla skryptow
  * 
@@ -70,17 +72,23 @@ public:
      */
     virtual void TriggerExit(std::shared_ptr<ColliderComponent> collider);
     
-    //On Destroy ?
+    /**
+     * @brief Ustawia flage enabled. Przy ustawieniu na true, gdy wczesniej bylo false, wywoluje metode Start
+     */
+    void SetEnabled(bool enabled);
 
     /**
      * @brief GameObject posiadajacy instancje skryptu
      */
     std::shared_ptr<GameObject> gameObject;
 
+protected:
     /**
-     * @brief Flaga ustalajaca czy wykonywac daną instancje skryptu
+     * @brief Flaga ustalajaca czy wykonywac Update danej instancji skryptu
      */
     bool enabled = true;
+
+    friend ScriptComponent;
 };
 
 
@@ -110,6 +118,16 @@ public:
      */
     template<class ScriptType>
     ScriptType* Get();
+
+    /**
+     * @brief Wywoluje SetEnable(true) dla wszystkich przypisanych skryptow
+     */
+    void EnableAll();
+
+    /**
+     * @brief Wywoluje SetEnable(false) dla wszystkich przypisanych skryptow
+     */
+    void DisableAll();
 
     /**
      * @brief Niszczy wszystkie przypisane skrypty

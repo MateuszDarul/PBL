@@ -58,9 +58,9 @@ bool TextComponent::Draw(std::shared_ptr<ShaderComponent> shader)
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
 
-    float x = 0.0f;
-    float y = 0.0f;
     float scale = 0.01f * 0.25f;
+    float x = (isCentered) ? (-font->characters[text.at(0)].Size.x * scale * text.size() * 0.5f) : 0.0f;
+    float y = 0.0f;
 
     // iterate through all characters
     std::string::const_iterator c;

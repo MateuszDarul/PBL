@@ -29,11 +29,18 @@ void ScriptComponent::Clear()
         delete m_ScriptInstances[i];
     }
 }
-
+#include "GameObject.h"
 void ScriptComponent::OnStart()
 {
     for (Script* s : m_ScriptInstances)
     {
+        if (!s->enabled) continue;
+        const char* scriptName = typeid(*s).name();
+
+        auto nameCmp = s->gameObject->GetComponent<cmp::Name>();
+        const char* goName = (nameCmp) ? nameCmp->Get().c_str() : "Unnamed";
+
+        printf("Starting script of type %s at GO: %s\n", scriptName, goName);
         s->Start();
     }
 }
@@ -99,6 +106,30 @@ void ScriptComponent::OnTriggerExit(std::shared_ptr<ColliderComponent> collider)
         if (s->enabled)
             s->TriggerExit(collider);
     }
+}
+
+void ScriptComponent::EnableAll()
+{
+    for (Script* s : m_ScriptInstances)
+    {
+        s->SetEnabled(true);
+    }
+}
+
+void ScriptComponent::DisableAll()
+{
+    for (Script* s : m_ScriptInstances)
+    {
+        s->SetEnabled(false);
+    }
+}
+
+void Script::SetEnabled(bool enabled)
+{
+    if (!this->enabled && enabled)
+        Start();
+
+    this->enabled = enabled;
 }
 
 void Script::CollisionEnter(std::shared_ptr<ColliderComponent> collider)

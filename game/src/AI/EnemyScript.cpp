@@ -71,9 +71,11 @@ void EnemyScript::Update(float dt)
 	//std::cout << mypos.x << std::endl;
 	//std::cout << dot << std::endl;
 
-	if (dot > 0.7f)
+	if (multitool->isFlashlightOn  && dot > 0.7f && distance < 16.66887f)
 	{
+		// player looks at me
 		std::cout << "I am taking dmg" << std::endl;
+		health->DecreaseHealth(2.0f * dt);
 	}
 
 }

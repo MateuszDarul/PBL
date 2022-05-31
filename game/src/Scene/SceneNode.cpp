@@ -1,4 +1,11 @@
 #include "SceneNode.h"
+#include "Scene.h"
+
+// defined in Scene.cpp
+extern std::shared_ptr<GameObject> GO_CAMERA;
+extern std::shared_ptr<GameObject> GO_MULTITOOL;
+extern std::shared_ptr<GameObject> GO_FLASHLIGHT;
+extern std::shared_ptr<GameObject> GO_CROSSHAIR;
 
 Frustum SceneNode::cameraFrustum;
 
@@ -40,14 +47,14 @@ void SceneNode::LoadScripts()
         this->children[i]->LoadScripts();
     }
 }
-static float GlobalElapsedTime = 0.0f;
+float GlobalElapsedTime = 0.0f;
 void SceneNode::Update(float dt)
 {
     GlobalElapsedTime += dt;
     this->PrivateUpdate(dt, glm::mat4(1.f));
 
     SceneNode::cameraFrustum = 
-    this->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>()->GetFrustum(
+    GO_CAMERA->GetComponent<cmp::Camera>()->GetFrustum(
         (float)GameApplication::GetWindowSize().x/GameApplication::GetWindowSize().y,
         GameApplication::GetFov(),
         GameApplication::GetProjectionRange().x,
@@ -135,7 +142,7 @@ void SceneNode::Render(const glm::mat4& matrixPV)
             shaderPtr->SetMat4("model", this->globalTransformations);
             shaderPtr->SetVec4("u_TintColor", {1, 1, 1, 1});
             shaderPtr->SetFloat("u_Time", GlobalElapsedTime);
-            shaderPtr->SetVec3("u_CameraPos", GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Transform>()->GetPosition());
+            shaderPtr->SetVec3("u_CameraPos", GO_CAMERA->GetComponent<cmp::Transform>()->GetPosition());
 
             std::shared_ptr<cmp::Model> modelPtr = this->gameObject->GetComponent<cmp::Model>();
             if(modelPtr != nullptr)
@@ -147,8 +154,6 @@ void SceneNode::Render(const glm::mat4& matrixPV)
                 std::shared_ptr<cmp::Refract> refractPtr = this->gameObject->GetComponent<cmp::Refract>();
                 if (refractPtr != nullptr)
                 {
-                    glm::vec3 camPos = this->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>()->GetPosition();
-                    shaderPtr->SetVec3("cameraPos", camPos);
                     refractPtr->Draw(shaderPtr);
                 }
                 else
@@ -163,8 +168,6 @@ void SceneNode::Render(const glm::mat4& matrixPV)
                         std::shared_ptr<cmp::Text> textPtr = this->gameObject->GetComponent<cmp::Text>();
                         if (textPtr != nullptr)
                         {
-                            shaderPtr->SetMat4("transform", glm::ortho(0.0f, 16.0f, 0.0f, 9.0f)); //ta kolejnosc naprawia tekst do góry nogami
-
                             textPtr->Draw(shaderPtr);
                         }
                         else
@@ -222,6 +225,16 @@ std::shared_ptr<TransformComponent> SceneNode::GetLocalTransformations()
 const glm::mat4& SceneNode::GetGlobalTransformations()
 {
     return this->globalTransformations;
+}
+
+void SceneNode::SetGlobalTransformations(const glm::mat4& newTransformations)
+{
+    this->globalTransformations = newTransformations;
+}
+
+void SceneNode::ResetGlobalTransformations()
+{
+    this->globalTransformations = glm::mat4(1.0f) * GetLocalTransformations()->GetModelMatrix();
 }
 
 SceneNode* SceneNode::FindNode(const std::string& name)
