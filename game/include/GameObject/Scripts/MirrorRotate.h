@@ -25,6 +25,8 @@ public:
     void Start()
     {
         transform = gameObject->GetComponent<cmp::Transform>();
+        currentRotationX = transform->GetRotation().x;
+        currentRotationY = transform->GetRotation().y;
     }
 
     void Update(float dt)

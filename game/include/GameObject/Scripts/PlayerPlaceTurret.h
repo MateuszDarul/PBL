@@ -22,7 +22,7 @@ public:
     float placingRange = 5.0f;
     float shootingTurretRange = 15.0f;
 
-    int ignoreLayerMask = ~(CollisionLayer::Player);
+    int ignoreLayerMask = ~(CollisionLayer::Player | CollisionLayer::Ignore);
 
     enum TurretType {
         None = -1, Lantern = 0, Shooting = 1, Laser = 2
@@ -30,7 +30,7 @@ public:
 
     bool unlocked[3] = { false, false, false };
     TurretType selectedTurretType = TurretType::None;
-    int turretCosts[3] = { 80, 100, 60 };
+    int turretCosts[3] = { 30, 80, 40 };
 
 
     //set these in 'inspector'
@@ -239,16 +239,22 @@ public:
 
         auto mc = std::make_shared<cmp::Model>();
         mc->Create(
-            resMan->GetMesh("Resources/models/wieze/w2/w2.obj"),
-            resMan->GetMaterial("Resources/models/wieze/w2/w2.mtl")
+            resMan->GetMesh("Resources/models/Wieze/Latarnia.obj"),
+            resMan->GetMaterial("Resources/models/Wieze/Latarnia.mtl")
         );
         gfxGO->AddComponent(mc);
         
         gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
         gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
-            resMan->GetMesh("Resources/models/wieze/w2/w2.obj")
+            resMan->GetMesh("Resources/models/Wieze/Latarnia.obj")
         );
         gfxGO->AddComponent(turretShader);
+
+
+        // gfxGO->AddComponent(std::make_shared<cmp::Shade>());
+        // std::shared_ptr<cmp::Shade> shadeCmp = gfxGO->GetComponent<cmp::Shade>();
+        // shadeCmp->Create(1);
+
 
         turretsHolder->AddChild(turretPrefabs[type])->AddChild(gfxGO);
     }
@@ -260,8 +266,8 @@ public:
 
         auto mc = std::make_shared<cmp::Model>();
         mc->Create(
-            resMan->GetMesh("Resources/models/wieze/w1/w1.obj"),
-            resMan->GetMaterial("Resources/models/wieze/w1/w1.mtl")
+            resMan->GetMesh("Resources/models/Wieze/Strzelajaca.obj"),
+            resMan->GetMaterial("Resources/models/Wieze/Strzelajaca.mtl")
         );
         turretPrefabs[type]->AddComponent(mc);
         turretPrefabs[type]->AddComponent(turretShader);
@@ -269,7 +275,7 @@ public:
         turretPrefabs[type]->GetComponent<cmp::Transform>()->SetPosition(0,0.5,-5);
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::FrustumCulling>());
         turretPrefabs[type]->GetComponent<cmp::FrustumCulling>()->Create(
-            resMan->GetMesh("Resources/models/wieze/w1/w1.obj"));
+            resMan->GetMesh("Resources/models/Wieze/Strzelajaca.obj"));
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::SphereCol>(true, true));
         std::shared_ptr<cmp::SphereCol> col = turretPrefabs[type]->GetComponent<cmp::SphereCol>();
         col->SetRadius(shootingTurretRange);
@@ -317,14 +323,14 @@ public:
 
         auto mc = std::make_shared<cmp::Model>();
         mc->Create(
-            resMan->GetMesh("Resources/models/wieze/w3/w3.obj"),
-            resMan->GetMaterial("Resources/models/wieze/w3/w3.mtl")
+            resMan->GetMesh("Resources/models/Wieze/Laser.obj"),
+            resMan->GetMaterial("Resources/models/Wieze/Laser.mtl")
         );
         gfxGO->AddComponent(mc);
         
         gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
         gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
-            resMan->GetMesh("Resources/models/wieze/w3/w3.obj")
+            resMan->GetMesh("Resources/models/Wieze/Laser.obj")
         );
         gfxGO->AddComponent(turretShader);
 

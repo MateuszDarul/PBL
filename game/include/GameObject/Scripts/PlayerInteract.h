@@ -16,7 +16,7 @@ public:
 
     float interactRange = 4.0f;
 
-    int ignoreLayerMask = ~(CollisionLayer::Player | CollisionLayer::GUI);
+    int ignoreLayerMask = ~(CollisionLayer::Player | CollisionLayer::GUI | CollisionLayer::Ignore);
 
 
     //set these in 'inspector'

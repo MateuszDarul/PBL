@@ -16,14 +16,19 @@ public:
 
 	void Start()
 	{
-		energy = 500;
-		if (auto energyGuiNode = gameObject->GetNode()->GetParent()->FindNode("EnergyText"))
+		energy = 0;
+		if (auto energyGuiNode = gameObject->GetNode()->GetRoot()->FindNode("EnergyText"))
 		{
 			energyText = energyGuiNode->GetGameObject()->GetComponent<cmp::Text>();
 		}
+		UpdateResourcesText();
 	}
 
 	void Update(float dt)
+	{
+	}
+
+	void UpdateResourcesText()
 	{
 		if (energyText)
 			energyText->SetText("Resources: " + std::to_string(energy));
@@ -33,11 +38,13 @@ public:
 	{
 		this->energy += energy;
 		std::cout << this->energy<<std::endl;
+		UpdateResourcesText();
 	}
 	void DescreaseEnergy(int energy)
 	{
 		this->energy -= energy;
 		std::cout << this->energy << std::endl;
+		UpdateResourcesText();
 	}
 
 	int GetCurrentEnergy()

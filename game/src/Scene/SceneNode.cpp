@@ -47,7 +47,7 @@ void SceneNode::LoadScripts()
         this->children[i]->LoadScripts();
     }
 }
-static float GlobalElapsedTime = 0.0f;
+float GlobalElapsedTime = 0.0f;
 void SceneNode::Update(float dt)
 {
     GlobalElapsedTime += dt;

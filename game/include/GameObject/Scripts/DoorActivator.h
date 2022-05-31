@@ -14,9 +14,9 @@ public:
 
     std::shared_ptr<cmp::Transform> doorTransform;
 
+    glm::vec3 targetPosition;
 private:
 
-    glm::vec3 targetPosition;
     std::shared_ptr<cmp::Model> buttonModel;
 
     bool isPrimed;

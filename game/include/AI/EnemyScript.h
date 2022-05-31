@@ -6,11 +6,19 @@
 #include "SceneNode.h"
 #include "SteeringBehaviours.h"
 #include "Path.h"
+#include "Scripts/Health.h"
+#include "Scripts/MultiToolController.h"
 
 /** @brief Skrypt obiektu przeciwnika
  */
 class EnemyScript : public Script
 {
+
+public:
+
+    Health* health;
+    MultiToolController* multitool;
+
 private:
 
     std::shared_ptr<StateMachine<GameObject>> stateMachine;

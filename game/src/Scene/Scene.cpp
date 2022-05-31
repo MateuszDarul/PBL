@@ -13,11 +13,22 @@
 #include "Scripts/Health.h"
 #include "EnemyScript.h"
 
+#include "Scripts/Cutscenexd.h"
+
+// #define ENABLE_DEBUG_INFO
+
+
 // for quick access (avoiding string comparisions in FindNode)
 std::shared_ptr<GameObject> GO_CAMERA;
 std::shared_ptr<GameObject> GO_MULTITOOL;
 std::shared_ptr<GameObject> GO_FLASHLIGHT;
 std::shared_ptr<GameObject> GO_CROSSHAIR;
+
+std::shared_ptr<SceneNode> NODE_MAIN;
+std::shared_ptr<SceneNode> NODE_GUI;
+
+DoorActivator* afterEnemy;
+
 
 Scene::Scene()
 {
@@ -74,6 +85,9 @@ Scene::Scene()
     gui->GetGameObject()->AddComponent(std::make_shared<cmp::Name>("GUI"));
     world->FindNode("ROOT")->AddChild(gui);
     world->GetGameObject()->AddComponent(std::make_shared<cmp::Transform>());
+
+    NODE_MAIN = main;
+    NODE_GUI = gui;
     
     ///***
 
@@ -85,7 +99,7 @@ Scene::Scene()
     go->AddComponent(std::make_shared<cmp::Transform>());
     go->AddComponent(std::make_shared<NameComponent>("CAMERA"));
     go->AddComponent(std::make_shared<CameraComponent>());
-    go->GetComponent<cmp::Camera>()->Create(glm::vec3(0,4.5,10));
+    go->GetComponent<cmp::Camera>()->Create(glm::vec3(-4,4.5,10));
     go->GetComponent<cmp::Camera>()->SetSpeed(5);
     collidersManager = new CollidersManager(go); //mened�er kolider�w
     collidersManager->SetDistanceFromPlayer(10.0f);
@@ -170,7 +184,7 @@ Scene::Scene()
 
     go->GetComponent<ScriptComponent>()->Add(playerInteract);
     
-
+MultiToolController* multiToolScript;
     //multi tool
     {
         auto multiTool = std::make_shared<GameObject>();
@@ -194,7 +208,7 @@ Scene::Scene()
 
         multiTool->AddComponent(std::make_shared<cmp::Scriptable>());
 
-        MultiToolController* multiToolScript = new MultiToolController();
+        multiToolScript = new MultiToolController();
         multiTool->GetComponent<cmp::Scriptable>()->Add(multiToolScript);
         playerGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->multiTool = multiToolScript;
         
@@ -281,7 +295,7 @@ Scene::Scene()
 
         
         go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(0, 2, 5);
+        go->GetComponent<cmp::Transform>()->SetPosition(-100, 2, 25);
 
         go->AddComponent(std::make_shared<cmp::Name>("Enemy"));
 
@@ -298,6 +312,8 @@ Scene::Scene()
         go->GetComponent<cmp::Scriptable>()->Add(health);
 
         auto enemyScript = new EnemyScript(std::shared_ptr<SceneNode>(world), playerGO);
+        enemyScript->health = health;
+        enemyScript->multitool = multiToolScript;
         go->GetComponent<cmp::Scriptable>()->Add(enemyScript);
     }
     world->FindNode("MAIN")->AddChild(go);
@@ -305,14 +321,21 @@ Scene::Scene()
 
         
     //=== pickupable resource
-    for (int i = 0; i < 3; i++)
+    std::vector<glm::vec3> resourcePositions = {
+        { -29.0f, 0.30f,  12.0f },
+        { -38.0f, 0.30f,  28.3f },
+        { -38.7f, 0.25f,  30.1f },
+        { -86.8f, 0.30f,  67.6f }
+    };
+
+    for (int i = 0; i < resourcePositions.size(); i++)
     {
         go = std::make_shared<GameObject>();
         go->AddComponent(std::make_shared<cmp::Name>("Resource " + std::to_string(i)));
         
         go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(14.5, 1.5, i * 2);
-        go->GetComponent<cmp::Transform>()->SetScale(0.5);
+        go->GetComponent<cmp::Transform>()->SetPosition(resourcePositions[i]);
+        go->GetComponent<cmp::Transform>()->SetScale(0.4);
 
         go->AddComponent(std::make_shared<BoxCollider>(true, true));
         go->GetComponent<cmp::BoxCol>()->setLengths({1.0, 1.0, 1.0});
@@ -337,14 +360,21 @@ Scene::Scene()
         world->FindNode("MAIN")->AddChild(go);
     }
 
+    
+
     //blueprints
+    glm::vec3 blueprintPositions[3] =  {
+        {0,-10,0}, //???
+        { -83.0f, 0.5f, 69.5f },    //Shooting
+        { -26.0f, 0.5f,  5.0f }     //Laser
+    };
     for (int i = 0; i < 3; i++)
     {
         go = std::make_shared<GameObject>();
         go->AddComponent(std::make_shared<cmp::Name>("Blueprint " + std::to_string(i)));
         
         go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(14.5, 1.5, i * 2 - 8);
+        go->GetComponent<cmp::Transform>()->SetPosition(blueprintPositions[i]);
         go->GetComponent<cmp::Transform>()->SetScale(0.5);
 
         go->AddComponent(std::make_shared<BoxCollider>(true, true));
@@ -377,8 +407,8 @@ Scene::Scene()
         go->AddComponent(std::make_shared<cmp::Name>("Mirror"));
 
         go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(2.5, 2.5, -28.3);
-        go->GetComponent<cmp::Transform>()->SetScale(1.0);
+        go->GetComponent<cmp::Transform>()->SetPosition(-20.0, 2.5, 64.5);
+        go->GetComponent<cmp::Transform>()->SetRotation(-11.0, 0.0, 0.0);
 
         go->AddComponent(std::make_shared<BoxCollider>(false, false));
         go->GetComponent<cmp::BoxCol>()->setLengths({2.0, 2.0, 2.0});
@@ -401,6 +431,7 @@ Scene::Scene()
 
         auto mirrorScript = new MirrorRotate();
         mirrorScript->SetEnabled(false);
+        mirrorScript->maxRotationY = 180;
         go->GetComponent<cmp::Scriptable>()->Add(mirrorScript);
 
         world->FindNode("MAIN")->AddChild(go);
@@ -460,11 +491,14 @@ Scene::Scene()
     };
 
     std::vector<DoorAndActivatorPair> doorsAndButtons = {
-        { {  0.0, 3.0, -10.5 }, 90.0f,   {  6.0, 2.5,  -9.5 } },
-        { { 10.0, 3.0, -36.5 }, 90.0f,   {  3.5, 2.5, -36.0 } },
-        { { 35.5, 3.0, -47.5 },  0.0f,   { 35.0, 2.5, -54.0 } },
+        { { -15.00,  1.0,  21.5 }, 90.0f,   { -19.6, 2.5,  20.0 } },
+        { { -64.75,  1.0,  60.0 },  0.0f,   { -61.0, 3.0,  64.6 } },
+        { { -73.00,  1.0,  74.5 }, 90.0f,   { -61.0, -9.0,  64.6 } },
     };
 
+    int i = 0;
+    DoorActivator* asdsada = nullptr;
+    afterEnemy = nullptr;
     for (auto& [doorPosition, doorRotation, activatorPosition] : doorsAndButtons)
     {
         //create door
@@ -473,11 +507,13 @@ Scene::Scene()
         auto doorTransform = std::make_shared<cmp::Transform>();
         doorTransform->SetPosition(doorPosition);
         doorTransform->SetRotation(0, doorRotation, 0);
+        float scl = 2.0f;
+        doorTransform->SetScale(scl);
         go->AddComponent(doorTransform);
 
         go->AddComponent(std::make_shared<BoxCollider>(false, true));
-        if (doorRotation < 0.001f) go->GetComponent<cmp::BoxCol>()->setLengths({1.0, 5.0, 5.0});
-        else go->GetComponent<cmp::BoxCol>()->setLengths({5.0, 5.0, 1.0});
+        if (doorRotation < 0.001f) go->GetComponent<cmp::BoxCol>()->setLengths({1.0 * scl, 5.0 * scl, 5.0 * scl});
+        else go->GetComponent<cmp::BoxCol>()->setLengths({5.0*scl, 5.0*scl, 1.0 *scl});
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
         auto model = std::make_shared<cmp::Model>();
@@ -508,6 +544,7 @@ Scene::Scene()
             resMan->GetMesh("Resources/models/Crate/Crate.obj"),
             resMan->GetMaterial("Resources/models/wall/wall.mtl")
         );
+        model->SetTintColor(1.0, 1.0, 0.0);
         go->AddComponent(model);
         go->AddComponent(shader_d);
 
@@ -519,11 +556,51 @@ Scene::Scene()
 
         auto activator = new DoorActivator();
         activator->doorTransform = doorTransform;
+        activator->openedOffset = { 0.0f, 10.1f, 0.0f };
         go->GetComponent<cmp::Scriptable>()->Add(activator);
+
+        if (i == 1) asdsada = activator;
+        if (i == 2) afterEnemy = activator;
+        i++;
 
         world->FindNode("MAIN")->AddChild(go);
     }
 
+    //cutscene
+    {
+        go = std::make_shared<GameObject>();
+        go->AddComponent(std::make_shared<cmp::Name>("cutscene"));
+        
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(-83.0f, 2.5f, 69.5f );
+        //go->GetComponent<cmp::Transform>()->SetScale(0.5);
+
+        go->AddComponent(std::make_shared<BoxCollider>(true, true));
+        go->GetComponent<cmp::BoxCol>()->setLengths({3.0, 3.0, 3.0});
+        go->GetComponent<cmp::BoxCol>()->layer = CollisionLayer::Ignore;
+        go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
+
+        auto model = std::make_shared<cmp::Model>();
+        model->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+            resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+        );
+        model->SetTintColor(1.0, 1.0, 1.0, 0.5);
+        go->AddComponent(model);
+        go->AddComponent(shader_d);
+
+
+        go->AddComponent(std::make_shared<cmp::Scriptable>());
+
+
+        auto cutscene = new Cutscenexd();
+        cutscene->activator = asdsada;
+
+        go->GetComponent<cmp::Scriptable>()->Add(cutscene);
+        
+        
+        world->FindNode("MAIN")->AddChild(go);
+    }
 
     //=== text
 
@@ -592,7 +669,7 @@ Scene::Scene()
     world->LoadScripts();
 
 
-    // PREVENT CAMERA AND MIRRORS FROM GOING TO INFINITY
+    // PREVENT CAMERA AND MIRRORS FROM GOING TO INFINITY 
     std::shared_ptr<GameObject> goCamera = world->FindNode("CAMERA")->GetGameObject();
     std::shared_ptr<TransformComponent> transformCamera = goCamera->GetComponent<cmp::Transform>();
 
@@ -616,10 +693,11 @@ Scene::~Scene()
     delete collidersManager;
     collidersManager = nullptr;
 }
-
+extern float GlobalElapsedTime;
 void Scene::Update(float dt)
 {
     GO_CROSSHAIR->GetComponent<cmp::Transform>()->SetPosition(GameApplication::GetAspectRatio() * 0.5f, 0.5f, 0.1f);
+    world->FindNode("cutscene")->GetGameObject()->GetComponent<cmp::Transform>()->SetPosition( 5 * sin(GlobalElapsedTime) -83.0f, 2.5f, 69.5f);
 
     //Update camera
     std::shared_ptr<GameObject> goCamera = GO_CAMERA;
@@ -637,8 +715,11 @@ void Scene::Update(float dt)
     //Prevent camera jiggle and set correct position
     goCamera->GetComponent<CameraComponent>()->SetPosition(transformCamera->GetPosition());
     transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();
-    // auto pos = transformCamera->GetPosition();
-    // printf("camera %f %f %f\n", pos.x, pos.y, pos.z);
+
+#ifdef ENABLE_DEBUG_INFO
+    auto cam = transformCamera->GetPosition();
+    printf("Camera position: %f %f %f\n", cam.x, cam.y, cam.z);
+#endif
 
     
     //Position multitool
@@ -660,6 +741,11 @@ void Scene::Update(float dt)
 
 
     //Update scene
+
+    if(!world->FindNode("Enemy"))
+    {
+        afterEnemy->Activate();
+    }
 
     world->Update(dt);
 
