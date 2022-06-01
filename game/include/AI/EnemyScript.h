@@ -18,10 +18,9 @@ public:
 
     Health* health;
     MultiToolController* multitool;
+    std::shared_ptr<StateMachine<GameObject>> stateMachine;
 
 private:
-
-    std::shared_ptr<StateMachine<GameObject>> stateMachine;
 
     glm::vec3 velocity; //!< speed of an object.
 
