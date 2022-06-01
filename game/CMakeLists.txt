@@ -122,6 +122,8 @@ file(GLOB_RECURSE HEADER_FILES
 
 	ImGui/include/*.h
 	ImGui/include/*.hpp
+
+	include/GameObject/Scripts/*.h
 )
 
 include_directories(include)

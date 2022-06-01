@@ -38,6 +38,7 @@ public:
         if (hasFinished)
         {
             doorsToOpen->Activate();
+            lightCmp->SetLightColor({0.0f, 1.0f, 0.0f}); //ehh
         }
         else if (hasStarted)
         {

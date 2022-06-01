@@ -137,7 +137,7 @@ void CameraComponent::Update(InputManager* inputManager, const float& deltaTime)
     else
     {
         // printf("is grounded\n");
-        verticalVelocity = gravity * deltaTime;
+        verticalVelocity = 0.0f; // gravity * deltaTime;
     
         if(inputManager->Keyboard()->IsPressed(KeyboardKey::Space) && isEnabledMovement)
         {
@@ -146,7 +146,7 @@ void CameraComponent::Update(InputManager* inputManager, const float& deltaTime)
         }
     }
 
-    this->position += glm::vec3(0.0f, (verticalVelocity + 0.5f * gravity * deltaTime) * deltaTime, 0.0f);
+    this->position += glm::vec3(0.0f, (verticalVelocity )/*+ 0.5f * gravity * deltaTime) */* deltaTime, 0.0f);
     this->needUpdate = true;
 }
 
