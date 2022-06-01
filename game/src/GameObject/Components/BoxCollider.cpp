@@ -43,7 +43,7 @@ bool BoxCollider::CheckCollision(std::shared_ptr<ColliderComponent> collider)
 	glm::vec3 thisPos = glm::vec3(thisModelMat[3][0], thisModelMat[3][1], thisModelMat[3][2]) + this->offset;
 	glm::vec3 otherPos = glm::vec3(otherModelMat[3][0], otherModelMat[3][1], otherModelMat[3][2]) + collider->GetOffset();
 
-	glm::uvec3 thisLenghts = this->getLengths();
+	glm::vec3 thisLenghts = this->getLengths();
 	float thisMinX = thisPos.x - thisLenghts.x * 0.5f;
 	float thisMaxX = thisPos.x + thisLenghts.x * 0.5f;
 	float thisMinY = thisPos.y - thisLenghts.y * 0.5f;
@@ -123,7 +123,7 @@ bool BoxCollider::CheckCollision(std::shared_ptr<ColliderComponent> collider)
 	else if (collider->GetClassUUID() == 12)
 	{
 		std::shared_ptr<BoxCollider> other = std::dynamic_pointer_cast<BoxCollider>(collider);
-		glm::uvec3 otherLenghts = other->getLengths();
+		glm::vec3 otherLenghts = other->getLengths();
 		float otherMinX = otherPos.x - otherLenghts.x * 0.5f;
 		float otherMaxX = otherPos.x + otherLenghts.x * 0.5f;
 		float otherMinY = otherPos.y - otherLenghts.y * 0.5f;
@@ -184,12 +184,12 @@ bool BoxCollider::CheckCollision(std::shared_ptr<ColliderComponent> collider)
 	return false;
 }
 
-void BoxCollider::setLengths(glm::uvec3 lengths)
+void BoxCollider::setLengths(glm::vec3 lengths)
 {
 	this->lengths = lengths;
 }
 
-glm::uvec3 BoxCollider::getLengths()
+glm::vec3 BoxCollider::getLengths()
 {
 	return lengths;
 }
