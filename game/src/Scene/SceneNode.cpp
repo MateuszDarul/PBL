@@ -1,6 +1,107 @@
 #include "SceneNode.h"
 #include "Scene.h"
 
+#define ENABLE_DEBUG_INFO
+
+#ifdef ENABLE_DEBUG_INFO
+
+static unsigned int boxVAO;
+static unsigned int boxVBO;
+static bool isDebugInitialized = false;
+static ShaderComponent debugShader;
+
+static void initializeDebug()
+{
+    isDebugInitialized = true;
+
+    glGenVertexArrays(1, &boxVAO);
+    glGenBuffers(1, &boxVBO);
+    glBindVertexArray(boxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 36 * 3, NULL, GL_DYNAMIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    debugShader.Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
+}
+
+static void drawDebugBox(const glm::mat4& model, const glm::mat4& vp, const glm::vec3& size, const glm::vec3& offset)
+{
+    float cx = model[3][0]+offset.x;
+    float cy = model[3][1]+offset.y;
+    float cz = model[3][2]+offset.z;
+    float x1 = cx + size.x * 0.5f;
+    float y1 = cy + size.y * 0.5f;
+    float z1 = cz + size.z * 0.5f;
+    float x2 = cx - size.x * 0.5f;
+    float y2 = cy - size.y * 0.5f;
+    float z2 = cz - size.z * 0.5f;
+    float vertices[36 * 3] = {
+        x1, y1, z1,  x1, y2, z1,  x1, y2, z2,    x1, y1, z1,  x1, y2, z2,  x1, y1, z2,
+        x2, y1, z1,  x2, y2, z1,  x2, y2, z2,    x2, y1, z1,  x2, y2, z2,  x2, y1, z2,
+        x1, y1, z1,  x2, y1, z1,  x2, y2, z1,    x1, y1, z1,  x2, y2, z1,  x1, y2, z1,
+        x1, y1, z2,  x2, y1, z2,  x2, y2, z2,    x1, y1, z2,  x2, y2, z2,  x1, y2, z2,
+        x1, y1, z1,  x2, y1, z1,  x2, y1, z2,    x1, y1, z1,  x2, y1, z2,  x1, y1, z2,
+        x1, y2, z1,  x2, y2, z1,  x2, y2, z2,    x1, y2, z1,  x2, y2, z2,  x1, y2, z2,
+    };
+
+    debugShader.Use();
+    debugShader.SetMat4("transform", vp);
+    debugShader.SetMat4("model", glm::mat4(1.0f));
+    debugShader.SetVec4("u_TintColor", {1.0f, 1.0f, 0.0f, 0.5f});
+
+    glBindVertexArray(boxVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glDrawArrays(GL_TRIANGLES, 0, 36*3);
+}
+
+//not a sphere lol
+static void drawDebugSphere(const glm::mat4& model, const glm::mat4& vp, float radius, const glm::vec3& offset)
+{
+    float cx = model[3][0]+offset.x;
+    float cy = model[3][1]+offset.y;
+    float cz = model[3][2]+offset.z;
+    float x1 = cx + radius;
+    float y1 = cy + radius;
+    float z1 = cz + radius;
+    float x2 = cx - radius;
+    float y2 = cy - radius;
+    float z2 = cz - radius;
+    float vertices[36 * 3] = {
+        x1, y1, z1,  x1, y2, z1,  x1, y2, z2,    x1, y1, z1,  x1, y2, z2,  x1, y1, z2,
+        x2, y1, z1,  x2, y2, z1,  x2, y2, z2,    x2, y1, z1,  x2, y2, z2,  x2, y1, z2,
+        x1, y1, z1,  x2, y1, z1,  x2, y2, z1,    x1, y1, z1,  x2, y2, z1,  x1, y2, z1,
+        x1, y1, z2,  x2, y1, z2,  x2, y2, z2,    x1, y1, z2,  x2, y2, z2,  x1, y2, z2,
+        x1, y1, z1,  x2, y1, z1,  x2, y1, z2,    x1, y1, z1,  x2, y1, z2,  x1, y1, z2,
+        x1, y2, z1,  x2, y2, z1,  x2, y2, z2,    x1, y2, z1,  x2, y2, z2,  x1, y2, z2,
+    };
+
+    debugShader.Use();
+    debugShader.SetMat4("transform", vp);
+    debugShader.SetMat4("model", glm::mat4(1.0f));
+    debugShader.SetVec4("u_TintColor", {1.0f, 1.0f, 0.2f, 0.2f});
+
+    glBindVertexArray(boxVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glDrawArrays(GL_TRIANGLES, 0, 36*3);
+}
+
+
+#endif
+
+
 // defined in Scene.cpp
 extern std::shared_ptr<GameObject> GO_CAMERA;
 extern std::shared_ptr<GameObject> GO_MULTITOOL;
@@ -14,6 +115,11 @@ SceneNode::SceneNode(std::shared_ptr<GameObject> gameObject)
 {
     this->globalTransformations = glm::mat4(1.f);
     gameObject->SetNode(this);
+
+#ifdef ENABLE_DEBUG_INFO
+    if(!isDebugInitialized)
+        initializeDebug();
+#endif
 }
 
 SceneNode::~SceneNode()
@@ -205,6 +311,27 @@ void SceneNode::Render(const glm::mat4& matrixPV)
     {
         particlePtr->Draw(matrixPV);
     }
+
+#ifdef ENABLE_DEBUG_INFO
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::F12))
+    {
+        if (auto collider = gameObject->GetComponent<cmp::BoxCol>())
+        {
+            if (collider->isTrigger)
+            {
+                drawDebugBox(this->globalTransformations, matrixPV, collider->getLengths(), collider->GetOffset());
+            }
+        }
+        else if (auto collider = gameObject->GetComponent<cmp::SphereCol>())
+        {
+            if (collider->isTrigger)
+            {
+                drawDebugSphere(this->globalTransformations, matrixPV, collider->GetRadius(), collider->GetOffset());
+            }
+        }
+    }
+
+#endif
 
     for(unsigned short int i=0; i<this->children.size(); i++)
     {
