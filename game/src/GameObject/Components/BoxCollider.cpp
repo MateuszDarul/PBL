@@ -197,6 +197,9 @@ glm::uvec3 BoxCollider::getLengths()
 bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, RayHitInfo& hitInfo, float maxDistance)
 {
 	glm::mat4 transformMatrix = GetOwner()->GetNode()->GetGlobalTransformations();
+	transformMatrix[3][0] += offset.x;
+	transformMatrix[3][1] += offset.y;
+	transformMatrix[3][2] += offset.z;
 	glm::vec3 position = { transformMatrix[3][0], transformMatrix[3][1], transformMatrix[3][2] };
 
 	if (isStatic)

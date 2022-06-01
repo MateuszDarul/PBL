@@ -192,7 +192,7 @@ bool SphereCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir,
 {
 	hitInfo.distance = maxDistance;
 
-	auto center = GetOwner()->GetComponent<TransformComponent>()->GetPosition();
+	auto center = GetOwner()->GetComponent<TransformComponent>()->GetPosition() + offset;
 
 	if (glm::intersectRaySphere(origin, dir, center, radius*radius, hitInfo.distance))
 	{
