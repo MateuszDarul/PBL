@@ -68,7 +68,7 @@ void PointLightComponent::Use()
         shaders[i]->SetFloat("pointLight[" + textID + "].distance", this->damping * DAMPING_MUL);
     }
 
-    if(PointLightComponent::thisLightID == PointLightComponent::lightAmount)
+    if(PointLightComponent::thisLightID == PointLightComponent::lightAmount - 1)
     {
         PointLightComponent::thisLightID = 0;
         PointLightComponent::needUpdate = false;
