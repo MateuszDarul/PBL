@@ -271,9 +271,9 @@ const glm::mat4& GameApplication::GetOrthoProjection()
     return s_OrthographicMatrix;
 }
 
-glm::vec3 GameApplication::GetWindowSize()
+glm::uvec2 GameApplication::GetWindowSize()
 {
-    return glm::vec3(s_ScreenWidth, s_ScreenHeight);
+    return glm::uvec2(s_ScreenWidth, s_ScreenHeight);
 }
  
 glm::vec2 GameApplication::GetProjectionRange()
