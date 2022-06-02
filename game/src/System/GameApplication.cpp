@@ -196,14 +196,8 @@ void GameApplication::Run()
         dt = t1 - t2;
         t2 = t1;
 
-
         if(inGame)
         {
-            //get time step
-            t1 = glfwGetTime();
-            dt = t1 - t2;
-            t2 = t1;
-
             //update logic
             s_Scene->Update(dt);
 
