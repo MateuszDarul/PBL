@@ -240,7 +240,7 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 				hitInfo.point = origin + dir * d;
 				hitInfo.normal = normal;
 				hitInfo.distance = d;
-				hitInfo.gameObject = GetOwner().get();
+				hitInfo.gameObject = GetOwner();
 
 				return true;
 			}
@@ -274,7 +274,7 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 				hitInfo.point = origin + dir * d;
 				hitInfo.normal = normal;
 				hitInfo.distance = d;
-				hitInfo.gameObject = GetOwner().get();
+				hitInfo.gameObject = GetOwner();
 
 				return true;
 			}
@@ -308,7 +308,7 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 				hitInfo.point = origin + dir * d;
 				hitInfo.normal = normal;
 				hitInfo.distance = d;
-				hitInfo.gameObject = GetOwner().get();
+				hitInfo.gameObject = GetOwner();
 
 				return true;
 			}
@@ -342,7 +342,7 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 				hitInfo.point = origin + dir * d;
 				hitInfo.normal = normal;
 				hitInfo.distance = d;
-				hitInfo.gameObject = GetOwner().get();
+				hitInfo.gameObject = GetOwner();
 
 				return true;
 			}
@@ -376,7 +376,7 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 				hitInfo.point = origin + dir * d;
 				hitInfo.normal = normal;
 				hitInfo.distance = d;
-				hitInfo.gameObject = GetOwner().get();
+				hitInfo.gameObject = GetOwner();
 
 				return true;
 			}
@@ -410,7 +410,7 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 				hitInfo.point = origin + dir * d;
 				hitInfo.normal = normal;
 				hitInfo.distance = d;
-				hitInfo.gameObject = GetOwner().get();
+				hitInfo.gameObject = GetOwner();
 
 				return true;
 			}

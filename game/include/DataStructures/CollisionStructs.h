@@ -8,7 +8,7 @@ struct RayHitInfo
 	glm::vec3 point;		//!< Punkt kolizji promienia
 	glm::vec3 normal;		//!< Wektor normalny trafionego kolidera
 	float distance;			//!< Odleglosc punktu zderzenia od poczatku promienia
-	GameObject* gameObject;	//!< Trafiony GameObject
+	std::shared_ptr<GameObject> gameObject;	//!< Trafiony GameObject
 };
 
 enum CollisionLayer     //tu mozna dodawac kolejne warstwy w miare potrzeb

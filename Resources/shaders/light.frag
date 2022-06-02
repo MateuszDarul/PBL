@@ -62,6 +62,8 @@ uniform bool depthMapStatus[10];
 uniform vec3 depthMapPosition[10];
 uniform samplerCube depthMap[10];
 
+uniform vec4 u_TintColor;
+
 
 
 ///--------------------------------------------------------- CODE
@@ -116,7 +118,7 @@ void main()
 
     pixelColor += tm.colorMAP * 0.07;
     
-    FragColor = vec4(pixelColor, 1.0f);
+    FragColor = vec4(pixelColor, 1.0f) * u_TintColor;
 }
 
 vec3 GetPointLight(TextureMaps textureMaps, PointLight pLight)

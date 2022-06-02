@@ -199,7 +199,7 @@ bool SphereCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir,
 		if (hitInfo.distance < 0.0001f) return false;
 		hitInfo.point = origin + dir * hitInfo.distance;
 		hitInfo.normal = (hitInfo.point - center) / radius;
-		hitInfo.gameObject = GetOwner().get();
+		hitInfo.gameObject = GetOwner();
 
 		return true;
 	}

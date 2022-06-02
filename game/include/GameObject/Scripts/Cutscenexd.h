@@ -67,7 +67,7 @@ public:
         hasFinished = true;
         printf("Finished cutscene\n");
 
-        lightCmp->SetLightColor({0.0f, 1.0f, 0.0f}); //czasem nie działa ustawienie tego koloru ???
+        lightCmp->SetLightColor({0.0f, 1.0f, 0.0f}); 
     }
 
     void TriggerEnter(std::shared_ptr<ColliderComponent> other) override
