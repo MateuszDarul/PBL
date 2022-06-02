@@ -109,6 +109,7 @@ extern std::shared_ptr<GameObject> GO_FLASHLIGHT;
 extern std::shared_ptr<GameObject> GO_CROSSHAIR;
 
 Frustum SceneNode::cameraFrustum;
+float GlobalElapsedTime = 0.0f;
 
 SceneNode::SceneNode(std::shared_ptr<GameObject> gameObject)
     :parent(nullptr), gameObject(gameObject)
@@ -153,9 +154,17 @@ void SceneNode::LoadScripts()
         this->children[i]->LoadScripts();
     }
 }
-float GlobalElapsedTime = 0.0f;
+
 void SceneNode::Update(float dt)
 {
+#ifdef ENABLE_DEBUG_INFO
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::F11))
+    {
+        const auto& cam = GO_CAMERA->GetComponent<cmp::Camera>()->GetPosition();
+        printf("Camera position: %f %f %f\n", cam.x, cam.y, cam.z);
+    }
+#endif
+
     GlobalElapsedTime += dt;
     this->PrivateUpdate(dt, glm::mat4(1.f));
 

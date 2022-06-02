@@ -15,7 +15,6 @@
 
 #include "Scripts/Cutscenexd.h"
 
-// #define ENABLE_DEBUG_INFO
 
 
 // for quick access (avoiding string comparisions in FindNode)
@@ -97,7 +96,8 @@ Scene::Scene()
     go->AddComponent(std::make_shared<cmp::Transform>());
     go->AddComponent(std::make_shared<NameComponent>("CAMERA"));
     go->AddComponent(std::make_shared<CameraComponent>());
-    go->GetComponent<cmp::Camera>()->Create(glm::vec3(-4,4.5,10));
+    go->GetComponent<cmp::Camera>()->Create(glm::vec3(-4,4.5,10)); // spawn room 0
+    // go->GetComponent<cmp::Camera>()->Create(glm::vec3(-80.0f, 4.5f, 60.5f)); // spawn shooting blueprint
     go->GetComponent<cmp::Camera>()->SetSpeed(5);
     collidersManager = new CollidersManager(go); //mened�er kolider�w
     collidersManager->SetDistanceFromPlayer(10.0f);
@@ -154,7 +154,7 @@ Scene::Scene()
     world->FindNode("MAIN")->FindNode("CAMERA")->AddChild(debugLineGO);
     
     auto playerPlace = new PlayerPlaceTurret();
-
+ 
     playerPlace->gameManager = gm;
     playerPlace->line = debugLineCmp;
     playerPlace->colMan = collidersManager;
@@ -176,13 +176,14 @@ Scene::Scene()
     
     playerInteract->colMan = collidersManager;
     playerInteract->camera = playerGO->GetComponent<cmp::Camera>();
+    playerInteract->placeTurretScript = playerPlace;
 
     auto crosshairTextTEMP = std::make_shared<TextComponent>();
     playerInteract->textTEMP = crosshairTextTEMP;
 
     go->GetComponent<ScriptComponent>()->Add(playerInteract);
     
-MultiToolController* multiToolScript;
+    MultiToolController* multiToolScript;
     //multi tool
     {
         auto multiTool = std::make_shared<GameObject>();
@@ -570,7 +571,7 @@ MultiToolController* multiToolScript;
         go->AddComponent(std::make_shared<cmp::Name>("cutscene"));
         
         go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(-83.0f, 2.5f, 69.5f );
+        go->GetComponent<cmp::Transform>()->SetPosition(-83.0f, 2.5f, 69.0f );
         go->GetComponent<cmp::Transform>()->SetScale(2.5);
 
         go->AddComponent(std::make_shared<BoxCollider>(true, true));
@@ -578,18 +579,8 @@ MultiToolController* multiToolScript;
         go->GetComponent<cmp::BoxCol>()->layer = CollisionLayer::Ignore;
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
-        auto model = std::make_shared<cmp::Model>();
-        model->Create(
-            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-            resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
-        );
-        model->SetTintColor(1.0, 1.0, 1.0, 0.5);
-        go->AddComponent(model);
-        go->AddComponent(shader_d);
-
 
         go->AddComponent(std::make_shared<cmp::Scriptable>());
-
 
         auto cutscene = new Cutscenexd();
         cutscene->doorsToShut = cutsceneDoorActivator;
@@ -716,10 +707,7 @@ void Scene::Update(float dt)
     goCamera->GetComponent<CameraComponent>()->SetPosition(transformCamera->GetPosition());
     transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();
 
-#ifdef ENABLE_DEBUG_INFO
-    auto cam = transformCamera->GetPosition();
-    printf("Camera position: %f %f %f\n", cam.x, cam.y, cam.z);
-#endif
+
 
     
     //Position multitool
