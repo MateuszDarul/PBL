@@ -312,6 +312,8 @@ MultiToolController* multiToolScript;
         auto enemyScript = new EnemyScript(std::shared_ptr<SceneNode>(world), playerGO);
         enemyScript->health = health;
         enemyScript->multitool = multiToolScript;
+        std::shared_ptr<Path> e_path = std::make_shared<Path>();
+        enemyScript->SetPath(e_path);
         go->GetComponent<cmp::Scriptable>()->Add(enemyScript);
     }
     world->FindNode("MAIN")->AddChild(go);

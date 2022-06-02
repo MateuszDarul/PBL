@@ -1,4 +1,5 @@
 #include "AttackingPlayerState.h"
+#include "FollowPathState.h"
 #include "EnemyScript.h"
 
 void AttackingPlayerState::Enter(std::shared_ptr<GameObject> gameObject)
@@ -12,9 +13,14 @@ void AttackingPlayerState::Enter(std::shared_ptr<GameObject> gameObject)
 
 void AttackingPlayerState::Execute(std::shared_ptr<GameObject> gameObject, float dt)
 {
-	gameObject->GetComponent<ScriptComponent>()->Get<EnemyScript>()->GetSteering()->SetSeekTarget(
-		gameObject->GetNode()->GetParent()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Transform>()->GetPosition()
-	);
+	glm::vec3 playerPos = gameObject->GetNode()->GetParent()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Transform>()->GetPosition();
+
+	if (glm::length(gameObject->GetComponent<cmp::Transform>()->GetPosition() - playerPos) > 10.0f)
+	{
+		gameObject->GetComponent<ScriptComponent>()->Get<EnemyScript>()->stateMachine->ChangeState(FollowPathState::Instance());
+	}
+
+	gameObject->GetComponent<ScriptComponent>()->Get<EnemyScript>()->GetSteering()->SetSeekTarget(playerPos);
 }
 
 void AttackingPlayerState::Exit(std::shared_ptr<GameObject> gameObject)

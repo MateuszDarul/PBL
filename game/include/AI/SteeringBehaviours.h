@@ -15,7 +15,7 @@ private:
 	bool followPath = false;
 
 	std::shared_ptr<GameObject> owner;
-	Path* path;
+	std::shared_ptr<Path> path;
 	glm::vec3 seekTarget;
 	glm::vec3 fleeTarget;
 
@@ -30,7 +30,7 @@ private:
 	bool AccumulateForce(glm::vec3&, glm::vec3);
 
 public:
-	SteeringBehaviours(std::shared_ptr<GameObject> own, Path* pth) {
+	SteeringBehaviours(std::shared_ptr<GameObject> own, std::shared_ptr<Path> pth) {
 
 		steeringForce = glm::vec3(0.0f);
 
@@ -42,7 +42,7 @@ public:
 
 	void SetSeekTarget(glm::vec3 trgt) { seekTarget = trgt; }
 	void SetFleeTarget(glm::vec3 trgt) { fleeTarget = trgt; }
-	void SetPath(Path* pth) { path = pth; }
+	void SetPath(std::shared_ptr<Path> pth) { path = pth; }
 
 	void SetSeek(bool on) { seek = on; }
 	void SetFlee(bool on) { flee = on; }
