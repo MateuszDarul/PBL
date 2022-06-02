@@ -37,13 +37,13 @@ public:
 	void IncreaseEnergy(int energy)
 	{
 		this->energy += energy;
-		std::cout << this->energy<<std::endl;
+		std::cout << "Increasing energy: " << this->energy<<std::endl;
 		UpdateResourcesText();
 	}
 	void DescreaseEnergy(int energy)
 	{
 		this->energy -= energy;
-		std::cout << this->energy << std::endl;
+		std::cout << "Decreasing energy: " << this->energy << std::endl;
 		UpdateResourcesText();
 	}
 

@@ -26,6 +26,8 @@ public:
 
     std::shared_ptr<cmp::Text> textTEMP;
 
+    PlayerPlaceTurret* placeTurretScript;
+
 private:
 
     MirrorRotate* selectedMirror = nullptr;
@@ -109,6 +111,26 @@ public:
 
                         // selectedMirror = mirror;
                         // selectedMirror->SetEnabled(!camera->GetMovementEnabled());
+                    }
+                }
+                else if (auto turret = scriptable->Get<TurretLaser>())
+                {
+                    textTEMP->color = { 0.0f, 1.0f, 1.0f };
+
+                    if (shouldInteract)
+                    {
+                        shouldInteract = false;
+                        placeTurretScript->PickUpTurret(PlayerPlaceTurret::TurretType::Laser, hit.gameObject);
+                    }
+
+                }
+                else if (auto turret = scriptable->Get<TurretShoot>())
+                {
+                    textTEMP->color = { 0.0f, 1.0f, 1.0f };
+                    if (shouldInteract)
+                    {
+                        shouldInteract = false;
+                        placeTurretScript->PickUpTurret(PlayerPlaceTurret::TurretType::Shooting, hit.gameObject);
                     }
                 }
             }

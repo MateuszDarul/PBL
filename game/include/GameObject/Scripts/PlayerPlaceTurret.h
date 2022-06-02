@@ -33,6 +33,9 @@ public:
     int turretCosts[3] = { 30, 80, 40 };
 
 
+    glm::vec4 turretGhostColor = { 0.0f, 1.0f, 0.0f,   1.0f };
+
+
     //set these in 'inspector'
 
     GameManager* gameManager;
@@ -43,7 +46,7 @@ public:
     ResourceManager* resMan;
     std::shared_ptr<cmp::Line> line;
     
-    std::shared_ptr<cmp::Shader> turretShader; //err, should be better solved by a prefab or smth
+    std::shared_ptr<cmp::Shader> turretShader;
     std::shared_ptr<cmp::Shader> lineShader;
 
     
@@ -151,25 +154,13 @@ public:
         }
 
         int lineIndexToPlace = 2;
+        bool hasPlacedTurret = false;
 
         if (isPlacing)
         {
             if (Input()->Mouse()->OnPressed(MouseButton::Left_MB) && gameManager->GetCurrentEnergy() >= turretCosts[selectedTurretType]) 
             {
-                if (auto scriptHolder = turretPrefabs[selectedTurretType]->GetComponent<cmp::Scriptable>())
-                {
-                    scriptHolder->EnableAll();
-                    
-                    std::shared_ptr<ColliderComponent> col = nullptr;
-                    col = turretPrefabs[selectedTurretType]->GetComponent<cmp::SphereCol>();
-                    if (!col) col = turretPrefabs[selectedTurretType]->GetComponent<cmp::BoxCol>();
-                    if(col)
-                    {
-                        col->AddToCollidersManager(colMan);
-                    }
-                }
-                CreateTurret(selectedTurretType);
-                gameManager->DescreaseEnergy(turretCosts[selectedTurretType]);
+                hasPlacedTurret = true;
             }
 
             RayHitInfo hit;
@@ -206,10 +197,43 @@ public:
             turretPrefabs[selectedTurretType]->GetComponent<cmp::Transform>()->SetPosition(line->Get(lineIndexToPlace) + transform->GetPosition() + adjust);
             turretPrefabs[selectedTurretType]->GetComponent<cmp::Transform>()->SetRotation(0.0f, -camera->GetYaw(), 0.0f);
         }
+
+        if (hasPlacedTurret)
+        {
+            if (auto scriptHolder = turretPrefabs[selectedTurretType]->GetComponent<cmp::Scriptable>())
+            {
+                scriptHolder->EnableAll();
+                
+                std::shared_ptr<ColliderComponent> col = nullptr;
+                col = turretPrefabs[selectedTurretType]->GetComponent<cmp::SphereCol>();
+                if (!col) col = turretPrefabs[selectedTurretType]->GetComponent<cmp::BoxCol>();
+                if(col)
+                {
+                    col->AddToCollidersManager(colMan);
+                }
+            }
+
+            
+            auto model = turretPrefabs[selectedTurretType]->GetComponent<cmp::Model>();
+            if(!model)
+                if (auto gfxNode = turretPrefabs[selectedTurretType]->GetNode()->FindNode("gfx"))
+                    model = gfxNode->GetGameObject()->GetComponent<cmp::Model>();
+            
+            if (model)
+                model->SetTintColor(1.0, 1.0, 1.0);
+
+
+            CreateTurret(selectedTurretType);
+            gameManager->DescreaseEnergy(turretCosts[selectedTurretType]);
+            selectedTurretType = TurretType::None;
+            multiTool->SetActiveIcon(selectedTurretType);
+            isPlacing = false;
+        }
     }
 
     void CreateTurret(TurretType type)
     {
+        printf("Creating new turret of type %i\n", type);
         switch (type)
         {
         case TurretType::Lantern:
@@ -243,6 +267,7 @@ public:
             resMan->GetMaterial("Resources/models/Wieze/Latarnia.mtl")
         );
         gfxGO->AddComponent(mc);
+        mc->SetTintColor(turretGhostColor);
         
         gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
         gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
@@ -270,23 +295,41 @@ public:
             resMan->GetMaterial("Resources/models/Wieze/Strzelajaca.mtl")
         );
         turretPrefabs[type]->AddComponent(mc);
+        mc->SetTintColor(turretGhostColor);
         turretPrefabs[type]->AddComponent(turretShader);
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::Transform>());
         turretPrefabs[type]->GetComponent<cmp::Transform>()->SetPosition(0,0.5,-5);
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::FrustumCulling>());
         turretPrefabs[type]->GetComponent<cmp::FrustumCulling>()->Create(
             resMan->GetMesh("Resources/models/Wieze/Strzelajaca.obj"));
-        turretPrefabs[type]->AddComponent(std::make_shared<cmp::SphereCol>(true, true));
-        std::shared_ptr<cmp::SphereCol> col = turretPrefabs[type]->GetComponent<cmp::SphereCol>();
-        col->SetRadius(shootingTurretRange);
-        // col->AddToCollidersManager(colMan);
+        
+        turretPrefabs[type]->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
+        std::shared_ptr<cmp::BoxCol> col = turretPrefabs[type]->GetComponent<cmp::BoxCol>();
+        col->setLengths({2.5, 3.5, 2.5});
+        col->SetOffset({0.0, 2.0, 0.0});
+
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::Scriptable>());
         TurretShoot* script = new TurretShoot();
         script->isPut = true;
         script->SetEnabled(false);
         turretPrefabs[type]->GetComponent<cmp::Scriptable>()->Add(script);
 
-        turretsHolder->AddChild(turretPrefabs[type]);
+        
+        auto rangeGO = std::make_shared<GameObject>();
+        rangeGO->AddComponent(std::make_shared<cmp::Transform>());
+
+        rangeGO->AddComponent(std::make_shared<cmp::SphereCol>(true, true));
+        std::shared_ptr<cmp::SphereCol> rangeCol = rangeGO->GetComponent<cmp::SphereCol>();
+        rangeCol->SetRadius(shootingTurretRange);
+        rangeCol->AddToCollidersManager(colMan);
+
+        rangeGO->AddComponent(std::make_shared<cmp::Scriptable>());
+        TurretRange* range = new TurretRange();
+        script->turretRange = range;
+        rangeGO->GetComponent<cmp::Scriptable>()->Add(range);
+        
+
+        turretsHolder->AddChild(turretPrefabs[type])->AddChild(rangeGO);
     }
 
     void CreateLaserTurret()
@@ -315,17 +358,25 @@ public:
 
 
         scriptHolder->Add(turretScript);
+
+
+        turretPrefabs[type]->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
+        std::shared_ptr<cmp::BoxCol> col = turretPrefabs[type]->GetComponent<cmp::BoxCol>();
+        col->setLengths({2.5, 3.5, 2.5});
+        col->SetOffset({0.0, 2.0, 0.0});
         
 
 
         auto gfxGO = std::make_shared<GameObject>();
         gfxGO->AddComponent(std::make_shared<cmp::Transform>());
+        gfxGO->AddComponent(std::make_shared<cmp::Name>("gfx"));
 
         auto mc = std::make_shared<cmp::Model>();
         mc->Create(
             resMan->GetMesh("Resources/models/Wieze/Laser.obj"),
             resMan->GetMaterial("Resources/models/Wieze/Laser.mtl")
         );
+        mc->SetTintColor(turretGhostColor);
         gfxGO->AddComponent(mc);
         
         gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
@@ -336,6 +387,39 @@ public:
 
 
         turretsHolder->AddChild(turretPrefabs[type])->AddChild(gfxGO);
+    }
+
+    void PickUpTurret(TurretType type, std::shared_ptr<GameObject> turretGO)
+    {    
+        if (type == TurretType::None) return;
+        gameManager->IncreaseEnergy(turretCosts[type]);
+
+        turretGO->GetComponent<cmp::Transform>()->SetPosition(0.0, -10000.0, 0.0);
+
+        //removing doesnt work lol
+
+        // printf("PickUpTurret()\n");
+
+        // std::shared_ptr<ColliderComponent> col = turretGO->GetComponent<cmp::SphereCol>();
+        // if (col == nullptr)
+        // {
+        //     col = gameObject->GetComponent<cmp::BoxCol>();
+        // }
+        // if (col != nullptr)
+        // {
+        //     printf(" has collider\n");
+            
+        //     printf("a\n");
+        //     colMan->RemoveStaticTrigger(col);
+        //     printf("b\n");
+        //     colMan->RemoveDynamicTrigger(col);
+        //     printf("c\n");
+        //     colMan->RemoveStaticColllider(col);
+        //     printf("d\n");
+        //     colMan->RemoveDynamicCollider(col);
+        // }
+        
+        // turretsHolder->RemoveNode(turretGO->GetNode());
     }
 
 };
