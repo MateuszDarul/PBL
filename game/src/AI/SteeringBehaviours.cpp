@@ -12,7 +12,7 @@ glm::vec3 SteeringBehaviours::Seek(glm::vec3 targetPos)
 glm::vec3 SteeringBehaviours::Flee(glm::vec3 targetPos)
 {
 	//only flee if the target is within 'panic distance'. Work in distance squared space.
-	const float panicDistance = 2.0;
+	const float panicDistance = 15.0f;
 	if (glm::distance(owner->GetComponent<TransformComponent>()->GetPosition(), targetPos) > panicDistance)
 	{
 		return glm::vec3(0.0f);
@@ -49,14 +49,14 @@ glm::vec3 SteeringBehaviours::Calculate()
 
 	if (seek)
 	{
-		force = Seek(seekTarget) * 1.0f; //modifiable parameter
+		force = Seek(seekTarget) * 2.0f; //modifiable parameter
 
 		if (!AccumulateForce(steeringForce, force)) return steeringForce;
 	}
 
 	if (flee)
 	{
-		force = Flee(fleeTarget) * 1.0f; //modifiable parameter
+		force = Flee(fleeTarget) * 3.0f; //modifiable parameter
 
 		if (!AccumulateForce(steeringForce, force)) return steeringForce;
 	}

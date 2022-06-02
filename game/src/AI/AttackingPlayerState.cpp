@@ -15,7 +15,7 @@ void AttackingPlayerState::Execute(std::shared_ptr<GameObject> gameObject, float
 {
 	glm::vec3 playerPos = gameObject->GetNode()->GetParent()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Transform>()->GetPosition();
 
-	if (glm::length(gameObject->GetComponent<cmp::Transform>()->GetPosition() - playerPos) > 10.0f)
+	if (glm::length(gameObject->GetComponent<cmp::Transform>()->GetPosition() - playerPos) > 20.0f)
 	{
 		gameObject->GetComponent<ScriptComponent>()->Get<EnemyScript>()->stateMachine->ChangeState(FollowPathState::Instance());
 	}
