@@ -19,7 +19,6 @@
 
 
 // for quick access (avoiding string comparisions in FindNode)
-std::shared_ptr<GameObject> GO_CAMERA;
 std::shared_ptr<GameObject> GO_MULTITOOL;
 std::shared_ptr<GameObject> GO_FLASHLIGHT;
 std::shared_ptr<GameObject> GO_CROSSHAIR;
@@ -118,7 +117,6 @@ Scene::Scene()
     ///***
 
     auto playerGO = go;
-    GO_CAMERA = go;
 
     //ground check
     {
@@ -702,7 +700,7 @@ void Scene::Update(float dt)
     GO_CROSSHAIR->GetComponent<cmp::Transform>()->SetPosition(GameApplication::GetAspectRatio() * 0.5f, 0.5f, 0.1f);
 
     //Update camera
-    std::shared_ptr<GameObject> goCamera = GO_CAMERA;
+    std::shared_ptr<GameObject> goCamera = world->FindNode("CAMERA")->GetGameObject();
     std::shared_ptr<TransformComponent> transformCamera = goCamera->GetComponent<cmp::Transform>();
 
     goCamera->GetComponent<CameraComponent>()->Update(GameApplication::GetInputManager(), dt);
@@ -751,7 +749,7 @@ void Scene::Update(float dt)
 void Scene::Render()
 {
     glViewport(0, 0, GameApplication::GetWindowSize().x, GameApplication::GetWindowSize().y);
-    std::shared_ptr<GameObject> goCamera = GO_CAMERA;
+    std::shared_ptr<GameObject> goCamera = world->FindNode("CAMERA")->GetGameObject();
     glm::mat4 skyboxTransform = GameApplication::GetProjection() * glm::mat4(glm::mat3(goCamera->GetComponent<CameraComponent>()->GetView()));
     skybox->Render(skyboxTransform);
     world->Render(transform);
