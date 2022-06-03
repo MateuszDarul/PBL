@@ -19,9 +19,6 @@ void EnemyScript::Start()
 
 	maxTurnRate = 3.0f;
 
-	//WORK IN PROGRESS
-	path = new Path();
-
 	steering = new SteeringBehaviours(gameObject, path);
 
 	steering->SetSeekTarget(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -65,11 +62,6 @@ void EnemyScript::Update(float dt)
 
 	float distance = glm::length(fl_pos - mypos);
 	float dot = glm::dot(glm::normalize(mypos - fl_pos), glm::normalize(fl_forward));
-
-	//std::cout << fl_pos.x << std::endl;
-	//std::cout << fl_forward.x << std::endl;
-	//std::cout << mypos.x << std::endl;
-	//std::cout << dot << std::endl;
 
 	if (multitool->isFlashlightOn  && dot > 0.7f && distance < 16.66887f)
 	{

@@ -103,7 +103,6 @@ static void drawDebugSphere(const glm::mat4& model, const glm::mat4& vp, float r
 
 
 // defined in Scene.cpp
-extern std::shared_ptr<GameObject> GO_CAMERA;
 extern std::shared_ptr<GameObject> GO_MULTITOOL;
 extern std::shared_ptr<GameObject> GO_FLASHLIGHT;
 extern std::shared_ptr<GameObject> GO_CROSSHAIR;
@@ -160,7 +159,7 @@ void SceneNode::Update(float dt)
 #ifdef ENABLE_DEBUG_INFO
     if (Input()->Keyboard()->IsPressed(KeyboardKey::F11))
     {
-        const auto& cam = GO_CAMERA->GetComponent<cmp::Camera>()->GetPosition();
+        const auto& cam = this->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>()->GetPosition();
         printf("Camera position: %f %f %f\n", cam.x, cam.y, cam.z);
     }
 #endif
@@ -169,7 +168,7 @@ void SceneNode::Update(float dt)
     this->PrivateUpdate(dt, glm::mat4(1.f));
 
     SceneNode::cameraFrustum = 
-    GO_CAMERA->GetComponent<cmp::Camera>()->GetFrustum(
+    this->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>()->GetFrustum(
         (float)GameApplication::GetWindowSize().x/GameApplication::GetWindowSize().y,
         GameApplication::GetFov(),
         GameApplication::GetProjectionRange().x,
@@ -257,7 +256,7 @@ void SceneNode::Render(const glm::mat4& matrixPV)
             shaderPtr->SetMat4("model", this->globalTransformations);
             shaderPtr->SetVec4("u_TintColor", {1, 1, 1, 1});
             shaderPtr->SetFloat("u_Time", GlobalElapsedTime);
-            shaderPtr->SetVec3("u_CameraPos", GO_CAMERA->GetComponent<cmp::Transform>()->GetPosition());
+            shaderPtr->SetVec3("u_CameraPos", this->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Transform>()->GetPosition());
 
             std::shared_ptr<cmp::Model> modelPtr = this->gameObject->GetComponent<cmp::Model>();
             if(modelPtr != nullptr)

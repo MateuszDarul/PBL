@@ -2,6 +2,7 @@
 #include "InputManager.h"
 #include "ResourceManager.h"
 #include "Scene.h"
+#include "Menu.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -57,6 +58,8 @@ glm::mat4 GameApplication::s_OrthographicMatrix = glm::ortho(
 );
 
 Scene* GameApplication::s_Scene = nullptr;
+MenuScene* GameApplication::s_Menu = nullptr;
+bool GameApplication::inGame = false;
 InputManager* GameApplication::s_InputManager = nullptr;
 ResourceManager* GameApplication::s_ResourceManager = nullptr;
 
@@ -190,12 +193,11 @@ int GameApplication::Init()
 
 
     //Load scene
-     //Scene OnCreate
+    //Scene OnCreate
     s_Scene = new Scene();
 
 
-
-
+    s_Menu = new MainMenu();
 
     return 0;
 }
@@ -224,12 +226,19 @@ void GameApplication::Run()
         dt = t1 - t2;
         t2 = t1;
 
-        //update logic
-        s_Scene->Update(dt);
+        if(inGame)
+        {
+            //update logic
+            s_Scene->Update(dt);
 
-        //show scene
-        s_Scene->Render();
-
+            //show scene
+            s_Scene->Render();
+        }
+        else
+        {
+            s_Menu->Update();
+            s_Menu->Draw();
+        }
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();

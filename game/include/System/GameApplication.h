@@ -7,7 +7,7 @@
 
 class GLFWwindow;
 class Scene;
-
+class MenuScene;
 
 /**
  * @brief Inicjalizuje biblioteki oraz tworzy pętlę gry.
@@ -28,6 +28,10 @@ private:
     static Scene* s_Scene;
     static InputManager* s_InputManager;
     static ResourceManager* s_ResourceManager;
+
+public:
+    static MenuScene* s_Menu;
+    static bool inGame;
 
 private:
     /**

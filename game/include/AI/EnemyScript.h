@@ -18,10 +18,9 @@ public:
 
     Health* health;
     MultiToolController* multitool;
+    std::shared_ptr<StateMachine<GameObject>> stateMachine;
 
 private:
-
-    std::shared_ptr<StateMachine<GameObject>> stateMachine;
 
     glm::vec3 velocity; //!< speed of an object.
 
@@ -41,7 +40,7 @@ private:
 
     SteeringBehaviours* steering; //!< a pointer to the steering behaviour class
 
-    Path* path; //!< a pointer to a path to follow
+    std::shared_ptr<Path> path; //!< a pointer to a path to follow
 
     std::shared_ptr<GameObject> player;
 
@@ -64,7 +63,6 @@ public:
     */
     ~EnemyScript() {
         delete steering;
-        delete path;
     }
 
     /**
@@ -79,6 +77,11 @@ public:
      * @param dt - krok czasu
      */
     void Update(float dt);
+
+    void SetPath(std::shared_ptr<Path> p)
+    {
+        path = p;
+    }
 
     glm::vec3 GetVelocity() {
         return velocity;

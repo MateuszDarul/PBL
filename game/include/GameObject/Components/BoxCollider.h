@@ -11,7 +11,7 @@
 class BoxCollider : public ColliderComponent
 {
 private:
-	glm::uvec3 lengths; //!< D�ugo�ci bok�w pude�ka, r�wnoleg�e do osi X, Y lub Z.
+	glm::vec3 lengths; //!< D�ugo�ci bok�w pude�ka, r�wnoleg�e do osi X, Y lub Z.
 public:
 
 	/** @brief Konstruktor komponentu kolider�w.
@@ -44,11 +44,11 @@ public:
 	/** @brief Metoda ustawiaj�ca nowe d�ugo�ci kraw�dzi pude�kowego kolidera.
 	* @param lengths - nowe d�ugo�ci kraw�dzi pude�kowego kolidera.
 	*/
-	void setLengths(glm::uvec3 lengths);
+	void setLengths(glm::vec3 lengths);
 
 	/** @brief Metoda zwracaj�ca d�ugo�ci kraw�dzi pude�kowego kolidera.
-	* @return glm::uvec3 - D�ugo�ci kraw�dzi.
+	* @return glm::vec3 - D�ugo�ci kraw�dzi.
 	*/
-	glm::uvec3 getLengths();
+	glm::vec3 getLengths();
 };
 #endif

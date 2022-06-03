@@ -1,25 +1,30 @@
 #include "FollowPathState.h"
 #include "EnemyScript.h"
+#include "Components.h"
+#include "AttackingPlayerState.h"
 
 void FollowPathState::Enter(std::shared_ptr<GameObject> gameObject)
 {
 	std::cout << "Following Path" << std::endl;
 	gameObject->GetComponent<ScriptComponent>()->Get<EnemyScript>()->GetSteering()->SetFollowPath(true);
-	//gameObject->GetComponent<ScriptComponent>()->Get<EnemyScript>()->GetSteering()->SetSeek(true);
 	gameObject->GetComponent<ScriptComponent>()->Get<EnemyScript>()->GetSteering()->SetFlee(true);
 }
 
 void FollowPathState::Execute(std::shared_ptr<GameObject> gameObject, float dt)
 {
-	//gameObject->GetComponent<TransformComponent>()->Move(0.0f, 0.0f, dt * 5.0f);
-	//gameObject->GetComponent<ScriptComponent>()->Get<EnemyScript>()->GetSteering()->SetSeekTarget();
+	glm::vec3 playerPos = gameObject->GetNode()->GetParent()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Transform>()->GetPosition();
+
+	if (glm::length(gameObject->GetComponent<cmp::Transform>()->GetPosition() - playerPos) < 5.0f)
+	{
+		gameObject->GetComponent<ScriptComponent>()->Get<EnemyScript>()->stateMachine->ChangeState(AttackingPlayerState::Instance());
+	}
+
 }
 
 void FollowPathState::Exit(std::shared_ptr<GameObject> gameObject)
 {
 	std::cout << "Stopping following path" << std::endl;
 	gameObject->GetComponent<ScriptComponent>()->Get<EnemyScript>()->GetSteering()->SetFollowPath(false);
-	//gameObject->GetComponent<ScriptComponent>()->Get<EnemyScript>()->GetSteering()->SetSeek(false);
 	gameObject->GetComponent<ScriptComponent>()->Get<EnemyScript>()->GetSteering()->SetFlee(false);
 }
 
