@@ -2,6 +2,8 @@
 #include "GameObject.h"
 #include "Components.h"
 #include "FollowPathState.h"
+#include "TakeDamageState.h"
+#include "TakeDamageState.h"
 
 void EnemyScript::Start() 
 {
@@ -13,9 +15,9 @@ void EnemyScript::Start()
 
 	top = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	maxSpeed = 2.0f;
+	maxSpeed = 4.0f;
 
-	maxForce = 1.0f;
+	maxForce = 2.0f;
 
 	maxTurnRate = 3.0f;
 
@@ -41,8 +43,6 @@ void EnemyScript::Update(float dt)
 
 	velocity += acceleration * dt;
 
-	steering->SetFleeTarget(player->GetComponent<CameraComponent>()->GetPosition());
-
 	if (glm::length(velocity) > maxSpeed) 
 	{
 		velocity = glm::normalize(velocity) * maxSpeed;
@@ -66,8 +66,17 @@ void EnemyScript::Update(float dt)
 	if (multitool->isFlashlightOn  && dot > 0.7f && distance < 16.66887f)
 	{
 		// player looks at me
-		std::cout << "I am taking dmg" << std::endl;
 		health->DecreaseHealth(2.0f * dt);
+
+		if (stateMachine->CurrentState() != TakeDamageState::Instance())
+		{
+			stateMachine->ChangeState(TakeDamageState::Instance());
+		}
+
+	}
+	else if (stateMachine->CurrentState() == TakeDamageState::Instance()) 
+	{
+		stateMachine->RevertToPreviousState();
 	}
 
 }

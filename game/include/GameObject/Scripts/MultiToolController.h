@@ -26,6 +26,9 @@ public:
     float maxFlashlightCharge = 10.0f; //10 seconds
     float currentFlashlightCharge;
 
+private:
+
+    float disabledIconsOffset = 0.1f;
 
 public:
 
@@ -36,7 +39,7 @@ public:
         for (int i = 0; i < 3; i++)
         {
             // 'disabling' icons
-            iconsGO[i]->GetComponent<cmp::Transform>()->Move(0.0f, 0.0f, -0.2f);
+            iconsGO[i]->GetComponent<cmp::Transform>()->Move(0.0f, 0.0f, -disabledIconsOffset);
         }
     }
 
@@ -92,6 +95,6 @@ public:
 
     void Unlock(int index)
     {
-        iconsGO[index]->GetComponent<cmp::Transform>()->Move(0.0f, 0.0f, 0.2f);
+        iconsGO[index]->GetComponent<cmp::Transform>()->Move(0.0f, 0.0f, disabledIconsOffset);
     }
 };

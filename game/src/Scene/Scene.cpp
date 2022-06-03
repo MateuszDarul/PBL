@@ -362,10 +362,14 @@ Scene::Scene()
     
 
     //blueprints
-    glm::vec3 blueprintPositions[3] =  {
-        {0,-10,0}, //???
-        { -83.0f, 0.5f, 69.5f },    //Shooting
-        { -26.0f, 0.5f,  5.0f }     //Laser
+    struct BlueprintPosition {
+        glm::vec3 position;
+        PlayerPlaceTurret::TurretType type;
+    };
+    std::vector<BlueprintPosition> blueprints =  {
+        {{      0,    0,    0  },  PlayerPlaceTurret::TurretType::Lantern  },    //???
+        {{ -83.0f, 0.5f, 69.5f },  PlayerPlaceTurret::TurretType::Shooting },    //Shooting
+        {{ -26.0f, 0.5f,  5.0f },  PlayerPlaceTurret::TurretType::Laser    }     //Laser
     };
     for (int i = 0; i < 3; i++)
     {
@@ -373,7 +377,7 @@ Scene::Scene()
         go->AddComponent(std::make_shared<cmp::Name>("Blueprint " + std::to_string(i)));
         
         go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(blueprintPositions[i]);
+        go->GetComponent<cmp::Transform>()->SetPosition(blueprints[i].position);
         go->GetComponent<cmp::Transform>()->SetScale(0.5);
 
         go->AddComponent(std::make_shared<BoxCollider>(true, true));
@@ -392,7 +396,7 @@ Scene::Scene()
         go->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
 
         auto resourceScript = new Blueprint();
-        resourceScript->type = i;
+        resourceScript->type = blueprints[i].type;
         go->AddComponent(std::make_shared<cmp::Scriptable>());
         go->GetComponent<cmp::Scriptable>()->Add(resourceScript);
 

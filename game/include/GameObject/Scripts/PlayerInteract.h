@@ -79,39 +79,50 @@ public:
                 else if (auto mirror = scriptable->Get<MirrorRotate>())
                 {
                     textTEMP->color = { 0.0f, 1.0f, 0.0f };
-                    if (shouldInteract)
-                    {
-                        shouldInteract = false;
+                    placeTurretScript->isLookingAtMirror = true;
 
-                        if (selectedMirror)
+                    if (!placeTurretScript->isPlacing)
+                    {
+                        if (Input()->Mouse()->OnPressed(MouseButton::Left_MB))
                         {
-                            if (selectedMirror == mirror)
-                            {
-                                camera->SetMovementEnable(true);
-                                selectedMirror->SetEnabled(false);
-                                selectedMirror = nullptr;
-                            }
-                            else
-                            {
-                                selectedMirror->SetEnabled(false);
-                                selectedMirror = mirror;
-                                selectedMirror->SetEnabled(true);
-                            }
-                        }
-                        else
-                        {
-                            camera->SetMovementEnable(false);
                             selectedMirror = mirror;
                             selectedMirror->SetEnabled(true);
                         }
-
-                        // if (selectedMirror) selectedMirror->SetEnabled(false);
-                        // else camera->SetMovementEnable(!camera->GetMovementEnabled());
-
-
-                        // selectedMirror = mirror;
-                        // selectedMirror->SetEnabled(!camera->GetMovementEnabled());
                     }
+
+                    // if (shouldInteract)
+                    // {
+                    //     shouldInteract = false;
+
+                    //     if (selectedMirror)
+                    //     {
+                    //         if (selectedMirror == mirror)
+                    //         {
+                    //             camera->SetMovementEnable(true);
+                    //             selectedMirror->SetEnabled(false);
+                    //             selectedMirror = nullptr;
+                    //         }
+                    //         else
+                    //         {
+                    //             selectedMirror->SetEnabled(false);
+                    //             selectedMirror = mirror;
+                    //             selectedMirror->SetEnabled(true);
+                    //         }
+                    //     }
+                    //     else
+                    //     {
+                    //         camera->SetMovementEnable(false);
+                    //         selectedMirror = mirror;
+                    //         selectedMirror->SetEnabled(true);
+                    //     }
+
+                    //     // if (selectedMirror) selectedMirror->SetEnabled(false);
+                    //     // else camera->SetMovementEnable(!camera->GetMovementEnabled());
+
+
+                    //     // selectedMirror = mirror;
+                    //     // selectedMirror->SetEnabled(!camera->GetMovementEnabled());
+                    // }
                 }
                 else if (auto turret = scriptable->Get<TurretLaser>())
                 {
@@ -141,14 +152,24 @@ public:
             // pressed Interact button and no interactable was found
             
             // removing focus from selected mirror - if any
-            if (selectedMirror) selectedMirror->SetEnabled(false);
-            selectedMirror = nullptr;
-            camera->SetMovementEnable(true);
+            // if (selectedMirror) selectedMirror->SetEnabled(false);
+            // selectedMirror = nullptr;
+            // camera->SetMovementEnable(true);
         }
 
         if (selectedMirror)
         {
-            textTEMP->SetText("<>");
+            selectedMirror->disableRotation = Input()->Mouse()->IsPressed(MouseButton::Right_MB);
+
+            if (Input()->Mouse()->IsReleased(MouseButton::Left_MB))
+            {
+                selectedMirror->SetEnabled(false);
+                selectedMirror = nullptr;
+            }
+            else
+            {
+                textTEMP->SetText("<>");
+            }
         }
     }
 };
