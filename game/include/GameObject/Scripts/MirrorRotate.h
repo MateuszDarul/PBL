@@ -28,6 +28,9 @@ public:
 
     float mouseRotationSpeed = 0.069f;
 
+    float invertRotationX = 1.0f;
+    float invertRotationY = 1.0f;
+
     bool disableRotation = false;
 
 private:
@@ -59,8 +62,8 @@ public:
         if (disableRotation) return;
 
         float modifier = (Input()->Keyboard()->IsPressed(KeyboardKey::LShift)) ? rotationSpeedModifier : 1.0f;
-        currentRotationX -= mouseOffset.y * mouseRotationSpeed * modifier;
-        currentRotationY -= mouseOffset.x * mouseRotationSpeed * modifier;
+        currentRotationX -= mouseOffset.y * mouseRotationSpeed * modifier * invertRotationX;
+        currentRotationY += mouseOffset.x * mouseRotationSpeed * modifier * invertRotationY;
 
         currentRotationX = std::clamp(currentRotationX, -maxRotationX+initialRotationOffsetX, maxRotationX+initialRotationOffsetX);
         currentRotationY = std::clamp(currentRotationY, -maxRotationY+initialRotationOffsetY, maxRotationY+initialRotationOffsetY);

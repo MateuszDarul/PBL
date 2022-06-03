@@ -112,7 +112,7 @@ public:
         short scroll = Input()->Mouse()->GetScrollOffset();
         if (scroll != 0)
         {
-            short newType = ((selectedTurretType + scroll) % 3 + 3) % 3;
+            short newType = ((selectedTurretType - scroll) % 3 + 3) % 3;
             if (unlocked[newType])
             {
                 selectedTurretType = (TurretType)newType;
@@ -120,7 +120,7 @@ public:
             }
             else
             {
-                newType = ((newType + scroll) % 3 + 3) % 3;
+                newType = ((newType - scroll) % 3 + 3) % 3;
                 if (unlocked[newType])
                 {
                     selectedTurretType = (TurretType)newType;

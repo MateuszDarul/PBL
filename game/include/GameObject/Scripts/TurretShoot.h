@@ -25,6 +25,8 @@ private:
 		}
 		return toReturn;
 	}
+
+	std::shared_ptr<ParticleComponent> muzzleParticles;
 public:
 	float damage = 10.0f;
 	float shootCd = 1.0f;
@@ -32,7 +34,24 @@ public:
 
 	void Start()
 	{
+		if (muzzleParticles == nullptr)
+		{
+			muzzleParticles = std::make_shared<ParticleComponent>();
+			
+			muzzleParticles->Create(gameObject->GetNode()->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>(), true, 10);
+			muzzleParticles->SetTexture("Resources/textures/particle.png");
+			muzzleParticles->SetParticlesPerSecond(50.0f);
+			muzzleParticles->SetOffset(glm::vec3(2.44f, 2.3f, 0));
+			muzzleParticles->SetDirection({ 0.0f, 0.4f, 0.0f });
+			muzzleParticles->SetDirectionVar(15);
+			muzzleParticles->SetParticleLifetime(0.4f);
+			muzzleParticles->SetScale(0.2f, 0.01f);
+			muzzleParticles->SetSpeed(3.0f);
+			muzzleParticles->SetColor({ 1.0f, 1.0f, 0.0f,   1.0f }, { 1.0f, 0.3f, 0.1f,   0.2f });
+			muzzleParticles->SetForce({ 0.0f, -2.5f, 0.0f });
 
+			gameObject->AddComponent(muzzleParticles);
+		}
 	}
 
 	void Update(float dt)
@@ -42,7 +61,7 @@ public:
 			if (turretRange->enemies.size() > 0)
 			{
 				float angle = Angle(gameObject->GetComponent<cmp::Transform>()->GetPosition(), turretRange->enemies[0]->gameObject->GetComponent<cmp::Transform>()->GetPosition());
-				gameObject->GetComponent<cmp::Transform>()->SetRotation(0, glm::degrees(angle), 0);
+				gameObject->GetComponent<cmp::Transform>()->SetRotation(0, glm::degrees(angle), 0);				
 			}
 
 			if (shootTimer < shootCd)
@@ -53,6 +72,7 @@ public:
 			{
 				if (turretRange->enemies.size() > 0)
 				{
+					muzzleParticles->Burst();
 					turretRange->enemies[0]->DecreaseHealth(damage);
 					shootTimer = 0.0f;
 				}

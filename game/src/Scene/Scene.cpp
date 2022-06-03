@@ -439,34 +439,16 @@ Scene::Scene()
 
         world->FindNode("MAIN")->AddChild(go);
     }
-
     {
-        //rotator
-        auto mirrorHolderGO = std::make_shared<GameObject>();
-
-        mirrorHolderGO->AddComponent(std::make_shared<cmp::Transform>());
-        mirrorHolderGO->GetComponent<cmp::Transform>()->SetPosition(8.5, 0.5, -20.3);
-
-        mirrorHolderGO->AddComponent(std::make_shared<cmp::Scriptable>());
-
-        auto mirrorScript = new MirrorRotate();
-        mirrorScript->SetEnabled(false);
-        mirrorHolderGO->GetComponent<cmp::Scriptable>()->Add(mirrorScript);
-
-
-        auto mirrorHolder = world->FindNode("MAIN")->AddChild(mirrorHolderGO);
-
-
-        //mirror itself
         go = std::make_shared<GameObject>();
         go->AddComponent(std::make_shared<cmp::Name>("Mirror"));
 
         go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(0.0, 1.0, 0.0);
-        go->GetComponent<cmp::Transform>()->SetScale(1.0);
+        go->GetComponent<cmp::Transform>()->SetPosition(-37.5, 4.0, 55.5);
+        go->GetComponent<cmp::Transform>()->SetRotation(0.0, 0.0, 0.0);
 
         go->AddComponent(std::make_shared<BoxCollider>(false, false));
-        go->GetComponent<cmp::BoxCol>()->setLengths({2.0, 2.0, 2.0});
+        go->GetComponent<cmp::BoxCol>()->setLengths({ 2.0, 2.0, 2.0 });
         go->GetComponent<cmp::BoxCol>()->SetMass(999999999.9f);
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
@@ -482,7 +464,14 @@ Scene::Scene()
         go->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
 
 
-        mirrorHolder->AddChild(go);
+        go->AddComponent(std::make_shared<cmp::Scriptable>());
+
+        auto mirrorScript = new MirrorRotate();
+        mirrorScript->SetEnabled(false);
+        mirrorScript->invertRotationX = -1.0f;
+        go->GetComponent<cmp::Scriptable>()->Add(mirrorScript);
+
+        world->FindNode("MAIN")->AddChild(go);
     }
     
     //doors and activators
