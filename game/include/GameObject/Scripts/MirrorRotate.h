@@ -43,12 +43,12 @@ public:
 
     void Update(float dt)
     {
-        if (disableRotation) return;
-
         glm::vec2 mouseOffset = currentMousePosition - previousMousePosition;
         previousMousePosition = currentMousePosition;
         currentMousePosition = Input()->Mouse()->GetPosition();
         // printf("Mouse offset: %f %f\n", mouseOffset.x, mouseOffset.y);
+
+        if (disableRotation) return;
 
         currentRotationX -= mouseOffset.y * mouseRotationSpeed;
         currentRotationY += mouseOffset.x * mouseRotationSpeed;

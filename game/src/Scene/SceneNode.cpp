@@ -321,7 +321,7 @@ void SceneNode::Render(const glm::mat4& matrixPV)
     }
 
 #ifdef ENABLE_DEBUG_INFO
-    if (Input()->Keyboard()->IsPressed(KeyboardKey::F12))
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::F9))
     {
         if (auto collider = gameObject->GetComponent<cmp::BoxCol>())
         {

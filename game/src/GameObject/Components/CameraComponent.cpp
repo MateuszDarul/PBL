@@ -39,6 +39,7 @@ bool CameraComponent::Create(const glm::vec3& position)
 
     CalculateJumpParams();
     isEnabledMovement = true;
+    isEnabledRotation = true;
     
     this->position = position;
 
@@ -193,6 +194,7 @@ void CameraComponent::ProcessMouseMovement(const float& offsetX, const float& of
     xoffset *= this->mouseSensitivity;
     yoffset *= this->mouseSensitivity;
 
+    if (!isEnabledRotation) return;
     this->yaw += xoffset;
     this->pitch += yoffset;
 
@@ -275,6 +277,16 @@ bool CameraComponent::GetMovementEnabled()
 void CameraComponent::SetMovementEnable(bool enabled)
 {
     isEnabledMovement = enabled;
+}
+
+bool CameraComponent::GetRotationEnabled()
+{
+    return isEnabledRotation;
+}
+
+void CameraComponent::SetRotationEnable(bool enabled)
+{
+    isEnabledRotation = enabled;
 }
 
 bool CameraComponent::GetIsGrounded()

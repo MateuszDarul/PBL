@@ -160,6 +160,7 @@ public:
         if (selectedMirror)
         {
             selectedMirror->disableRotation = Input()->Mouse()->IsPressed(MouseButton::Right_MB);
+            camera->SetRotationEnable(selectedMirror->disableRotation);
 
             if (Input()->Mouse()->IsReleased(MouseButton::Left_MB))
             {
