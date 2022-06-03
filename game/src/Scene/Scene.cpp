@@ -434,7 +434,7 @@ Scene::Scene()
 
         auto mirrorScript = new MirrorRotate();
         mirrorScript->SetEnabled(false);
-        mirrorScript->maxRotationY = 180;
+        mirrorScript->initialRotationOffsetY = 30.0f;
         go->GetComponent<cmp::Scriptable>()->Add(mirrorScript);
 
         world->FindNode("MAIN")->AddChild(go);

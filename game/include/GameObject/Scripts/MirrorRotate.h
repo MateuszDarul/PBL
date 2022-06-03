@@ -8,11 +8,17 @@ class MirrorRotate : public Script
 {
 public:
 
+    float initialRotationOffsetX = 0.0f;
+    float initialRotationOffsetY = 0.0f;
+
     float maxRotationX = 30.0f;
     float maxRotationY = 45.0f;
 
     float currentRotationX = 0.0f;
     float currentRotationY = 0.0f;
+
+    float smoothedRotationX;
+    float smoothedRotationY;
 
     float rotationSpeed = 12.5f;
     float rotationSpeedModifier = 0.088f;
@@ -34,6 +40,8 @@ public:
         transform = gameObject->GetComponent<cmp::Transform>();
         currentRotationX = transform->GetRotation().x;
         currentRotationY = transform->GetRotation().y;
+        smoothedRotationX = currentRotationX;
+        smoothedRotationY = currentRotationY;
 
         currentMousePosition = Input()->Mouse()->GetPosition();
         previousMousePosition = currentMousePosition;
@@ -50,13 +58,18 @@ public:
 
         if (disableRotation) return;
 
-        currentRotationX -= mouseOffset.y * mouseRotationSpeed;
-        currentRotationY += mouseOffset.x * mouseRotationSpeed;
+        float modifier = (Input()->Keyboard()->IsPressed(KeyboardKey::LShift)) ? rotationSpeedModifier : 1.0f;
+        currentRotationX -= mouseOffset.y * mouseRotationSpeed * modifier;
+        currentRotationY -= mouseOffset.x * mouseRotationSpeed * modifier;
 
-        currentRotationX = std::clamp(currentRotationX, -maxRotationX, maxRotationX);
-        currentRotationY = std::clamp(currentRotationY, -maxRotationY, maxRotationY);
+        currentRotationX = std::clamp(currentRotationX, -maxRotationX+initialRotationOffsetX, maxRotationX+initialRotationOffsetX);
+        currentRotationY = std::clamp(currentRotationY, -maxRotationY+initialRotationOffsetY, maxRotationY+initialRotationOffsetY);
 
-        transform->SetRotation(currentRotationX, currentRotationY, 0.0f);
+        float factor = 0.48f;
+        smoothedRotationX = smoothedRotationX + factor * (currentRotationX - smoothedRotationX);
+        smoothedRotationY = smoothedRotationY + factor * (currentRotationY - smoothedRotationY);
+
+        transform->SetRotation(smoothedRotationX, smoothedRotationY, 0.0f);
 
 
         // float modifier = (Input()->Keyboard()->IsPressed(KeyboardKey::LShift)) ? rotationSpeedModifier : 1.0f;

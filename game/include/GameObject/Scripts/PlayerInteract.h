@@ -42,11 +42,13 @@ public:
     void Update(float dt)
     {
         bool shouldInteract = false;
-        if (Input()->Keyboard()->OnPressed(KeyboardKey::E))
+        if (Input()->Keyboard()->OnPressed(KeyboardKey::E) || (!placeTurretScript->isPlacing && Input()->Mouse()->OnPressed(MouseButton::Right_MB)))
         {
             shouldInteract = true;
         }
 
+
+        placeTurretScript->isLookingAtMirror = false;
         textTEMP->color = { 1.0f, 0.0f, 0.0f };
         textTEMP->SetText("+");
         RayHitInfo hit;
@@ -162,10 +164,16 @@ public:
             selectedMirror->disableRotation = Input()->Mouse()->IsPressed(MouseButton::Right_MB);
             camera->SetRotationEnable(selectedMirror->disableRotation);
 
-            if (Input()->Mouse()->IsReleased(MouseButton::Left_MB))
+            const auto& camPos = camera->GetPosition();
+            const auto& mirrorPos = selectedMirror->gameObject->GetComponent<cmp::Transform>()->GetPosition();
+            const auto& posDiff = mirrorPos - camPos;
+            float distanceSquared = glm::dot(posDiff, posDiff);
+
+            if (Input()->Mouse()->IsReleased(MouseButton::Left_MB) || distanceSquared > 67.050f)
             {
                 selectedMirror->SetEnabled(false);
                 selectedMirror = nullptr;
+                camera->SetRotationEnable(true);
             }
             else
             {
