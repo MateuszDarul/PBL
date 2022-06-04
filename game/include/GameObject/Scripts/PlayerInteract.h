@@ -36,16 +36,13 @@ public:
 
     void Start()
     {
-        
-    }
 
+    }
+    bool usingRMBToRotate = false;
     void Update(float dt)
     {
-        bool shouldInteract = false;
-        if (Input()->Keyboard()->OnPressed(KeyboardKey::E) || (!placeTurretScript->isPlacing && Input()->Mouse()->OnPressed(MouseButton::Right_MB)))
-        {
-            shouldInteract = true;
-        }
+        bool canUseRMB = !placeTurretScript->isPlacing && Input()->Mouse()->OnPressed(MouseButton::Right_MB);
+        bool shouldInteract = Input()->Keyboard()->OnPressed(KeyboardKey::E) || canUseRMB;
 
 
         placeTurretScript->isLookingAtMirror = false;
@@ -81,50 +78,62 @@ public:
                 else if (auto mirror = scriptable->Get<MirrorRotate>())
                 {
                     textTEMP->color = { 0.0f, 1.0f, 0.0f };
-                    placeTurretScript->isLookingAtMirror = true;
 
-                    if (!placeTurretScript->isPlacing)
+                    if (!placeTurretScript->isPlacing && !selectedMirror)
                     {
+                        placeTurretScript->isLookingAtMirror = true;
                         if (Input()->Mouse()->OnPressed(MouseButton::Left_MB))
                         {
                             selectedMirror = mirror;
+                            selectedMirror->isPlayerInside = false;
                             selectedMirror->SetEnabled(true);
+                            camera->SetRotationEnable(false);
+                        }
+                        else if (shouldInteract)
+                        {
+                            shouldInteract = false;
+                            if (canUseRMB) usingRMBToRotate = true;
+
+                            selectedMirror = mirror;
+                            selectedMirror->isPlayerInside = true;
+                            selectedMirror->SetEnabled(true);
+                            camera->SetMovementEnable(false);
                         }
                     }
 
-                    // if (shouldInteract)
-                    // {
-                    //     shouldInteract = false;
+                    /*if (shouldInteract)
+                    {
+                        shouldInteract = false;
 
-                    //     if (selectedMirror)
-                    //     {
-                    //         if (selectedMirror == mirror)
-                    //         {
-                    //             camera->SetMovementEnable(true);
-                    //             selectedMirror->SetEnabled(false);
-                    //             selectedMirror = nullptr;
-                    //         }
-                    //         else
-                    //         {
-                    //             selectedMirror->SetEnabled(false);
-                    //             selectedMirror = mirror;
-                    //             selectedMirror->SetEnabled(true);
-                    //         }
-                    //     }
-                    //     else
-                    //     {
-                    //         camera->SetMovementEnable(false);
-                    //         selectedMirror = mirror;
-                    //         selectedMirror->SetEnabled(true);
-                    //     }
+                        if (selectedMirror)
+                        {
+                            if (selectedMirror == mirror)
+                            {
+                                camera->SetMovementEnable(true);
+                                selectedMirror->SetEnabled(false);
+                                selectedMirror = nullptr;
+                            }
+                            else
+                            {
+                                selectedMirror->SetEnabled(false);
+                                selectedMirror = mirror;
+                                selectedMirror->SetEnabled(true);
+                            }
+                        }
+                        else
+                        {
+                            camera->SetMovementEnable(false);
+                            selectedMirror = mirror;
+                            selectedMirror->SetEnabled(true);
+                        }
 
-                    //     // if (selectedMirror) selectedMirror->SetEnabled(false);
-                    //     // else camera->SetMovementEnable(!camera->GetMovementEnabled());
+                        // if (selectedMirror) selectedMirror->SetEnabled(false);
+                        // else camera->SetMovementEnable(!camera->GetMovementEnabled());
 
 
-                    //     // selectedMirror = mirror;
-                    //     // selectedMirror->SetEnabled(!camera->GetMovementEnabled());
-                    // }
+                        // selectedMirror = mirror;
+                        // selectedMirror->SetEnabled(!camera->GetMovementEnabled());
+                    }*/
                 }
                 else if (auto turret = scriptable->Get<TurretLaser>())
                 {
@@ -149,36 +158,52 @@ public:
             }
         }
 
-        if (shouldInteract)
+        
+        
+
+        bool kbpresd = kbpressed();
+
+
+
+        if (selectedMirror && selectedMirror->isPlayerInside)
         {
-            // pressed Interact button and no interactable was found
-            
-            // removing focus from selected mirror - if any
-            // if (selectedMirror) selectedMirror->SetEnabled(false);
-            // selectedMirror = nullptr;
-            // camera->SetMovementEnable(true);
+            if ((usingRMBToRotate && Input()->Mouse()->IsReleased(MouseButton::Right_MB)) || shouldInteract)
+            {
+                usingRMBToRotate = false;
+                selectedMirror->SetEnabled(false);
+                selectedMirror = nullptr;
+                camera->SetMovementEnable(true);
+            }
         }
 
-        if (selectedMirror)
+        if (selectedMirror && !selectedMirror->isPlayerInside)
         {
-            selectedMirror->disableRotation = Input()->Mouse()->IsPressed(MouseButton::Right_MB);
-            camera->SetRotationEnable(selectedMirror->disableRotation);
-
+            //selectedMirror->disableRotation = Input()->Mouse()->IsPressed(MouseButton::Right_MB);
+            //camera->SetRotationEnable(selectedMirror->disableRotation);
+            
             const auto& camPos = camera->GetPosition();
             const auto& mirrorPos = selectedMirror->gameObject->GetComponent<cmp::Transform>()->GetPosition();
             const auto& posDiff = mirrorPos - camPos;
             float distanceSquared = glm::dot(posDiff, posDiff);
-
+            
             if (Input()->Mouse()->IsReleased(MouseButton::Left_MB) || distanceSquared > 67.050f)
             {
                 selectedMirror->SetEnabled(false);
                 selectedMirror = nullptr;
                 camera->SetRotationEnable(true);
-            }
-            else
-            {
-                textTEMP->SetText("<>");
+                placeTurretScript->isLookingAtMirror = false;
             }
         }
+
+        if (selectedMirror)
+        {
+            textTEMP->SetText("<>");
+            placeTurretScript->isLookingAtMirror = true;
+        }
+    }
+
+    bool kbpressed()
+    {
+        return Input()->Keyboard()->OnPressed(KeyboardKey::W) || Input()->Keyboard()->OnPressed(KeyboardKey::A) || Input()->Keyboard()->OnPressed(KeyboardKey::S) || Input()->Keyboard()->OnPressed(KeyboardKey::D);
     }
 };

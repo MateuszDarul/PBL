@@ -367,7 +367,7 @@ Scene::Scene()
         PlayerPlaceTurret::TurretType type;
     };
     std::vector<BlueprintPosition> blueprints =  {
-        {{      0,    0,    0  },  PlayerPlaceTurret::TurretType::Lantern  },    //???
+        {{ -73.0f, 0.5f, 89.5f },  PlayerPlaceTurret::TurretType::Lantern  },    //???
         {{ -83.0f, 0.5f, 69.5f },  PlayerPlaceTurret::TurretType::Shooting },    //Shooting
         {{ -26.0f, 0.5f,  5.0f },  PlayerPlaceTurret::TurretType::Laser    }     //Laser
     };
