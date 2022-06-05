@@ -37,6 +37,14 @@ private:
      */
     void PrivateUpdate(float dt, const glm::mat4& parentTransformations);
 
+    struct NodeToDelete
+    {
+        SceneNode* parent;
+        SceneNode* child;
+    };
+    static std::vector<NodeToDelete> nodesToDelete;
+    void DeleteNodes();
+    void PrivateDelete();
 public:
     static Frustum cameraFrustum; //!< Ostroslup widzenia kamery.
     /** @brief Tworzy nowy wezel.

@@ -13,6 +13,7 @@ class CollidersManager;
  */
 class ColliderComponent : public Component
 {
+	CollidersManager* collidersManager = nullptr;
 protected:
 	glm::vec3 offset; //!< Przesuni�cie kolidera wzgl�dem bazowego obiektu.
 	float mass; //!< Masa obiektu do kt�rego podczepiony jest kolider.
@@ -50,6 +51,8 @@ public:
 	/** @brief Bazowy destruktor
 	*/
 	~ColliderComponent();
+
+	void RemoveFromCollidersManager(std::shared_ptr<ColliderComponent> collider);
 
 	/** @brief Metoda dodaje kolider do menad�era kolider�w.
 	* @param collidersManager - wska�nik na menad�er kolider�w.

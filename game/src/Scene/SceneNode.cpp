@@ -112,6 +112,7 @@ extern std::shared_ptr<GameObject> GO_FLASHLIGHT;
 extern std::shared_ptr<GameObject> GO_CROSSHAIR;
 
 Frustum SceneNode::cameraFrustum;
+std::vector<SceneNode::NodeToDelete> SceneNode::nodesToDelete;
 float GlobalElapsedTime = 0.0f;
 
 SceneNode::SceneNode(std::shared_ptr<GameObject> gameObject)
@@ -180,6 +181,8 @@ void SceneNode::Update(float dt)
         GameApplication::GetProjectionRange().x,
         GameApplication::GetProjectionRange().y
     );
+
+    this->DeleteNodes();
 }
 
 void SceneNode::PrivateUpdate(float dt, const glm::mat4& parentTransformations)
@@ -394,13 +397,52 @@ bool SceneNode::RemoveNode(SceneNode* node)
         {
             if (this->children[i] && this->children[i]->Is(node))
             {
-                this->children[i].reset();
-                this->children.erase(children.begin() + i, children.begin() + i + 1);
+                nodesToDelete.push_back({ this, node });
                 return true;
             }
         }
     }
     return false;
+}
+
+void SceneNode::DeleteNodes()
+{
+    for (auto& nodeToDelete : nodesToDelete)
+    {
+        nodeToDelete.child->PrivateDelete();
+        for (unsigned short int i = 0; i < nodeToDelete.parent->children.size(); i++)
+        {
+            if (nodeToDelete.parent->children[i] && nodeToDelete.parent->children[i]->Is(nodeToDelete.child))
+            {
+                nodeToDelete.parent->children[i].reset();
+                nodeToDelete.parent->children.erase(nodeToDelete.parent->children.begin() + i, nodeToDelete.parent->children.begin() + i + 1);
+                break;
+            }
+        }
+    }
+
+    nodesToDelete.clear();
+}
+
+void SceneNode::PrivateDelete()
+{
+    if (auto boxCol = this->GetGameObject()->GetComponent<cmp::BoxCol>())
+    {
+        boxCol->RemoveFromCollidersManager(boxCol);
+    }
+    if (auto sphereCol = this->GetGameObject()->GetComponent<cmp::SphereCol>())
+    {
+        sphereCol->RemoveFromCollidersManager(sphereCol);
+    }
+    if (auto scriptable = this->GetGameObject()->GetComponent<cmp::Scriptable>())
+    {
+        scriptable->Clear();
+    }
+    
+    for (unsigned short int i = 0; i < this->children.size(); i++)
+    {
+        children[i]->PrivateDelete();
+    }
 }
 
 void SceneNode::FindByName(const std::string& name, SceneNode** result)

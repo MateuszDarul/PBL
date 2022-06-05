@@ -62,13 +62,44 @@ ColliderComponent::ColliderComponent(uint32_t UUID, bool isTrigger, bool isStati
 
 ColliderComponent::~ColliderComponent()
 {
+	
+}
 
+void ColliderComponent::RemoveFromCollidersManager(std::shared_ptr<ColliderComponent> collider)
+{
+	if (collidersManager)
+	{
+		if (isStatic)
+		{
+			if (isTrigger)
+			{
+				collidersManager->RemoveStaticTrigger(collider);
+			}
+			else
+			{
+				collidersManager->RemoveStaticColllider(collider);
+			}
+		}
+		else
+		{
+			if (isTrigger)
+			{
+				collidersManager->RemoveDynamicTrigger(collider);
+			}
+			else
+			{
+				collidersManager->RemoveDynamicCollider(collider);
+			}
+		}
+		collidersManager = nullptr;
+	}
 }
 
 void ColliderComponent::AddToCollidersManager(CollidersManager* collidersManager)
 {
 	if (collidersManager)
 	{
+		this->collidersManager = collidersManager;
 		if (isTrigger)
 		{
 			if (isStatic)
