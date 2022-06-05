@@ -15,10 +15,17 @@ CameraComponent::~CameraComponent()
 
 void CameraComponent::UpdateVectors()
 {
+    float combinedYaw = yaw + yawOffset;
+    float combinedPitch = pitch + pitchOffset;
+    if (combinedPitch > 89.0f)
+        combinedPitch = 89.0f;
+    if (combinedPitch < -89.0f)
+        combinedPitch = -89.0f;
+
     glm::vec3 front;
-    front.x = cos(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
-    front.y = sin(glm::radians(this->pitch));
-    front.z = sin(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
+    front.x = cos(glm::radians(combinedYaw)) * cos(glm::radians(combinedPitch));
+    front.y = sin(glm::radians(combinedPitch));
+    front.z = sin(glm::radians(combinedYaw)) * cos(glm::radians(combinedPitch));
 
     this->front = glm::normalize(front);
     this->right = glm::normalize(glm::cross(this->front, glm::vec3(0,1,0)));
@@ -36,6 +43,9 @@ bool CameraComponent::Create(const glm::vec3& position)
 
     this->yaw = -90;
     this->pitch = 0;
+
+    this->yawOffset = 0.0f;
+    this->pitchOffset = 0.0f;
 
     CalculateJumpParams();
     isEnabledMovement = true;
@@ -217,6 +227,32 @@ void CameraComponent::SetPosition(const glm::vec3& position)
     this->position = position;
 }
 
+glm::vec2 CameraComponent::GetRotation()
+{
+    return { pitch, yaw };
+}
+
+void CameraComponent::SetRotation(float pitch, float yaw)
+{
+    this->pitch = pitch;
+    this->yaw = yaw;
+
+    if (this->pitch > 89.0f)
+        this->pitch = 89.0f;
+    if (this->pitch < -89.0f)
+        this->pitch = -89.0f;
+    this->UpdateVectors();
+    this->needUpdate = true;
+}
+
+void CameraComponent::SetRotationOffset(float pitch, float yaw)
+{
+    this->pitchOffset = pitch;
+    this->yawOffset = yaw;
+
+    this->UpdateVectors();
+    this->needUpdate = true;
+}
 
 Frustum CameraComponent::GetFrustum(float aspect, float fov, float nearPlane, float farPlane)
 {

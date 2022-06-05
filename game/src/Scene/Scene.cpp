@@ -445,7 +445,7 @@ Scene::Scene()
 
         go->AddComponent(std::make_shared<cmp::Transform>());
         go->GetComponent<cmp::Transform>()->SetPosition(-37.5, 4.0, 55.5);
-        go->GetComponent<cmp::Transform>()->SetRotation(0.0, 0.0, 0.0);
+        go->GetComponent<cmp::Transform>()->SetRotation(0.0, 180.0, 0.0);
 
         go->AddComponent(std::make_shared<BoxCollider>(false, false));
         go->GetComponent<cmp::BoxCol>()->setLengths({ 2.0, 2.0, 2.0 });
@@ -468,7 +468,7 @@ Scene::Scene()
 
         auto mirrorScript = new MirrorRotate();
         mirrorScript->SetEnabled(false);
-        mirrorScript->invertRotationX = -1.0f;
+        mirrorScript->initialRotationOffsetY = 180.0f;
         go->GetComponent<cmp::Scriptable>()->Add(mirrorScript);
 
         world->FindNode("MAIN")->AddChild(go);

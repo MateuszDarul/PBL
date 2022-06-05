@@ -70,6 +70,9 @@ private:
     float yaw; //!< Kat obrotu kamery (lewo/prawo).
     float pitch; //!< Kat obrotu kamery (gora/dol).
 
+    float yawOffset;
+    float pitchOffset;
+
     float mouseSensitivity; //!< Czulosc obrotu kamery przy pomocy myszy.
     float speedPerSec; //!< Predkosc poruszania sie kamery na sekunde przy pomocy klawiatury.
 
@@ -153,6 +156,11 @@ public:
 
     bool GetIsGrounded();
     void SetIsGrounded(bool grounded);
+
+
+    glm::vec2 GetRotation();
+    void SetRotation(float pitch, float yaw);
+    void SetRotationOffset(float pitch, float yaw);
 
 
     /** @brief Pozwala na przemieszczanie kamery w wybranym kierunku.

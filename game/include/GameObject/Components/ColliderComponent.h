@@ -37,6 +37,8 @@ public:
 	bool isOptimized; //!< Czy ten kolider ma by� optymalizowany pod wzgl�dem odleg�o�ci od gracza.
 	int layer; //!< Warstwa kolidera.
 
+	bool isDisabled = false;
+
 	/** @brief Konstruktor komponent kolider�w.
 	 * @param UUID - Unikalny indentyfikator klasy komponentu.
 	 * @param isTrigger - Czy ten kolider ma by� wyzwalaczem.

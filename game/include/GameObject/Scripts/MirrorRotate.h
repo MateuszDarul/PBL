@@ -31,13 +31,15 @@ public:
     float invertRotationX = 1.0f;
     float invertRotationY = 1.0f;
 
-    bool disableRotation = false;
-
+    bool disableMouseRotation = false;
     bool isPlayerInside = false;
+
+    std::shared_ptr<GameObject> cameraHandle;
 
 private:
 
     std::shared_ptr<cmp::Transform> transform;
+    std::shared_ptr<cmp::Camera> camera;
 
 public:
     void Start()
@@ -51,7 +53,17 @@ public:
         currentMousePosition = Input()->Mouse()->GetPosition();
         previousMousePosition = currentMousePosition;
 
-        disableRotation = false;
+        disableMouseRotation = false;
+
+        camera = gameObject->GetNode()->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>();
+
+        if (cameraHandle == nullptr)
+        {
+            cameraHandle = std::make_shared<GameObject>();
+            cameraHandle->AddComponent(std::make_shared<cmp::Transform>());
+            cameraHandle->GetComponent<cmp::Transform>()->SetPosition(0.0f, 0.0f, -2.0f);
+            gameObject->GetNode()->AddChild(cameraHandle);
+        }
     }
 
     void Update(float dt)
@@ -61,11 +73,10 @@ public:
         currentMousePosition = Input()->Mouse()->GetPosition();
         // printf("Mouse offset: %f %f\n", mouseOffset.x, mouseOffset.y);
         
-        if (disableRotation) return;
         
         float modifier = (Input()->Keyboard()->IsPressed(KeyboardKey::LShift)) ? rotationSpeedModifier : 1.0f;
 
-        if (!isPlayerInside)
+        if (!disableMouseRotation)
         {
             currentRotationX -= mouseOffset.y * mouseRotationSpeed * modifier * invertRotationX;
             currentRotationY += mouseOffset.x * mouseRotationSpeed * modifier * invertRotationY;
@@ -92,6 +103,15 @@ public:
             currentRotationY = std::clamp(currentRotationY, -maxRotationY + initialRotationOffsetY, maxRotationY + initialRotationOffsetY);
 
             transform->SetRotation(currentRotationX, currentRotationY, 0.0f);
+
+            if (isPlayerInside)
+            {
+                const auto& m = cameraHandle->GetNode()->GetGlobalTransformations();
+                auto newPos = glm::vec3(m[3][0], m[3][1], m[3][2]);
+                camera->SetPosition(newPos);
+                camera->SetRotationOffset(currentRotationX, -currentRotationY);
+                camera->SetIsGrounded(true);
+            }
         }
     }
 };

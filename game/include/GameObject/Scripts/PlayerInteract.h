@@ -39,6 +39,8 @@ public:
 
     }
     bool usingRMBToRotate = false;
+    glm::vec3 saveCamPos;
+    glm::vec2 saveCamRot;
     void Update(float dt)
     {
         bool canUseRMB = !placeTurretScript->isPlacing && Input()->Mouse()->OnPressed(MouseButton::Right_MB);
@@ -86,18 +88,40 @@ public:
                         {
                             selectedMirror = mirror;
                             selectedMirror->isPlayerInside = false;
+                            selectedMirror->disableMouseRotation = false;
                             selectedMirror->SetEnabled(true);
                             camera->SetRotationEnable(false);
                         }
                         else if (shouldInteract)
                         {
                             shouldInteract = false;
-                            if (canUseRMB) usingRMBToRotate = true;
 
                             selectedMirror = mirror;
-                            selectedMirror->isPlayerInside = true;
                             selectedMirror->SetEnabled(true);
                             camera->SetMovementEnable(false);
+
+                            if (canUseRMB)
+                            {
+                                usingRMBToRotate = true;
+                                selectedMirror->isPlayerInside = false;
+                                selectedMirror->disableMouseRotation = true;
+                            }
+                            else
+                            {
+                                selectedMirror->isPlayerInside = true;
+                                selectedMirror->disableMouseRotation = true;
+
+                                // setup camera
+                                saveCamPos = camera->GetPosition();
+                                saveCamRot = camera->GetRotation();
+
+                                camera->SetPosition(mirror->gameObject->GetComponent<cmp::Transform>()->GetPosition() + glm::vec3(0.0f, 0.0f, -2.0f));
+                                camera->SetRotation(0, -90);
+
+                                // disable player colliders
+                                camera->GetOwner()->GetComponent<cmp::BoxCol>()->isDisabled = true;
+                                camera->GetOwner()->GetComponent<cmp::SphereCol>()->isDisabled = true;
+                            }
                         }
                     }
 
@@ -165,18 +189,34 @@ public:
 
 
 
-        if (selectedMirror && selectedMirror->isPlayerInside)
+        if (selectedMirror && selectedMirror->disableMouseRotation)
         {
-            if ((usingRMBToRotate && Input()->Mouse()->IsReleased(MouseButton::Right_MB)) || shouldInteract)
+            if (usingRMBToRotate && Input()->Mouse()->IsReleased(MouseButton::Right_MB))
             {
                 usingRMBToRotate = false;
                 selectedMirror->SetEnabled(false);
                 selectedMirror = nullptr;
                 camera->SetMovementEnable(true);
             }
+            else if (!usingRMBToRotate && shouldInteract)
+            {
+                usingRMBToRotate = false;
+                selectedMirror->SetEnabled(false);
+                selectedMirror = nullptr;
+                camera->SetMovementEnable(true);
+
+                // reset camera
+                camera->SetPosition(saveCamPos);
+                camera->SetRotation(saveCamRot.x, saveCamRot.y);
+                camera->SetRotationOffset(0, 0);
+
+                // enable player colliders
+                camera->GetOwner()->GetComponent<cmp::BoxCol>()->isDisabled = false;
+                camera->GetOwner()->GetComponent<cmp::SphereCol>()->isDisabled = false;
+            }
         }
 
-        if (selectedMirror && !selectedMirror->isPlayerInside)
+        if (selectedMirror && !selectedMirror->disableMouseRotation)
         {
             //selectedMirror->disableRotation = Input()->Mouse()->IsPressed(MouseButton::Right_MB);
             //camera->SetRotationEnable(selectedMirror->disableRotation);

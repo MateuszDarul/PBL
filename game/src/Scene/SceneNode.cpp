@@ -27,7 +27,7 @@ static void initializeDebug()
     debugShader.Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
 }
 
-static void drawDebugBox(const glm::mat4& model, const glm::mat4& vp, const glm::vec3& size, const glm::vec3& offset)
+static void drawDebugBox(const glm::mat4& model, const glm::mat4& vp, const glm::vec3& size, const glm::vec3& offset, const glm::vec4& color)
 {
     float cx = model[3][0]+offset.x;
     float cy = model[3][1]+offset.y;
@@ -50,8 +50,9 @@ static void drawDebugBox(const glm::mat4& model, const glm::mat4& vp, const glm:
     debugShader.Use();
     debugShader.SetMat4("transform", vp);
     debugShader.SetMat4("model", glm::mat4(1.0f));
-    debugShader.SetVec4("u_TintColor", {1.0f, 1.0f, 0.0f, 0.5f});
+    debugShader.SetVec4("u_TintColor", color);
 
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //enable wireframe
     glBindVertexArray(boxVAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
@@ -60,10 +61,11 @@ static void drawDebugBox(const glm::mat4& model, const glm::mat4& vp, const glm:
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glDrawArrays(GL_TRIANGLES, 0, 36*3);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 //not a sphere lol
-static void drawDebugSphere(const glm::mat4& model, const glm::mat4& vp, float radius, const glm::vec3& offset)
+static void drawDebugSphere(const glm::mat4& model, const glm::mat4& vp, float radius, const glm::vec3& offset, const glm::vec4& color)
 {
     float cx = model[3][0]+offset.x;
     float cy = model[3][1]+offset.y;
@@ -86,8 +88,9 @@ static void drawDebugSphere(const glm::mat4& model, const glm::mat4& vp, float r
     debugShader.Use();
     debugShader.SetMat4("transform", vp);
     debugShader.SetMat4("model", glm::mat4(1.0f));
-    debugShader.SetVec4("u_TintColor", {1.0f, 1.0f, 0.2f, 0.2f});
+    debugShader.SetVec4("u_TintColor", color);
 
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //enable wireframe
     glBindVertexArray(boxVAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
@@ -96,6 +99,7 @@ static void drawDebugSphere(const glm::mat4& model, const glm::mat4& vp, float r
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glDrawArrays(GL_TRIANGLES, 0, 36*3);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 
@@ -159,8 +163,10 @@ void SceneNode::Update(float dt)
 #ifdef ENABLE_DEBUG_INFO
     if (Input()->Keyboard()->IsPressed(KeyboardKey::F11))
     {
-        const auto& cam = this->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>()->GetPosition();
-        printf("Camera position: %f %f %f\n", cam.x, cam.y, cam.z);
+        auto cam = this->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>();
+        const auto& pos = cam->GetPosition();
+        const auto& rot = cam->GetRotation();
+        printf("Camera position: %f %f %f \tPitch = %f, Yaw = %f\n", pos.x, pos.y, pos.z, rot.x, rot.y);
     }
 #endif
 
@@ -325,17 +331,13 @@ void SceneNode::Render(const glm::mat4& matrixPV)
     {
         if (auto collider = gameObject->GetComponent<cmp::BoxCol>())
         {
-            if (collider->isTrigger)
-            {
-                drawDebugBox(this->globalTransformations, matrixPV, collider->getLengths(), collider->GetOffset());
-            }
+            glm::vec4 color = (collider->isTrigger) ? glm::vec4(1.0f, 1.0f, 0.0f, 1.0f) : glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+            drawDebugBox(this->globalTransformations, matrixPV, collider->getLengths(), collider->GetOffset(), color);
         }
         else if (auto collider = gameObject->GetComponent<cmp::SphereCol>())
         {
-            if (collider->isTrigger)
-            {
-                drawDebugSphere(this->globalTransformations, matrixPV, collider->GetRadius(), collider->GetOffset());
-            }
+            glm::vec4 color = (collider->isTrigger) ? glm::vec4(1.0f, 1.0f, 0.7f, 1.0f) : glm::vec4(0.7f, 1.0f, 0.7f, 1.0f);
+            drawDebugSphere(this->globalTransformations, matrixPV, collider->GetRadius(), collider->GetOffset(), color);
         }
     }
 
