@@ -158,7 +158,8 @@ public:
     void SetIsGrounded(bool grounded);
 
 
-    glm::vec2 GetRotation();
+    float GetPitch() const;
+    float GetYaw() const;
     void SetRotation(float pitch, float yaw);
     void SetRotationOffset(float pitch, float yaw);
 

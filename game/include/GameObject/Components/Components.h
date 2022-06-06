@@ -21,6 +21,8 @@
 #include "ParticleComponent.h"          // UUID 15
 #include "RefractiveGlassComponent.h"   // UUID 16
 
+#include "SlopeCollider.h"              // UUID 18
+
 #include "ModelGuiComponent.h"          // UUID 50
 
 #include "ScriptComponent.h"            // UUID 100
@@ -44,6 +46,7 @@ namespace cmp
 
     typedef SphereCollider SphereCol;
     typedef BoxCollider BoxCol;
+    typedef SlopeCollider SlopeCol;
     typedef CameraComponent Camera;
     typedef TextComponent Text;
     typedef LineComponent Line;

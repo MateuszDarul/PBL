@@ -113,7 +113,7 @@ public:
 
                                 // setup camera
                                 saveCamPos = camera->GetPosition();
-                                saveCamRot = camera->GetRotation();
+                                saveCamRot = glm::vec2(camera->GetPitch(), camera->GetYaw());
 
                                 camera->SetPosition(mirror->gameObject->GetComponent<cmp::Transform>()->GetPosition() + glm::vec3(0.0f, 0.0f, -2.0f));
                                 camera->SetRotation(0, -90);

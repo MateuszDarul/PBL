@@ -106,7 +106,7 @@ Scene::Scene()
     go->GetComponent<cmp::BoxCol>()->layer = CollisionLayer::Player;
     go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
     go->AddComponent(std::make_shared<SphereCollider>(false, false));
-    go->GetComponent<cmp::SphereCol>()->SetRadius(0.5);
+    go->GetComponent<cmp::SphereCol>()->SetRadius(0.75);
     go->GetComponent<cmp::SphereCol>()->SetOffset(glm::vec3(0,-2.5,0));
     go->GetComponent<cmp::SphereCol>()->layer = CollisionLayer::Player;
     go->GetComponent<cmp::SphereCol>()->AddToCollidersManager(collidersManager);
@@ -122,11 +122,10 @@ Scene::Scene()
     {
         auto groundCheckGO = std::make_shared<GameObject>();
         groundCheckGO->AddComponent(std::make_shared<cmp::Transform>());
-        groundCheckGO->GetComponent<cmp::Transform>()->SetPosition(0.0, -3.0, 0.0);
-        // groundCheckGO->GetComponent<cmp::Transform>()->SetPosition(13.5, 5.5, -8);
+        groundCheckGO->GetComponent<cmp::Transform>()->SetPosition(0.0, -3.35, 0.0);
 
         groundCheckGO->AddComponent(std::make_shared<SphereCollider>(true, false));
-        groundCheckGO->GetComponent<cmp::SphereCol>()->SetRadius(0.3f);
+        groundCheckGO->GetComponent<cmp::SphereCol>()->SetRadius(0.45f);
         groundCheckGO->GetComponent<cmp::SphereCol>()->AddToCollidersManager(collidersManager);
 
         groundCheckGO->AddComponent(std::make_shared<cmp::Scriptable>());
@@ -271,7 +270,33 @@ Scene::Scene()
         GO_FLASHLIGHT = flashLightGO;
     }
 
-    
+    //slope test
+    {
+        go = std::make_shared<GameObject>();
+        
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(-35, 4.1-1.0, 44.5+3.0);
+        go->GetComponent<cmp::Transform>()->SetRotation(90.0, 0.0, 90.0-36.87);
+        go->GetComponent<cmp::Transform>()->SetScale(1.5);
+
+        go->AddComponent(std::make_shared<SlopeCollider>(false, true));
+        go->GetComponent<SlopeCollider>()->SetDimensions(64.0f/6.0f, 8.2f, 4.0f);
+        go->GetComponent<SlopeCollider>()->SetOffset({0.0f, 1.0f, -3.0f});        
+        go->GetComponent<SlopeCollider>()->SetDirection(SlopeCollider::Direction::X_NEG);
+        go->GetComponent<SlopeCollider>()->AddToCollidersManager(collidersManager);
+
+
+        mc = std::make_shared<ModelComponent>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/Exported/Sciana.NR1.obj"),
+            resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+        );
+        go->AddComponent(shader_d);
+        go->AddComponent(mc);
+
+        world->FindNode("MAIN")->AddChild(go);
+    }
+  
 
 
     //===enemy

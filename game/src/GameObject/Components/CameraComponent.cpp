@@ -138,26 +138,22 @@ void CameraComponent::Update(InputManager* inputManager, const float& deltaTime)
 
 
 
-    //if (JUMP_TIMER > 0.0f)
     if (!isGrounded)
     {
-        // printf("is jumping\n");
         verticalVelocity += gravity * deltaTime;
-        //JUMP_TIMER -= deltaTime;
+        verticalVelocity = std::max(verticalVelocity, gravity);
     }
     else
     {
-        // printf("is grounded\n");
-        verticalVelocity = 0.0f; // gravity * deltaTime;
+        verticalVelocity = 0.0f; 
     
         if(inputManager->Keyboard()->IsPressed(KeyboardKey::Space) && isEnabledMovement)
         {
             verticalVelocity = jumpVelocity;
-            //JUMP_TIMER = 2 * jumpTimeToPeak;     
         }
     }
 
-    this->position += glm::vec3(0.0f, (verticalVelocity )/*+ 0.5f * gravity * deltaTime) */* deltaTime, 0.0f);
+    this->position += glm::vec3(0.0f, verticalVelocity * deltaTime, 0.0f);
     this->needUpdate = true;
 }
 
@@ -227,9 +223,14 @@ void CameraComponent::SetPosition(const glm::vec3& position)
     this->position = position;
 }
 
-glm::vec2 CameraComponent::GetRotation()
+float CameraComponent::GetPitch() const
 {
-    return { pitch, yaw };
+    return pitch;
+}
+
+float CameraComponent::GetYaw() const
+{
+    return yaw;
 }
 
 void CameraComponent::SetRotation(float pitch, float yaw)

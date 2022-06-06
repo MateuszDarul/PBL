@@ -168,6 +168,48 @@ bool SphereCollider::CheckCollision(std::shared_ptr<ColliderComponent> collider)
 			return true;
 		}
 	}
+	else if (collider->GetClassUUID() == 18)
+	{
+		std::shared_ptr<SlopeCollider> other = std::dynamic_pointer_cast<SlopeCollider>(collider);
+
+		const auto& dim = other->GetDimensions();
+		if ((thisPos.x < otherPos.x + dim.x *.5f && thisPos.x > otherPos.x - dim.x * .5f)
+		&&  (thisPos.y - this->radius < otherPos.y + dim.y *.5f && thisPos.y + this->radius > otherPos.y - dim.y * .5f)
+		&&  (thisPos.z < otherPos.z + dim.z *.5f && thisPos.z > otherPos.z - dim.z * .5f))
+		{
+			float distance = glm::dot(thisPos - otherPos, other->GetNormal());
+
+			float moveAmount;
+			bool shouldMove;
+
+			if (distance < 0.0f) // we are under the slope
+			{
+				moveAmount = distance + this->radius;
+				shouldMove = moveAmount > 0.0f;
+			}
+			else //we are above the slope
+			{
+				moveAmount = distance - this->radius;
+				shouldMove = moveAmount < 0.0f;
+			}
+
+			if (shouldMove)
+			{
+				if (!isTrigger)
+				{
+					glm::vec3 thisMoveVec = -moveAmount * other->GetNormal();
+
+					thisTransform->SetPosition(thisTransform->GetPosition() + thisMoveVec);
+					thisModelMat[3][0] += thisMoveVec.x;
+					thisModelMat[3][1] += thisMoveVec.y;
+					thisModelMat[3][2] += thisMoveVec.z;
+					this->GetOwner()->GetNode()->SetGlobalTransformations(thisModelMat);
+				}
+
+				return true;
+			}
+		}
+	}
 	return false;
 }
 
