@@ -242,6 +242,7 @@ bool SphereCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir,
 		hitInfo.point = origin + dir * hitInfo.distance;
 		hitInfo.normal = (hitInfo.point - center) / radius;
 		hitInfo.gameObject = GetOwner();
+		hitInfo.layer = (CollisionLayer)layer;
 
 		return true;
 	}

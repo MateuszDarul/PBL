@@ -134,7 +134,7 @@ bool SlopeCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, 
 
 	d1 = maxDistance;
 	d2 = maxDistance;
-	if (glm::dot(dir, normal) < 0)
+	//if (glm::dot(dir, normal) < 0)   // without this if we allow for slope collisions on both sides
 	{
         const auto& model = GetOwner()->GetNode()->GetGlobalTransformations();
         glm::vec3 c = { model[3][0]+offset.x, model[3][1]+offset.y, model[3][2]+offset.z };
@@ -158,6 +158,7 @@ bool SlopeCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, 
 				hitInfo.normal = normal;
 				hitInfo.distance = d;
 				hitInfo.gameObject = GetOwner();
+                hitInfo.layer = (CollisionLayer)layer;
 
 				return true;
 			}

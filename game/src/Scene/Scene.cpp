@@ -430,6 +430,45 @@ Scene::Scene()
     }
 
     //mirrors
+
+    //- room 2
+    {
+        go = std::make_shared<GameObject>();
+        go->AddComponent(std::make_shared<cmp::Name>("Mirror"));
+
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(-9.5, 2.5, 35.5);
+        go->GetComponent<cmp::Transform>()->SetRotation(0.0, 90.0, 0.0);
+
+        go->AddComponent(std::make_shared<BoxCollider>(false, true, CollisionLayer::Mirror));
+        go->GetComponent<cmp::BoxCol>()->setLengths({2.0, 2.0, 2.0});
+        go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
+
+        auto model = std::make_shared<cmp::Model>();
+        model->Create(
+            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+            resMan->GetMaterial("Resources/models/floor/floor.mtl")
+        );
+        go->AddComponent(model);
+        go->AddComponent(shader_d);
+
+        go->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+
+
+        go->AddComponent(std::make_shared<cmp::Scriptable>());
+
+        auto mirrorScript = new MirrorRotate();
+        mirrorScript->SetEnabled(false);
+        mirrorScript->initialRotationOffsetY = 90.0f;
+        mirrorScript->maxRotationX = 10.0f;
+        mirrorScript->maxRotationY = 15.0f;
+        go->GetComponent<cmp::Scriptable>()->Add(mirrorScript);
+
+        world->FindNode("MAIN")->AddChild(go);
+    }
+
+    //- room 3
     {
         go = std::make_shared<GameObject>();
         go->AddComponent(std::make_shared<cmp::Name>("Mirror"));
@@ -438,9 +477,8 @@ Scene::Scene()
         go->GetComponent<cmp::Transform>()->SetPosition(-20.0, 2.5, 64.5);
         go->GetComponent<cmp::Transform>()->SetRotation(-11.0, 0.0, 0.0);
 
-        go->AddComponent(std::make_shared<BoxCollider>(false, false));
+        go->AddComponent(std::make_shared<BoxCollider>(false, true, CollisionLayer::Mirror));
         go->GetComponent<cmp::BoxCol>()->setLengths({2.0, 2.0, 2.0});
-        go->GetComponent<cmp::BoxCol>()->SetMass(999999999.9f);
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
         auto model = std::make_shared<cmp::Model>();
@@ -472,9 +510,8 @@ Scene::Scene()
         go->GetComponent<cmp::Transform>()->SetPosition(-37.5, 4.0, 55.5);
         go->GetComponent<cmp::Transform>()->SetRotation(0.0, 180.0, 0.0);
 
-        go->AddComponent(std::make_shared<BoxCollider>(false, false));
-        go->GetComponent<cmp::BoxCol>()->setLengths({ 2.0, 2.0, 2.0 });
-        go->GetComponent<cmp::BoxCol>()->SetMass(999999999.9f);
+        go->AddComponent(std::make_shared<BoxCollider>(false, true, CollisionLayer::Mirror));
+        go->GetComponent<cmp::BoxCol>()->setLengths({2.0, 2.0, 2.0});
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
         auto model = std::make_shared<cmp::Model>();
@@ -507,10 +544,11 @@ Scene::Scene()
         glm::vec3 activatorPosition;
     };
 
-    std::vector<DoorAndActivatorPair> doorsAndButtons = {
-        { { -15.00,  1.0,  21.5 }, 90.0f,   { -19.6, 2.5,  20.0 } },
-        { { -64.75,  1.0,  60.0 },  0.0f,   { -61.0, 3.0,  64.6 } },
-        { { -73.00,  1.0,  74.5 }, 90.0f,   { -61.0, -9.0,  64.6 } },
+    std::vector<DoorAndActivatorPair> doorsAndButtons = {  //0 rot = Z aligned; 90 rot = X aligned
+        { { -15.00,  1.0,  25.0 }, 90.0f,   { -20.0,  2.5,  20.49 } },  //room 1
+        { { -25.00,  1.0,  50.5 }, 90.0f,   { -20.0,  2.5,  47.49 } },  //room 2
+        { { -64.75,  1.0,  60.0 },  0.0f,   { -61.0,  3.0,  64.60 } },  //room 3 - cutscene close (important id)
+        { { -73.00,  1.0,  74.5 }, 90.0f,   { -61.0, -9.0,  64.60 } },  //room 4 - cutscene open  (important id)
     };
 
     int i = 0;
@@ -576,11 +614,58 @@ Scene::Scene()
         activator->openedOffset = { 0.0f, 10.1f, 0.0f };
         go->GetComponent<cmp::Scriptable>()->Add(activator);
 
-        if (i == 1) cutsceneDoorActivator = activator;
-        if (i == 2) openDoorAfterEnemyDies = activator;
+        if (i == 2) cutsceneDoorActivator = activator;
+        if (i == 3) openDoorAfterEnemyDies = activator;
         i++;
 
         world->FindNode("MAIN")->AddChild(go);
+    }
+
+    //predefined lasers
+    {
+        go = std::make_shared<GameObject>();
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(-30.0f, 0.0f, 28.5f);
+        go->GetComponent<cmp::Transform>()->SetRotation(0.0, -20.0, 0.0);
+
+
+        auto scriptHolder = std::make_shared<cmp::Scriptable>();
+        go->AddComponent(scriptHolder);
+
+        auto turretScript = new TurretLaser();
+        turretScript->colMan = collidersManager;
+        
+        auto line = std::make_shared<cmp::Line>();
+        line->Create();
+        line->thickness = 2.0f;
+        line->color1 = { 1.0f, 1.0f, 0.0f };
+        line->color2 = { 1.0f, 0.7f, 0.0f };
+
+        go->AddComponent(line);
+        go->AddComponent(lineShader);
+        turretScript->line = line.get();
+
+        scriptHolder->Add(turretScript);
+
+        auto gfxGO = std::make_shared<GameObject>();
+        gfxGO->AddComponent(std::make_shared<cmp::Transform>());
+        gfxGO->AddComponent(std::make_shared<cmp::Name>("gfx"));
+
+        auto mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/Wieze/Laser.obj"),
+            resMan->GetMaterial("Resources/models/Wieze/Laser.mtl")
+        );
+        gfxGO->AddComponent(mc);
+        
+        gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
+            resMan->GetMesh("Resources/models/Wieze/Laser.obj")
+        );
+        gfxGO->AddComponent(shader_d);
+
+
+        world->FindNode("MAIN")->AddChild(go)->AddChild(gfxGO);
     }
 
     //cutscene

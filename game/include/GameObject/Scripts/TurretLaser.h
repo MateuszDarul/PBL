@@ -14,13 +14,12 @@ public:
     
     //adjust these
 
-    int ignoreLayerMask = ~(CollisionLayer::Player);
+    int ignoreLayerMask = ~(CollisionLayer::Player | CollisionLayer::Ignore);
     int maxBounces = 15;
     float maxDistance = 150.0f;
 
-    const char* mirrorTag = "Mirror";
-
-    glm::vec3 originOffset = { 0.0f, 2.3f, 0.0f };
+    float originOffsetUp = 2.38f;
+    float originOffsetForward = 0.45f;
 
 
     //set these in 'inspector'
@@ -33,6 +32,7 @@ private:
 
     glm::vec3 dir = { 1.0f, 0.0f, 0.0f };
     glm::vec3 origin = { 0.0f, 0.0f, 0.0f };
+    glm::vec3 originOffset = { originOffsetForward, originOffsetUp, 0.0f };
    
     cmp::Transform* transform;
 
@@ -48,9 +48,10 @@ public:
     {	
         if (line)
         {
+            dir = glm::rotateY(glm::vec3(1.0f, 0.0f, 0.0f), glm::radians(transform->GetRotation().y));
+            originOffset = dir * originOffsetForward + glm::vec3(0.0f, 1.0f, 0.0f) * originOffsetUp;
             origin = transform->GetPosition() + originOffset;
             line->Set(0, origin);
-            dir = glm::rotateY(glm::vec3(1.0f, 0.0f, 0.0f), glm::radians(transform->GetRotation().y));
 
 
             float d = maxDistance;
@@ -76,10 +77,8 @@ public:
                         line->Set(hits, hit.point);
                     }
 
-                    auto nameCmp = hit.gameObject->GetComponent<cmp::Name>();
-                    if (!nameCmp) break;
 
-                    if (nameCmp->Get().compare(mirrorTag) == 0)
+                    if (hit.layer & CollisionLayer::Mirror)
                     {
                         dir = glm::reflect(dir, hit.normal);
                         origin = hit.point;

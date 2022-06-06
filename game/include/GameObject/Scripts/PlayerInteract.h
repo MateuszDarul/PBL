@@ -55,7 +55,7 @@ public:
         {
             auto scriptable = hit.gameObject->GetComponent<cmp::Scriptable>();
             if (!scriptable) scriptable = hit.gameObject->GetNode()->GetParent()->GetGameObject()->GetComponent<cmp::Scriptable>();
-            if (scriptable)
+            if (scriptable && !selectedMirror)
             {
                 if (auto resource = scriptable->Get<Resource>())
                 {

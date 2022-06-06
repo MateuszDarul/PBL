@@ -355,8 +355,8 @@ public:
 
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
         std::shared_ptr<cmp::BoxCol> col = turretPrefabs[type]->GetComponent<cmp::BoxCol>();
-        col->setLengths({2.5, 3.5, 2.5});
-        col->SetOffset({0.0, 2.0, 0.0});
+        col->setLengths({2.0, 2.5, 2.0});
+        col->SetOffset({0.0, 1.75, 0.0});
         
 
 
