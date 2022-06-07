@@ -64,7 +64,7 @@ public:
 	State<entity_type>* GlobalState() const { return m_pGlobalState; }
 	State<entity_type>* PreviousState() const { return m_pPreviousState; }
 
-	//returns true if the current state�s type is equal to the type of the
+	//returns true if the current state's type is equal to the type of the
 	//class passed as a parameter.
 	bool isInState(const State<entity_type>& st)const { return typeid(*m_pCurrentState) == typeid(st); }
 

@@ -32,6 +32,9 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/ParticleComponent.cpp
 	src/GameObject/Components/RefractiveGlassComponent.cpp
 	src/GameObject/Components/ShadowComponent.cpp
+	src/GameObject/Components/SlopeCollider.cpp
+
+	src/GameObject/Scripts/LanternRange.cpp
 
 	src/Resource/Font.cpp
 	src/Resource/Mesh.cpp
@@ -104,6 +107,7 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/Components/ParticleComponent.cpp
 	include/GameObject/Components/RefractiveGlassComponent.cpp
 	include/GameObject/Components/ShadowComponent.h
+	include/GameObject/Components/SlopeCollider.h
 
 	include/Resource/Font.h
 	include/Resource/Mesh.h
@@ -136,6 +140,8 @@ file(GLOB_RECURSE HEADER_FILES
 
 	ImGui/include/*.h
 	ImGui/include/*.hpp
+
+	include/GameObject/Scripts/*.h
 )
 
 include_directories(include)

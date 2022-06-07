@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Components.h"
+#include "GameObject.h"
 
 class DoorActivator : public Script 
 {
@@ -39,9 +40,12 @@ public:
 
     void Update(float dt)
     {
-        if (isShutdown) isActivated = false;
-
-        if (isActivated)    //on being powered
+        if (isShutdown) 
+        {
+            isActivated = false;
+            isPrimed = true;
+        }
+        else if (isActivated)    //on being powered
         {
             isActivated = false;
 
@@ -52,7 +56,7 @@ public:
             isPrimed = true;
 
             if (doorTransform) targetPosition -= openedOffset;
-            if (buttonModel) buttonModel->SetTintColor({ 1.0f, 1.0f, 1.0f,  1.0f });
+            if (buttonModel) buttonModel->SetTintColor({ 1.0f, 1.0f, 0.0f,  1.0f });
         }
         else                //on being unpowered
         {
@@ -68,19 +72,27 @@ public:
 
     void Activate()
     {
-        if (isPrimed) //on power on
+        if (!isShutdown)
         {
-            isPrimed = false;
+            if (isPrimed) //on power on
+            {
+                isPrimed = false;
 
-            if (doorTransform) targetPosition += openedOffset;
-            if (buttonModel) buttonModel->SetTintColor({ 0.2f, 1.0f, 0.2f,  1.0f });
+                if (doorTransform) targetPosition += openedOffset;
+                if (buttonModel) buttonModel->SetTintColor({ 0.2f, 1.0f, 0.2f,  1.0f });
+            }
+
+            isActivated = true;
         }
-
-        isActivated = true;
     }
 
     void ForceShutdown(bool shutdown = true)
     {
         isShutdown = shutdown;
+        if (isShutdown) 
+        { 
+            if (doorTransform) targetPosition -= openedOffset;
+            if (buttonModel) buttonModel->SetTintColor({ 1.0f, 0.0f, 0.0f,  1.0f });
+        }
     }
 };

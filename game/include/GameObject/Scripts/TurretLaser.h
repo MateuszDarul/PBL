@@ -2,8 +2,10 @@
 
 #include "GameApplication.h"
 #include "Components.h"
+#include "CollidersManager.h"
 
 #include "DoorActivator.h"
+#include "LightActivator.h"
 
 #include <glm/gtx/rotate_vector.hpp>
 
@@ -14,13 +16,12 @@ public:
     
     //adjust these
 
-    int ignoreLayerMask = ~(CollisionLayer::Player);
+    int ignoreLayerMask = ~(CollisionLayer::Player | CollisionLayer::Ignore);
     int maxBounces = 15;
     float maxDistance = 150.0f;
 
-    const char* mirrorTag = "Mirror";
-
-    glm::vec3 originOffset = { 0.0f, 2.3f, 0.0f };
+    float originOffsetUp = 2.38f;
+    float originOffsetForward = 0.45f;
 
 
     //set these in 'inspector'
@@ -28,11 +29,16 @@ public:
     cmp::Line* line;
     CollidersManager* colMan;
 
+
+    //for public use
+       
+    int lightSourcesInRange = 0;
  
 private:
 
     glm::vec3 dir = { 1.0f, 0.0f, 0.0f };
     glm::vec3 origin = { 0.0f, 0.0f, 0.0f };
+    glm::vec3 originOffset = { originOffsetForward, originOffsetUp, 0.0f };
    
     cmp::Transform* transform;
 
@@ -48,9 +54,18 @@ public:
     {	
         if (line)
         {
+            if (lightSourcesInRange < 1)
+            {
+                line->RemoveLast(line->Count() - 2);
+                line->Set(0, glm::vec3(0,0,0));
+                line->Set(1, glm::vec3(0,0,0));
+                return;
+            }
+
+            dir = glm::rotateY(glm::vec3(1.0f, 0.0f, 0.0f), glm::radians(transform->GetRotation().y));
+            originOffset = dir * originOffsetForward + glm::vec3(0.0f, 1.0f, 0.0f) * originOffsetUp;
             origin = transform->GetPosition() + originOffset;
             line->Set(0, origin);
-            dir = glm::rotateY(glm::vec3(1.0f, 0.0f, 0.0f), glm::radians(transform->GetRotation().y));
 
 
             float d = maxDistance;
@@ -76,10 +91,8 @@ public:
                         line->Set(hits, hit.point);
                     }
 
-                    auto nameCmp = hit.gameObject->GetComponent<cmp::Name>();
-                    if (!nameCmp) break;
 
-                    if (nameCmp->Get().compare(mirrorTag) == 0)
+                    if (hit.layer & CollisionLayer::Mirror)
                     {
                         dir = glm::reflect(dir, hit.normal);
                         origin = hit.point;
@@ -93,6 +106,13 @@ public:
                         if (auto doorActivator = scriptHolder->Get<DoorActivator>())
                         {
                             doorActivator->Activate();
+                        }
+                        else if (auto lightActivator = scriptHolder->Get<LightActivator>())
+                        {
+                            if(lightSourcesInRange > 1 || !lightActivator->range->IsInRange(this))
+                            {
+                                lightActivator->Activate();
+                            }
                         }
                     }
                     

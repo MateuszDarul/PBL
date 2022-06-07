@@ -64,6 +64,31 @@ InputManager* GameApplication::s_InputManager = nullptr;
 ResourceManager* GameApplication::s_ResourceManager = nullptr;
 
 
+
+struct MemoryStatistics
+{
+    size_t TotalAllocated = 0;
+    size_t TotalFreed = 0;
+    size_t CurrentUsage() { return TotalAllocated - TotalFreed; }
+    float CurrentUsageMB() { return CurrentUsage() * 0.000001; }
+    float TotalAllocatedMB() { return TotalAllocated * 0.000001; }
+    float TotalFreedMB() { return TotalFreed * 0.000001; }
+};
+
+static MemoryStatistics s_MemoryStatistics;
+
+void* operator new(size_t bytes)
+{
+    s_MemoryStatistics.TotalAllocated += bytes;
+    return malloc(bytes);
+}
+
+void operator delete(void* memory, size_t bytes)
+{
+    s_MemoryStatistics.TotalFreed += bytes;
+    free(memory);
+}
+
 int GameApplication::Init()
 {
     //Load libraries
@@ -179,10 +204,17 @@ int GameApplication::Init()
 
 void GameApplication::Run()
 {
+    glfwMaximizeWindow(GameApplication::GetWindow());
+        glfwRestoreWindow(GameApplication::GetWindow());
     double t1, t2 = glfwGetTime();
     double dt;
     while (!glfwWindowShouldClose(s_Window))
     {
+        if(s_InputManager->Keyboard()->OnPressed(KeyboardKey::F10))
+        {
+            printf("=== Current memory usage: %f (Total allocated: %f, total freed: %f) ===\n", 
+            s_MemoryStatistics.CurrentUsageMB(), s_MemoryStatistics.TotalAllocatedMB(), s_MemoryStatistics.TotalFreedMB());
+        }
         if(s_InputManager->Keyboard()->OnPressed(KeyboardKey::Escape_KB))
         {
             glfwSetWindowShouldClose(s_Window, true);

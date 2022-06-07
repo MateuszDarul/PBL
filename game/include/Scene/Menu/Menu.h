@@ -59,8 +59,7 @@ protected:
         go->AddComponent(std::make_shared<cmp::Name>("CURSOR"));
         menu->AddChild(go);
         
-        glfwMaximizeWindow(GameApplication::GetWindow());
-        glfwRestoreWindow(GameApplication::GetWindow());
+        
     }
 
     glm::vec2 GetCursorOffser(glm::vec2 pos)
