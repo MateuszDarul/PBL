@@ -454,6 +454,8 @@ bool SceneNode::RemoveNode(SceneNode* node)
         {
             if (this->children[i] && this->children[i]->Is(node))
             {
+                if (std::find_if(nodesToDelete.begin(), nodesToDelete.end(), [&](NodeToDelete n) { return n.child->Is(node); }) != nodesToDelete.end()) return true;
+
                 nodesToDelete.push_back({ this, node });
                 return true;
             }
