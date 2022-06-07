@@ -102,28 +102,33 @@ public:
                             selectedMirror->SetEnabled(true);
                             camera->SetMovementEnable(false);
 
-                            if (canUseRMB)
-                            {
-                                usingRMBToRotate = true;
-                                selectedMirror->isPlayerInside = false;
-                                selectedMirror->disableMouseRotation = true;
-                            }
-                            else
-                            {
-                                selectedMirror->isPlayerInside = true;
-                                selectedMirror->disableMouseRotation = true;
+                            selectedMirror->isPlayerInside = false;
+                            selectedMirror->disableMouseRotation = true;
+                            
+                            if (canUseRMB) usingRMBToRotate = true;
 
-                                // setup camera
-                                saveCamPos = camera->GetPosition();
-                                saveCamRot = glm::vec2(camera->GetPitch(), camera->GetYaw());
+                            // if (canUseRMB)
+                            // {
+                            //     usingRMBToRotate = true;
+                            //     selectedMirror->isPlayerInside = false;
+                            //     selectedMirror->disableMouseRotation = true;
+                            // }
+                            // else
+                            // {
+                            //     selectedMirror->isPlayerInside = true;
+                            //     selectedMirror->disableMouseRotation = true;
 
-                                camera->SetPosition(mirror->gameObject->GetComponent<cmp::Transform>()->GetPosition() + glm::vec3(0.0f, 0.0f, -2.0f));
-                                camera->SetRotation(0, -90);
+                            //     // setup camera
+                            //     saveCamPos = camera->GetPosition();
+                            //     saveCamRot = glm::vec2(camera->GetPitch(), camera->GetYaw());
 
-                                // disable player colliders
-                                camera->GetOwner()->GetComponent<cmp::BoxCol>()->isDisabled = true;
-                                camera->GetOwner()->GetComponent<cmp::SphereCol>()->isDisabled = true;
-                            }
+                            //     camera->SetPosition(mirror->gameObject->GetComponent<cmp::Transform>()->GetPosition() + glm::vec3(0.0f, 0.0f, -2.0f));
+                            //     camera->SetRotation(0, -90);
+
+                            //     // disable player colliders
+                            //     camera->GetOwner()->GetComponent<cmp::BoxCol>()->isDisabled = true;
+                            //     camera->GetOwner()->GetComponent<cmp::SphereCol>()->isDisabled = true;
+                            // }
                         }
                     }
 
@@ -206,15 +211,19 @@ public:
                 selectedMirror->SetEnabled(false);
                 selectedMirror = nullptr;
                 camera->SetMovementEnable(true);
+                // usingRMBToRotate = false;
+                // selectedMirror->SetEnabled(false);
+                // selectedMirror = nullptr;
+                // camera->SetMovementEnable(true);
 
-                // reset camera
-                camera->SetPosition(saveCamPos);
-                camera->SetRotation(saveCamRot.x, saveCamRot.y);
-                camera->SetRotationOffset(0, 0);
+                // // reset camera
+                // camera->SetPosition(saveCamPos);
+                // camera->SetRotation(saveCamRot.x, saveCamRot.y);
+                // camera->SetRotationOffset(0, 0);
 
-                // enable player colliders
-                camera->GetOwner()->GetComponent<cmp::BoxCol>()->isDisabled = false;
-                camera->GetOwner()->GetComponent<cmp::SphereCol>()->isDisabled = false;
+                // // enable player colliders
+                // camera->GetOwner()->GetComponent<cmp::BoxCol>()->isDisabled = false;
+                // camera->GetOwner()->GetComponent<cmp::SphereCol>()->isDisabled = false;
             }
         }
 
