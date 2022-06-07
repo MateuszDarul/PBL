@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Components.h"
+#include "GameObject.h"
 
 class DoorActivator : public Script 
 {

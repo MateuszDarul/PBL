@@ -14,6 +14,8 @@
 #include "EnemyScript.h"
 
 #include "Scripts/Cutscenexd.h"
+#include "Scripts/LightActivator.h"
+#include "Scripts/LanternRange.h"
 
 
 
@@ -112,7 +114,7 @@ Scene::Scene()
     go->GetComponent<cmp::SphereCol>()->AddToCollidersManager(collidersManager);
     world->FindNode("MAIN")->AddChild(go);
 
-    MapLoader::Load("Resources/maps/world.map", world->FindNode("MAIN"), shader_l, collidersManager, shadowsManager);
+    MapLoader::Load("Resources/maps/world_nolights.map", world->FindNode("MAIN"), shader_l, collidersManager, shadowsManager);
 
     ///***
 
@@ -291,7 +293,7 @@ Scene::Scene()
             resMan->GetMesh("Resources/models/Exported/Sciana.NR1.obj"),
             resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
         );
-        go->AddComponent(shader_d);
+        go->AddComponent(shader_l);
         go->AddComponent(mc);
 
         world->FindNode("MAIN")->AddChild(go);
@@ -347,9 +349,9 @@ Scene::Scene()
     //=== pickupable resource
     std::vector<glm::vec3> resourcePositions = {
         { -29.0f, 0.30f,  12.0f },
-        { -38.0f, 0.30f,  28.3f },
-        { -38.7f, 0.25f,  30.1f },
-        { -86.8f, 0.30f,  67.6f }
+        { -86.8f, 0.30f,  67.6f },
+        { -78.0f, 0.30f,  91.5f },
+        { -78.7f, 0.25f,  92.8f },
     };
 
     for (int i = 0; i < resourcePositions.size(); i++)
@@ -406,7 +408,7 @@ Scene::Scene()
         go->GetComponent<cmp::Transform>()->SetScale(0.5);
 
         go->AddComponent(std::make_shared<BoxCollider>(true, true));
-        go->GetComponent<cmp::BoxCol>()->setLengths({1.0, 1.0, 1.0});
+        go->GetComponent<cmp::BoxCol>()->setLengths({1.1, 1.1, 1.1});
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
         auto model = std::make_shared<cmp::Model>();
@@ -643,9 +645,15 @@ Scene::Scene()
 
         go->AddComponent(line);
         go->AddComponent(lineShader);
-        turretScript->line = line.get();
+        turretScript->line = line.get(); 
 
         scriptHolder->Add(turretScript);
+
+        go->AddComponent(std::make_shared<cmp::BoxCol>(true, true, CollisionLayer::Ignore));
+        std::shared_ptr<cmp::BoxCol> col = go->GetComponent<cmp::BoxCol>();
+        col->setLengths({ 2.0, 2.5, 2.0 });
+        col->SetOffset({ 0.0, 1.75, 0.0 });
+        col->AddToCollidersManager(collidersManager);
 
         auto gfxGO = std::make_shared<GameObject>();
         gfxGO->AddComponent(std::make_shared<cmp::Transform>());
@@ -668,6 +676,107 @@ Scene::Scene()
         world->FindNode("MAIN")->AddChild(go)->AddChild(gfxGO);
     }
 
+    //generator
+    struct GeneratorInfo
+    {
+        glm::vec3 position;
+        bool isEnabled;
+    };
+    std::vector<GeneratorInfo> genPositions = {
+        {{ -10.0f, 0.0f, 10.0f }, true  },
+        {{ -20.0f, 0.0f, 29.0f }, false },
+    };
+    for (auto& [position, isEnabled] : genPositions)
+    {
+        float lightbulbOffset = 2.5f;
+        float lightRange = 11.0f;
+
+        auto bulbPos = glm::vec3(position.x, position.y + lightbulbOffset, position.z);
+
+        go = std::make_shared<GameObject>();
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(bulbPos);
+
+
+        auto bulbModel = std::make_shared<cmp::Model>();
+        bulbModel->Create(
+            resMan->GetMesh("Resources/models/Sphere/Sphere.obj"),
+            resMan->GetMaterial("Resources/models/wall/wall.mtl")
+        );
+        go->AddComponent(bulbModel);
+        go->AddComponent(shader_d);
+
+        go->AddComponent(std::make_shared<SphereCollider>(false, true, CollisionLayer::GUI));
+        go->GetComponent<SphereCollider>()->SetRadius(0.6f);
+        go->GetComponent<SphereCollider>()->AddToCollidersManager(collidersManager);
+
+
+        auto light = std::make_shared<cmp::PointLight>();
+        auto lightGO = std::make_shared<GameObject>();
+        lightGO->AddComponent(light);
+        light->Create();
+        light->AddShader(shader_l);
+        light->SetPosition(bulbPos);
+        light->SetDamping(lightRange);
+        light->SetLightColor({ 0.8f, 0.8f, 1.0f });
+        shadowsManager->AddLight(lightGO.get());
+
+        if (!isEnabled)
+        {
+            bulbModel->SetTintColor(0.4f, 0.4f, 0.8f);
+            light->SetPosition({ 999, 999, 999 });
+        }
+
+        go->AddComponent(std::make_shared<cmp::Scriptable>());
+
+        LightActivator* activator = new LightActivator();
+        activator->bulbModel = bulbModel.get();
+        activator->lightComponent = light.get();
+        activator->isAlwaysLit = isEnabled;
+        go->GetComponent<cmp::Scriptable>()->Add(activator);
+
+
+        auto rangeGO = std::make_shared<GameObject>();
+        rangeGO->AddComponent(std::make_shared<cmp::Transform>());
+
+        rangeGO->AddComponent(std::make_shared<SphereCollider>(true, false, CollisionLayer::Ignore));
+        rangeGO->GetComponent<SphereCollider>()->SetRadius(lightRange);
+        rangeGO->GetComponent<SphereCollider>()->AddToCollidersManager(collidersManager);
+
+        rangeGO->AddComponent(std::make_shared<cmp::Scriptable>());
+        LanternRange* range = new LanternRange();
+        range->isAlwaysLit = isEnabled; 
+        range->ChangeLightPower(isEnabled);
+        rangeGO->GetComponent<cmp::Scriptable>()->Add(range);
+
+        activator->range = range;
+
+        auto gfxGO = std::make_shared<GameObject>();
+        gfxGO->AddComponent(std::make_shared<cmp::Transform>());
+        gfxGO->GetComponent<cmp::Transform>()->SetPosition(0.0f, -lightbulbOffset, 0.0f);
+        gfxGO->AddComponent(std::make_shared<cmp::Name>("gfx"));
+
+        auto mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/Wieze/Latarnia.obj"),
+            resMan->GetMaterial("Resources/models/Wieze/Latarnia.mtl")
+        );
+        gfxGO->AddComponent(mc);
+
+        gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
+            resMan->GetMesh("Resources/models/Wieze/Latarnia.obj")
+        );
+        gfxGO->AddComponent(shader_l);
+
+        
+        auto node = world->FindNode("MAIN")->AddChild(go);
+        node->AddChild(gfxGO);
+        node->AddChild(rangeGO);
+        world->FindNode("MAIN")->AddChild(lightGO);
+    }
+
+
     //cutscene
     {
         go = std::make_shared<GameObject>();
@@ -689,6 +798,7 @@ Scene::Scene()
         cutscene->doorsToShut = cutsceneDoorActivator;
         cutscene->doorsToOpen = openDoorAfterEnemyDies;
         cutscene->lightShader = shader_l;
+        cutscene->shadowManager = shadowsManager;
         cutscene->enemyHealth = world->FindNode("Enemy")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<Health>();
         go->GetComponent<cmp::Scriptable>()->Add(cutscene);
         

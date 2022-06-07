@@ -3,6 +3,7 @@
 #include "Components.h"
 #include "DoorActivator.h"
 #include "Health.h"
+#include "ShadowsManager.h"
 
 
 class Cutscenexd : public Script
@@ -12,6 +13,7 @@ public:
     DoorActivator* doorsToShut;
     DoorActivator* doorsToOpen;
     std::shared_ptr<cmp::Shader> lightShader;
+    ShadowsManager* shadowManager;
 
     Health* enemyHealth;
 
@@ -42,7 +44,7 @@ public:
         else if (hasStarted)
         {
             float current = lightCmp->GetLightColor().r;
-            if (current < 0.021f) isFadingOutAnimation = false;
+            if (current < 0.11f) isFadingOutAnimation = false;
             else if (current > 0.999f) isFadingOutAnimation = true;
 
             if (isFadingOutAnimation) lightCmp->SetLightColor({current - dt, 0.0f, 0.0f});
@@ -67,7 +69,7 @@ public:
         hasFinished = true;
         printf("Finished cutscene\n");
 
-        lightCmp->SetLightColor({0.0f, 1.0f, 0.0f}); 
+        lightCmp->SetLightColor({0.2f, 0.75f, 0.2f}); 
     }
 
     void TriggerEnter(std::shared_ptr<ColliderComponent> other) override
@@ -86,8 +88,11 @@ public:
             alarmLightGO->AddComponent(lightCmp);
             lightCmp->Create();
             lightCmp->AddShader(lightShader);
-            lightCmp->SetPosition({-64.75,  6.0,  65.0});
-            lightCmp->SetLightColor({1.0f, 0.0f, 0.0f});
+            lightCmp->SetPosition({-73.75, 4.0, 63.0});
+            lightCmp->SetLightColor({0.2f, 0.0f, 0.0f});
+            lightCmp->SetDamping(20.0f);
+
+            shadowManager->AddLight(alarmLightGO.get());
         }
     }
 };

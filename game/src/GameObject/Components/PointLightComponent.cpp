@@ -65,7 +65,7 @@ void PointLightComponent::Use()
         shaders[i]->SetVec3("pointLight[" + textID + "].position", this->transform->GetPosition());
         shaders[i]->SetVec3("pointLight[" + textID + "].lightColor", this->lightColor);
         shaders[i]->SetVec3("pointLight[" + textID + "].specularColor", this->specularColor);
-        shaders[i]->SetFloat("pointLight[" + textID + "].distance", this->damping * DAMPING_MUL);
+        shaders[i]->SetFloat("pointLight[" + textID + "].distance", 1.0f/this->damping);// *DAMPING_MUL);
     }
 
     if(PointLightComponent::thisLightID == PointLightComponent::lightAmount - 1)

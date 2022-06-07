@@ -49,6 +49,7 @@ public:
 			muzzleParticles->SetSpeed(3.0f);
 			muzzleParticles->SetColor({ 1.0f, 1.0f, 0.0f,   1.0f }, { 1.0f, 0.3f, 0.1f,   0.2f });
 			muzzleParticles->SetForce({ 0.0f, -2.5f, 0.0f });
+			muzzleParticles->Stop();
 
 			gameObject->AddComponent(muzzleParticles);
 		}
@@ -72,6 +73,7 @@ public:
 			{
 				if (turretRange->enemies.size() > 0)
 				{
+					muzzleParticles->Play();
 					muzzleParticles->Burst();
 					turretRange->enemies[0]->DecreaseHealth(damage);
 					shootTimer = 0.0f;

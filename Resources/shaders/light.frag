@@ -123,6 +123,10 @@ void main()
 
 vec3 GetPointLight(TextureMaps textureMaps, PointLight pLight)
 {
+	float distance = length(pLight.position - fragPos);
+	float attenuation = 1 - pow(distance * pLight.distance, 5.0);
+	if (attenuation < 0.0001) return vec3(0.0, 0.0, 0.0);
+
     vec3 viewDir = normalize(cameraPos - fragPos);
 
     vec3 lightDir = normalize(pLight.position - fragPos);
@@ -133,8 +137,9 @@ vec3 GetPointLight(TextureMaps textureMaps, PointLight pLight)
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
     vec3 specular = pLight.specularColor * spec * textureMaps.specularMAP;
 
-    float distance = length(pLight.position - fragPos);
-    float attenuation = 1 - pLight.distance * distance;
+    
+    //float attenuation = 1 - pLight.distance * distance;
+		
 
     diffuse *= attenuation;
     specular *= attenuation;   

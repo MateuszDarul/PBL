@@ -2,8 +2,10 @@
 
 #include "GameApplication.h"
 #include "Components.h"
+#include "CollidersManager.h"
 
 #include "DoorActivator.h"
+#include "LightActivator.h"
 
 #include <glm/gtx/rotate_vector.hpp>
 
@@ -27,6 +29,10 @@ public:
     cmp::Line* line;
     CollidersManager* colMan;
 
+
+    //for public use
+       
+    bool isInLight = false;
  
 private:
 
@@ -48,6 +54,14 @@ public:
     {	
         if (line)
         {
+            if (!isInLight)
+            {
+                line->RemoveLast(line->Count() - 2);
+                line->Set(0, glm::vec3(0,0,0));
+                line->Set(1, glm::vec3(0,0,0));
+                return;
+            }
+
             dir = glm::rotateY(glm::vec3(1.0f, 0.0f, 0.0f), glm::radians(transform->GetRotation().y));
             originOffset = dir * originOffsetForward + glm::vec3(0.0f, 1.0f, 0.0f) * originOffsetUp;
             origin = transform->GetPosition() + originOffset;
@@ -92,6 +106,10 @@ public:
                         if (auto doorActivator = scriptHolder->Get<DoorActivator>())
                         {
                             doorActivator->Activate();
+                        }
+                        else if (auto lightActivator = scriptHolder->Get<LightActivator>())
+                        {
+                            lightActivator->Activate();
                         }
                     }
                     

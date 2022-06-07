@@ -22,7 +22,7 @@ public:
     float placingRange = 5.0f;
     float shootingTurretRange = 15.0f;
 
-    int ignoreLayerMask = ~(CollisionLayer::Player | CollisionLayer::Ignore);
+    int ignoreLayerMask = ~(CollisionLayer::Player | CollisionLayer::GUI | CollisionLayer::Ignore);
 
     enum TurretType {
         None = -1, Laser = 0, Shooting = 1, Lantern = 2

@@ -60,7 +60,8 @@ public:
                 if (auto resource = scriptable->Get<Resource>())
                 {
                     textTEMP->color = { 0.0f, 1.0f, 0.0f };
-                    if (shouldInteract)
+                    placeTurretScript->isLookingAtMirror = true; // to disable player placing
+                    if (shouldInteract || Input()->Mouse()->OnPressed(MouseButton::Left_MB))
                     {
                         shouldInteract = false;
                         printf("Picked resource\n");
@@ -70,7 +71,8 @@ public:
                 else if (auto blueprint = scriptable->Get<Blueprint>())
                 {
                     textTEMP->color = { 0.0f, 1.0f, 0.0f };
-                    if (shouldInteract)
+                    placeTurretScript->isLookingAtMirror = true; // to disable player placing
+                    if (shouldInteract || Input()->Mouse()->OnPressed(MouseButton::Left_MB))
                     {
                         shouldInteract = false;
                         printf("Picked blueprint\n");

@@ -34,6 +34,8 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/ShadowComponent.cpp
 	src/GameObject/Components/SlopeCollider.cpp
 
+	src/GameObject/Scripts/LanternRange.cpp
+
 	src/Resource/Font.cpp
 	src/Resource/Mesh.cpp
 	src/Resource/Material.cpp
