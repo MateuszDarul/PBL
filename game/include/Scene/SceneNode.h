@@ -81,6 +81,8 @@ public:
      */
     const glm::mat4& GetGlobalTransformations();
 
+    glm::vec3 GetGlobalPosition();
+
     /**
      * @brief Ustawia globalna macierz na zadana macierz przeksztalcen.
      */

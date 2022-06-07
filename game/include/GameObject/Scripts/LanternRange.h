@@ -11,7 +11,12 @@ public:
 	std::vector<TurretLaser*> turretsInRange;
 	
 	bool isAlwaysLit = false;
+
+	CollidersManager* colMan;
+	int lineOfSightIgnoreLayerMask = ~(CollisionLayer::Player | CollisionLayer::Ignore);
+
 private:
+
 	bool isTurnedOn = false;
 
 public:
@@ -20,7 +25,8 @@ public:
 
 	void ChangeLightPower(bool enabled);
 	
-	bool IsInRange(TurretLaser* laser);
+	bool IsInRange(TurretLaser* turret);
+	bool HasLineOfSight(TurretLaser* turret);
 
 	void TriggerEnter(std::shared_ptr<ColliderComponent> collider) override;
 	void TriggerExit(std::shared_ptr<ColliderComponent> collider) override;

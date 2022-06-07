@@ -424,6 +424,11 @@ const glm::mat4& SceneNode::GetGlobalTransformations()
     return this->globalTransformations;
 }
 
+glm::vec3 SceneNode::GetGlobalPosition()
+{
+    return { globalTransformations[3][0], globalTransformations[3][1], globalTransformations[3][2] };
+}
+
 void SceneNode::SetGlobalTransformations(const glm::mat4& newTransformations)
 {
     this->globalTransformations = newTransformations;

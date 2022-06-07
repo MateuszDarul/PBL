@@ -627,6 +627,7 @@ Scene::Scene()
     {
         go = std::make_shared<GameObject>();
         go->AddComponent(std::make_shared<cmp::Transform>());
+        go->AddComponent(std::make_shared<cmp::Name>("debugturet"));
         go->GetComponent<cmp::Transform>()->SetPosition(-30.0f, 0.0f, 28.5f);
         go->GetComponent<cmp::Transform>()->SetRotation(0.0, -20.0, 0.0);
 
@@ -649,7 +650,7 @@ Scene::Scene()
 
         scriptHolder->Add(turretScript);
 
-        go->AddComponent(std::make_shared<cmp::BoxCol>(true, true, CollisionLayer::Ignore));
+        go->AddComponent(std::make_shared<cmp::BoxCol>(true, true, CollisionLayer::GUI));
         std::shared_ptr<cmp::BoxCol> col = go->GetComponent<cmp::BoxCol>();
         col->setLengths({ 2.0, 2.5, 2.0 });
         col->SetOffset({ 0.0, 1.75, 0.0 });
@@ -696,6 +697,7 @@ Scene::Scene()
         go = std::make_shared<GameObject>();
         go->AddComponent(std::make_shared<cmp::Transform>());
         go->GetComponent<cmp::Transform>()->SetPosition(bulbPos);
+        go->AddComponent(std::make_shared<cmp::Name>("debugbulb"));
 
 
         auto bulbModel = std::make_shared<cmp::Model>();
@@ -738,6 +740,7 @@ Scene::Scene()
 
         auto rangeGO = std::make_shared<GameObject>();
         rangeGO->AddComponent(std::make_shared<cmp::Transform>());
+        rangeGO->AddComponent(std::make_shared<cmp::Name>("debugrange"));
 
         rangeGO->AddComponent(std::make_shared<SphereCollider>(true, false, CollisionLayer::Ignore));
         rangeGO->GetComponent<SphereCollider>()->SetRadius(lightRange);
@@ -745,6 +748,7 @@ Scene::Scene()
 
         rangeGO->AddComponent(std::make_shared<cmp::Scriptable>());
         LanternRange* range = new LanternRange();
+        range->colMan = collidersManager;
         range->isAlwaysLit = isEnabled; 
         range->ChangeLightPower(isEnabled);
         rangeGO->GetComponent<cmp::Scriptable>()->Add(range);
