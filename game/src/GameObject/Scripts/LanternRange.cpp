@@ -14,8 +14,13 @@ void LanternRange::ChangeLightPower(bool enabled)
 	isTurnedOn = enabled | isAlwaysLit;
 	for (auto turret : turretsInRange)
 	{
-		turret->isInLight = isTurnedOn;
+		turret->lightSourcesInRange += isTurnedOn ? 1 : -1;
 	}
+}
+
+bool LanternRange::IsInRange(TurretLaser* laser)
+{
+	return std::find(turretsInRange.begin(), turretsInRange.end(), laser) != turretsInRange.end();
 }
 
 void LanternRange::TriggerEnter(std::shared_ptr<ColliderComponent> collider)
@@ -25,7 +30,7 @@ void LanternRange::TriggerEnter(std::shared_ptr<ColliderComponent> collider)
 	{
 		if (auto turret = scriptable->Get<TurretLaser>())
 		{
-			turret->isInLight = isTurnedOn;
+			turret->lightSourcesInRange += 1;
 			turretsInRange.push_back(turret);
 		}
 	}
@@ -37,7 +42,7 @@ void LanternRange::TriggerExit(std::shared_ptr<ColliderComponent> collider)
 	{
 		if (auto turret = scriptable->Get<TurretLaser>())
 		{
-			turret->isInLight = false;
+			turret->lightSourcesInRange -= 1;
 			turretsInRange.erase(std::remove(turretsInRange.begin(), turretsInRange.end(), turret));
 		}
 	}

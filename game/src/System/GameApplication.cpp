@@ -204,6 +204,8 @@ int GameApplication::Init()
 
 void GameApplication::Run()
 {
+    glfwMaximizeWindow(GameApplication::GetWindow());
+        glfwRestoreWindow(GameApplication::GetWindow());
     double t1, t2 = glfwGetTime();
     double dt;
     while (!glfwWindowShouldClose(s_Window))

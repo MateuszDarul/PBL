@@ -19,6 +19,8 @@ public:
 	void Update(float dt) override;
 
 	void ChangeLightPower(bool enabled);
+	
+	bool IsInRange(TurretLaser* laser);
 
 	void TriggerEnter(std::shared_ptr<ColliderComponent> collider) override;
 	void TriggerExit(std::shared_ptr<ColliderComponent> collider) override;

@@ -33,7 +33,7 @@ public:
     int turretCosts[3] = { 30, 80, 40 };
 
 
-    glm::vec4 turretGhostColor = { 0.0f, 1.0f, 0.0f,   1.0f };
+    glm::vec4 turretGhostColor = { 0.0f, 1.0f, 0.0f,   0.5f };
 
 
     //set these in 'inspector'

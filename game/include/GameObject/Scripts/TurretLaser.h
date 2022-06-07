@@ -32,7 +32,7 @@ public:
 
     //for public use
        
-    bool isInLight = false;
+    int lightSourcesInRange = 0;
  
 private:
 
@@ -54,7 +54,7 @@ public:
     {	
         if (line)
         {
-            if (!isInLight)
+            if (lightSourcesInRange < 1)
             {
                 line->RemoveLast(line->Count() - 2);
                 line->Set(0, glm::vec3(0,0,0));
@@ -109,7 +109,10 @@ public:
                         }
                         else if (auto lightActivator = scriptHolder->Get<LightActivator>())
                         {
-                            lightActivator->Activate();
+                            if(!lightActivator->range->IsInRange(this))
+                            {
+                                lightActivator->Activate();
+                            }
                         }
                     }
                     
