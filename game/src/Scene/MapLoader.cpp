@@ -1,11 +1,13 @@
 #include "MapLoader.h"
 #include "Scripts/PlayerPlaceTurret.h"
 #include "Scripts/Blueprint.h"
+#include "Scripts/Resource.h"
 
 #include "ShadowsManager.h"
 
 bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Shader> shader, CollidersManager* collisionManager, ShadowsManager* shadowsManager)
 {
+    int resourceBoxCounter = 0;
     ResourceManager* resMan = GameApplication::GetResourceManager();
 
     std::shared_ptr<GameObject> gameObject;
@@ -340,6 +342,32 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
             default:
                 std::cerr << "Undefined collider type:" << type << " supported [0,1]" << std::endl;
             }
+        }
+        else if (line == "Resource:")
+        {
+            gameObject->AddComponent(std::make_shared<cmp::Name>("Resource " + std::to_string(resourceBoxCounter)));
+            resourceBoxCounter++;
+
+            gameObject->GetComponent<cmp::Transform>()->SetScale(0.4);
+
+            gameObject->AddComponent(std::make_shared<BoxCollider>(true, true));
+            gameObject->GetComponent<cmp::BoxCol>()->setLengths({ 1.0, 1.0, 1.0 });
+            gameObject->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
+
+            auto model = std::make_shared<cmp::Model>();
+            model->Create(
+                resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+                resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+            );
+            gameObject->AddComponent(model);
+            gameObject->AddComponent(shader);
+
+            gameObject->AddComponent(std::make_shared<cmp::FrustumCulling>());
+            gameObject->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+
+            auto resourceScript = new Resource();
+            gameObject->AddComponent(std::make_shared<cmp::Scriptable>());
+            gameObject->GetComponent<cmp::Scriptable>()->Add(resourceScript);
         }
         else if (line == "Blueprints:")
         {
