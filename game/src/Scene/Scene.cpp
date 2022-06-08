@@ -161,12 +161,12 @@ Scene::Scene()
     playerPlace->turretShader = shader_l;
     playerPlace->lineShader = lineShader;
 
-    //to fix rendering order
-    auto turretsHolderGO = std::make_shared<GameObject>();
-    turretsHolderGO->AddComponent(std::make_shared<cmp::Transform>());
-    auto turretsHolderNode = world->FindNode("MAIN")->AddChild(turretsHolderGO);
+    //to fix rendering order - moved at the end
+    // auto turretsHolderGO = std::make_shared<GameObject>();
+    // turretsHolderGO->AddComponent(std::make_shared<cmp::Transform>());
+    // auto turretsHolderNode = world->FindNode("MAIN")->AddChild(turretsHolderGO);
 
-    playerPlace->turretsHolder = turretsHolderNode.get();
+    // playerPlace->turretsHolder = turretsHolderNode.get();
     
     go->GetComponent<ScriptComponent>()->Add(playerPlace);
 
@@ -809,6 +809,13 @@ Scene::Scene()
         
         world->FindNode("MAIN")->AddChild(go);
     }
+
+    //=== fixing rendering order
+    auto turretsHolderGO = std::make_shared<GameObject>();
+    turretsHolderGO->AddComponent(std::make_shared<cmp::Transform>());
+    auto turretsHolderNode = world->FindNode("MAIN")->AddChild(turretsHolderGO);
+
+    playerPlace->turretsHolder = turretsHolderNode.get();
 
     //=== text
 
