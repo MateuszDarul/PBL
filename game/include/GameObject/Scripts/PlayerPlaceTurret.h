@@ -387,32 +387,7 @@ public:
         if (type == TurretType::None) return;
         gameManager->IncreaseEnergy(turretCosts[type]);
 
-        turretGO->GetComponent<cmp::Transform>()->SetPosition(0.0, -10000.0, 0.0);
-
-        //removing doesnt work lol
-
-        // printf("PickUpTurret()\n");
-
-        // std::shared_ptr<ColliderComponent> col = turretGO->GetComponent<cmp::SphereCol>();
-        // if (col == nullptr)
-        // {
-        //     col = gameObject->GetComponent<cmp::BoxCol>();
-        // }
-        // if (col != nullptr)
-        // {
-        //     printf(" has collider\n");
-            
-        //     printf("a\n");
-        //     colMan->RemoveStaticTrigger(col);
-        //     printf("b\n");
-        //     colMan->RemoveDynamicTrigger(col);
-        //     printf("c\n");
-        //     colMan->RemoveStaticColllider(col);
-        //     printf("d\n");
-        //     colMan->RemoveDynamicCollider(col);
-        // }
-        
-        // turretsHolder->RemoveNode(turretGO->GetNode());
+        turretsHolder->RemoveNode(turretGO->GetNode());
     }
 
 };
