@@ -25,6 +25,21 @@ bool LightComponent::AddShader(std::shared_ptr<ShaderComponent> shader)
     return true;
 }
 
+void LightComponent::TurnOn()
+{
+    turnedOn = true;
+}
+
+void LightComponent::TurnOff()
+{
+    turnedOn = false;
+}
+
+bool LightComponent::IsTurnedOn()
+{
+    return turnedOn;
+}
+
 std::vector<std::shared_ptr<ShaderComponent>> LightComponent::GetShaders()
 {
     return this->shaders;

@@ -15,6 +15,7 @@ protected:
 
     std::string textID;
     bool wasCreated;
+    bool turnedOn = true;
 
     std::shared_ptr<TransformComponent> transform;
     glm::vec3 lightColor;
@@ -30,6 +31,9 @@ public:
     virtual void Use() = 0;
 
     bool AddShader(std::shared_ptr<ShaderComponent> shader);
+    void TurnOn();
+    void TurnOff();
+    bool IsTurnedOn();
     std::vector<std::shared_ptr<ShaderComponent>> GetShaders();
 };
 

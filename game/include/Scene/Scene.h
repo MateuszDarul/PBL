@@ -26,6 +26,7 @@ private:
     CollidersManager* collidersManager;
     ShadowsManager* shadowsManager;
     glm::mat4 transform; //!< Macierz transformacji widoku i kamery.
+    void CreateLanternTurret(bool turnedOn, glm::vec3 position, std::shared_ptr<cmp::Shader> crystalShader, std::shared_ptr<cmp::Shader> turretShader);
 
 public:
     /** @brief Domyslny konstruktor.
@@ -49,6 +50,7 @@ public:
     void AddGameObject(std::shared_ptr<GameObject> child, std::shared_ptr<GameObject> parent = std::shared_ptr<GameObject>());
     SceneNode* GetWorldNode();
     CollidersManager* GetCollidersManager();
+
 };
 
 #endif // __SCENE_H__

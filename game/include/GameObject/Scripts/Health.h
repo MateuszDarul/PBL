@@ -21,7 +21,6 @@ public:
 
 	void Update(float dt)
 	{
-
 	}
 
 	void DecreaseHealth(float health)

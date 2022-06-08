@@ -4,6 +4,8 @@
 #include "Components.h"
 
 #include "DoorActivator.h"
+#include "PlacedTurret.h"
+#include "TurretLight.h"
 
 #include <glm/gtx/rotate_vector.hpp>
 
@@ -27,6 +29,7 @@ public:
 
     cmp::Line* line;
     CollidersManager* colMan;
+    PlacedTurret* placedTurretScript;
 
  
 private:
@@ -46,7 +49,7 @@ public:
 
     void Update(float dt)
     {	
-        if (line)
+        if (line && placedTurretScript->IsWorking())
         {
             origin = transform->GetPosition() + originOffset;
             line->Set(0, origin);
@@ -77,14 +80,32 @@ public:
                     }
 
                     auto nameCmp = hit.gameObject->GetComponent<cmp::Name>();
-                    if (!nameCmp) break;
-
-                    if (nameCmp->Get().compare(mirrorTag) == 0)
+                    TurretLight* lightScript = nullptr;
+                    auto lightScriptable = hit.gameObject->GetNode()->GetParent()->GetGameObject()->GetComponent<cmp::Scriptable>();
+                    if (lightScriptable)
                     {
-                        dir = glm::reflect(dir, hit.normal);
-                        origin = hit.point;
-                        totalLinePoints += 1;
-                        continue;
+                        lightScript = lightScriptable->Get<TurretLight>();
+                    }
+                    if (!nameCmp && !lightScript) break;
+
+                    if (nameCmp)
+                    {
+                        if (nameCmp->Get().compare(mirrorTag) == 0)
+                        {
+                            dir = glm::reflect(dir, hit.normal);
+                            origin = hit.point;
+                            totalLinePoints += 1;
+                            continue;
+                        }
+                    }
+
+                    if (lightScript)
+                    {
+                        if (lightScript != placedTurretScript->GetLight())
+                        {
+                            lightScript->light->GetComponent<cmp::PointLight>()->TurnOn();
+                        }
+                        break;
                     }
 
                     auto scriptHolder = hit.gameObject->GetComponent<cmp::Scriptable>();

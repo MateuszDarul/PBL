@@ -94,7 +94,7 @@ bool SphereCollider::CheckCollision(std::shared_ptr<ColliderComponent> collider)
 	else if (collider->GetClassUUID() == 12)
 	{
 		std::shared_ptr<BoxCollider> other = std::dynamic_pointer_cast<BoxCollider>(collider);
-		glm::vec3 otherLenghts = other->getLengths();
+		glm::vec3 otherLenghts = other->GetLengths();
 		float otherMinX = otherPos.x - otherLenghts.x * 0.5f;
 		float otherMaxX = otherPos.x + otherLenghts.x * 0.5f;
 		float otherMinY = otherPos.y - otherLenghts.y * 0.5f;

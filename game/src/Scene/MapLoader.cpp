@@ -318,7 +318,7 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
                     line_id += 3;
 
                     boxCollider->AddToCollidersManager(collisionManager);
-                    boxCollider->setLengths(size);
+                    boxCollider->SetLengths(size);
                 }
             break;
 

@@ -7,6 +7,7 @@
 #include "ColliderComponent.h"
 #include "Scene.h"
 #include "Health.h"
+#include "PlacedTurret.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -28,20 +29,21 @@ public:
 	float damage = 10.0f;
 	float shootCd = 1.0f;
 	bool isPut = false;
+	PlacedTurret* placedTurretScript;
 
 	void Start()
 	{
-
 	}
 
 	void Update(float dt)
 	{
-		if (isPut)
+		if (isPut && placedTurretScript->IsWorking())
 		{
 			if (enemies.size() > 0)
 			{
-				float angle = Angle(gameObject->GetComponent<cmp::Transform>()->GetPosition(), enemies[0]->gameObject->GetComponent<cmp::Transform>()->GetPosition());
-				gameObject->GetComponent<cmp::Transform>()->SetRotation(0, glm::degrees(angle), 0);
+				std::shared_ptr<cmp::Transform> trans = gameObject->GetNode()->GetParent()->GetGameObject()->GetComponent<cmp::Transform>();
+				float angle = Angle(trans->GetPosition(), enemies[0]->gameObject->GetComponent<cmp::Transform>()->GetPosition());
+				trans->SetRotation(0, glm::degrees(angle), 0);
 			}
 
 			if (shootTimer < shootCd)
@@ -61,7 +63,7 @@ public:
 
 	void TriggerEnter(std::shared_ptr<ColliderComponent> collider)
 	{
-		if (collider->layer == ENEMY)
+		if (collider->layer == ENEMY && isPut && placedTurretScript->IsWorking())
 		{
 			Health* health = collider->GetOwner()->GetComponent<cmp::Scriptable>()->Get<Health>();
 			if (health != nullptr)
@@ -72,7 +74,7 @@ public:
 	}
 	void TriggerExit(std::shared_ptr<ColliderComponent> collider)
 	{
-		if (collider->layer == ENEMY)
+		if (collider->layer == ENEMY && placedTurretScript->IsWorking())
 		{
 			Health* health = collider->GetOwner()->GetComponent<cmp::Scriptable>()->Get<Health>();
 			for (int i = 0; i < enemies.size(); i++)

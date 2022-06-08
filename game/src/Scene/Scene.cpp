@@ -102,7 +102,7 @@ Scene::Scene()
     collidersManager = new CollidersManager(go); //mened�er kolider�w
     collidersManager->SetDistanceFromPlayer(10.0f);
     go->AddComponent(std::make_shared<BoxCollider>(false, false));
-    go->GetComponent<cmp::BoxCol>()->setLengths(glm::vec3(1.5,3,1.5));
+    go->GetComponent<cmp::BoxCol>()->SetLengths(glm::vec3(1.5,3,1.5));
     go->GetComponent<cmp::BoxCol>()->SetOffset(glm::vec3(0,-1,0));
     go->GetComponent<cmp::BoxCol>()->layer = CollisionLayer::Player;
     go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
@@ -298,7 +298,7 @@ MultiToolController* multiToolScript;
         go->AddComponent(std::make_shared<cmp::Name>("Enemy"));
 
         go->AddComponent(std::make_shared<BoxCollider>(true, false, CollisionLayer::ENEMY));
-        go->GetComponent<cmp::BoxCol>()->setLengths(glm::vec3(2, 2, 2));
+        go->GetComponent<cmp::BoxCol>()->SetLengths(glm::vec3(2, 2, 2));
         go->GetComponent<cmp::BoxCol>()->isOptimized = false;
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
@@ -323,6 +323,7 @@ MultiToolController* multiToolScript;
     //=== pickupable resource
     std::vector<glm::vec3> resourcePositions = {
         { -29.0f, 0.30f,  12.0f },
+        { -29.0f, 0.30f,  10.0f },
         { -38.0f, 0.30f,  28.3f },
         { -38.7f, 0.25f,  30.1f },
         { -86.8f, 0.30f,  67.6f }
@@ -338,7 +339,7 @@ MultiToolController* multiToolScript;
         go->GetComponent<cmp::Transform>()->SetScale(0.4);
 
         go->AddComponent(std::make_shared<BoxCollider>(true, true));
-        go->GetComponent<cmp::BoxCol>()->setLengths({1.0, 1.0, 1.0});
+        go->GetComponent<cmp::BoxCol>()->SetLengths({1.0, 1.0, 1.0});
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
         auto model = std::make_shared<cmp::Model>();
@@ -364,7 +365,7 @@ MultiToolController* multiToolScript;
 
     //blueprints
     glm::vec3 blueprintPositions[3] =  {
-        {0,-10,0}, //???
+        {0,0.5f,0}, //???
         { -83.0f, 0.5f, 69.5f },    //Shooting
         { -26.0f, 0.5f,  5.0f }     //Laser
     };
@@ -378,7 +379,7 @@ MultiToolController* multiToolScript;
         go->GetComponent<cmp::Transform>()->SetScale(0.5);
 
         go->AddComponent(std::make_shared<BoxCollider>(true, true));
-        go->GetComponent<cmp::BoxCol>()->setLengths({1.0, 1.0, 1.0});
+        go->GetComponent<cmp::BoxCol>()->SetLengths({1.0, 1.0, 1.0});
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
         auto model = std::make_shared<cmp::Model>();
@@ -411,7 +412,7 @@ MultiToolController* multiToolScript;
         go->GetComponent<cmp::Transform>()->SetRotation(-11.0, 0.0, 0.0);
 
         go->AddComponent(std::make_shared<BoxCollider>(false, false));
-        go->GetComponent<cmp::BoxCol>()->setLengths({2.0, 2.0, 2.0});
+        go->GetComponent<cmp::BoxCol>()->SetLengths({2.0, 2.0, 2.0});
         go->GetComponent<cmp::BoxCol>()->SetMass(999999999.9f);
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
@@ -463,7 +464,7 @@ MultiToolController* multiToolScript;
         go->GetComponent<cmp::Transform>()->SetScale(1.0);
 
         go->AddComponent(std::make_shared<BoxCollider>(false, false));
-        go->GetComponent<cmp::BoxCol>()->setLengths({2.0, 2.0, 2.0});
+        go->GetComponent<cmp::BoxCol>()->SetLengths({2.0, 2.0, 2.0});
         go->GetComponent<cmp::BoxCol>()->SetMass(999999999.9f);
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
@@ -512,8 +513,8 @@ MultiToolController* multiToolScript;
         go->AddComponent(doorTransform);
 
         go->AddComponent(std::make_shared<BoxCollider>(false, true));
-        if (doorRotation < 0.001f) go->GetComponent<cmp::BoxCol>()->setLengths({1.0 * scl, 5.0 * scl, 5.0 * scl});
-        else go->GetComponent<cmp::BoxCol>()->setLengths({5.0*scl, 5.0*scl, 1.0 *scl});
+        if (doorRotation < 0.001f) go->GetComponent<cmp::BoxCol>()->SetLengths({1.0 * scl, 5.0 * scl, 5.0 * scl});
+        else go->GetComponent<cmp::BoxCol>()->SetLengths({5.0*scl, 5.0*scl, 1.0 *scl});
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
         auto model = std::make_shared<cmp::Model>();
@@ -536,7 +537,7 @@ MultiToolController* multiToolScript;
         go->GetComponent<cmp::Transform>()->SetScale(0.5);
 
         go->AddComponent(std::make_shared<BoxCollider>(false, true));
-        go->GetComponent<cmp::BoxCol>()->setLengths({1.0, 1.0, 1.0});
+        go->GetComponent<cmp::BoxCol>()->SetLengths({1.0, 1.0, 1.0});
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
         model = std::make_shared<cmp::Model>();
@@ -576,7 +577,7 @@ MultiToolController* multiToolScript;
         go->GetComponent<cmp::Transform>()->SetScale(2.5);
 
         go->AddComponent(std::make_shared<BoxCollider>(true, true));
-        go->GetComponent<cmp::BoxCol>()->setLengths({5.0, 5.0, 5.0});
+        go->GetComponent<cmp::BoxCol>()->SetLengths({5.0, 5.0, 5.0});
         go->GetComponent<cmp::BoxCol>()->layer = CollisionLayer::Ignore;
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
@@ -683,6 +684,8 @@ MultiToolController* multiToolScript;
     goCamera->GetComponent<CameraComponent>()->SetPosition(transformCamera->GetPosition());
     transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();
 
+    CreateLanternTurret(true, glm::vec3(-2.0f, 0.0f, 2.0f), shader_d, shader_l);
+
     world->Update(0.0f); 
 }
 
@@ -746,6 +749,7 @@ void Scene::Update(float dt)
     world->Update(dt);
 
     shadowsManager->Update();
+
 }
 
 void Scene::Render()
@@ -781,4 +785,78 @@ SceneNode* Scene::GetWorldNode()
 CollidersManager* Scene::GetCollidersManager()
 {
     return collidersManager;
+}
+
+void Scene::CreateLanternTurret(bool turnedOn, glm::vec3 position, std::shared_ptr<cmp::Shader> crystalShader, std::shared_ptr<cmp::Shader> turretShader)
+{
+    ResourceManager* resMan = GameApplication::GetResourceManager();
+    std::shared_ptr<GameObject> mainObject = std::make_shared<GameObject>();
+    mainObject->AddComponent(std::make_shared<cmp::Transform>());
+    mainObject->GetComponent<cmp::Transform>()->SetPosition(position);
+
+    mainObject->AddComponent(std::make_shared<cmp::Name>("gfx"));
+
+    auto mc = std::make_shared<cmp::Model>();
+    mc->Create(
+        resMan->GetMesh("Resources/models/Wieze/Latarnia.obj"),
+        resMan->GetMaterial("Resources/models/Wieze/Latarnia.mtl")
+    );
+    mainObject->AddComponent(mc);
+
+    mainObject->AddComponent(std::make_shared<cmp::FrustumCulling>());
+    mainObject->GetComponent<cmp::FrustumCulling>()->Create(
+        resMan->GetMesh("Resources/models/Wieze/Latarnia.obj")
+    );
+    mainObject->AddComponent(std::make_shared<cmp::Scriptable>());
+    TurretLight* script = new TurretLight();
+    script->SetEnabled(false);
+    script->SetRange(12);
+    mainObject->GetComponent<cmp::Scriptable>()->Add(script);
+    mainObject->AddComponent(crystalShader);
+
+    mainObject->AddComponent(std::make_shared<cmp::SphereCol>(true, true, CollisionLayer::Light));
+
+    std::shared_ptr<cmp::SphereCol> col = mainObject->GetComponent<cmp::SphereCol>();
+    col->SetRadius(script->GetRange());
+    col->AddToCollidersManager(collidersManager);
+
+    auto gfxGO = std::make_shared<GameObject>();
+    gfxGO->AddComponent(std::make_shared<cmp::PointLight>());
+    gfxGO->GetComponent<cmp::PointLight>()->Create();
+    gfxGO->GetComponent<cmp::PointLight>()->AddShader(turretShader);
+    gfxGO->GetComponent<cmp::PointLight>()->SetDamping(script->GetRange());
+    mc = std::make_shared<cmp::Model>();
+    mc->Create(
+        resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+        resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+    );
+    gfxGO->AddComponent(mc);
+    gfxGO->AddComponent(crystalShader);
+    gfxGO->AddComponent(std::make_shared<cmp::Transform>());
+    gfxGO->GetComponent<cmp::Transform>()->SetScale(0.5f);
+    gfxGO->GetComponent<cmp::Transform>()->SetPosition(glm::vec3(0.0f, 2.0f, 0.0f));
+    gfxGO->AddComponent(std::make_shared<cmp::BoxCol>(true, true, CollisionLayer::LightTrigger));
+
+    std::shared_ptr<cmp::BoxCol> col2 = gfxGO->GetComponent<cmp::BoxCol>();
+    col2->SetLengths(glm::vec3(1.0, 1.0f, 1.0f));
+    col2->AddToCollidersManager(collidersManager);
+
+    script->light = gfxGO;
+
+    if (turnedOn)
+    {
+        gfxGO->GetComponent<cmp::PointLight>()->TurnOn();
+    }
+    else
+    {
+        gfxGO->GetComponent<cmp::PointLight>()->TurnOff();
+    }
+
+
+    // gfxGO->AddComponent(std::make_shared<cmp::Shade>());
+    // std::shared_ptr<cmp::Shade> shadeCmp = gfxGO->GetComponent<cmp::Shade>();
+    // shadeCmp->Create(1);
+
+
+    world->AddChild(mainObject)->AddChild(gfxGO);
 }

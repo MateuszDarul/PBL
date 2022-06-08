@@ -44,11 +44,11 @@ public:
 	/** @brief Metoda ustawiaj�ca nowe d�ugo�ci kraw�dzi pude�kowego kolidera.
 	* @param lengths - nowe d�ugo�ci kraw�dzi pude�kowego kolidera.
 	*/
-	void setLengths(glm::vec3 lengths);
+	void SetLengths(glm::vec3 lengths);
 
 	/** @brief Metoda zwracaj�ca d�ugo�ci kraw�dzi pude�kowego kolidera.
 	* @return glm::vec3 - D�ugo�ci kraw�dzi.
 	*/
-	glm::vec3 getLengths();
+	glm::vec3 GetLengths();
 };
 #endif

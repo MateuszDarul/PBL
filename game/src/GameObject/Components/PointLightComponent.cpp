@@ -19,14 +19,15 @@ PointLightComponent::~PointLightComponent()
 
 bool PointLightComponent::Create()
 {
-    if(this->GetOwner()->GetComponent<TransformComponent>() == nullptr)
+    this->transform = this->GetOwner()->GetComponent<TransformComponent>();
+    if(this->transform == nullptr)
     {
         this->transform = std::make_shared<TransformComponent>();
         this->GetOwner()->AddComponent(transform);
     }
 
     this->wasCreated = true;
-    this->transform->SetPosition(glm::vec3(0,0,0));
+   // this->transform->SetPosition(glm::vec3(0,0,0));
     this->lightColor = glm::vec3(1,1,1);
     this->specularColor = glm::vec3(1,1,1);
     this->damping = 10;
@@ -58,17 +59,20 @@ void PointLightComponent::Use()
     }
 
     textID = std::to_string(PointLightComponent::thisLightID);
-    for(uint16_t i=0; i<shaders.size(); i++)
+    if (this->turnedOn)
     {
-        shaders[i]->Use();
-        shaders[i]->SetInt("pointLightAmount", PointLightComponent::lightAmount);
-        shaders[i]->SetVec3("pointLight[" + textID + "].position", this->transform->GetPosition());
-        shaders[i]->SetVec3("pointLight[" + textID + "].lightColor", this->lightColor);
-        shaders[i]->SetVec3("pointLight[" + textID + "].specularColor", this->specularColor);
-        shaders[i]->SetFloat("pointLight[" + textID + "].distance", this->damping * DAMPING_MUL);
+        for (uint16_t i = 0; i < shaders.size(); i++)
+        {
+            shaders[i]->Use();
+            shaders[i]->SetInt("pointLightAmount", PointLightComponent::lightAmount);
+            shaders[i]->SetVec3("pointLight[" + textID + "].position", this->transform->GetPosition());
+            shaders[i]->SetVec3("pointLight[" + textID + "].lightColor", this->lightColor);
+            shaders[i]->SetVec3("pointLight[" + textID + "].specularColor", this->specularColor);
+            shaders[i]->SetFloat("pointLight[" + textID + "].distance", this->damping * DAMPING_MUL);
+        }
     }
-
-    if(PointLightComponent::thisLightID == PointLightComponent::lightAmount)
+    
+    if(PointLightComponent::thisLightID == PointLightComponent::lightAmount - 1)
     {
         PointLightComponent::thisLightID = 0;
         PointLightComponent::needUpdate = false;
