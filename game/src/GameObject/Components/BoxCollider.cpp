@@ -8,6 +8,11 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/intersect.hpp>
 
+float calcBoundingRadiusSquared(const glm::vec3& lengths)
+{
+	return (lengths.x * lengths.x + lengths.y * lengths.y + lengths.z * lengths.z) * 0.25f;
+}
+
 BoxCollider::BoxCollider()
 	:ColliderComponent(12, false, false, CollisionLayer::Default)
 {
@@ -15,6 +20,7 @@ BoxCollider::BoxCollider()
 	isStatic = false;
 	isTrigger = false;
 	lengths = { 1.0f, 1.0f, 1.0f };
+	boundingRadiusSquared = calcBoundingRadiusSquared(lengths);
 }
 
 BoxCollider::BoxCollider(bool isTrigger, bool isStatic, int layer)
@@ -22,6 +28,7 @@ BoxCollider::BoxCollider(bool isTrigger, bool isStatic, int layer)
 {
 	offset = glm::vec3(0.0f, 0.0f, 0.0f);
 	lengths = { 1.0f, 1.0f, 1.0f };
+	boundingRadiusSquared = calcBoundingRadiusSquared(lengths);
 }
 
 BoxCollider::~BoxCollider()
@@ -187,6 +194,7 @@ bool BoxCollider::CheckCollision(std::shared_ptr<ColliderComponent> collider)
 void BoxCollider::setLengths(glm::vec3 lengths)
 {
 	this->lengths = lengths;
+	boundingRadiusSquared = calcBoundingRadiusSquared(lengths);
 }
 
 glm::vec3 BoxCollider::getLengths()
@@ -202,6 +210,11 @@ bool BoxCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir, Ra
 	transformMatrix[3][2] += offset.z;
 	glm::vec3 position = { transformMatrix[3][0], transformMatrix[3][1], transformMatrix[3][2] };
 
+	// optimalisation - calculate intersection only with boxes the ray can see
+	float distanceCopy = maxDistance;
+	if (!glm::intersectRaySphere(origin, dir, position, boundingRadiusSquared, distanceCopy)) return false;
+
+	// only if collider is mirror use transform rotation
 	if (layer != CollisionLayer::Mirror)
 	{
 		transformMatrix = glm::translate(glm::mat4(1.0f), position);

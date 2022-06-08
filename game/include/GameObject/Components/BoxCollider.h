@@ -12,6 +12,7 @@ class BoxCollider : public ColliderComponent
 {
 private:
 	glm::vec3 lengths; //!< D�ugo�ci bok�w pude�ka, r�wnoleg�e do osi X, Y lub Z.
+	float boundingRadiusSquared;
 public:
 
 	/** @brief Konstruktor komponentu kolider�w.
