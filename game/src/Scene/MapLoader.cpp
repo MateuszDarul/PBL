@@ -1,4 +1,6 @@
 #include "MapLoader.h"
+#include "Scripts/PlayerPlaceTurret.h"
+#include "Scripts/Blueprint.h"
 
 #include "ShadowsManager.h"
 
@@ -337,6 +339,53 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
             
             default:
                 std::cerr << "Undefined collider type:" << type << " supported [0,1]" << std::endl;
+            }
+        }
+        else if (line == "Blueprints:")
+        {
+            //blueprints
+            struct BlueprintPosition {
+                glm::vec3 position;
+                PlayerPlaceTurret::TurretType type;
+            };
+            std::vector<BlueprintPosition> blueprints = {
+                {{ -73.0f, 0.5f, 89.5f },  PlayerPlaceTurret::TurretType::Lantern  },    //baricade
+                {{ -83.0f, 0.5f, 69.5f },  PlayerPlaceTurret::TurretType::Shooting },    //Shooting
+                {{ -26.0f, 0.5f,  5.0f },  PlayerPlaceTurret::TurretType::Laser    }     //Laser
+            };
+            for (int i = 0; i < 3; i++)
+            {
+                gameObject = std::make_shared<GameObject>();
+                gameObject->AddComponent(std::make_shared<cmp::Name>("Blueprint " + std::to_string(i)));
+
+                gameObject->AddComponent(std::make_shared<cmp::Transform>());
+                gameObject->GetComponent<cmp::Transform>()->SetPosition(blueprints[i].position);
+                gameObject->GetComponent<cmp::Transform>()->SetScale(0.5);
+
+                gameObject->AddComponent(std::make_shared<BoxCollider>(true, true));
+                gameObject->GetComponent<cmp::BoxCol>()->setLengths({ 1.1, 1.1, 1.1 });
+                gameObject->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
+
+                auto model = std::make_shared<cmp::Model>();
+                model->Create(
+                    resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+                    resMan->GetMaterial("Resources/models/wall/wall.mtl")
+                );
+                gameObject->AddComponent(model);
+                gameObject->AddComponent(shader);
+
+                gameObject->AddComponent(std::make_shared<cmp::FrustumCulling>());
+                gameObject->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+
+                auto resourceScript = new Blueprint();
+                resourceScript->type = blueprints[i].type;
+                gameObject->AddComponent(std::make_shared<cmp::Scriptable>());
+                gameObject->GetComponent<cmp::Scriptable>()->Add(resourceScript);
+
+                if (i != 2)
+                {
+                    root->AddChild(gameObject);
+                }
             }
         }
         else if(line == "END")

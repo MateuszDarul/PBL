@@ -386,51 +386,6 @@ Scene::Scene()
         world->FindNode("MAIN")->AddChild(go);
     }
 
-    
-
-    //blueprints
-    struct BlueprintPosition {
-        glm::vec3 position;
-        PlayerPlaceTurret::TurretType type;
-    };
-    std::vector<BlueprintPosition> blueprints =  {
-        {{ -73.0f, 0.5f, 89.5f },  PlayerPlaceTurret::TurretType::Lantern  },    //???
-        {{ -83.0f, 0.5f, 69.5f },  PlayerPlaceTurret::TurretType::Shooting },    //Shooting
-        {{ -26.0f, 0.5f,  5.0f },  PlayerPlaceTurret::TurretType::Laser    }     //Laser
-    };
-    for (int i = 0; i < 3; i++)
-    {
-        go = std::make_shared<GameObject>();
-        go->AddComponent(std::make_shared<cmp::Name>("Blueprint " + std::to_string(i)));
-        
-        go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(blueprints[i].position);
-        go->GetComponent<cmp::Transform>()->SetScale(0.5);
-
-        go->AddComponent(std::make_shared<BoxCollider>(true, true));
-        go->GetComponent<cmp::BoxCol>()->setLengths({1.1, 1.1, 1.1});
-        go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
-
-        auto model = std::make_shared<cmp::Model>();
-        model->Create(
-            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-            resMan->GetMaterial("Resources/models/wall/wall.mtl")
-        );
-        go->AddComponent(model);
-        go->AddComponent(shader_d);
-
-        go->AddComponent(std::make_shared<cmp::FrustumCulling>());
-        go->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
-
-        auto resourceScript = new Blueprint();
-        resourceScript->type = blueprints[i].type;
-        go->AddComponent(std::make_shared<cmp::Scriptable>());
-        go->GetComponent<cmp::Scriptable>()->Add(resourceScript);
-
-    
-        world->FindNode("MAIN")->AddChild(go);
-    }
-
     //mirrors
 
     //- room 2
