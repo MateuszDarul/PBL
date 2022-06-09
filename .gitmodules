@@ -19,3 +19,9 @@
 [submodule "thirdparty/libsndfile"]
 	path = thirdparty/libsndfile
 	url = https://github.com/libsndfile/libsndfile.git
+[submodule "thirdparty/flac"]
+	path = thirdparty/flac
+	url = https://github.com/xiph/flac.git
+[submodule "thirdparty/opus"]
+	path = thirdparty/opus
+	url = https://github.com/xiph/opus.git

@@ -169,6 +169,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${STB_IMAGE_INCLUDE_DIR}")
 target_include_directories(${PROJECT_NAME} PUBLIC "${FREETYPE_INCLUDE_DIR}")
 target_include_directories(${PROJECT_NAME} PUBLIC "${RAPIDJSON_INCLUDE_DIR}")
 target_include_directories(${PROJECT_NAME} PUBLIC "${OPENAL_SOFT_INCLUDE_DIR}")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+target_include_directories(${PROJECT_NAME} PUBLIC "${FLAC_INCLUDE_DIR}")
+target_include_directories(${PROJECT_NAME} PUBLIC "${OPUS_INCLUDE_DIR}")
+endif()
+target_include_directories(${PROJECT_NAME} PUBLIC "${LIBSNDFILE_INCLUDE_DIR}")
 
 target_link_libraries(${PROJECT_NAME} "${OPENGL_LIBRARY}")
 target_link_libraries(${PROJECT_NAME} "${ASSIMP_LIBRARY}")
@@ -178,10 +183,13 @@ target_link_libraries(${PROJECT_NAME} "${IMGUI_LIBRARY}"     "${CMAKE_DL_LIBS}")
 target_link_libraries(${PROJECT_NAME} "${STB_IMAGE_LIBRARY}" "${CMAKE_DL_LIBS}")
 target_link_libraries(${PROJECT_NAME} "${FREETYPE_LIBRARY}")
 target_link_libraries(${PROJECT_NAME} "${OPENAL_SOFT_LIBRARY}")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+target_link_libraries(${PROJECT_NAME} "${OPUS_LIBRARY}")
+endif()
+target_link_libraries(${PROJECT_NAME} "${LIBSNDFILE_LIBRARY}")
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE GLFW_INCLUDE_NONE)
 target_compile_definitions(${PROJECT_NAME} PRIVATE LIBRARY_SUFFIX="")
-
 
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
