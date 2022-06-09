@@ -31,7 +31,12 @@ public:
 	void UpdateResourcesText()
 	{
 		if (energyText)
-			energyText->SetText("Resources: " + std::to_string(energy));
+		{
+			energyText->SetText(std::to_string(energy));
+			
+			float w = energyText->GetWidth();
+			energyText->GetOwner()->GetComponent<cmp::Transform>()->SetPosition(-w*0.5f, -0.035f, 0.0f);
+		}
 	}
 
 	void IncreaseEnergy(int energy)

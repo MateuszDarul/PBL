@@ -94,12 +94,7 @@ void main()
                 pixelColor += col;
         }
 
-        for(int i=0; i<spotLightAmount; i++)
-        {
-            vec3 col = GetSpotLight(tm, spotLight[i]);
-            if(col.x > 0.02 || col.y > 0.02 || col.z > 0.02)
-                pixelColor += col;
-        }
+        
 
         float mul = 0;
         for(int i=0; i<10; i++)
@@ -114,6 +109,12 @@ void main()
             pixelColor *= 0.25;
         }
 
+        for(int i=0; i<spotLightAmount; i++)
+        {
+            vec3 col = GetSpotLight(tm, spotLight[i]);
+            if(col.x > 0.02 || col.y > 0.02 || col.z > 0.02)
+                pixelColor += col;
+        }
     }
 
     pixelColor += tm.colorMAP * 0.07;
@@ -185,7 +186,7 @@ float ShadowCalculation(int id, vec3 lightPos)
     closestDepth *= 25;
 
     float currentDepth = length(fragToLight);
-    float shadow = currentDepth - 0.1 > closestDepth ? 0.0 : 1.0;
+    float shadow = currentDepth - 0.41 > closestDepth ? 0.0 : 1.0;
     
     return shadow;
 }
