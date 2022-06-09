@@ -135,3 +135,60 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	set(OPENAL_SOFT_LIBRARY	"${OPENAL_SOFT_DIR}/build/Debug/OpenAL32.lib")
 endif()
+
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	# flac
+	find_library(FLAC_LIBRARY "FLAC" "/usr/lib" "/usr/local/lib")
+	find_path(FLAC_INCLUDE_DIR "FLAC/all.h" "/usr/include" "/usr/local/include")
+
+	if((NOT FLAC_LIBRARY) OR (NOT FLAC_INCLUDE_DIR))
+		set(FLAC_DIR "${THIRDPARTY_DIR}/flac")
+
+		message("Unable to find flac, cloning...")
+		execute_process(COMMAND git submodule update --init ${FLAC_DIR}
+						WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
+		add_subdirectory("${FLAC_DIR}")
+
+		set(FLAC_LIBRARY "flac" "${FLAC_LIBRARIES}")
+		set(FLAC_INCLUDE_DIR "${FLAC_DIR}/include")
+	endif()
+
+
+	# opus
+	find_library(OPUS_LIBRARY "OPUS" "/usr/lib" "/usr/local/lib")
+	find_path(OPUS_INCLUDE_DIR "opus.h" "/usr/include" "/usr/local/include")
+
+	if((NOT OPUS_LIBRARY) OR (NOT OPUS_INCLUDE_DIR))
+		set(OPUS_DIR "${THIRDPARTY_DIR}/opus")
+
+		message("Unable to find opus, cloning...")
+		execute_process(COMMAND git submodule update --init ${OPUS_DIR}
+						WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
+		add_subdirectory("${OPUS_DIR}")
+
+		set(OPUS_LIBRARY "opus" "${OPUS_LIBRARIES}")
+		set(OPUS_INCLUDE_DIR "${OPUS_DIR}/include")
+	endif()
+endif()
+
+# libsndfile
+find_library(LIBSNDFILE_LIBRARY "libsndfile" "/usr/lib" "/usr/local/lib")
+find_path(LIBSNDFILE_INCLUDE_DIR "sndfile.hh" "/usr/include" "/usr/local/include")
+
+if((NOT LIBSNDFILE_LIBRARY) OR (NOT LIBSNDFILE_INCLUDE_DIR))
+	set(LIBSNDFILE_DIR "${THIRDPARTY_DIR}/libsndfile")
+
+	message("Unable to find libsndfile, cloning...")
+    execute_process(COMMAND git submodule update --init ${LIBSNDFILE_DIR}
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
+	option(ENABLE_EXTERNAL_LIBS "Enable FLAC, Vorbis, and Opus codecs" OFF)
+
+    add_subdirectory("${LIBSNDFILE_DIR}")
+
+	set(LIBSNDFILE_LIBRARY "sndfile" "${LIBSNDFILE_LIBRARIES}")
+	set(LIBSNDFILE_INCLUDE_DIR "${LIBSNDFILE_DIR}/include")
+endif()
