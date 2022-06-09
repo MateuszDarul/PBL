@@ -184,6 +184,7 @@ Scene::Scene()
     
     MultiToolController* multiToolScript;
     //multi tool
+    SceneNode* multiToolDisplayNode;
     {
         auto multiTool = std::make_shared<GameObject>();
         multiTool->AddComponent(std::make_shared<cmp::Name>("MultiTool"));
@@ -217,6 +218,7 @@ Scene::Scene()
         mutliToolDisplayHolder->GetComponent<cmp::Transform>()->SetPosition(0, 0.2, 0.5);
         mutliToolDisplayHolder->GetComponent<cmp::Transform>()->SetRotation(-10, 0, 0);
         auto displayNode = multiToolNode->AddChild(mutliToolDisplayHolder);
+        multiToolDisplayNode = displayNode.get();
 
 
         auto radialBar = std::make_shared<GameObject>();
@@ -460,8 +462,8 @@ Scene::Scene()
     };
 
     std::vector<DoorAndActivatorPair> doorsAndButtons = {  //0 rot = Z aligned; 90 rot = X aligned
-        { { -15.00,  1.0,  25.0 }, 90.0f,   { -20.0,  2.5,  20.49 } },  //room 1
-        { { -25.00,  1.0,  50.5 }, 90.0f,   { -20.0,  2.5,  47.49 } },  //room 2
+        { { -15.00,  1.0,  25.0 }, 90.0f,   { -20.0,  2.5,  20.48 } },  //room 1
+        { { -25.00,  1.0,  50.5 }, 90.0f,   { -20.0,  2.5,  47.48 } },  //room 2
         { { -64.75,  1.0,  60.0 },  0.0f,   { -61.0,  3.0,  64.60 } },  //room 3 - cutscene close (important id)
         { { -73.00,  1.0,  74.5 }, 90.0f,   { -61.0, -9.0,  64.60 } },  //room 4 - cutscene open  (important id)
     };
@@ -740,9 +742,10 @@ Scene::Scene()
         go = std::make_shared<GameObject>();
         auto tc = std::make_shared<TransformComponent>();
         auto energyTextComponentTEMP = std::make_shared<TextComponent>();
-        energyTextComponentTEMP->Create("Resources: ", font);
+        energyTextComponentTEMP->Create("0", font);
         energyTextComponentTEMP->alwaysSeen = true;
-        energyTextComponentTEMP->isGuiElement = true;
+        //energyTextComponentTEMP->isCentered = true;
+        // energyTextComponentTEMP->isGuiElement = true;
         energyTextComponentTEMP->color = {1.0f, 0.6f, 0.0f};
 
         auto textShader = std::make_shared<ShaderComponent>();
@@ -753,11 +756,11 @@ Scene::Scene()
         go->AddComponent(tc);
         go->AddComponent(energyTextComponentTEMP);
 
-        go->GetComponent<TransformComponent>()->SetPosition(0.1f, 0.1f, 0.1f);
-        go->GetComponent<TransformComponent>()->SetScale(0.1f);
+        go->GetComponent<TransformComponent>()->SetPosition(-0.00941f, -0.035f, 0.0f);
+        go->GetComponent<TransformComponent>()->SetScale(0.07f);
         go->AddComponent(std::make_shared<cmp::Name>("EnergyText"));
         
-        world->FindNode("GUI")->AddChild(go);
+        multiToolDisplayNode->AddChild(go);
     }
 
 
@@ -782,7 +785,7 @@ Scene::Scene()
         go->AddComponent(tc);
         go->AddComponent(crosshairTextTEMP);
 
-        go->GetComponent<TransformComponent>()->SetPosition(0.1f, 0.1f, 0.1f);
+        // go->GetComponent<TransformComponent>()->SetPosition(0.1f, 0.1f, 0.1f);
         go->GetComponent<TransformComponent>()->SetScale(0.1f);
         go->AddComponent(std::make_shared<cmp::Name>("CROSSHAIR"));
         

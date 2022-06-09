@@ -1,5 +1,6 @@
 #include "Scripts/LanternRange.h"
 #include "Scripts/TurretLaser.h"
+#include "Scripts/MultiToolController.h"
 
 #include "SceneNode.h"
 
@@ -17,6 +18,10 @@ void LanternRange::ChangeLightPower(bool enabled)
 	for (auto turret : turretsInRange)
 	{
 		turret->lightSourcesInRange += (isTurnedOn && HasLineOfSight(turret)) ? 1 : -1;
+	}
+	if (playerInRange)
+	{
+		playerInRange->GetNode()->GetRoot()->FindNode("MultiTool")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<MultiToolController>()->lightSourcesInRange += isTurnedOn ? 1 : -1;
 	}
 }
 
@@ -50,6 +55,13 @@ bool LanternRange::HasLineOfSight(TurretLaser* turret)
 
 void LanternRange::TriggerEnter(std::shared_ptr<ColliderComponent> collider)
 {
+	if (collider->layer == CollisionLayer::Player && !playerInRange)
+	{
+		playerInRange = collider->GetOwner().get();
+		if (isTurnedOn) playerInRange->GetNode()->GetRoot()->FindNode("MultiTool")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<MultiToolController>()->lightSourcesInRange += 1;
+		return;
+	}
+
 	auto scriptable = collider->GetOwner()->GetComponent<cmp::Scriptable>();
 	if (scriptable)
 	{
@@ -66,6 +78,13 @@ void LanternRange::TriggerEnter(std::shared_ptr<ColliderComponent> collider)
 }
 void LanternRange::TriggerExit(std::shared_ptr<ColliderComponent> collider)
 {
+	if (collider->layer == CollisionLayer::Player && playerInRange)
+	{
+		if (isTurnedOn) playerInRange->GetNode()->GetRoot()->FindNode("MultiTool")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<MultiToolController>()->lightSourcesInRange -= 1;
+		playerInRange = nullptr;
+		return;
+	}
+
 	auto scriptable = collider->GetOwner()->GetComponent<cmp::Scriptable>();
 	if (scriptable)
 	{

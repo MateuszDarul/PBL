@@ -211,7 +211,12 @@ public:
                     model = gfxNode->GetGameObject()->GetComponent<cmp::Model>();
             
             if (model)
+            {
                 model->SetTintColor(1.0, 1.0, 1.0);
+
+                model->GetOwner()->AddComponent(std::make_shared<cmp::Shade>());
+                model->GetOwner()->GetComponent<cmp::Shade>()->Create(1);
+            }
 
 
             CreateTurret(selectedTurretType);

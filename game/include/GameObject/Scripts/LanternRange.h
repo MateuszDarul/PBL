@@ -9,6 +9,8 @@ class LanternRange : public Script
 {
 public:
 	std::vector<TurretLaser*> turretsInRange;
+
+	GameObject* playerInRange;
 	
 	bool isAlwaysLit = false;
 

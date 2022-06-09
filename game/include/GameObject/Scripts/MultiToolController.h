@@ -26,6 +26,9 @@ public:
     float maxFlashlightCharge = 10.0f; //10 seconds
     float currentFlashlightCharge;
 
+    //
+    int lightSourcesInRange = 0;
+
 private:
 
     float disabledIconsOffset = 0.1f;
@@ -42,17 +45,29 @@ public:
             iconsGO[i]->GetComponent<cmp::Transform>()->Move(0.0f, 0.0f, -disabledIconsOffset);
         }
     }
-
+bool manuallyTurnedOn = false;
     void Update(float dt)
     {
-        if (Input()->Keyboard()->OnPressed(KeyboardKey::T)) //obecnie tylko na przycisk, do zrobienia automatyczna aktywacja
+        if (lightSourcesInRange > 0) 
         {
-            isFlashlightOn = !isFlashlightOn;
+            currentFlashlightCharge += 1.618f * dt;
+            if (!manuallyTurnedOn) isFlashlightOn = false;
+            
+            if (Input()->Keyboard()->OnPressed(KeyboardKey::T)) 
+            {
+                isFlashlightOn = !isFlashlightOn;
+                manuallyTurnedOn = isFlashlightOn;
+            }
+        }
+        else if (!manuallyTurnedOn)
+        {
+            isFlashlightOn = true;
         }
 
         if (currentFlashlightCharge < 0.00001f)
         {
             isFlashlightOn = false;
+            manuallyTurnedOn = false;
         }
         if (Input()->Keyboard()->OnPressed(KeyboardKey::R))
         {
@@ -62,7 +77,6 @@ public:
         if (isFlashlightOn)
         {
             currentFlashlightCharge -= dt;
-            currentFlashlightCharge = std::max(0.0f, currentFlashlightCharge);
 
             flashlight->SetDamping(10.0f);
         }
@@ -70,6 +84,10 @@ public:
         {
             flashlight->SetDamping(1000.0f);
         }
+        
+        
+        
+        currentFlashlightCharge = std::min(std::max(0.0f, currentFlashlightCharge), maxFlashlightCharge);
 
         float progress = currentFlashlightCharge / maxFlashlightCharge;
         progressBar->GetComponent<cmp::Model>()->SetTintColor(progress, 0.0f, 0.06f);

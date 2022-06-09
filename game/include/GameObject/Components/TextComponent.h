@@ -62,10 +62,14 @@ public:
 
     std::string GetText();
 
+    float GetWidth() const;
+
 private:
     unsigned int VAO; //!< Vertex Array Object.
     unsigned int VBO; //!< Vertex Buffer Object.
 
     std::string text; //!< Tekst do wyswietlenia
     Font* font; //!< Wskazanie na czcionke
+    float currentWidth;
+    void calcCurrentWidth();
 };
