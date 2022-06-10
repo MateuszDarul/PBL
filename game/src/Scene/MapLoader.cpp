@@ -377,9 +377,9 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
                 PlayerPlaceTurret::TurretType type;
             };
             std::vector<BlueprintPosition> blueprints = {
-                {{ -73.0f, 0.5f, 89.5f },  PlayerPlaceTurret::TurretType::Lantern  },    //baricade
-                {{ -83.0f, 0.5f, 69.5f },  PlayerPlaceTurret::TurretType::Shooting },    //Shooting
-                {{ -26.0f, 0.5f,  5.0f },  PlayerPlaceTurret::TurretType::Laser    }     //Laser
+                {{ -73.0f, 1.25f, 89.5f },  PlayerPlaceTurret::TurretType::Lantern  },    //baricade
+                {{ -83.0f, 1.25f, 69.5f },  PlayerPlaceTurret::TurretType::Shooting },    //Shooting
+                {{ -26.8f, 1.25f, 5.0f },  PlayerPlaceTurret::TurretType::Laser    }     //Laser
             };
             for (int i = 0; i < 3; i++)
             {
@@ -388,22 +388,49 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
 
                 gameObject->AddComponent(std::make_shared<cmp::Transform>());
                 gameObject->GetComponent<cmp::Transform>()->SetPosition(blueprints[i].position);
-                gameObject->GetComponent<cmp::Transform>()->SetScale(0.5);
+
+                if (i == 2)
+                {
+                    gameObject->GetComponent<cmp::Transform>()->SetRotation(0.0f, 90.0f, 0.0f);
+                }
 
                 gameObject->AddComponent(std::make_shared<BoxCollider>(true, true));
                 gameObject->GetComponent<cmp::BoxCol>()->setLengths({ 1.1, 1.1, 1.1 });
                 gameObject->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
 
                 auto model = std::make_shared<cmp::Model>();
-                model->Create(
-                    resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-                    resMan->GetMaterial("Resources/models/wall/wall.mtl")
-                );
+
+                //barricade
+                if (i == 0)
+                {
+                    model->Create(
+                        resMan->GetMesh("Resources/models/Board/Board.obj"),
+                        resMan->GetMaterial("Resources/models/Board/blueprintDefensive.mtl")
+                    );
+                }
+
+                //shooting
+                if (i == 1)
+                {
+                    model->Create(
+                        resMan->GetMesh("Resources/models/Board/Board.obj"),
+                        resMan->GetMaterial("Resources/models/Board/blueprintOffensive.mtl")
+                    );
+                }
+
+                //laser
+                if (i == 2)
+                {
+                    model->Create(
+                        resMan->GetMesh("Resources/models/Board/Board.obj"),
+                        resMan->GetMaterial("Resources/models/Board/blueprintLaser.mtl")
+                    );
+                }
                 gameObject->AddComponent(model);
                 gameObject->AddComponent(shader);
 
                 gameObject->AddComponent(std::make_shared<cmp::FrustumCulling>());
-                gameObject->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+                gameObject->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Board/Board.obj"));
 
                 auto resourceScript = new Blueprint();
                 resourceScript->type = blueprints[i].type;
