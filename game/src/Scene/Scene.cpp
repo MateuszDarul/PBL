@@ -51,6 +51,8 @@ Scene::Scene()
 
     musicBuffer->Play();
 
+    /// *** SKYBOX
+
     skybox = new Skybox();
     std::string skyboxFaces[] = {
     "Resources/textures/skybox/right.png",
@@ -124,7 +126,7 @@ Scene::Scene()
     go->GetComponent<cmp::SphereCol>()->AddToCollidersManager(collidersManager);
     world->FindNode("MAIN")->AddChild(go);
 
-    MapLoader::Load("Resources/maps/world_nolights.map", world->FindNode("MAIN"), shader_l, collidersManager, shadowsManager);
+    MapLoader::Load("Resources/maps/world_nolights.map", world->FindNode("MAIN"), shader_l, shader_d, lineShader, collidersManager, shadowsManager);
 
     ///***
 
@@ -548,164 +550,6 @@ Scene::Scene()
         world->FindNode("MAIN")->AddChild(go);
     }
 
-    //predefined lasers
-    {
-        go = std::make_shared<GameObject>();
-        go->AddComponent(std::make_shared<cmp::Transform>());
-        go->AddComponent(std::make_shared<cmp::Name>("debugturet"));
-        go->GetComponent<cmp::Transform>()->SetPosition(-30.0f, 0.0f, 28.5f);
-        go->GetComponent<cmp::Transform>()->SetRotation(0.0, -20.0, 0.0);
-
-
-        auto scriptHolder = std::make_shared<cmp::Scriptable>();
-        go->AddComponent(scriptHolder);
-
-        auto turretScript = new TurretLaser();
-        turretScript->colMan = collidersManager;
-        
-        auto line = std::make_shared<cmp::Line>();
-        line->Create();
-        line->thickness = 2.0f;
-        line->color1 = { 1.0f, 1.0f, 0.0f };
-        line->color2 = { 1.0f, 0.7f, 0.0f };
-
-        go->AddComponent(line);
-        go->AddComponent(lineShader);
-        turretScript->line = line.get(); 
-
-        scriptHolder->Add(turretScript);
-
-        go->AddComponent(std::make_shared<cmp::BoxCol>(true, true, CollisionLayer::GUI));
-        std::shared_ptr<cmp::BoxCol> col = go->GetComponent<cmp::BoxCol>();
-        col->setLengths({ 2.0, 2.5, 2.0 });
-        col->SetOffset({ 0.0, 1.75, 0.0 });
-        col->AddToCollidersManager(collidersManager);
-
-        auto gfxGO = std::make_shared<GameObject>();
-        gfxGO->AddComponent(std::make_shared<cmp::Transform>());
-        gfxGO->AddComponent(std::make_shared<cmp::Name>("gfx"));
-
-        auto mc = std::make_shared<cmp::Model>();
-        mc->Create(
-            resMan->GetMesh("Resources/models/Wieze/Laser.obj"),
-            resMan->GetMaterial("Resources/models/Wieze/Laser.mtl")
-        );
-        gfxGO->AddComponent(mc);
-        
-        gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
-        gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
-            resMan->GetMesh("Resources/models/Wieze/Laser.obj")
-        );
-        gfxGO->AddComponent(shader_d);
-
-
-        world->FindNode("MAIN")->AddChild(go)->AddChild(gfxGO);
-    }
-
-    //generator
-    struct GeneratorInfo
-    {
-        glm::vec3 position;
-        bool isEnabled;
-    };
-    std::vector<GeneratorInfo> genPositions = {
-        {{ -10.0f, 0.0f, 10.0f }, true  },
-        {{ -20.0f, 0.0f, 29.0f }, false },
-    };
-    for (auto& [position, isEnabled] : genPositions)
-    {
-        float lightbulbOffset = 2.5f;
-        float lightRange = 11.0f;
-
-        auto bulbPos = glm::vec3(position.x, position.y + lightbulbOffset, position.z);
-
-        go = std::make_shared<GameObject>();
-        go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(bulbPos);
-        go->AddComponent(std::make_shared<cmp::Name>("debugbulb"));
-
-
-        auto bulbModel = std::make_shared<cmp::Model>();
-        bulbModel->Create(
-            resMan->GetMesh("Resources/models/Sphere/Sphere.obj"),
-            resMan->GetMaterial("Resources/models/wall/wall.mtl")
-        );
-        go->AddComponent(bulbModel);
-        go->AddComponent(shader_d);
-
-        go->AddComponent(std::make_shared<SphereCollider>(false, true, CollisionLayer::GUI));
-        go->GetComponent<SphereCollider>()->SetRadius(0.6f);
-        go->GetComponent<SphereCollider>()->AddToCollidersManager(collidersManager);
-
-
-        auto light = std::make_shared<cmp::PointLight>();
-        auto lightGO = std::make_shared<GameObject>();
-        lightGO->AddComponent(light);
-        light->Create();
-        light->AddShader(shader_l);
-        light->SetPosition(bulbPos);
-        light->SetDamping(lightRange);
-        light->SetLightColor({ 0.8f, 0.8f, 1.0f });
-        shadowsManager->AddLight(lightGO.get());
-
-        if (!isEnabled)
-        {
-            bulbModel->SetTintColor(0.4f, 0.4f, 0.8f);
-            light->SetPosition({ 999, 999, 999 });
-        }
-
-        go->AddComponent(std::make_shared<cmp::Scriptable>());
-
-        LightActivator* activator = new LightActivator();
-        activator->bulbModel = bulbModel.get();
-        activator->lightComponent = light.get();
-        activator->isAlwaysLit = isEnabled;
-        go->GetComponent<cmp::Scriptable>()->Add(activator);
-
-
-        auto rangeGO = std::make_shared<GameObject>();
-        rangeGO->AddComponent(std::make_shared<cmp::Transform>());
-        rangeGO->AddComponent(std::make_shared<cmp::Name>("debugrange"));
-
-        rangeGO->AddComponent(std::make_shared<SphereCollider>(true, false, CollisionLayer::Ignore));
-        rangeGO->GetComponent<SphereCollider>()->SetRadius(lightRange);
-        rangeGO->GetComponent<SphereCollider>()->AddToCollidersManager(collidersManager);
-
-        rangeGO->AddComponent(std::make_shared<cmp::Scriptable>());
-        LanternRange* range = new LanternRange();
-        range->colMan = collidersManager;
-        range->isAlwaysLit = isEnabled; 
-        range->ChangeLightPower(isEnabled);
-        rangeGO->GetComponent<cmp::Scriptable>()->Add(range);
-
-        activator->range = range;
-
-        auto gfxGO = std::make_shared<GameObject>();
-        gfxGO->AddComponent(std::make_shared<cmp::Transform>());
-        gfxGO->GetComponent<cmp::Transform>()->SetPosition(0.0f, -lightbulbOffset, 0.0f);
-        gfxGO->AddComponent(std::make_shared<cmp::Name>("gfx"));
-
-        auto mc = std::make_shared<cmp::Model>();
-        mc->Create(
-            resMan->GetMesh("Resources/models/Wieze/Latarnia.obj"),
-            resMan->GetMaterial("Resources/models/Wieze/Latarnia.mtl")
-        );
-        gfxGO->AddComponent(mc);
-
-        gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
-        gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
-            resMan->GetMesh("Resources/models/Wieze/Latarnia.obj")
-        );
-        gfxGO->AddComponent(shader_l);
-
-        
-        auto node = world->FindNode("MAIN")->AddChild(go);
-        node->AddChild(gfxGO);
-        node->AddChild(rangeGO);
-        world->FindNode("MAIN")->AddChild(lightGO);
-    }
-
-
     //cutscene
     {
         go = std::make_shared<GameObject>();
@@ -772,7 +616,6 @@ Scene::Scene()
         
         multiToolDisplayNode->AddChild(go);
     }
-
 
     //crosshair
     {
