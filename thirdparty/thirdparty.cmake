@@ -62,20 +62,6 @@ execute_process(COMMAND git submodule update --init ${GLM_DIR}
 
 set(GLM_INCLUDE_DIR "${GLM_DIR}")
 
-# imgui
-set(IMGUI_DIR "${THIRDPARTY_DIR}/imgui")
-execute_process(COMMAND git submodule update --init ${IMGUI_DIR}
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-					
-add_library("imgui" STATIC "${IMGUI_DIR}/imgui.cpp"
-					"${IMGUI_DIR}/imgui_demo.cpp"
-					"${IMGUI_DIR}/imgui_draw.cpp"
-					"${IMGUI_DIR}/imgui_widgets.cpp")
-target_include_directories("imgui" PRIVATE "${IMGUI_DIR}")
-
-set(IMGUI_LIBRARY "imgui")
-set(IMGUI_INCLUDE_DIR "${IMGUI_DIR}")
-
 # stb_image
 set(STB_IMAGE_DIR "${THIRDPARTY_DIR}/stb_image")
 add_library("stb_image" STATIC "${STB_IMAGE_DIR}/stb_image.cpp")

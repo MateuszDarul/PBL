@@ -20,17 +20,7 @@ namespace rj = rapidjson;
 #include <AL/al.h>
 #include <AL/alc.h>
 
-
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-
-
 #include <iostream>
-
-
-
-
 
 #define DEFAULT_FOV 83.0f
 #define DEFAULT_SCREEN_WIDTH 800
@@ -173,19 +163,6 @@ int GameApplication::Init()
         std::cout << "Successfully created AL device" << std::endl;
     }
 
-
-
-
-
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(s_Window, true);
-    ImGui_ImplOpenGL3_Init(glsl_version);
-	
-
-
-
     //Create managers / systems
 
     s_InputManager = new InputManager(s_Window);
@@ -242,17 +219,6 @@ void GameApplication::Run()
             s_Menu->Draw();
         }
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        {
-            ImGui::Begin("GUI");
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-            ImGui::End();
-        }
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
         glfwPollEvents();
         glfwSwapBuffers(s_Window);
     }
@@ -263,11 +229,6 @@ void GameApplication::Run()
 void GameApplication::OnStop()
 {
     //Clean up
-
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-    
     delete s_InputManager;
     delete s_ResourceManager;
 
