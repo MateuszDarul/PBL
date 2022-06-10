@@ -63,6 +63,11 @@ file(GLOB_RECURSE SOURCE_FILES
 
 	src/AI/SteeringBehaviours.cpp
 
+	src/Sounds/SoundDevice.cpp
+	src/Sounds/SoundBuffer.cpp
+	src/Sounds/SoundSource.cpp
+	src/Sounds/MusicBuffer.cpp
+
 	main.cpp
 )
 	
@@ -135,6 +140,11 @@ file(GLOB_RECURSE HEADER_FILES
 
 	include/AI/Path.h
 
+	include/Sounds/SoundDevice.h
+	include/Sounds/SoundBuffer.h
+	include/Sounds/SoundSource.h
+	include/Sounds/MusicBuffer.h
+
 	include/GameObject/Scripts/*.h
 )
 
@@ -147,6 +157,7 @@ include_directories(include/Resource)
 include_directories(include/Scene)
 include_directories(include/Scene/Menu)
 include_directories(include/AI)
+include_directories(include/Sounds)
 
 add_compile_options(-Wall)
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})

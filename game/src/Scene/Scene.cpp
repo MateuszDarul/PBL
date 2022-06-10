@@ -2,6 +2,10 @@
 
 #include "ShadowsManager.h"
 
+#include "SoundDevice.h"
+#include "SoundBuffer.h"
+#include "MusicBuffer.h"
+
 #include "Scripts/RaycastTest.h"
 #include "Scripts/DoorActivator.h"
 #include "Scripts/PlayerPlaceTurret.h"
@@ -39,7 +43,14 @@ Scene::Scene()
     std::shared_ptr<cmp::Model> mc;
     std::shared_ptr<cmp::ModelInst> mic;
 
-    ///***
+    ///*** SOUND ///***
+
+    SoundDevice* soundDevice = SoundDevice::get();
+
+    //musicBuffer = new MusicBuffer("Resources\\Music\\agresive.wav");
+    musicBuffer = new MusicBuffer("Resources\\Music\\action.wav");
+
+    musicBuffer->Play();
 
     skybox = new Skybox();
     std::string skyboxFaces[] = {
@@ -847,9 +858,9 @@ void Scene::Update(float dt)
     goCamera->GetComponent<CameraComponent>()->SetPosition(transformCamera->GetPosition());
     transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();
 
+    //SOUND
+    musicBuffer->UpdateBufferStream();
 
-
-    
     //Position multitool
 
     auto mtTransform = GO_MULTITOOL->GetComponent<cmp::Transform>();

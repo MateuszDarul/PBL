@@ -13,6 +13,7 @@
 #include "MapLoader.h"
 #include "Skybox.h"
 #include "CollidersManager.h"
+#include "MusicBuffer.h"
 
 class ShadowsManager;
 
@@ -26,6 +27,7 @@ private:
     CollidersManager* collidersManager;
     ShadowsManager* shadowsManager;
     glm::mat4 transform; //!< Macierz transformacji widoku i kamery.
+    MusicBuffer* musicBuffer;
 
 public:
     /** @brief Domyslny konstruktor.
