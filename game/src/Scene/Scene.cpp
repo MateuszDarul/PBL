@@ -312,8 +312,6 @@ Scene::Scene()
 
         world->FindNode("MAIN")->AddChild(go);
     }
-  
-
 
     //===enemy
     {      
@@ -331,7 +329,6 @@ Scene::Scene()
                 resMan->GetMesh("Resources/models/displacement test/capsule.obj")
             );
 
-        
         go->AddComponent(std::make_shared<cmp::Transform>());
         go->GetComponent<cmp::Transform>()->SetPosition(-100, 2, 25);
 
@@ -616,7 +613,7 @@ Scene::Scene()
         
         multiToolDisplayNode->AddChild(go);
     }
-
+    //
     //crosshair
     {
         Font* font = resMan->GetFont("Resources/fonts/arial.ttf");
