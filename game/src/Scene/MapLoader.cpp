@@ -4,12 +4,25 @@
 #include "Scripts/Resource.h"
 
 #include "ShadowsManager.h"
+#include "EnemySpawnerScript.h"
 
-bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Shader> shader, std::shared_ptr<cmp::Shader> shader_d, std::shared_ptr<cmp::Shader> shader_l, CollidersManager* collisionManager, ShadowsManager* shadowsManager)
+bool MapLoader::Load(
+    std::string path, 
+    SceneNode* root, 
+    std::shared_ptr<cmp::Shader> shader, 
+    std::shared_ptr<cmp::Shader> shader_d, 
+    std::shared_ptr<cmp::Shader> shader_l, 
+    std::shared_ptr<cmp::Shader> shader_dis, 
+    CollidersManager* collisionManager, 
+    ShadowsManager* shadowsManager, 
+    Scene* scn,
+    MultiToolController* multiToolScript,
+    std::shared_ptr<GameObject> p)
 {
     int resourceBoxCounter = 0;
     int predefinedLasersCounter = 0;
     int generatorCounter = 0;
+    int spawnerCounter = 0;
     ResourceManager* resMan = GameApplication::GetResourceManager();
 
     std::shared_ptr<GameObject> gameObject;
@@ -593,6 +606,38 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
             node->AddChild(gfxGO);
             node->AddChild(rangeGO);
             root->AddChild(lightGO);
+        }
+        else if (line == "Spawner:")
+        {
+            gameObject->AddComponent(std::make_shared<cmp::Name>("spawner" + std::to_string(spawnerCounter)));
+
+            auto scriptHolder = std::make_shared<cmp::Scriptable>();
+            gameObject->AddComponent(scriptHolder);
+
+            auto spawnerScript = new EnemySpawnerScript(root, shader_dis, collisionManager, scn, multiToolScript, p);
+
+            std::string ln;
+            file >> std::dec >> ln;
+            line_id++;
+
+            glm::vec3 position;
+
+            while (ln == "Node:")
+            {
+                file >> std::dec >> position.x;
+                file >> std::dec >> position.y;
+                file >> std::dec >> position.z;
+                line_id += 3;
+
+                spawnerScript->AddWayPoint(position);
+
+                file >> std::dec >> ln;
+                line_id++;
+            }
+
+            scriptHolder->Add(spawnerScript);
+
+            spawnerCounter++;
         }
         else if(line == "END")
         {

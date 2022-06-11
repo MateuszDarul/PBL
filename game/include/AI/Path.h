@@ -23,7 +23,7 @@ public:
 
     //constructor for creating a path with initial random waypoints. MinX/Y
     //& MaxX/Y define the bounding box of the path.
-    Path() :m_bLooped(true)
+    Path(bool loop) :m_bLooped(loop)
     {
         m_WayPoints.clear();
 
@@ -32,7 +32,6 @@ public:
 
         curWaypoint = m_WayPoints.begin();
     }
-
 
     //returns the current waypoint
     glm::vec3    CurrentWaypoint()const { return *curWaypoint; }
@@ -53,9 +52,9 @@ public:
     }
 
     //methods for setting the path with either another Path or a list of vectors
+    void Set() { curWaypoint = m_WayPoints.begin(); }
     void Set(std::list<glm::vec3> new_path) { m_WayPoints = new_path; curWaypoint = m_WayPoints.begin(); }
     void Set(const Path& path) { m_WayPoints = path.GetPath(); curWaypoint = m_WayPoints.begin(); }
-
 
     void Clear() { m_WayPoints.clear(); }
 
