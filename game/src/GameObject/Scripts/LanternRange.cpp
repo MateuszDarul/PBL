@@ -46,16 +46,18 @@ bool LanternRange::HasLineOfSight(Turret* turret)
 
 		if (auto scriptable = hit.gameObject->GetComponent<cmp::Scriptable>())
 		{
-			if (auto turret = scriptable->Get<TurretLaser>())
+			if (auto turret = scriptable->Get<Turret>())
 			{
-				origin += dir * 0.1f;
+				origin = hit.point + dir * 0.1f;
 				continue;
 			}
 		}
 
 		return false;
 	}
-	
+
+	return true;
+
 	// printf("testing line of sight. origin: %f %f %f\ttarget: %f %f %f\n", origin.x, origin.y, origin.z, target.x, target.y, target.z);
 	// printf("tgo: %i hgo: %i\n", turret->gameObject.get(), hit.gameObject.get());
 
@@ -81,11 +83,11 @@ void LanternRange::TriggerEnter(std::shared_ptr<ColliderComponent> collider)
 		if (turret)
 		{
 			printf("Adding turret to range\n");
-			if (isTurnedOn && HasLineOfSight(turret)) turret->lightSourcesInRange += 1;
+			bool hasSight = HasLineOfSight(turret);
+			if (isTurnedOn && hasSight) turret->lightSourcesInRange += 1;
 			turretsInRange.push_back(turret);
 
-			bool sight = HasLineOfSight(turret);
-			printf("Has %sline of sight\n", sight ? "" : "no ");
+			printf("Has %sline of sight\n", hasSight ? "" : "no ");
 		}
 	}
 }
