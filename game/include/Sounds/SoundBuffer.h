@@ -1,7 +1,7 @@
 #ifndef __SOUND_BUFFER_H__
 #define __SOUND_BUFFER_H__
 
-#include <AL\al.h>
+#include <AL/al.h>
 #include <vector>
 class SoundBuffer
 {

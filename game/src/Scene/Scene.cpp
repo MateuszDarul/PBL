@@ -47,7 +47,7 @@ Scene::Scene()
 
     SoundDevice* soundDevice = SoundDevice::get();
 
-    musicBuffer = new MusicBuffer("Resources\\Music\\agresive.wav");
+    musicBuffer = new MusicBuffer("Resources/Music/agresive.wav");
 
     musicBuffer->Play();
 

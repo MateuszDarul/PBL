@@ -1,7 +1,7 @@
 #ifndef __SOUND_SOURCE_H__
 #define __SOUND_SOURCE_H__
 
-#include <AL\al.h>
+#include <AL/al.h>
 class SoundSource
 {
 public:

@@ -1,7 +1,7 @@
 #ifndef __SOUND_DEVICE_H__
 #define __SOUND_DEVICE_H__
 
-#include <AL\alc.h>
+#include <AL/alc.h>
 
 class SoundDevice
 {

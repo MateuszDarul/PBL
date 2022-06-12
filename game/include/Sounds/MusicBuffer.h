@@ -1,7 +1,7 @@
 #ifndef __MUSIC_BUFFER_H__
 #define __MUSIC_BUFFER_H__
 
-#include <AL\al.h>
+#include <AL/al.h>
 #include <sndfile.h>
 class MusicBuffer
 {
