@@ -1,5 +1,6 @@
 #include "Scripts/LanternRange.h"
 #include "Scripts/TurretLaser.h"
+#include "Scripts/TurretShoot.h"
 #include "Scripts/MultiToolController.h"
 
 #include "SceneNode.h"
@@ -25,12 +26,12 @@ void LanternRange::ChangeLightPower(bool enabled)
 	}
 }
 
-bool LanternRange::IsInRange(TurretLaser* turret)
+bool LanternRange::IsInRange(Turret* turret)
 {
 	return std::find(turretsInRange.begin(), turretsInRange.end(), turret) != turretsInRange.end();
 }
 
-bool LanternRange::HasLineOfSight(TurretLaser* turret)
+bool LanternRange::HasLineOfSight(Turret* turret)
 {
 	//TODO: Fix turrets blocking line of sight
 
@@ -65,7 +66,9 @@ void LanternRange::TriggerEnter(std::shared_ptr<ColliderComponent> collider)
 	auto scriptable = collider->GetOwner()->GetComponent<cmp::Scriptable>();
 	if (scriptable)
 	{
-		if (auto turret = scriptable->Get<TurretLaser>())
+		Turret* turret = scriptable->Get<TurretLaser>();
+		if (!turret) turret = scriptable->Get<TurretShoot>();
+		if (turret)
 		{
 			printf("Adding turret to range\n");
 			if (isTurnedOn && HasLineOfSight(turret)) turret->lightSourcesInRange += 1;
@@ -88,7 +91,9 @@ void LanternRange::TriggerExit(std::shared_ptr<ColliderComponent> collider)
 	auto scriptable = collider->GetOwner()->GetComponent<cmp::Scriptable>();
 	if (scriptable)
 	{
-		if (auto turret = scriptable->Get<TurretLaser>())
+		Turret* turret = scriptable->Get<TurretLaser>();
+		if (!turret) turret = scriptable->Get<TurretShoot>();
+		if (turret)
 		{
 			if (isTurnedOn && HasLineOfSight(turret)) turret->lightSourcesInRange -= 1;
 			turretsInRange.erase(std::remove(turretsInRange.begin(), turretsInRange.end(), turret));

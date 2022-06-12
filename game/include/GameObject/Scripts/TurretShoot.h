@@ -6,11 +6,12 @@
 #include "SceneNode.h"
 #include "ColliderComponent.h"
 #include "Scene.h"
+#include "Turret.h"
 #include "TurretRange.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-class TurretShoot : public Script
+class TurretShoot : public Turret
 {
 public:
 	TurretRange* turretRange;
@@ -57,7 +58,7 @@ public:
 
 	void Update(float dt)
 	{
-		if (isPut && turretRange)
+		if (isPut && turretRange && lightSourcesInRange > 0)
 		{
 			if (turretRange->enemies.size() > 0)
 			{
@@ -79,7 +80,11 @@ public:
 					shootTimer = 0.0f;
 				}
 			}
-		}	
+		}
+		else
+		{
+			shootTimer = 0.0f;
+		}
 	}
 
 	
