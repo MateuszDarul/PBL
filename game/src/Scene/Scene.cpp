@@ -572,7 +572,7 @@ Scene::Scene()
         cutscene->doorsToOpen = openDoorAfterEnemyDies;
         cutscene->lightShader = shader_l;
         cutscene->shadowManager = shadowsManager;
-        cutscene->enemyHealth = world->FindNode("Enemy")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<Health>();
+        cutscene->enemy = world->FindNode("Enemy")->GetGameObject();
         go->GetComponent<cmp::Scriptable>()->Add(cutscene);
         
         

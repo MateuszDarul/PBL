@@ -89,6 +89,9 @@ protected:
     bool enabled = true;
 
     friend ScriptComponent;
+
+public:
+    virtual ~Script() = default;
 };
 
 

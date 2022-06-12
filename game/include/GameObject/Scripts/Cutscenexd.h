@@ -15,12 +15,13 @@ public:
     std::shared_ptr<cmp::Shader> lightShader;
     ShadowsManager* shadowManager;
 
-    Health* enemyHealth;
+    std::shared_ptr<GameObject> enemy;
 
 
 private:
     std::shared_ptr<GameObject> alarmLightGO;
     std::shared_ptr<cmp::PointLight> lightCmp;
+    Health* enemyHealth;
 
 
     bool hasStarted, hasFinished;
@@ -33,6 +34,8 @@ public:
     {
         hasStarted = false;
         hasFinished = false;
+
+        if (enemy) enemyHealth = enemy->GetComponent<cmp::Scriptable>()->Get<Health>();
     }
 
     void Update(float dt)
@@ -50,12 +53,11 @@ public:
             if (isFadingOutAnimation) lightCmp->SetLightColor({current - dt, 0.0f, 0.0f});
             else lightCmp->SetLightColor({current + dt, 0.0f, 0.0f});
 
-            if (enemyHealth)
+
+            if (enemy && !enemy->IsDestroyed())
             {
                 if (enemyHealth->GetHealth() <= 0.0f)
-                {
                     EndCutscene();
-                }
             }
             else
             {
