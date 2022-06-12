@@ -208,6 +208,10 @@ ScriptType* ScriptComponent::Get()
         {
            return (ScriptType*)s;
         }
+        else if(ScriptType* v = dynamic_cast<ScriptType*>(s)) 
+        {
+            return v;
+        }
     }
 
     return nullptr;
