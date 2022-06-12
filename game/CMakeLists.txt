@@ -60,6 +60,7 @@ file(GLOB_RECURSE SOURCE_FILES
 
 	src/AI/StateMachine.cpp
 	src/AI/EnemyScript.cpp
+	src/AI/EnemySpawnerScript.cpp
 
 	src/AI/SteeringBehaviours.cpp
 
@@ -135,6 +136,7 @@ file(GLOB_RECURSE HEADER_FILES
 
 	include/AI/StateMachine.h
 	include/AI/EnemyScript.h
+	include/AI/EnemySpawnerScript.h
 
 	include/AI/SteeringBehaviours.h
 

@@ -126,7 +126,11 @@ Scene::Scene()
     go->GetComponent<cmp::SphereCol>()->AddToCollidersManager(collidersManager);
     world->FindNode("MAIN")->AddChild(go);
 
-    MapLoader::Load("Resources/maps/world_nolights.map", world->FindNode("MAIN"), shader_l, shader_d, lineShader, collidersManager, shadowsManager);
+    //FOR ENEMY SCRIPT
+    MultiToolController* multiToolScript;
+    multiToolScript = new MultiToolController();
+
+    MapLoader::Load("Resources/maps/world_nolights.map", world->FindNode("MAIN"), shader_l, shader_d, lineShader, displShader, collidersManager, shadowsManager, this, multiToolScript, go);
 
     ///***
 
@@ -194,7 +198,7 @@ Scene::Scene()
 
     go->GetComponent<ScriptComponent>()->Add(playerInteract);
     
-    MultiToolController* multiToolScript;
+    //MultiToolController* multiToolScript; MOVED BEFORE MAP LOADER
     //multi tool
     SceneNode* multiToolDisplayNode;
     {
@@ -219,7 +223,7 @@ Scene::Scene()
 
         multiTool->AddComponent(std::make_shared<cmp::Scriptable>());
 
-        multiToolScript = new MultiToolController();
+        //multiToolScript = new MultiToolController(); MOVED BEFORE MAP LOADER
         multiTool->GetComponent<cmp::Scriptable>()->Add(multiToolScript);
         playerGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->multiTool = multiToolScript;
         
@@ -312,8 +316,6 @@ Scene::Scene()
 
         world->FindNode("MAIN")->AddChild(go);
     }
-  
-
 
     //===enemy
     {      
@@ -331,7 +333,6 @@ Scene::Scene()
                 resMan->GetMesh("Resources/models/displacement test/capsule.obj")
             );
 
-        
         go->AddComponent(std::make_shared<cmp::Transform>());
         go->GetComponent<cmp::Transform>()->SetPosition(-100, 2, 25);
 
@@ -342,17 +343,16 @@ Scene::Scene()
         go->GetComponent<cmp::BoxCol>()->isOptimized = false;
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
-
         go->AddComponent(std::make_shared<cmp::Scriptable>());
         Health* health = new Health();
         health->SetMaxHealth(50.0f);
         health->scene = this;
         go->GetComponent<cmp::Scriptable>()->Add(health);
 
-        auto enemyScript = new EnemyScript(std::shared_ptr<SceneNode>(world), playerGO);
+        auto enemyScript = new EnemyScript(playerGO);
         enemyScript->health = health;
         enemyScript->multitool = multiToolScript;
-        std::shared_ptr<Path> e_path = std::make_shared<Path>();
+        std::shared_ptr<Path> e_path = std::make_shared<Path>(true);
         enemyScript->SetPath(e_path);
         go->GetComponent<cmp::Scriptable>()->Add(enemyScript);
     }
@@ -616,7 +616,7 @@ Scene::Scene()
         
         multiToolDisplayNode->AddChild(go);
     }
-
+    //
     //crosshair
     {
         Font* font = resMan->GetFont("Resources/fonts/arial.ttf");

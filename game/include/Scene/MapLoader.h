@@ -11,6 +11,7 @@
 #include "SceneNode.h"
 #include "Components.h"
 #include "CollidersManager.h"
+#include "Scripts/MultiToolController.h"
 
 class ShadowsManager;
 
@@ -27,7 +28,19 @@ public:
      * @return true - Poprawnie wczytano uklad SceneNodow.
      * @return false - Blad podczas wczytywania SceneNodow.
      */
-    static bool Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Shader> shader, std::shared_ptr<cmp::Shader> shader_d, std::shared_ptr<cmp::Shader> shader_l, CollidersManager* collisionManager, ShadowsManager* shadowsManager);
+    static bool Load(
+        std::string path, 
+        SceneNode* root, 
+        std::shared_ptr<cmp::Shader> shader, 
+        std::shared_ptr<cmp::Shader> shader_d, 
+        std::shared_ptr<cmp::Shader> shader_l, 
+        std::shared_ptr<cmp::Shader> shader_dis, 
+        CollidersManager* collisionManager, 
+        ShadowsManager* shadowsManager, 
+        Scene* scn,
+        MultiToolController* multiToolScript,
+        std::shared_ptr<GameObject> p
+    );
 };
 
 #endif // __MAP_LOADER_H__
