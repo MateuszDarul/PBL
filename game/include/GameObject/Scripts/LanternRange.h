@@ -15,7 +15,7 @@ public:
 	bool isAlwaysLit = false;
 
 	CollidersManager* colMan;
-	int lineOfSightIgnoreLayerMask = ~(CollisionLayer::Player | CollisionLayer::Ignore);
+	int lineOfSightIgnoreLayerMask = ~(CollisionLayer::Player | CollisionLayer::ENEMY | CollisionLayer::Ignore);
 
 private:
 

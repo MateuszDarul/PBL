@@ -33,16 +33,28 @@ bool LanternRange::IsInRange(Turret* turret)
 
 bool LanternRange::HasLineOfSight(Turret* turret)
 {
-	//TODO: Fix turrets blocking line of sight
-
 	glm::vec3 origin = gameObject->GetNode()->GetGlobalPosition();
 	glm::vec3 target = turret->gameObject->GetNode()->GetGlobalPosition();
 	target.y += 2.0f;
 	glm::vec3 dir = glm::normalize(target - origin);
 
 	RayHitInfo hit;
-	colMan->Raycast(origin, dir, hit, 50.0f, true, lineOfSightIgnoreLayerMask);
+	while (colMan->Raycast(origin, dir, hit, 25.0f, true, lineOfSightIgnoreLayerMask))
+	{
+		if (turret->gameObject->Is(hit.gameObject))
+			return true;
 
+		if (auto scriptable = hit.gameObject->GetComponent<cmp::Scriptable>())
+		{
+			if (auto turret = scriptable->Get<TurretLaser>())
+			{
+				origin += dir * 0.1f;
+				continue;
+			}
+		}
+
+		return false;
+	}
 	
 	// printf("testing line of sight. origin: %f %f %f\ttarget: %f %f %f\n", origin.x, origin.y, origin.z, target.x, target.y, target.z);
 	// printf("tgo: %i hgo: %i\n", turret->gameObject.get(), hit.gameObject.get());
@@ -50,8 +62,6 @@ bool LanternRange::HasLineOfSight(Turret* turret)
 	// auto namecmp = hit.gameObject->GetComponent<cmp::Name>();
 	// std::string name = (namecmp) ? namecmp->Get() : "Unnamed";
 	// printf("Hit go: %s \td: %f\n", name.c_str(), hit.distance);
-
-	return turret->gameObject->Is(hit.gameObject);
 }
 
 void LanternRange::TriggerEnter(std::shared_ptr<ColliderComponent> collider)

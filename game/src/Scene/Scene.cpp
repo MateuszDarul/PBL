@@ -256,9 +256,10 @@ Scene::Scene()
         {
             auto icon = std::make_shared<GameObject>();
             auto iconModel = std::make_shared<cmp::Model>();
+            std::string iconMaterialPath = "Resources/models/multitool/icon" + std::to_string(i+1) + ".mtl";
             iconModel->Create(
                 resMan->GetMesh("Resources/models/multitool/icon.obj"),
-                resMan->GetMaterial("Resources/models/multitool/icon.mtl")
+                resMan->GetMaterial(iconMaterialPath)
             );
             icon->AddComponent(iconModel);
             icon->AddComponent(shader_d);
@@ -591,7 +592,7 @@ Scene::Scene()
     //renderowany jako ostatni bo inaczej sa te dziwne artefakty
 
     {
-        Font* font = resMan->GetFont("Resources/fonts/arial.ttf");
+        Font* font = resMan->GetFont("Resources/fonts/Segment7-4Gml.otf");
 
         go = std::make_shared<GameObject>();
         auto tc = std::make_shared<TransformComponent>();
@@ -610,7 +611,7 @@ Scene::Scene()
         go->AddComponent(tc);
         go->AddComponent(energyTextComponentTEMP);
 
-        go->GetComponent<TransformComponent>()->SetPosition(-0.00941f, -0.035f, 0.0f);
+        go->GetComponent<TransformComponent>()->SetPosition(-0.02341f, -0.035f, 0.0f);
         go->GetComponent<TransformComponent>()->SetScale(0.07f);
         go->AddComponent(std::make_shared<cmp::Name>("EnergyText"));
         

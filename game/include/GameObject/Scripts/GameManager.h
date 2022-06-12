@@ -32,10 +32,10 @@ public:
 	{
 		if (energyText)
 		{
-			energyText->SetText(std::to_string(energy));
-			
-			float w = energyText->GetWidth();
-			energyText->GetOwner()->GetComponent<cmp::Transform>()->SetPosition(-w*0.5f, -0.035f, 0.0f);
+			std::string text = std::to_string(energy);
+			if (energy < 100) text = "0" + text;
+			if (energy < 10 ) text = "0" + text;
+			energyText->SetText(text);
 		}
 	}
 
