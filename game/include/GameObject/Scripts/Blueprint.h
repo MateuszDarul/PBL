@@ -11,7 +11,7 @@
 class Blueprint : public Script
 {
 public:
-	int type = 0;
+	PlayerPlaceTurret::TurretType type;
 	
 	void Start()
 	{

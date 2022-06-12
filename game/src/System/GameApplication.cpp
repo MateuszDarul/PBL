@@ -2,6 +2,7 @@
 #include "InputManager.h"
 #include "ResourceManager.h"
 #include "Scene.h"
+#include "Menu.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -57,9 +58,36 @@ glm::mat4 GameApplication::s_OrthographicMatrix = glm::ortho(
 );
 
 Scene* GameApplication::s_Scene = nullptr;
+MenuScene* GameApplication::s_Menu = nullptr;
+bool GameApplication::inGame = false;
 InputManager* GameApplication::s_InputManager = nullptr;
 ResourceManager* GameApplication::s_ResourceManager = nullptr;
 
+
+
+struct MemoryStatistics
+{
+    size_t TotalAllocated = 0;
+    size_t TotalFreed = 0;
+    size_t CurrentUsage() { return TotalAllocated - TotalFreed; }
+    float CurrentUsageMB() { return CurrentUsage() * 0.000001; }
+    float TotalAllocatedMB() { return TotalAllocated * 0.000001; }
+    float TotalFreedMB() { return TotalFreed * 0.000001; }
+};
+
+static MemoryStatistics s_MemoryStatistics;
+
+void* operator new(size_t bytes)
+{
+    s_MemoryStatistics.TotalAllocated += bytes;
+    return malloc(bytes);
+}
+
+void operator delete(void* memory, size_t bytes)
+{
+    s_MemoryStatistics.TotalFreed += bytes;
+    free(memory);
+}
 
 int GameApplication::Init()
 {
@@ -165,22 +193,28 @@ int GameApplication::Init()
 
 
     //Load scene
-     //Scene OnCreate
+    //Scene OnCreate
     s_Scene = new Scene();
 
 
-
-
+    s_Menu = new MainMenu();
 
     return 0;
 }
 
 void GameApplication::Run()
 {
+    glfwMaximizeWindow(GameApplication::GetWindow());
+        glfwRestoreWindow(GameApplication::GetWindow());
     double t1, t2 = glfwGetTime();
     double dt;
     while (!glfwWindowShouldClose(s_Window))
     {
+        if(s_InputManager->Keyboard()->OnPressed(KeyboardKey::F10))
+        {
+            printf("=== Current memory usage: %f (Total allocated: %f, total freed: %f) ===\n", 
+            s_MemoryStatistics.CurrentUsageMB(), s_MemoryStatistics.TotalAllocatedMB(), s_MemoryStatistics.TotalFreedMB());
+        }
         if(s_InputManager->Keyboard()->OnPressed(KeyboardKey::Escape_KB))
         {
             glfwSetWindowShouldClose(s_Window, true);
@@ -194,12 +228,19 @@ void GameApplication::Run()
         dt = t1 - t2;
         t2 = t1;
 
-        //update logic
-        s_Scene->Update(dt);
+        if(inGame)
+        {
+            //update logic
+            s_Scene->Update(dt);
 
-        //show scene
-        s_Scene->Render();
-
+            //show scene
+            s_Scene->Render();
+        }
+        else
+        {
+            s_Menu->Update();
+            s_Menu->Draw();
+        }
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();

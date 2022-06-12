@@ -67,7 +67,7 @@ inline void Path::SetNextWaypoint()
 {
     assert(m_WayPoints.size() > 0);
 
-    std::cout << "Next target" << std::endl;
+    // std::cout << "Next target" << std::endl;
 
     if (++curWaypoint == m_WayPoints.end())
     {

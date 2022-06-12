@@ -155,7 +155,7 @@ void SpotLightComponent::Use()
         shaders[i]->SetFloat("spotLight[" + textID + "].outerCutOff", glm::cos(glm::radians(this->cutOff.y)));
     }
 
-    if(SpotLightComponent::thisLightID == SpotLightComponent::lightAmount)
+    if(SpotLightComponent::thisLightID == SpotLightComponent::lightAmount - 1)
     {
         SpotLightComponent::thisLightID = 0;
         SpotLightComponent::needUpdate = false;

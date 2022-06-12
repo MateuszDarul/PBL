@@ -1,19 +1,181 @@
 #include "SceneNode.h"
 #include "Scene.h"
 
+#define ENABLE_DEBUG_INFO
+
+#ifdef ENABLE_DEBUG_INFO
+
+static unsigned int boxVAO;
+static unsigned int boxVBO;
+static bool isDebugInitialized = false;
+static ShaderComponent debugShader;
+
+static void initializeDebug()
+{
+    isDebugInitialized = true;
+
+    glGenVertexArrays(1, &boxVAO);
+    glGenBuffers(1, &boxVBO);
+    glBindVertexArray(boxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 36 * 3, NULL, GL_DYNAMIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    debugShader.Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
+}
+
+static void drawDebugBox(const glm::mat4& model, const glm::mat4& vp, const glm::vec3& size, const glm::vec3& offset, const glm::vec4& color)
+{
+    float cx = model[3][0]+offset.x;
+    float cy = model[3][1]+offset.y;
+    float cz = model[3][2]+offset.z;
+    float x1 = cx + size.x * 0.5f;
+    float y1 = cy + size.y * 0.5f;
+    float z1 = cz + size.z * 0.5f;
+    float x2 = cx - size.x * 0.5f;
+    float y2 = cy - size.y * 0.5f;
+    float z2 = cz - size.z * 0.5f;
+    float vertices[36 * 3] = {
+        x1, y1, z1,  x1, y2, z1,  x1, y2, z2,    x1, y1, z1,  x1, y2, z2,  x1, y1, z2,
+        x2, y1, z1,  x2, y2, z1,  x2, y2, z2,    x2, y1, z1,  x2, y2, z2,  x2, y1, z2,
+        x1, y1, z1,  x2, y1, z1,  x2, y2, z1,    x1, y1, z1,  x2, y2, z1,  x1, y2, z1,
+        x1, y1, z2,  x2, y1, z2,  x2, y2, z2,    x1, y1, z2,  x2, y2, z2,  x1, y2, z2,
+        x1, y1, z1,  x2, y1, z1,  x2, y1, z2,    x1, y1, z1,  x2, y1, z2,  x1, y1, z2,
+        x1, y2, z1,  x2, y2, z1,  x2, y2, z2,    x1, y2, z1,  x2, y2, z2,  x1, y2, z2,
+    };
+
+    debugShader.Use();
+    debugShader.SetMat4("transform", vp);
+    debugShader.SetMat4("model", glm::mat4(1.0f));
+    debugShader.SetVec4("u_TintColor", color);
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //enable wireframe
+    glBindVertexArray(boxVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glDrawArrays(GL_TRIANGLES, 0, 36*3);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
+static void drawDebugSlope(const glm::mat4& model, const glm::mat4& vp, const std::shared_ptr<SlopeCollider> col, const glm::vec4& color)
+{
+    float cx = model[3][0]+col->GetOffset().x;
+    float cy = model[3][1]+col->GetOffset().y;
+    float cz = model[3][2]+col->GetOffset().z;
+
+    glm::vec3 c = { cx, cy, cz };
+    const auto& alongX = col->GetAlongX();    
+    const auto& alongZ = col->GetAlongZ();
+
+    glm::vec3 p1 = c + col->GetLengthX() * 0.5f * alongX + col->GetLengthZ() * 0.5f * alongZ;
+    glm::vec3 p2 = c - col->GetLengthX() * 0.5f * alongX + col->GetLengthZ() * 0.5f * alongZ;
+    glm::vec3 p3 = c - col->GetLengthX() * 0.5f * alongX - col->GetLengthZ() * 0.5f * alongZ;
+    glm::vec3 p4 = c + col->GetLengthX() * 0.5f * alongX - col->GetLengthZ() * 0.5f * alongZ;
+
+    
+    const auto& n = col->GetNormal();
+    float nx = cx + n.x * 2.0f;
+    float ny = cy + n.y * 2.0f;
+    float nz = cz + n.z * 2.0f;
+     
+    // printf("X: %.2f %.2f %.2f\tZ: %.2f %.2f %.2f\t Normal: %.2f %.2f %.2f\n", alongX.x, alongX.y, alongX.z, alongZ.x, alongZ.y, alongZ.z, n.x, n.y, n.z);
+
+    float vertices[36 * 3] = {
+        p1.x, p1.y, p1.z,  p2.x, p2.y, p2.z,  p3.x, p3.y, p3.z,    p3.x, p3.y, p3.z,  p2.x, p2.y, p2.z,  p4.x, p4.y, p4.z,
+        
+        cx, cy, cz,  cx, cy, cz,  nx, ny, nz,    cx, cy, cz,  cx, cy, cz,  nx, ny, nz,
+        cx, cy, cz,  cx, cy, cz,  nx, ny, nz,    cx, cy, cz,  cx, cy, cz,  nx, ny, nz,
+        cx, cy, cz,  cx, cy, cz,  nx, ny, nz,    cx, cy, cz,  cx, cy, cz,  nx, ny, nz,
+        
+        p1.x, p1.y, p1.z,  p4.x, p4.y, p4.z,  p1.x, p1.y, p1.z,p1.x, p1.y, p1.z,  p4.x, p4.y, p4.z,  p1.x, p1.y, p1.z,
+        cx, cy, cz,  cx, cy, cz,  nx, ny, nz,    cx, cy, cz,  cx, cy, cz,  nx, ny, nz,
+    };
+
+    debugShader.Use();
+    debugShader.SetMat4("transform", vp);
+    debugShader.SetMat4("model", glm::mat4(1.0f));
+    debugShader.SetVec4("u_TintColor", color);
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //enable wireframe
+    glBindVertexArray(boxVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glDrawArrays(GL_TRIANGLES, 0, 36*3);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
+//not a sphere lol
+static void drawDebugSphere(const glm::mat4& model, const glm::mat4& vp, float radius, const glm::vec3& offset, const glm::vec4& color)
+{
+    float cx = model[3][0]+offset.x;
+    float cy = model[3][1]+offset.y;
+    float cz = model[3][2]+offset.z;
+    float x1 = cx + radius;
+    float y1 = cy + radius;
+    float z1 = cz + radius;
+    float x2 = cx - radius;
+    float y2 = cy - radius;
+    float z2 = cz - radius;
+    float vertices[36 * 3] = {
+        x1, y1, z1,  x1, y2, z1,  x1, y2, z2,    x1, y1, z1,  x1, y2, z2,  x1, y1, z2,
+        x2, y1, z1,  x2, y2, z1,  x2, y2, z2,    x2, y1, z1,  x2, y2, z2,  x2, y1, z2,
+        x1, y1, z1,  x2, y1, z1,  x2, y2, z1,    x1, y1, z1,  x2, y2, z1,  x1, y2, z1,
+        x1, y1, z2,  x2, y1, z2,  x2, y2, z2,    x1, y1, z2,  x2, y2, z2,  x1, y2, z2,
+        x1, y1, z1,  x2, y1, z1,  x2, y1, z2,    x1, y1, z1,  x2, y1, z2,  x1, y1, z2,
+        x1, y2, z1,  x2, y2, z1,  x2, y2, z2,    x1, y2, z1,  x2, y2, z2,  x1, y2, z2,
+    };
+
+    debugShader.Use();
+    debugShader.SetMat4("transform", vp);
+    debugShader.SetMat4("model", glm::mat4(1.0f));
+    debugShader.SetVec4("u_TintColor", color);
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //enable wireframe
+    glBindVertexArray(boxVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glDrawArrays(GL_TRIANGLES, 0, 36*3);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
+
+#endif
+
+
 // defined in Scene.cpp
-extern std::shared_ptr<GameObject> GO_CAMERA;
 extern std::shared_ptr<GameObject> GO_MULTITOOL;
 extern std::shared_ptr<GameObject> GO_FLASHLIGHT;
 extern std::shared_ptr<GameObject> GO_CROSSHAIR;
 
 Frustum SceneNode::cameraFrustum;
+std::vector<SceneNode::NodeToDelete> SceneNode::nodesToDelete;
+float GlobalElapsedTime = 0.0f;
 
 SceneNode::SceneNode(std::shared_ptr<GameObject> gameObject)
     :parent(nullptr), gameObject(gameObject)
 {
     this->globalTransformations = glm::mat4(1.f);
     gameObject->SetNode(this);
+
+#ifdef ENABLE_DEBUG_INFO
+    if(!isDebugInitialized)
+        initializeDebug();
+#endif
 }
 
 SceneNode::~SceneNode()
@@ -47,19 +209,32 @@ void SceneNode::LoadScripts()
         this->children[i]->LoadScripts();
     }
 }
-float GlobalElapsedTime = 0.0f;
+
 void SceneNode::Update(float dt)
 {
+#ifdef ENABLE_DEBUG_INFO
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::F11))
+    {
+        const auto cam = this->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>();
+        const auto& pos = cam->GetPosition();
+        float pitch = cam->GetPitch();
+        float yaw = cam->GetYaw();
+        printf("Camera position: %f %f %f \tPitch = %f, Yaw = %f\n", pos.x, pos.y, pos.z, pitch, yaw);
+    }
+#endif
+
     GlobalElapsedTime += dt;
     this->PrivateUpdate(dt, glm::mat4(1.f));
 
     SceneNode::cameraFrustum = 
-    GO_CAMERA->GetComponent<cmp::Camera>()->GetFrustum(
+    this->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>()->GetFrustum(
         (float)GameApplication::GetWindowSize().x/GameApplication::GetWindowSize().y,
         GameApplication::GetFov(),
         GameApplication::GetProjectionRange().x,
         GameApplication::GetProjectionRange().y
     );
+
+    this->DeleteNodes();
 }
 
 void SceneNode::PrivateUpdate(float dt, const glm::mat4& parentTransformations)
@@ -142,7 +317,7 @@ void SceneNode::Render(const glm::mat4& matrixPV)
             shaderPtr->SetMat4("model", this->globalTransformations);
             shaderPtr->SetVec4("u_TintColor", {1, 1, 1, 1});
             shaderPtr->SetFloat("u_Time", GlobalElapsedTime);
-            shaderPtr->SetVec3("u_CameraPos", GO_CAMERA->GetComponent<cmp::Transform>()->GetPosition());
+            shaderPtr->SetVec3("u_CameraPos", this->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Transform>()->GetPosition());
 
             std::shared_ptr<cmp::Model> modelPtr = this->gameObject->GetComponent<cmp::Model>();
             if(modelPtr != nullptr)
@@ -206,6 +381,28 @@ void SceneNode::Render(const glm::mat4& matrixPV)
         particlePtr->Draw(matrixPV);
     }
 
+#ifdef ENABLE_DEBUG_INFO
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::F9))
+    {
+        if (auto collider = gameObject->GetComponent<cmp::BoxCol>())
+        {
+            glm::vec4 color = (collider->isTrigger) ? glm::vec4(1.0f, 1.0f, 0.0f, 1.0f) : glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+            drawDebugBox(this->globalTransformations, matrixPV, collider->GetLengths(), collider->GetOffset(), color);
+        }
+        else if (auto collider = gameObject->GetComponent<cmp::SphereCol>())
+        {
+            glm::vec4 color = (collider->isTrigger) ? glm::vec4(1.0f, 1.0f, 0.7f, 1.0f) : glm::vec4(0.7f, 1.0f, 0.7f, 1.0f);
+            drawDebugSphere(this->globalTransformations, matrixPV, collider->GetRadius(), collider->GetOffset(), color);
+        }
+        else if (auto collider = gameObject->GetComponent<cmp::SlopeCol>())
+        {
+            glm::vec4 color = (collider->isTrigger) ? glm::vec4(1.0f, 1.0f, 0.0f, 1.0f) : glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+            drawDebugSlope(this->globalTransformations, matrixPV, collider, color);
+        }
+    }
+
+#endif
+
     for(unsigned short int i=0; i<this->children.size(); i++)
     {
         this->children[i]->Render(matrixPV);
@@ -225,6 +422,11 @@ std::shared_ptr<TransformComponent> SceneNode::GetLocalTransformations()
 const glm::mat4& SceneNode::GetGlobalTransformations()
 {
     return this->globalTransformations;
+}
+
+glm::vec3 SceneNode::GetGlobalPosition()
+{
+    return { globalTransformations[3][0], globalTransformations[3][1], globalTransformations[3][2] };
 }
 
 void SceneNode::SetGlobalTransformations(const glm::mat4& newTransformations)
@@ -257,13 +459,54 @@ bool SceneNode::RemoveNode(SceneNode* node)
         {
             if (this->children[i] && this->children[i]->Is(node))
             {
-                this->children[i].reset();
-                this->children.erase(children.begin() + i, children.begin() + i + 1);
+                if (std::find_if(nodesToDelete.begin(), nodesToDelete.end(), [&](NodeToDelete n) { return n.child->Is(node); }) != nodesToDelete.end()) return true;
+
+                nodesToDelete.push_back({ this, node });
                 return true;
             }
         }
     }
     return false;
+}
+
+void SceneNode::DeleteNodes()
+{
+    for (auto& nodeToDelete : nodesToDelete)
+    {
+        nodeToDelete.child->PrivateDelete();
+        for (unsigned short int i = 0; i < nodeToDelete.parent->children.size(); i++)
+        {
+            if (nodeToDelete.parent->children[i] && nodeToDelete.parent->children[i]->Is(nodeToDelete.child))
+            {
+                nodeToDelete.parent->children[i].reset();
+                nodeToDelete.parent->children.erase(nodeToDelete.parent->children.begin() + i, nodeToDelete.parent->children.begin() + i + 1);
+                break;
+            }
+        }
+    }
+
+    nodesToDelete.clear();
+}
+
+void SceneNode::PrivateDelete()
+{
+    if (auto boxCol = this->GetGameObject()->GetComponent<cmp::BoxCol>())
+    {
+        boxCol->RemoveFromCollidersManager(boxCol);
+    }
+    if (auto sphereCol = this->GetGameObject()->GetComponent<cmp::SphereCol>())
+    {
+        sphereCol->RemoveFromCollidersManager(sphereCol);
+    }
+    if (auto scriptable = this->GetGameObject()->GetComponent<cmp::Scriptable>())
+    {
+        scriptable->Clear();
+    }
+    
+    for (unsigned short int i = 0; i < this->children.size(); i++)
+    {
+        children[i]->PrivateDelete();
+    }
 }
 
 void SceneNode::FindByName(const std::string& name, SceneNode** result)

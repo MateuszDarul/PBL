@@ -56,6 +56,7 @@ private:
     float jumpHeight;
     float jumpTimeToPeak;
     bool isEnabledMovement;
+    bool isEnabledRotation;
     bool isGrounded;
 
     glm::mat4 view; //!< Macierz widoku kamery.
@@ -68,6 +69,9 @@ private:
 
     float yaw; //!< Kat obrotu kamery (lewo/prawo).
     float pitch; //!< Kat obrotu kamery (gora/dol).
+
+    float yawOffset;
+    float pitchOffset;
 
     float mouseSensitivity; //!< Czulosc obrotu kamery przy pomocy myszy.
     float speedPerSec; //!< Predkosc poruszania sie kamery na sekunde przy pomocy klawiatury.
@@ -146,9 +150,18 @@ public:
 
     bool GetMovementEnabled();
     void SetMovementEnable(bool enabled);
+    
+    bool GetRotationEnabled();
+    void SetRotationEnable(bool enabled);
 
     bool GetIsGrounded();
     void SetIsGrounded(bool grounded);
+
+
+    float GetPitch() const;
+    float GetYaw() const;
+    void SetRotation(float pitch, float yaw);
+    void SetRotationOffset(float pitch, float yaw);
 
 
     /** @brief Pozwala na przemieszczanie kamery w wybranym kierunku.

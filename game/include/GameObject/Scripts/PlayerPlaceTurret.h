@@ -8,6 +8,7 @@
 #include "TurretLaser.h"
 #include "TurretLight.h"
 #include "TurretShoot.h"
+#include "TurretRange.h"
 #include "PlacedTurret.h"
 
 #include <glm/gtx/rotate_vector.hpp>
@@ -24,15 +25,18 @@ public:
     float placingRange = 5.0f;
     float shootingTurretRange = 15.0f;
 
-    int ignoreLayerMask = ~(CollisionLayer::Player | CollisionLayer::Ignore);
+    int ignoreLayerMask = ~(CollisionLayer::Player | CollisionLayer::GUI | CollisionLayer::Ignore);
 
     enum TurretType {
-        None = -1, Blockade = 0, Shooting = 1, Laser = 2
+        None = -1, Laser = 0, Shooting = 1, Blockade = 2
     };
 
     bool unlocked[3] = { false, false, false };
     TurretType selectedTurretType = TurretType::None;
     int turretCosts[3] = { 30, 80, 40 };
+
+
+    glm::vec4 turretGhostColor = { 0.0f, 1.0f, 0.0f,   0.5f };
 
 
     //set these in 'inspector'
@@ -45,13 +49,17 @@ public:
     ResourceManager* resMan;
     std::shared_ptr<cmp::Line> line;
     
-    std::shared_ptr<cmp::Shader> turretShader; //err, should be better solved by a prefab or smth
+    std::shared_ptr<cmp::Shader> turretShader;
     std::shared_ptr<cmp::Shader> lineShader;
 
     
     //for public READ
 
     bool isPlacing = false;
+
+    //for public SET
+
+    bool isLookingAtMirror = false;
 
 
 private: 
@@ -78,102 +86,74 @@ public:
         CreateTurret(TurretType::Blockade);
         CreateTurret(TurretType::Shooting);
         CreateTurret(TurretType::Laser);
+
+        selectedTurretType = TurretType::Laser;
+        multiTool->SetActiveIcon(selectedTurretType);
     }
 
     void Update(float dt)
     {
         bool needUpdate = false; 
-        // dziesiec if'ow ale ¯\_(ツ)_/¯
-        if (!isPlacing)
+
+        if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr1) && unlocked[0])
         {
-            if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr1) && unlocked[TurretType::Blockade])
+            selectedTurretType = (TurretType)0;
+            needUpdate = true;
+        }
+        else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr2) && unlocked[1])
+        {
+            selectedTurretType = (TurretType)1;
+            needUpdate = true;
+        }
+        else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr3) && unlocked[2])
+        {
+            selectedTurretType = (TurretType)2;
+            needUpdate = true;
+        }
+
+
+        short scroll = Input()->Mouse()->GetScrollOffset();
+        if (scroll != 0)
+        {
+            short newType = ((selectedTurretType - scroll) % 3 + 3) % 3;
+            if (unlocked[newType])
             {
-                isPlacing = true;
-                selectedTurretType = TurretType::Blockade;
+                selectedTurretType = (TurretType)newType;
                 needUpdate = true;
             }
-            else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr2) && unlocked[TurretType::Shooting])
+            else
             {
-                isPlacing = true;
-                selectedTurretType = TurretType::Shooting;
-                needUpdate = true;
-            }
-            else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr3)  && unlocked[TurretType::Laser])
-            {
-                isPlacing = true;
-                selectedTurretType = TurretType::Laser;
-                needUpdate = true;
+                newType = ((newType - scroll) % 3 + 3) % 3;
+                if (unlocked[newType])
+                {
+                    selectedTurretType = (TurretType)newType;
+                    needUpdate = true;
+                }
             }
         }
-        else
-        {
-            if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr1)  && unlocked[TurretType::Blockade])
-            {
-                if (selectedTurretType == TurretType::Blockade)
-                {
-                    isPlacing = false;
-                    selectedTurretType = TurretType::None;
-                }
-                else
-                {
-                    selectedTurretType = TurretType::Blockade;
-                }
-                needUpdate = true;
-            }
-            else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr2) && unlocked[TurretType::Shooting])
-            {
-                if (selectedTurretType == TurretType::Shooting) 
-                {
-                    isPlacing = false;
-                    selectedTurretType = TurretType::None;
-                }
-                else
-                {
-                    selectedTurretType = TurretType::Shooting;
-                }
-                needUpdate = true;
-            }
-            else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr3) && unlocked[TurretType::Laser])
-            {
-                if (selectedTurretType == TurretType::Laser) 
-                {
-                    isPlacing = false;
-                    selectedTurretType = TurretType::None;
-                }
-                else
-                {
-                    selectedTurretType = TurretType::Laser;
-                }
-                needUpdate = true;
-            }
-        }
+
         if (needUpdate)
         {
             multiTool->SetActiveIcon(selectedTurretType);
         }
 
+
         int lineIndexToPlace = 2;
+        bool hasPlacedTurret = false;
+
+        turretPrefabs[0]->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
+        turretPrefabs[1]->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
+        //turretPrefabs[2]->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
 
         if (isPlacing)
         {
-            PlacedTurret* placedTurret = turretPrefabs[selectedTurretType]->GetComponent<cmp::Scriptable>()->Get<PlacedTurret>();
             if (Input()->Mouse()->OnPressed(MouseButton::Left_MB) && gameManager->GetCurrentEnergy() >= turretCosts[selectedTurretType])
             {
-                if (auto scriptHolder = turretPrefabs[selectedTurretType]->GetComponent<cmp::Scriptable>())
-                {
-                    scriptHolder->EnableAll();
-                    
-                    /*std::shared_ptr<ColliderComponent> col = nullptr;
-                    col = turretPrefabs[selectedTurretType]->GetComponent<cmp::SphereCol>();
-                    if (!col) col = turretPrefabs[selectedTurretType]->GetComponent<cmp::BoxCol>();
-                    if(col)
-                    {
-                        col->AddToCollidersManager(colMan);
-                    }
-                    */
-                }
-                CreateTurret(selectedTurretType);
-                gameManager->DescreaseEnergy(turretCosts[selectedTurretType]);
+                hasPlacedTurret = true;
+            }
+            else if (Input()->Mouse()->OnPressed(MouseButton::Right_MB))
+            {
+                isPlacing = false;
             }
 
             RayHitInfo hit;
@@ -195,25 +175,59 @@ public:
                 line->Set(2, line->Get(1) + glm::vec3(0.0f, -1.0f, 0.0f));
                 lineIndexToPlace = 1;
             }  
-            
+
+            if (selectedTurretType != TurretType::None)
+            {
+                glm::vec3 adjust = {0.0f, 0.0f, 0.0f};
+                turretPrefabs[selectedTurretType]->GetComponent<cmp::Transform>()->SetPosition(line->Get(lineIndexToPlace) + transform->GetPosition() + adjust);
+                turretPrefabs[selectedTurretType]->GetComponent<cmp::Transform>()->SetRotation(0.0f, -camera->GetYaw(), 0.0f);
+            }   
         }
         else
-        line->Set(2, {0.0f, 999.9f, 0.0f}); //'delete' turret xd
-
-        //turretPrefabs[0]->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
-        turretPrefabs[1]->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
-        turretPrefabs[2]->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
-
-        if (selectedTurretType != TurretType::None)
         {
-            glm::vec3 adjust = {0.0f, 0.0f, 0.0f};
-            turretPrefabs[selectedTurretType]->GetComponent<cmp::Transform>()->SetPosition(line->Get(lineIndexToPlace) + transform->GetPosition() + adjust);
-            turretPrefabs[selectedTurretType]->GetComponent<cmp::Transform>()->SetRotation(0.0f, -camera->GetYaw(), 0.0f);
+            line->Set(2, {0.0f, 999.9f, 0.0f}); //'delete' turret xd
+            if (!isLookingAtMirror && Input()->Mouse()->OnPressed(MouseButton::Left_MB) && selectedTurretType != TurretType::None && unlocked[selectedTurretType])
+            {
+                isPlacing = true;
+            }
+        }
+
+        if (hasPlacedTurret)
+        {
+            if (auto scriptHolder = turretPrefabs[selectedTurretType]->GetComponent<cmp::Scriptable>())
+            {
+                scriptHolder->EnableAll();
+                
+                std::shared_ptr<ColliderComponent> col = nullptr;
+                col = turretPrefabs[selectedTurretType]->GetComponent<cmp::SphereCol>();
+                if (!col) col = turretPrefabs[selectedTurretType]->GetComponent<cmp::BoxCol>();
+                if(col)
+                {
+                    col->AddToCollidersManager(colMan);
+                }
+            }
+
+            
+            auto model = turretPrefabs[selectedTurretType]->GetComponent<cmp::Model>();
+            if(!model)
+                if (auto gfxNode = turretPrefabs[selectedTurretType]->GetNode()->FindNode("gfx"))
+                    model = gfxNode->GetGameObject()->GetComponent<cmp::Model>();
+            
+            if (model)
+                model->SetTintColor(1.0, 1.0, 1.0);
+
+
+            CreateTurret(selectedTurretType);
+            gameManager->DescreaseEnergy(turretCosts[selectedTurretType]);
+            // selectedTurretType = TurretType::None;
+            // multiTool->SetActiveIcon(selectedTurretType);
+            isPlacing = false;
         }
     }
 
     void CreateTurret(TurretType type)
     {
+        printf("Creating new turret of type %i\n", type);
         switch (type)
         {
         case TurretType::Blockade:
@@ -230,6 +244,7 @@ public:
         }
     }
 
+
     void CreateBlockadeTurret()
     {
     }
@@ -245,33 +260,41 @@ public:
             resMan->GetMaterial("Resources/models/Wieze/Strzelajaca.mtl")
         );
         turretPrefabs[type]->AddComponent(mc);
+        mc->SetTintColor(turretGhostColor);
         turretPrefabs[type]->AddComponent(turretShader);
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::Transform>());
-        turretPrefabs[type]->GetComponent<cmp::Transform>()->SetPosition(0,0.5,-5);
+        turretPrefabs[type]->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::FrustumCulling>());
         turretPrefabs[type]->GetComponent<cmp::FrustumCulling>()->Create(
             resMan->GetMesh("Resources/models/Wieze/Strzelajaca.obj"));
-        turretPrefabs[type]->AddComponent(std::make_shared<cmp::BoxCol>(true, false));
-        std::shared_ptr<cmp::BoxCol> col2 = turretPrefabs[type]->GetComponent<cmp::BoxCol>();
-        col2->SetLengths(glm::vec3(2.0f, 3.0f, 2.0f));
-        col2->AddToCollidersManager(colMan);
-        turretPrefabs[type]->AddComponent(std::make_shared<cmp::Scriptable>());
-        PlacedTurret* script2 = new PlacedTurret();
-        turretPrefabs[type]->GetComponent<cmp::Scriptable>()->Add(script2);
 
-        auto gfxGO = std::make_shared<GameObject>();
-        gfxGO->AddComponent(std::make_shared<cmp::Transform>());
-        gfxGO->AddComponent(std::make_shared<cmp::SphereCol>(true, false));
-        std::shared_ptr<cmp::SphereCol> col = gfxGO->GetComponent<cmp::SphereCol>();
-        col->SetRadius(shootingTurretRange);
-        col->AddToCollidersManager(colMan);
-        gfxGO->AddComponent(std::make_shared<cmp::Scriptable>());
+        turretPrefabs[type]->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
+        std::shared_ptr<cmp::BoxCol> col = turretPrefabs[type]->GetComponent<cmp::BoxCol>();
+        col->SetLengths({ 2.5, 3.5, 2.5 });
+        col->SetOffset({ 0.0, 2.0, 0.0 });
+
+        turretPrefabs[type]->AddComponent(std::make_shared<cmp::Scriptable>());
         TurretShoot* script = new TurretShoot();
         script->isPut = true;
-        gfxGO->GetComponent<cmp::Scriptable>()->Add(script);
-        script->placedTurretScript = script2;
+        script->SetEnabled(false);
+        turretPrefabs[type]->GetComponent<cmp::Scriptable>()->Add(script);
 
-        turretsHolder->AddChild(turretPrefabs[type])->AddChild(gfxGO);
+
+        auto rangeGO = std::make_shared<GameObject>();
+        rangeGO->AddComponent(std::make_shared<cmp::Transform>());
+
+        rangeGO->AddComponent(std::make_shared<cmp::SphereCol>(true, true));
+        std::shared_ptr<cmp::SphereCol> rangeCol = rangeGO->GetComponent<cmp::SphereCol>();
+        rangeCol->SetRadius(shootingTurretRange);
+        rangeCol->AddToCollidersManager(colMan);
+
+        rangeGO->AddComponent(std::make_shared<cmp::Scriptable>());
+        TurretRange* range = new TurretRange();
+        script->turretRange = range;
+        rangeGO->GetComponent<cmp::Scriptable>()->Add(range);
+
+
+        turretsHolder->AddChild(turretPrefabs[type])->AddChild(rangeGO);
     }
 
     void CreateLaserTurret()
@@ -279,6 +302,7 @@ public:
         TurretType type = TurretType::Laser;
         turretPrefabs[type] = std::make_shared<GameObject>();
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::Transform>());
+        turretPrefabs[type]->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
 
 
         auto scriptHolder = std::make_shared<cmp::Scriptable>();
@@ -287,9 +311,6 @@ public:
         auto turretScript = new TurretLaser();
         turretScript->colMan = colMan;
         turretScript->SetEnabled(false);
-        PlacedTurret* script2 = new PlacedTurret();
-        turretPrefabs[type]->GetComponent<cmp::Scriptable>()->Add(script2);
-        turretScript->placedTurretScript = script2;
 
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::BoxCol>(true, false));
         std::shared_ptr<cmp::BoxCol> col = turretPrefabs[type]->GetComponent<cmp::BoxCol>();
@@ -308,17 +329,25 @@ public:
 
 
         scriptHolder->Add(turretScript);
+
+
+        turretPrefabs[type]->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
+        std::shared_ptr<cmp::BoxCol> col1 = turretPrefabs[type]->GetComponent<cmp::BoxCol>();
+        col1->SetLengths({2.0, 2.5, 2.0});
+        col1->SetOffset({0.0, 1.75, 0.0});
         
 
 
         auto gfxGO = std::make_shared<GameObject>();
         gfxGO->AddComponent(std::make_shared<cmp::Transform>());
+        gfxGO->AddComponent(std::make_shared<cmp::Name>("gfx"));
 
         auto mc = std::make_shared<cmp::Model>();
         mc->Create(
             resMan->GetMesh("Resources/models/Wieze/Laser.obj"),
             resMan->GetMaterial("Resources/models/Wieze/Laser.mtl")
         );
+        mc->SetTintColor(turretGhostColor);
         gfxGO->AddComponent(mc);
         
         gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
@@ -329,6 +358,39 @@ public:
 
 
         turretsHolder->AddChild(turretPrefabs[type])->AddChild(gfxGO);
+    }
+
+    void PickUpTurret(TurretType type, std::shared_ptr<GameObject> turretGO)
+    {    
+        if (type == TurretType::None) return;
+        gameManager->IncreaseEnergy(turretCosts[type]);
+
+        turretGO->GetComponent<cmp::Transform>()->SetPosition(0.0, -10000.0, 0.0);
+
+        //removing doesnt work lol
+
+        // printf("PickUpTurret()\n");
+
+        // std::shared_ptr<ColliderComponent> col = turretGO->GetComponent<cmp::SphereCol>();
+        // if (col == nullptr)
+        // {
+        //     col = gameObject->GetComponent<cmp::BoxCol>();
+        // }
+        // if (col != nullptr)
+        // {
+        //     printf(" has collider\n");
+            
+        //     printf("a\n");
+        //     colMan->RemoveStaticTrigger(col);
+        //     printf("b\n");
+        //     colMan->RemoveDynamicTrigger(col);
+        //     printf("c\n");
+        //     colMan->RemoveStaticColllider(col);
+        //     printf("d\n");
+        //     colMan->RemoveDynamicCollider(col);
+        // }
+        
+        // turretsHolder->RemoveNode(turretGO->GetNode());
     }
 
 };

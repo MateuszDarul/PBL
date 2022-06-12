@@ -247,12 +247,12 @@ void CollidersManager::CheckCollisions(std::vector<std::pair<std::shared_ptr<Col
 	for (unsigned int i = 0; i<dynamicColliders.size(); i++)
 	{
 		std::shared_ptr<ColliderComponent> firstCollider = dynamicColliders[i].lock();
-		if(CheckOptimalization(firstCollider, frustum, playerPos))
+		if(!firstCollider->isDisabled && CheckOptimalization(firstCollider, frustum, playerPos))
 		{
 			for (unsigned int j = i + 1; j < dynamicColliders.size(); j++)
 			{
 				std::shared_ptr<ColliderComponent> secondCollider = dynamicColliders[j].lock();
-				if(CheckOptimalization(secondCollider, frustum, playerPos))
+				if(!secondCollider->isDisabled && CheckOptimalization(secondCollider, frustum, playerPos))
 				{
 					bool areColliding = firstCollider->CheckCollision(secondCollider);
 					ExecuteOnCollidingScripts(currentCollisions, firstCollider, secondCollider, areColliding, collision);
@@ -261,7 +261,7 @@ void CollidersManager::CheckCollisions(std::vector<std::pair<std::shared_ptr<Col
 			for (unsigned int j = 0; j < staticColliders.size(); j++)
 			{
 				std::shared_ptr<ColliderComponent> secondCollider = staticColliders[j].lock();
-				if (CheckOptimalization(secondCollider, frustum, playerPos))
+				if (!secondCollider->isDisabled && CheckOptimalization(secondCollider, frustum, playerPos))
 				{
 					bool areColliding = firstCollider->CheckCollision(secondCollider);
 					ExecuteOnCollidingScripts(currentCollisions, firstCollider, secondCollider, areColliding, collision);
@@ -270,7 +270,7 @@ void CollidersManager::CheckCollisions(std::vector<std::pair<std::shared_ptr<Col
 			for (unsigned int j = 0; j < dynamicTriggers.size(); j++)
 			{
 				std::shared_ptr<ColliderComponent> secondCollider = dynamicTriggers[j].lock();
-				if (CheckOptimalization(secondCollider, frustum, playerPos))
+				if (!secondCollider->isDisabled && CheckOptimalization(secondCollider, frustum, playerPos))
 				{
 					bool areColliding = firstCollider->CheckCollision(secondCollider);
 					ExecuteOnCollidingScripts(currentCollisions, firstCollider, secondCollider, areColliding, trigger);
@@ -279,7 +279,7 @@ void CollidersManager::CheckCollisions(std::vector<std::pair<std::shared_ptr<Col
 			for (unsigned int j = 0; j < staticTriggers.size(); j++)
 			{
 				std::shared_ptr<ColliderComponent> secondCollider = staticTriggers[j].lock();
-				if (CheckOptimalization(secondCollider, frustum, playerPos))
+				if (!secondCollider->isDisabled && CheckOptimalization(secondCollider, frustum, playerPos))
 				{
 
 					bool areColliding = firstCollider->CheckCollision(secondCollider);
@@ -298,12 +298,12 @@ void CollidersManager::CheckTriggers(std::vector<std::pair<std::shared_ptr<Colli
 	for (unsigned int i = 0; i < dynamicTriggers.size(); i++)
 	{
 		std::shared_ptr<ColliderComponent> firstCollider = dynamicTriggers[i].lock();
-		if (CheckOptimalization(firstCollider, frustum, playerPos))
+		if (!firstCollider->isDisabled && CheckOptimalization(firstCollider, frustum, playerPos))
 		{
 			for (unsigned int j = i + 1; j < dynamicTriggers.size(); j++)
 			{
 				std::shared_ptr<ColliderComponent> secondCollider = dynamicTriggers[j].lock();
-				if (CheckOptimalization(secondCollider, frustum, playerPos))
+				if (!secondCollider->isDisabled && CheckOptimalization(secondCollider, frustum, playerPos))
 				{
 					bool areColliding = firstCollider->CheckCollision(secondCollider);
 					ExecuteOnCollidingScripts(currentCollisions, firstCollider, secondCollider, areColliding, trigger);
@@ -312,7 +312,7 @@ void CollidersManager::CheckTriggers(std::vector<std::pair<std::shared_ptr<Colli
 			for (unsigned int j = 0; j < staticColliders.size(); j++)
 			{
 				std::shared_ptr<ColliderComponent> secondCollider = staticColliders[j].lock();
-				if (CheckOptimalization(secondCollider, frustum, playerPos))
+				if (!secondCollider->isDisabled && CheckOptimalization(secondCollider, frustum, playerPos))
 				{
 					bool areColliding = firstCollider->CheckCollision(secondCollider);
 					ExecuteOnCollidingScripts(currentCollisions, firstCollider, secondCollider, areColliding, trigger);
@@ -321,7 +321,7 @@ void CollidersManager::CheckTriggers(std::vector<std::pair<std::shared_ptr<Colli
 			for (unsigned int j = 0; j < staticTriggers.size(); j++)
 			{
 				std::shared_ptr<ColliderComponent> secondCollider = staticTriggers[j].lock();
-				if (CheckOptimalization(secondCollider, frustum, playerPos))
+				if (!secondCollider->isDisabled && CheckOptimalization(secondCollider, frustum, playerPos))
 				{
 					bool areColliding = firstCollider->CheckCollision(secondCollider);
 					ExecuteOnCollidingScripts(currentCollisions, firstCollider, secondCollider, areColliding, trigger);

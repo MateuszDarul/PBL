@@ -29,22 +29,7 @@ public:
 		std::cout << this->health<<std::endl;
 		if (this->health <= 0)
 		{
-			std::shared_ptr<ColliderComponent> col = gameObject->GetComponent<cmp::SphereCol>();
-			if (col == nullptr)
-			{
-				col = gameObject->GetComponent<cmp::BoxCol>();
-			}
-			if (col != nullptr)
-			{
-				if (col->isTrigger)
-				{
-					scene->GetCollidersManager()->RemoveDynamicTrigger(col);
-				}
-				else
-				{
-					scene->GetCollidersManager()->RemoveDynamicCollider(col);
-				}
-			}
+			// to nie powinno byc tutaj - co jesli nie chcemy usunac objektu nawet jak ma 0 hp?
 			gameObject->GetNode()->GetParent()->RemoveNode(gameObject->GetNode());
 		}
 	}

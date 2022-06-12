@@ -13,6 +13,7 @@ class CollidersManager;
  */
 class ColliderComponent : public Component
 {
+	CollidersManager* collidersManager = nullptr;
 protected:
 	glm::vec3 offset; //!< Przesuni�cie kolidera wzgl�dem bazowego obiektu.
 	float mass; //!< Masa obiektu do kt�rego podczepiony jest kolider.
@@ -37,6 +38,8 @@ public:
 	bool isOptimized; //!< Czy ten kolider ma by� optymalizowany pod wzgl�dem odleg�o�ci od gracza.
 	int layer; //!< Warstwa kolidera.
 
+	bool isDisabled = false;
+
 	/** @brief Konstruktor komponent kolider�w.
 	 * @param UUID - Unikalny indentyfikator klasy komponentu.
 	 * @param isTrigger - Czy ten kolider ma by� wyzwalaczem.
@@ -48,6 +51,8 @@ public:
 	/** @brief Bazowy destruktor
 	*/
 	~ColliderComponent();
+
+	void RemoveFromCollidersManager(std::shared_ptr<ColliderComponent> collider);
 
 	/** @brief Metoda dodaje kolider do menad�era kolider�w.
 	* @param collidersManager - wska�nik na menad�er kolider�w.

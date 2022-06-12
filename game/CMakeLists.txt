@@ -32,6 +32,9 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/ParticleComponent.cpp
 	src/GameObject/Components/RefractiveGlassComponent.cpp
 	src/GameObject/Components/ShadowComponent.cpp
+	src/GameObject/Components/SlopeCollider.cpp
+
+	src/GameObject/Scripts/LanternRange.cpp
 
 	src/Resource/Font.cpp
 	src/Resource/Mesh.cpp
@@ -44,6 +47,7 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/Scene/SceneNode.cpp
 	src/Scene/Skybox.cpp
 	src/Scene/MapLoader.cpp
+	src/Scene/Menu/Menu.cpp
 
 	src/AI/State.cpp
 	src/AI/FollowPathState.cpp
@@ -103,6 +107,7 @@ file(GLOB_RECURSE HEADER_FILES
 	include/GameObject/Components/ParticleComponent.cpp
 	include/GameObject/Components/RefractiveGlassComponent.cpp
 	include/GameObject/Components/ShadowComponent.h
+	include/GameObject/Components/SlopeCollider.h
 
 	include/Resource/Font.h
 	include/Resource/Mesh.h
@@ -115,6 +120,7 @@ file(GLOB_RECURSE HEADER_FILES
 	include/Scene/SceneNode.h
 	include/Scene/Skybox.h
 	include/Scene/MapLoader.h
+	include/Scene/Menu/Menu.h
 
 	include/AI/State.h
 	include/AI/FollowPathState.h
@@ -134,6 +140,8 @@ file(GLOB_RECURSE HEADER_FILES
 
 	ImGui/include/*.h
 	ImGui/include/*.hpp
+
+	include/GameObject/Scripts/*.h
 )
 
 include_directories(include)
@@ -143,6 +151,7 @@ include_directories(include/GameObject)
 include_directories(include/GameObject/Components)
 include_directories(include/Resource)
 include_directories(include/Scene)
+include_directories(include/Scene/Menu)
 include_directories(include/AI)
 include_directories(ImGui/include)
 
