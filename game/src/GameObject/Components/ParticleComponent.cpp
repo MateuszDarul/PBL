@@ -25,6 +25,7 @@ ParticleComponent::ParticleComponent() : Component(15), particlesPerSecond(2), p
 	directionVar = 0;
 	burst = false;
 	bursted = false;
+	SetColor(1.0, 1.0, 1.0, 1.0);
 }
 
 ParticleComponent::~ParticleComponent()
@@ -47,13 +48,13 @@ void ParticleComponent::Create(std::shared_ptr<CameraComponent> playerCam, bool 
 	shader = std::make_shared<ShaderComponent>();
 	shader->Create("Resources/shaders/particles.vert", "Resources/shaders/particles.frag");
 	float particle_quad[] = {
-		0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-		1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		-0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
+		 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
 
-		0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-		1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-		1.0f, 0.0f, 0.0f, 1.0f, 0.0f
+		-0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
+		 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+		 0.5f, -0.5f, 0.0f, 1.0f, 0.0f
 	};
 	glGenVertexArrays(1, &this->VAO);
 	glGenBuffers(1, &VBO);
@@ -167,6 +168,7 @@ void ParticleComponent::Update(float dt)
 				float distance = glm::length(playerCamera->GetPosition() - particles[i]->position);
 				sortedTransforms[distance] = i;
 			}
+			transformations[i][0][0] = 0;
 		}
 		particles.erase(std::remove_if(particles.begin(), particles.end(), [](std::shared_ptr<Particle> particle) {return particle->isDead; }), particles.end());
 
@@ -178,7 +180,7 @@ void ParticleComponent::Update(float dt)
 			float lifePercent = 1.0f - particles[it->second]->lifetimeTimer / particles[it->second]->lifetime;		
 			
 			float scale = scaleStart * (1.0f - lifePercent) + scaleEnd * lifePercent;
-			transformations[i] = glm::scale(transformations[i], glm::vec3(scale, scale, scale));
+			transformations[i][0][0] = scale;
 			
 			transformations[i][0][3] = lifePercent;
 			i++;
