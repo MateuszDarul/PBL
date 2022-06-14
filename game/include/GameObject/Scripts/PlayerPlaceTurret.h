@@ -88,7 +88,7 @@ public:
         selectedTurretType = TurretType::Laser;
         multiTool->SetActiveIcon(selectedTurretType);
 
-        sfxplay = new SoundPlayer("Resources/sounds/Click_01mono.mp3");
+        sfxplay = new SoundPlayer("Resources/sounds/Click_01mono.wav");
     }
 
     void Update(float dt)

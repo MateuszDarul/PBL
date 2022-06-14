@@ -53,7 +53,7 @@ void MusicBuffer::Stop()
 
 	if (queued > 0)
 	{
-		ALuint bufid[queued];
+		ALuint bufid[NUM_BUFFERS];
 		alSourceUnqueueBuffers(p_Source, queued, bufid);
 	}
 	

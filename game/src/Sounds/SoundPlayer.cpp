@@ -15,6 +15,8 @@ SoundPlayer::SoundPlayer(const char* filename)
 	sf_count_t num_frames;
 	ALsizei num_bytes;
 
+	alGenSources(1, &p_Source);
+
 	/* Open the audio file and check that it's usable. */
 	sndfile = sf_open(filename, SFM_READ, &sfinfo);
 	if (!sndfile)
@@ -84,7 +86,7 @@ SoundPlayer::SoundPlayer(const char* filename)
 			alDeleteBuffers(1, &buffer);
 	}
 
-    alGenSources(1, &p_Source);
+    
 	p_Buffer = buffer;
 	alSourcei(p_Source, AL_BUFFER, p_Buffer);
 }
@@ -98,9 +100,10 @@ void SoundPlayer::Play()
 {
 	alSourcePlay(p_Source);
 
-    if (alGetError() != AL_NO_ERROR)
+	auto err = alGetError();
+    if (err != AL_NO_ERROR)
 	{
-		throw("error with al");
+		//throw("error with al");
 	}
 }
 
