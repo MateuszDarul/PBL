@@ -37,7 +37,7 @@ bool CameraComponent::Create(const glm::vec3& position)
     this->needUpdate = true;
     this->firstMouseMovement = true;
     this->mouseSensitivity = 0.1;
-    this->speedPerSec = 1.5f;
+    this->speedPerSec = 12.5f;
     this->jumpHeight = 2.0f;
     this->jumpTimeToPeak = 0.299f;
 

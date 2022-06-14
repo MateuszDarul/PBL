@@ -1,0 +1,6 @@
+
+newmtl Material.065
+
+illum 2
+map_Kd przelacznikLaserowy_texture.png
+map_Ks przelacznikLaserowy_specular.png

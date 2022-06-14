@@ -56,7 +56,7 @@ public:
             isPrimed = true;
 
             if (doorTransform) targetPosition -= openedOffset;
-            if (buttonModel) buttonModel->SetTintColor({ 1.0f, 1.0f, 0.0f,  1.0f });
+            if (buttonModel) buttonModel->SetTintColor(0.88, 0.21, 0.21);
         }
         else                //on being unpowered
         {
@@ -79,7 +79,7 @@ public:
                 isPrimed = false;
 
                 if (doorTransform) targetPosition += openedOffset;
-                if (buttonModel) buttonModel->SetTintColor({ 0.2f, 1.0f, 0.2f,  1.0f });
+                if (buttonModel) buttonModel->SetTintColor(0.21, 0.88, 0.21);
             }
 
             isActivated = true;
@@ -92,7 +92,7 @@ public:
         if (isShutdown) 
         { 
             if (doorTransform) targetPosition -= openedOffset;
-            if (buttonModel) buttonModel->SetTintColor({ 1.0f, 0.0f, 0.0f,  1.0f });
+            if (buttonModel) buttonModel->SetTintColor({ 0.5f, 0.0f, 0.0f,  1.0f });
         }
     }
 };

@@ -1,0 +1,6 @@
+
+newmtl Material.038
+
+illum 2
+map_Kd drzwi4texture.png
+map_Ks drzwi4specular.png

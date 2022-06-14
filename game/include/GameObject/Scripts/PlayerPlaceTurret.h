@@ -2,6 +2,7 @@
 
 #include "GameApplication.h"
 #include "Components.h"
+#include "SoundPlayer.h"
 
 #include "GameManager.h"
 #include "MultiToolController.h"
@@ -66,7 +67,7 @@ private:
 
     std::shared_ptr<GameObject> turretPrefabs[3];
 
-
+SoundPlayer* sfxplay;
 public:
 
     void Start()
@@ -86,23 +87,25 @@ public:
 
         selectedTurretType = TurretType::Laser;
         multiTool->SetActiveIcon(selectedTurretType);
+
+        sfxplay = new SoundPlayer("Resources/sounds/Click_01mono.mp3");
     }
 
     void Update(float dt)
     {
         bool needUpdate = false; 
 
-        if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr1) && unlocked[0])
+        if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr1) && unlocked[0] && selectedTurretType != 0)
         {
             selectedTurretType = (TurretType)0;
             needUpdate = true;
         }
-        else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr2) && unlocked[1])
+        else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr2) && unlocked[1] && selectedTurretType != 1)
         {
             selectedTurretType = (TurretType)1;
             needUpdate = true;
         }
-        else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr3) && unlocked[2])
+        else if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr3) && unlocked[2] && selectedTurretType != 2)
         {
             selectedTurretType = (TurretType)2;
             needUpdate = true;
@@ -131,6 +134,7 @@ public:
 
         if (needUpdate)
         {
+            sfxplay->Play();
             multiTool->SetActiveIcon(selectedTurretType);
         }
 
@@ -367,19 +371,20 @@ public:
 
         auto gfxGO = std::make_shared<GameObject>();
         gfxGO->AddComponent(std::make_shared<cmp::Transform>());
+        // gfxGO->GetComponent<cmp::Transform>()->SetPosition(0.0f, 1.28f, 0.0f);
         gfxGO->AddComponent(std::make_shared<cmp::Name>("gfx"));
 
         auto mc = std::make_shared<cmp::Model>();
         mc->Create(
-            resMan->GetMesh("Resources/models/Wieze/Laser.obj"),
-            resMan->GetMaterial("Resources/models/Wieze/Laser.mtl")
+            resMan->GetMesh("Resources/models/Wieze/laser.obj"),
+            resMan->GetMaterial("Resources/models/Wieze/laser.mtl")
         );
         mc->SetTintColor(turretGhostColor);
         gfxGO->AddComponent(mc);
         
         gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
         gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
-            resMan->GetMesh("Resources/models/Wieze/Laser.obj")
+            resMan->GetMesh("Resources/models/Wieze/laser.obj")
         );
         gfxGO->AddComponent(turretShader);
 

@@ -1,0 +1,6 @@
+
+newmtl Material.036
+
+illum 2
+map_Kd NadStolik.png
+map_Ks NadStolikspecular.png

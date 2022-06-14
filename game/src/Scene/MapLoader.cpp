@@ -291,6 +291,7 @@ bool MapLoader::Load(
                 file >> std::dec >> type;
                 line_id++;
 
+                // shadeCmp->Create(gameObject->GetComponent<cmp::ModelInst>() == nullptr);
                 shadeCmp->Create(type);
             }
         }
@@ -411,6 +412,7 @@ bool MapLoader::Load(
 
                 gameObject->AddComponent(std::make_shared<BoxCollider>(true, true));
                 gameObject->GetComponent<cmp::BoxCol>()->setLengths({ 1.1, 1.1, 1.1 });
+                gameObject->GetComponent<cmp::BoxCol>()->SetOffset({0.0, 1.25, 0.0});
                 gameObject->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
 
                 auto model = std::make_shared<cmp::Model>();
@@ -427,6 +429,7 @@ bool MapLoader::Load(
                 //shooting
                 if (i == 1)
                 {
+                    gameObject->GetComponent<cmp::BoxCol>()->setLengths({ 4.1, 2.5, 0.6 });
                     model->Create(
                         resMan->GetMesh("Resources/models/Board/Board.obj"),
                         resMan->GetMaterial("Resources/models/Board/blueprintOffensive.mtl")
@@ -436,6 +439,7 @@ bool MapLoader::Load(
                 //laser
                 if (i == 2)
                 {
+                    gameObject->GetComponent<cmp::BoxCol>()->setLengths({ 0.6, 2.5, 4.1 });
                     model->Create(
                         resMan->GetMesh("Resources/models/Board/Board.obj"),
                         resMan->GetMaterial("Resources/models/Board/blueprintLaser.mtl")
@@ -492,14 +496,14 @@ bool MapLoader::Load(
 
             auto mc = std::make_shared<cmp::Model>();
             mc->Create(
-                resMan->GetMesh("Resources/models/Wieze/Laser.obj"),
-                resMan->GetMaterial("Resources/models/Wieze/Laser.mtl")
+                resMan->GetMesh("Resources/models/Wieze/laser.obj"),
+                resMan->GetMaterial("Resources/models/Wieze/laser.mtl")
             );
             gfxGO->AddComponent(mc);
 
             gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
             gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
-                resMan->GetMesh("Resources/models/Wieze/Laser.obj")
+                resMan->GetMesh("Resources/models/Wieze/laser.obj")
             );
             gfxGO->AddComponent(shader);
 

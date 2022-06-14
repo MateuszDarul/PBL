@@ -23,7 +23,7 @@ void EnemySpawnerScript::SpawnEnemy(int nr)
     std::shared_ptr<GameObject> go = std::make_shared<GameObject>();
     std::shared_ptr<ModelComponent> mc = std::make_shared<ModelComponent>();
     mc->Create(
-        resMan->GetMesh("Resources/models/displacement test/capsule.obj"),
+        resMan->GetMesh("Resources/models/ny/przeciwnik/przeciwnik/przeciwnik.obj"),
         resMan->GetMaterial("Resources/models/displacement test/capsule.mtl")
     );
     go->AddComponent(displShader);
@@ -31,11 +31,11 @@ void EnemySpawnerScript::SpawnEnemy(int nr)
 
     go->AddComponent(std::make_shared<FrustumCullingComponent>());
     go->GetComponent<cmp::FrustumCulling>()->Create(
-        resMan->GetMesh("Resources/models/displacement test/capsule.obj")
+        resMan->GetMesh("Resources/models/ny/przeciwnik/przeciwnik/przeciwnik.obj")
     );
 
     go->AddComponent(std::make_shared<cmp::Transform>());
-    go->GetComponent<cmp::Transform>()->SetPosition(-4, 3, 10);
+    go->GetComponent<cmp::Transform>()->SetRotation(0, 90, 0);
 
     go->AddComponent(std::make_shared<cmp::Name>("Enemy" + std::to_string(enemyEnumerator) + "," + gameObject->GetComponent<NameComponent>()->Get()));
 
@@ -57,7 +57,7 @@ void EnemySpawnerScript::SpawnEnemy(int nr)
     {
         path->AddWayPoint(wayPoints.at(i));
     }
-
+    go->GetComponent<cmp::Transform>()->SetPosition(wayPoints.at(0));
     path->Set();
 
     auto enemyScript = new EnemyScript(playerGO);

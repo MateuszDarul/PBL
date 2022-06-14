@@ -4,7 +4,7 @@
 #include "DoorActivator.h"
 #include "Health.h"
 #include "ShadowsManager.h"
-
+#include "SoundPlayer.h"
 
 class Cutscenexd : public Script
 {
@@ -27,6 +27,7 @@ private:
     bool hasStarted, hasFinished;
     
     bool isFadingOutAnimation = true;
+    SoundPlayer* siren;
 
 public:
 
@@ -36,6 +37,7 @@ public:
         hasFinished = false;
 
         if (enemy) enemyHealth = enemy->GetComponent<cmp::Scriptable>()->Get<Health>();
+        siren = new SoundPlayer("Resources/sounds/siren.wav");
     }
 
     void Update(float dt)
@@ -83,6 +85,7 @@ public:
             printf("Triggering cutscene...\n");
 
             doorsToShut->ForceShutdown();
+            siren->Play();
 
             alarmLightGO = std::make_shared<GameObject>();
             gameObject->GetNode()->GetRoot()->FindNode("MAIN")->AddChild(alarmLightGO);

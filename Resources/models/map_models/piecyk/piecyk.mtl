@@ -1,0 +1,7 @@
+
+
+newmtl Material.037
+
+illum 2
+map_Kd piecyk_Material.037_BaseColor.png
+map_Ks Specularmap\\Piecykspecular.png

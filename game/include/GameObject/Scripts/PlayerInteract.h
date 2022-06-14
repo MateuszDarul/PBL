@@ -31,12 +31,13 @@ public:
 private:
 
     MirrorRotate* selectedMirror = nullptr;
+    GameObject* tooltip;
 
 public:
 
     void Start()
     {
-
+        tooltip = gameObject->GetNode()->GetRoot()->FindNode("Tooltip")->GetGameObject().get();
     }
     bool usingRMBToRotate = false;
     glm::vec3 saveCamPos;
@@ -49,6 +50,7 @@ public:
 
         placeTurretScript->isLookingAtMirror = false;
         textTEMP->color = { 1.0f, 0.0f, 0.0f };
+        tooltip->GetComponent<TransformComponent>()->SetScale(0.0f);
         textTEMP->SetText("+");
         RayHitInfo hit;
         if (colMan->Raycast(camera->GetPosition(), camera->GetForward(), hit, interactRange, true, ignoreLayerMask))
@@ -70,6 +72,7 @@ public:
                 }
                 else if (auto blueprint = scriptable->Get<Blueprint>())
                 {
+                    tooltip->GetComponent<TransformComponent>()->SetScale(0.1f);
                     textTEMP->color = { 0.0f, 1.0f, 0.0f };
                     placeTurretScript->isLookingAtMirror = true; // to disable player placing
                     if (shouldInteract || Input()->Mouse()->OnPressed(MouseButton::Left_MB))
