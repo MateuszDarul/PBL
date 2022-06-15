@@ -432,39 +432,6 @@ Scene::Scene()
 
         world->FindNode("MAIN")->AddChild(go);
     }
-    {
-        go = std::make_shared<GameObject>();
-        go->AddComponent(std::make_shared<cmp::Name>("Mirror"));
-
-        go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(-37.5, 4.0, 55.5);
-        go->GetComponent<cmp::Transform>()->SetRotation(0.0, 180.0, 0.0);
-
-        go->AddComponent(std::make_shared<BoxCollider>(false, true, CollisionLayer::Mirror));
-        go->GetComponent<cmp::BoxCol>()->setLengths({2.0, 2.0, 2.0});
-        go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
-
-        auto model = std::make_shared<cmp::Model>();
-        model->Create(
-            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-            resMan->GetMaterial("Resources/models/floor/floor.mtl")
-        );
-        go->AddComponent(model);
-        go->AddComponent(shader_d);
-
-        go->AddComponent(std::make_shared<cmp::FrustumCulling>());
-        go->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
-
-
-        go->AddComponent(std::make_shared<cmp::Scriptable>());
-
-        auto mirrorScript = new MirrorRotate();
-        mirrorScript->SetEnabled(false);
-        mirrorScript->initialRotationOffsetY = 180.0f;
-        go->GetComponent<cmp::Scriptable>()->Add(mirrorScript);
-
-        world->FindNode("MAIN")->AddChild(go);
-    }
     
     //doors and activators
     struct DoorAndActivatorPair
