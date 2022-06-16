@@ -60,13 +60,16 @@ file(GLOB_RECURSE SOURCE_FILES
 
 	src/AI/StateMachine.cpp
 	src/AI/EnemyScript.cpp
+	src/AI/EnemySpawnerScript.cpp
 
 	src/AI/SteeringBehaviours.cpp
 
-	main.cpp
+	src/Sounds/SoundDevice.cpp
+	src/Sounds/SoundBuffer.cpp
+	src/Sounds/SoundSource.cpp
+	src/Sounds/MusicBuffer.cpp
 
-	ImGui/src/*.c
-	ImGui/src/*.cpp
+	main.cpp
 )
 	
 file(GLOB_RECURSE HEADER_FILES 
@@ -133,13 +136,16 @@ file(GLOB_RECURSE HEADER_FILES
 
 	include/AI/StateMachine.h
 	include/AI/EnemyScript.h
+	include/AI/EnemySpawnerScript.h
 
 	include/AI/SteeringBehaviours.h
 
 	include/AI/Path.h
 
-	ImGui/include/*.h
-	ImGui/include/*.hpp
+	include/Sounds/SoundDevice.h
+	include/Sounds/SoundBuffer.h
+	include/Sounds/SoundSource.h
+	include/Sounds/MusicBuffer.h
 
 	include/GameObject/Scripts/*.h
 )
@@ -153,7 +159,7 @@ include_directories(include/Resource)
 include_directories(include/Scene)
 include_directories(include/Scene/Menu)
 include_directories(include/AI)
-include_directories(ImGui/include)
+include_directories(include/Sounds)
 
 add_compile_options(-Wall)
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
@@ -164,24 +170,30 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${ASSIMP_INCLUDE_DIR}")
 target_include_directories(${PROJECT_NAME} PUBLIC "${GLFW_INCLUDE_DIR}")
 target_include_directories(${PROJECT_NAME} PUBLIC "${GLAD_INCLUDE_DIR}")
 target_include_directories(${PROJECT_NAME} PUBLIC "${GLM_INCLUDE_DIR}")
-target_include_directories(${PROJECT_NAME} PUBLIC "${IMGUI_INCLUDE_DIR}")
 target_include_directories(${PROJECT_NAME} PUBLIC "${STB_IMAGE_INCLUDE_DIR}")
 target_include_directories(${PROJECT_NAME} PUBLIC "${FREETYPE_INCLUDE_DIR}")
 target_include_directories(${PROJECT_NAME} PUBLIC "${RAPIDJSON_INCLUDE_DIR}")
 target_include_directories(${PROJECT_NAME} PUBLIC "${OPENAL_SOFT_INCLUDE_DIR}")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+target_include_directories(${PROJECT_NAME} PUBLIC "${FLAC_INCLUDE_DIR}")
+target_include_directories(${PROJECT_NAME} PUBLIC "${OPUS_INCLUDE_DIR}")
+endif()
+target_include_directories(${PROJECT_NAME} PUBLIC "${LIBSNDFILE_INCLUDE_DIR}")
 
 target_link_libraries(${PROJECT_NAME} "${OPENGL_LIBRARY}")
 target_link_libraries(${PROJECT_NAME} "${ASSIMP_LIBRARY}")
 target_link_libraries(${PROJECT_NAME} "${GLFW_LIBRARY}")
 target_link_libraries(${PROJECT_NAME} "${GLAD_LIBRARY}"      "${CMAKE_DL_LIBS}")
-target_link_libraries(${PROJECT_NAME} "${IMGUI_LIBRARY}"     "${CMAKE_DL_LIBS}")
 target_link_libraries(${PROJECT_NAME} "${STB_IMAGE_LIBRARY}" "${CMAKE_DL_LIBS}")
 target_link_libraries(${PROJECT_NAME} "${FREETYPE_LIBRARY}")
 target_link_libraries(${PROJECT_NAME} "${OPENAL_SOFT_LIBRARY}")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+target_link_libraries(${PROJECT_NAME} "${OPUS_LIBRARY}")
+endif()
+target_link_libraries(${PROJECT_NAME} "${LIBSNDFILE_LIBRARY}")
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE GLFW_INCLUDE_NONE)
 target_compile_definitions(${PROJECT_NAME} PRIVATE LIBRARY_SUFFIX="")
-
 
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

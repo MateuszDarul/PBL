@@ -36,8 +36,6 @@ private:
 
     float maxTurnRate; //!< the maximum rate (radians per second) at which this vehicle can rotate
 
-    std::shared_ptr<SceneNode> world; //!< a pointer to the world data
-
     SteeringBehaviours* steering; //!< a pointer to the steering behaviour class
 
     std::shared_ptr<Path> path; //!< a pointer to a path to follow
@@ -50,9 +48,8 @@ public:
     * @brief Konstruktor
     *
     */
-    EnemyScript(std::shared_ptr<SceneNode> wrld, std::shared_ptr<GameObject> p) {
+    EnemyScript(std::shared_ptr<GameObject> p) {
 
-        world = wrld;
         player = p;
 
     }

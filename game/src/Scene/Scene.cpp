@@ -2,6 +2,10 @@
 
 #include "ShadowsManager.h"
 
+#include "SoundDevice.h"
+#include "SoundBuffer.h"
+#include "MusicBuffer.h"
+
 #include "Scripts/RaycastTest.h"
 #include "Scripts/DoorActivator.h"
 #include "Scripts/PlayerPlaceTurret.h"
@@ -39,7 +43,15 @@ Scene::Scene()
     std::shared_ptr<cmp::Model> mc;
     std::shared_ptr<cmp::ModelInst> mic;
 
-    ///***
+    ///*** SOUND ///***
+
+    SoundDevice* soundDevice = SoundDevice::get();
+
+    musicBuffer = new MusicBuffer("Resources/Music/agresive.wav");
+
+    musicBuffer->Play();
+
+    /// *** SKYBOX
 
     skybox = new Skybox();
     std::string skyboxFaces[] = {
@@ -114,7 +126,11 @@ Scene::Scene()
     go->GetComponent<cmp::SphereCol>()->AddToCollidersManager(collidersManager);
     world->FindNode("MAIN")->AddChild(go);
 
-    MapLoader::Load("Resources/maps/world_nolights.map", world->FindNode("MAIN"), shader_l, collidersManager, shadowsManager);
+    //FOR ENEMY SCRIPT
+    MultiToolController* multiToolScript;
+    multiToolScript = new MultiToolController();
+
+    MapLoader::Load("Resources/maps/world_nolights.map", world->FindNode("MAIN"), shader_l, shader_d, lineShader, displShader, collidersManager, shadowsManager, this, multiToolScript, go);
 
     ///***
 
@@ -161,12 +177,12 @@ Scene::Scene()
     playerPlace->turretShader = shader_l;
     playerPlace->lineShader = lineShader;
 
-    //to fix rendering order
-    auto turretsHolderGO = std::make_shared<GameObject>();
-    turretsHolderGO->AddComponent(std::make_shared<cmp::Transform>());
-    auto turretsHolderNode = world->FindNode("MAIN")->AddChild(turretsHolderGO);
+    //to fix rendering order - moved at the end
+    // auto turretsHolderGO = std::make_shared<GameObject>();
+    // turretsHolderGO->AddComponent(std::make_shared<cmp::Transform>());
+    // auto turretsHolderNode = world->FindNode("MAIN")->AddChild(turretsHolderGO);
 
-    playerPlace->turretsHolder = turretsHolderNode.get();
+    // playerPlace->turretsHolder = turretsHolderNode.get();
     
     go->GetComponent<ScriptComponent>()->Add(playerPlace);
 
@@ -182,8 +198,9 @@ Scene::Scene()
 
     go->GetComponent<ScriptComponent>()->Add(playerInteract);
     
-    MultiToolController* multiToolScript;
+    //MultiToolController* multiToolScript; MOVED BEFORE MAP LOADER
     //multi tool
+    SceneNode* multiToolDisplayNode;
     {
         auto multiTool = std::make_shared<GameObject>();
         multiTool->AddComponent(std::make_shared<cmp::Name>("MultiTool"));
@@ -206,7 +223,7 @@ Scene::Scene()
 
         multiTool->AddComponent(std::make_shared<cmp::Scriptable>());
 
-        multiToolScript = new MultiToolController();
+        //multiToolScript = new MultiToolController(); MOVED BEFORE MAP LOADER
         multiTool->GetComponent<cmp::Scriptable>()->Add(multiToolScript);
         playerGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->multiTool = multiToolScript;
         
@@ -217,6 +234,7 @@ Scene::Scene()
         mutliToolDisplayHolder->GetComponent<cmp::Transform>()->SetPosition(0, 0.2, 0.5);
         mutliToolDisplayHolder->GetComponent<cmp::Transform>()->SetRotation(-10, 0, 0);
         auto displayNode = multiToolNode->AddChild(mutliToolDisplayHolder);
+        multiToolDisplayNode = displayNode.get();
 
 
         auto radialBar = std::make_shared<GameObject>();
@@ -238,9 +256,10 @@ Scene::Scene()
         {
             auto icon = std::make_shared<GameObject>();
             auto iconModel = std::make_shared<cmp::Model>();
+            std::string iconMaterialPath = "Resources/models/multitool/icon" + std::to_string(i+1) + ".mtl";
             iconModel->Create(
                 resMan->GetMesh("Resources/models/multitool/icon.obj"),
-                resMan->GetMaterial("Resources/models/multitool/icon.mtl")
+                resMan->GetMaterial(iconMaterialPath)
             );
             icon->AddComponent(iconModel);
             icon->AddComponent(shader_d);
@@ -298,8 +317,6 @@ Scene::Scene()
 
         world->FindNode("MAIN")->AddChild(go);
     }
-  
-
 
     //===enemy
     {      
@@ -317,7 +334,6 @@ Scene::Scene()
                 resMan->GetMesh("Resources/models/displacement test/capsule.obj")
             );
 
-        
         go->AddComponent(std::make_shared<cmp::Transform>());
         go->GetComponent<cmp::Transform>()->SetPosition(-100, 2, 25);
 
@@ -328,108 +344,21 @@ Scene::Scene()
         go->GetComponent<cmp::BoxCol>()->isOptimized = false;
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
-
         go->AddComponent(std::make_shared<cmp::Scriptable>());
         Health* health = new Health();
         health->SetMaxHealth(50.0f);
         health->scene = this;
         go->GetComponent<cmp::Scriptable>()->Add(health);
 
-        auto enemyScript = new EnemyScript(std::shared_ptr<SceneNode>(world), playerGO);
+        auto enemyScript = new EnemyScript(playerGO);
         enemyScript->health = health;
         enemyScript->multitool = multiToolScript;
-        std::shared_ptr<Path> e_path = std::make_shared<Path>();
+        std::shared_ptr<Path> e_path = std::make_shared<Path>(true);
         enemyScript->SetPath(e_path);
         go->GetComponent<cmp::Scriptable>()->Add(enemyScript);
     }
     world->FindNode("MAIN")->AddChild(go);
 
-
-        
-    //=== pickupable resource
-    std::vector<glm::vec3> resourcePositions = {
-        { -29.0f, 0.30f,  12.0f },
-        { -86.8f, 0.30f,  67.6f },
-        { -78.0f, 0.30f,  91.5f },
-        { -78.7f, 0.25f,  92.8f },
-    };
-
-    for (int i = 0; i < resourcePositions.size(); i++)
-    {
-        go = std::make_shared<GameObject>();
-        go->AddComponent(std::make_shared<cmp::Name>("Resource " + std::to_string(i)));
-        
-        go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(resourcePositions[i]);
-        go->GetComponent<cmp::Transform>()->SetScale(0.4);
-
-        go->AddComponent(std::make_shared<BoxCollider>(true, true));
-        go->GetComponent<cmp::BoxCol>()->SetLengths({1.0, 1.0, 1.0});
-        go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
-
-        auto model = std::make_shared<cmp::Model>();
-        model->Create(
-            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-            resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
-        );
-        go->AddComponent(model);
-        go->AddComponent(shader_d);
-
-        go->AddComponent(std::make_shared<cmp::FrustumCulling>());
-        go->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
-
-        auto resourceScript = new Resource();
-        go->AddComponent(std::make_shared<cmp::Scriptable>());
-        go->GetComponent<cmp::Scriptable>()->Add(resourceScript);
-
-    
-        world->FindNode("MAIN")->AddChild(go);
-    }
-
-    
-
-    //blueprints
-    struct BlueprintPosition {
-        glm::vec3 position;
-        PlayerPlaceTurret::TurretType type;
-    };
-    std::vector<BlueprintPosition> blueprints = {
-        {{ -73.0f, 0.5f, 89.5f },  PlayerPlaceTurret::TurretType::Blockade  },    //???
-        {{ -83.0f, 0.5f, 69.5f },  PlayerPlaceTurret::TurretType::Shooting },    //Shooting
-        {{ -26.0f, 0.5f,  5.0f },  PlayerPlaceTurret::TurretType::Laser    }     //Laser
-    };
-    for (int i = 0; i < 3; i++)
-    {
-        go = std::make_shared<GameObject>();
-        go->AddComponent(std::make_shared<cmp::Name>("Blueprint " + std::to_string(i)));
-        
-        go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(blueprints[i].position);
-        go->GetComponent<cmp::Transform>()->SetScale(0.5);
-
-        go->AddComponent(std::make_shared<BoxCollider>(true, true));
-        go->GetComponent<cmp::BoxCol>()->SetLengths({1.1, 1.1, 1.1});
-        go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
-
-        auto model = std::make_shared<cmp::Model>();
-        model->Create(
-            resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-            resMan->GetMaterial("Resources/models/wall/wall.mtl")
-        );
-        go->AddComponent(model);
-        go->AddComponent(shader_d);
-
-        go->AddComponent(std::make_shared<cmp::FrustumCulling>());
-        go->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
-
-        auto resourceScript = new Blueprint();
-        resourceScript->type = blueprints[i].type;
-        go->AddComponent(std::make_shared<cmp::Scriptable>());
-        go->GetComponent<cmp::Scriptable>()->Add(resourceScript);
-
-    
-        world->FindNode("MAIN")->AddChild(go);
-    }
 
     //mirrors
 
@@ -547,8 +476,8 @@ Scene::Scene()
     };
 
     std::vector<DoorAndActivatorPair> doorsAndButtons = {  //0 rot = Z aligned; 90 rot = X aligned
-        { { -15.00,  1.0,  25.0 }, 90.0f,   { -20.0,  2.5,  20.49 } },  //room 1
-        { { -25.00,  1.0,  50.5 }, 90.0f,   { -20.0,  2.5,  47.49 } },  //room 2
+        { { -15.00,  1.0,  25.0 }, 90.0f,   { -20.0,  2.5,  20.48 } },  //room 1
+        { { -25.00,  1.0,  50.5 }, 90.0f,   { -20.0,  2.5,  47.48 } },  //room 2
         { { -64.75,  1.0,  60.0 },  0.0f,   { -61.0,  3.0,  64.60 } },  //room 3 - cutscene close (important id)
         { { -73.00,  1.0,  74.5 }, 90.0f,   { -61.0, -9.0,  64.60 } },  //room 4 - cutscene open  (important id)
     };
@@ -623,164 +552,6 @@ Scene::Scene()
         world->FindNode("MAIN")->AddChild(go);
     }
 
-    //predefined lasers
-    {
-        go = std::make_shared<GameObject>();
-        go->AddComponent(std::make_shared<cmp::Transform>());
-        go->AddComponent(std::make_shared<cmp::Name>("debugturet"));
-        go->GetComponent<cmp::Transform>()->SetPosition(-30.0f, 0.0f, 28.5f);
-        go->GetComponent<cmp::Transform>()->SetRotation(0.0, -20.0, 0.0);
-
-
-        auto scriptHolder = std::make_shared<cmp::Scriptable>();
-        go->AddComponent(scriptHolder);
-
-        auto turretScript = new TurretLaser();
-        turretScript->colMan = collidersManager;
-        
-        auto line = std::make_shared<cmp::Line>();
-        line->Create();
-        line->thickness = 2.0f;
-        line->color1 = { 1.0f, 1.0f, 0.0f };
-        line->color2 = { 1.0f, 0.7f, 0.0f };
-
-        go->AddComponent(line);
-        go->AddComponent(lineShader);
-        turretScript->line = line.get(); 
-
-        scriptHolder->Add(turretScript);
-
-        go->AddComponent(std::make_shared<cmp::BoxCol>(true, true, CollisionLayer::GUI));
-        std::shared_ptr<cmp::BoxCol> col = go->GetComponent<cmp::BoxCol>();
-        col->SetLengths({ 2.0, 2.5, 2.0 });
-        col->SetOffset({ 0.0, 1.75, 0.0 });
-        col->AddToCollidersManager(collidersManager);
-
-        auto gfxGO = std::make_shared<GameObject>();
-        gfxGO->AddComponent(std::make_shared<cmp::Transform>());
-        gfxGO->AddComponent(std::make_shared<cmp::Name>("gfx"));
-
-        auto mc = std::make_shared<cmp::Model>();
-        mc->Create(
-            resMan->GetMesh("Resources/models/Wieze/Laser.obj"),
-            resMan->GetMaterial("Resources/models/Wieze/Laser.mtl")
-        );
-        gfxGO->AddComponent(mc);
-        
-        gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
-        gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
-            resMan->GetMesh("Resources/models/Wieze/Laser.obj")
-        );
-        gfxGO->AddComponent(shader_d);
-
-
-        world->FindNode("MAIN")->AddChild(go)->AddChild(gfxGO);
-    }
-
-    //generator
-    struct GeneratorInfo
-    {
-        glm::vec3 position;
-        bool isEnabled;
-    };
-    std::vector<GeneratorInfo> genPositions = {
-        {{ -10.0f, 0.0f, 10.0f }, true  },
-        {{ -20.0f, 0.0f, 29.0f }, false },
-    };
-    for (auto& [position, isEnabled] : genPositions)
-    {
-        float lightbulbOffset = 2.5f;
-        float lightRange = 11.0f;
-
-        auto bulbPos = glm::vec3(position.x, position.y + lightbulbOffset, position.z);
-
-        go = std::make_shared<GameObject>();
-        go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(bulbPos);
-        go->AddComponent(std::make_shared<cmp::Name>("debugbulb"));
-
-
-        auto bulbModel = std::make_shared<cmp::Model>();
-        bulbModel->Create(
-            resMan->GetMesh("Resources/models/Sphere/Sphere.obj"),
-            resMan->GetMaterial("Resources/models/wall/wall.mtl")
-        );
-        go->AddComponent(bulbModel);
-        go->AddComponent(shader_d);
-
-        go->AddComponent(std::make_shared<SphereCollider>(false, true, CollisionLayer::GUI));
-        go->GetComponent<SphereCollider>()->SetRadius(0.6f);
-        go->GetComponent<SphereCollider>()->AddToCollidersManager(collidersManager);
-
-
-        auto light = std::make_shared<cmp::PointLight>();
-        auto lightGO = std::make_shared<GameObject>();
-        lightGO->AddComponent(light);
-        light->Create();
-        light->AddShader(shader_l);
-        light->SetPosition(bulbPos);
-        light->SetDamping(lightRange);
-        light->SetLightColor({ 0.8f, 0.8f, 1.0f });
-        shadowsManager->AddLight(lightGO.get());
-
-        if (!isEnabled)
-        {
-            bulbModel->SetTintColor(0.4f, 0.4f, 0.8f);
-            light->SetPosition({ 999, 999, 999 });
-        }
-
-        go->AddComponent(std::make_shared<cmp::Scriptable>());
-
-        LightActivator* activator = new LightActivator();
-        activator->bulbModel = bulbModel.get();
-        activator->lightComponent = light.get();
-        activator->isAlwaysLit = isEnabled;
-        go->GetComponent<cmp::Scriptable>()->Add(activator);
-
-
-        auto rangeGO = std::make_shared<GameObject>();
-        rangeGO->AddComponent(std::make_shared<cmp::Transform>());
-        rangeGO->AddComponent(std::make_shared<cmp::Name>("debugrange"));
-
-        rangeGO->AddComponent(std::make_shared<SphereCollider>(true, false, CollisionLayer::Ignore));
-        rangeGO->GetComponent<SphereCollider>()->SetRadius(lightRange);
-        rangeGO->GetComponent<SphereCollider>()->AddToCollidersManager(collidersManager);
-
-        rangeGO->AddComponent(std::make_shared<cmp::Scriptable>());
-        LanternRange* range = new LanternRange();
-        range->colMan = collidersManager;
-        range->isAlwaysLit = isEnabled; 
-        range->ChangeLightPower(isEnabled);
-        rangeGO->GetComponent<cmp::Scriptable>()->Add(range);
-
-        activator->range = range;
-
-        auto gfxGO = std::make_shared<GameObject>();
-        gfxGO->AddComponent(std::make_shared<cmp::Transform>());
-        gfxGO->GetComponent<cmp::Transform>()->SetPosition(0.0f, -lightbulbOffset, 0.0f);
-        gfxGO->AddComponent(std::make_shared<cmp::Name>("gfx"));
-
-        auto mc = std::make_shared<cmp::Model>();
-        mc->Create(
-            resMan->GetMesh("Resources/models/Wieze/Latarnia.obj"),
-            resMan->GetMaterial("Resources/models/Wieze/Latarnia.mtl")
-        );
-        gfxGO->AddComponent(mc);
-
-        gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
-        gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
-            resMan->GetMesh("Resources/models/Wieze/Latarnia.obj")
-        );
-        gfxGO->AddComponent(shader_l);
-
-        
-        auto node = world->FindNode("MAIN")->AddChild(go);
-        node->AddChild(gfxGO);
-        node->AddChild(rangeGO);
-        world->FindNode("MAIN")->AddChild(lightGO);
-    }
-
-
     //cutscene
     {
         go = std::make_shared<GameObject>();
@@ -803,26 +574,34 @@ Scene::Scene()
         cutscene->doorsToOpen = openDoorAfterEnemyDies;
         cutscene->lightShader = shader_l;
         cutscene->shadowManager = shadowsManager;
-        cutscene->enemyHealth = world->FindNode("Enemy")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<Health>();
+        cutscene->enemy = world->FindNode("Enemy")->GetGameObject();
         go->GetComponent<cmp::Scriptable>()->Add(cutscene);
         
         
         world->FindNode("MAIN")->AddChild(go);
     }
 
+    //=== fixing rendering order
+    auto turretsHolderGO = std::make_shared<GameObject>();
+    turretsHolderGO->AddComponent(std::make_shared<cmp::Transform>());
+    auto turretsHolderNode = world->FindNode("MAIN")->AddChild(turretsHolderGO);
+
+    playerPlace->turretsHolder = turretsHolderNode.get();
+
     //=== text
 
     //renderowany jako ostatni bo inaczej sa te dziwne artefakty
 
     {
-        Font* font = resMan->GetFont("Resources/fonts/arial.ttf");
+        Font* font = resMan->GetFont("Resources/fonts/Segment7-4Gml.otf");
 
         go = std::make_shared<GameObject>();
         auto tc = std::make_shared<TransformComponent>();
         auto energyTextComponentTEMP = std::make_shared<TextComponent>();
-        energyTextComponentTEMP->Create("Resources: ", font);
+        energyTextComponentTEMP->Create("0", font);
         energyTextComponentTEMP->alwaysSeen = true;
-        energyTextComponentTEMP->isGuiElement = true;
+        //energyTextComponentTEMP->isCentered = true;
+        // energyTextComponentTEMP->isGuiElement = true;
         energyTextComponentTEMP->color = {1.0f, 0.6f, 0.0f};
 
         auto textShader = std::make_shared<ShaderComponent>();
@@ -833,14 +612,13 @@ Scene::Scene()
         go->AddComponent(tc);
         go->AddComponent(energyTextComponentTEMP);
 
-        go->GetComponent<TransformComponent>()->SetPosition(0.1f, 0.1f, 0.1f);
-        go->GetComponent<TransformComponent>()->SetScale(0.1f);
+        go->GetComponent<TransformComponent>()->SetPosition(-0.02341f, -0.035f, 0.0f);
+        go->GetComponent<TransformComponent>()->SetScale(0.07f);
         go->AddComponent(std::make_shared<cmp::Name>("EnergyText"));
         
-        world->FindNode("GUI")->AddChild(go);
+        multiToolDisplayNode->AddChild(go);
     }
-
-
+    //
     //crosshair
     {
         Font* font = resMan->GetFont("Resources/fonts/arial.ttf");
@@ -862,7 +640,7 @@ Scene::Scene()
         go->AddComponent(tc);
         go->AddComponent(crosshairTextTEMP);
 
-        go->GetComponent<TransformComponent>()->SetPosition(0.1f, 0.1f, 0.1f);
+        // go->GetComponent<TransformComponent>()->SetPosition(0.1f, 0.1f, 0.1f);
         go->GetComponent<TransformComponent>()->SetScale(0.1f);
         go->AddComponent(std::make_shared<cmp::Name>("CROSSHAIR"));
         
@@ -926,9 +704,9 @@ void Scene::Update(float dt)
     goCamera->GetComponent<CameraComponent>()->SetPosition(transformCamera->GetPosition());
     transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();
 
+    //SOUND
+    musicBuffer->UpdateBufferStream();
 
-
-    
     //Position multitool
 
     auto mtTransform = GO_MULTITOOL->GetComponent<cmp::Transform>();
@@ -1063,36 +841,3 @@ CollidersManager* Scene::GetCollidersManager()
     world->AddChild(mainObject)->AddChild(gfxGO);
 }
 */
-void Scene::CreateLanternTurret(glm::vec3 position, std::shared_ptr<cmp::Shader> crystalShader, std::shared_ptr<cmp::Shader> turretShader)
-{
-    ResourceManager* resMan = GameApplication::GetResourceManager();
-    std::shared_ptr<GameObject> gObject = std::make_shared<GameObject>();
-    gObject->AddComponent(std::make_shared<cmp::Transform>());
-    gObject->GetComponent<cmp::Transform>()->SetPosition(position);
-
-
-    auto gfxGO = std::make_shared<GameObject>();
-    gfxGO->AddComponent(std::make_shared<cmp::Transform>());
-    gfxGO->AddComponent(std::make_shared<cmp::Name>("gfx"));
-
-    auto mc = std::make_shared<cmp::Model>();
-    mc->Create(
-        resMan->GetMesh("Resources/models/Wieze/Latarnia.obj"),
-        resMan->GetMaterial("Resources/models/Wieze/Latarnia.mtl")
-    );
-    gfxGO->AddComponent(mc);
-
-    gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
-    gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
-        resMan->GetMesh("Resources/models/Wieze/Latarnia.obj")
-    );
-    gfxGO->AddComponent(turretShader);
-
-
-    // gfxGO->AddComponent(std::make_shared<cmp::Shade>());
-    // std::shared_ptr<cmp::Shade> shadeCmp = gfxGO->GetComponent<cmp::Shade>();
-    // shadeCmp->Create(1);
-
-
-    world->AddChild(gObject)->AddChild(gfxGO);
-}

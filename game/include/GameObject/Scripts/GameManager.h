@@ -31,7 +31,12 @@ public:
 	void UpdateResourcesText()
 	{
 		if (energyText)
-			energyText->SetText("Resources: " + std::to_string(energy));
+		{
+			std::string text = std::to_string(energy);
+			if (energy < 100) text = "0" + text;
+			if (energy < 10 ) text = "0" + text;
+			energyText->SetText(text);
+		}
 	}
 
 	void IncreaseEnergy(int energy)

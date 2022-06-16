@@ -4,13 +4,14 @@
 #include "Components.h"
 #include "CollidersManager.h"
 
+#include "Turret.h"
 #include "DoorActivator.h"
 #include "LightActivator.h"
 
 #include <glm/gtx/rotate_vector.hpp>
 
 
-class TurretLaser : public Script
+class TurretLaser : public Turret
 {
 public:
     
@@ -29,10 +30,6 @@ public:
     cmp::Line* line;
     CollidersManager* colMan;
 
-
-    //for public use
-       
-    int lightSourcesInRange = 0;
  
 private:
 

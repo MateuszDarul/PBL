@@ -1,9 +1,28 @@
 #include "MapLoader.h"
+#include "Scripts/PlayerPlaceTurret.h"
+#include "Scripts/Blueprint.h"
+#include "Scripts/Resource.h"
 
 #include "ShadowsManager.h"
+#include "EnemySpawnerScript.h"
 
-bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Shader> shader, CollidersManager* collisionManager, ShadowsManager* shadowsManager)
+bool MapLoader::Load(
+    std::string path, 
+    SceneNode* root, 
+    std::shared_ptr<cmp::Shader> shader, 
+    std::shared_ptr<cmp::Shader> shader_d, 
+    std::shared_ptr<cmp::Shader> shader_l, 
+    std::shared_ptr<cmp::Shader> shader_dis, 
+    CollidersManager* collisionManager, 
+    ShadowsManager* shadowsManager, 
+    Scene* scn,
+    MultiToolController* multiToolScript,
+    std::shared_ptr<GameObject> p)
 {
+    int resourceBoxCounter = 0;
+    int predefinedLasersCounter = 0;
+    int generatorCounter = 0;
+    int spawnerCounter = 0;
     ResourceManager* resMan = GameApplication::GetResourceManager();
 
     std::shared_ptr<GameObject> gameObject;
@@ -338,6 +357,287 @@ bool MapLoader::Load(std::string path, SceneNode* root, std::shared_ptr<cmp::Sha
             default:
                 std::cerr << "Undefined collider type:" << type << " supported [0,1]" << std::endl;
             }
+        }
+        else if (line == "Resource:")
+        {
+            gameObject->AddComponent(std::make_shared<cmp::Name>("Resource " + std::to_string(resourceBoxCounter)));
+            resourceBoxCounter++;
+
+            gameObject->GetComponent<cmp::Transform>()->SetScale(0.4);
+
+            gameObject->AddComponent(std::make_shared<BoxCollider>(true, true));
+            gameObject->GetComponent<cmp::BoxCol>()->SetLengths({ 1.0, 1.0, 1.0 });
+            gameObject->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
+
+            auto model = std::make_shared<cmp::Model>();
+            model->Create(
+                resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+                resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
+            );
+            gameObject->AddComponent(model);
+            gameObject->AddComponent(shader);
+
+            gameObject->AddComponent(std::make_shared<cmp::FrustumCulling>());
+            gameObject->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+
+            auto resourceScript = new Resource();
+            gameObject->AddComponent(std::make_shared<cmp::Scriptable>());
+            gameObject->GetComponent<cmp::Scriptable>()->Add(resourceScript);
+        }
+        else if (line == "Blueprints:")
+        {
+            //blueprints
+            struct BlueprintPosition {
+                glm::vec3 position;
+                PlayerPlaceTurret::TurretType type;
+            };
+            std::vector<BlueprintPosition> blueprints = {
+                {{ -73.0f, 1.25f, 89.5f },  PlayerPlaceTurret::TurretType::Blockade  },    //baricade
+                {{ -83.0f, 1.25f, 69.5f },  PlayerPlaceTurret::TurretType::Shooting },    //Shooting
+                {{ -26.8f, 1.25f, 5.0f },  PlayerPlaceTurret::TurretType::Laser    }     //Laser
+            };
+            for (int i = 0; i < 3; i++)
+            {
+                gameObject = std::make_shared<GameObject>();
+                gameObject->AddComponent(std::make_shared<cmp::Name>("Blueprint " + std::to_string(i)));
+
+                gameObject->AddComponent(std::make_shared<cmp::Transform>());
+                gameObject->GetComponent<cmp::Transform>()->SetPosition(blueprints[i].position);
+
+                if (i == 2)
+                {
+                    gameObject->GetComponent<cmp::Transform>()->SetRotation(0.0f, 90.0f, 0.0f);
+                }
+
+                gameObject->AddComponent(std::make_shared<BoxCollider>(true, true));
+                gameObject->GetComponent<cmp::BoxCol>()->SetLengths({ 1.1, 1.1, 1.1 });
+                gameObject->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
+
+                auto model = std::make_shared<cmp::Model>();
+
+                //barricade
+                if (i == 0)
+                {
+                    model->Create(
+                        resMan->GetMesh("Resources/models/Board/Board.obj"),
+                        resMan->GetMaterial("Resources/models/Board/blueprintDefensive.mtl")
+                    );
+                }
+
+                //shooting
+                if (i == 1)
+                {
+                    model->Create(
+                        resMan->GetMesh("Resources/models/Board/Board.obj"),
+                        resMan->GetMaterial("Resources/models/Board/blueprintOffensive.mtl")
+                    );
+                }
+
+                //laser
+                if (i == 2)
+                {
+                    model->Create(
+                        resMan->GetMesh("Resources/models/Board/Board.obj"),
+                        resMan->GetMaterial("Resources/models/Board/blueprintLaser.mtl")
+                    );
+                }
+                gameObject->AddComponent(model);
+                gameObject->AddComponent(shader_d);
+
+                gameObject->AddComponent(std::make_shared<cmp::FrustumCulling>());
+                gameObject->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Board/Board.obj"));
+
+                auto resourceScript = new Blueprint();
+                resourceScript->type = blueprints[i].type;
+                gameObject->AddComponent(std::make_shared<cmp::Scriptable>());
+                gameObject->GetComponent<cmp::Scriptable>()->Add(resourceScript);
+
+                if (i != 2)
+                {
+                    root->AddChild(gameObject);
+                }
+            }
+        }
+        else if (line == "LaserTurret:")
+        {
+            gameObject->AddComponent(std::make_shared<cmp::Name>("predefLaserTurret" + std::to_string(predefinedLasersCounter)));
+            
+            auto scriptHolder = std::make_shared<cmp::Scriptable>();
+            gameObject->AddComponent(scriptHolder);
+
+            auto turretScript = new TurretLaser();
+            turretScript->colMan = collisionManager;
+
+            auto line = std::make_shared<cmp::Line>();
+            line->Create();
+            line->thickness = 2.0f;
+            line->color1 = { 1.0f, 1.0f, 0.0f };
+            line->color2 = { 1.0f, 0.7f, 0.0f };
+
+            gameObject->AddComponent(line);
+            gameObject->AddComponent(shader_l);
+            turretScript->line = line.get();
+
+            scriptHolder->Add(turretScript);
+
+            gameObject->AddComponent(std::make_shared<cmp::BoxCol>(true, true, CollisionLayer::GUI));
+            std::shared_ptr<cmp::BoxCol> col = gameObject->GetComponent<cmp::BoxCol>();
+            col->SetLengths({ 2.0, 2.5, 2.0 });
+            col->SetOffset({ 0.0, 1.75, 0.0 });
+            col->AddToCollidersManager(collisionManager);
+
+            auto gfxGO = std::make_shared<GameObject>();
+            gfxGO->AddComponent(std::make_shared<cmp::Transform>());
+            gfxGO->AddComponent(std::make_shared<cmp::Name>("gfxLaser" + std::to_string(predefinedLasersCounter)));
+
+            auto mc = std::make_shared<cmp::Model>();
+            mc->Create(
+                resMan->GetMesh("Resources/models/Wieze/Laser.obj"),
+                resMan->GetMaterial("Resources/models/Wieze/Laser.mtl")
+            );
+            gfxGO->AddComponent(mc);
+
+            gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
+            gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
+                resMan->GetMesh("Resources/models/Wieze/Laser.obj")
+            );
+            gfxGO->AddComponent(shader);
+
+            root->AddChild(gameObject)->AddChild(gfxGO);
+
+            predefinedLasersCounter++;
+        }
+        else if (line == "Generator:")
+        {
+            glm::vec3 position;
+            bool isEnabled;
+            file >> std::dec >> position.x;
+            file >> std::dec >> position.y;
+            file >> std::dec >> position.z;
+            file >> std::dec >> isEnabled;
+
+            line_id += 4;
+
+            float lightbulbOffset = 2.5f;
+            float lightRange = 11.0f;
+
+            auto bulbPos = glm::vec3(position.x, position.y + lightbulbOffset, position.z);
+
+            gameObject->AddComponent(std::make_shared<cmp::Transform>());
+            gameObject->GetComponent<cmp::Transform>()->SetPosition(bulbPos);
+            gameObject->AddComponent(std::make_shared<cmp::Name>("bulb" + std::to_string(generatorCounter)));
+
+            auto bulbModel = std::make_shared<cmp::Model>();
+            bulbModel->Create(
+                resMan->GetMesh("Resources/models/Sphere/Sphere.obj"),
+                resMan->GetMaterial("Resources/models/wall/wall.mtl")
+            );
+            gameObject->AddComponent(bulbModel);
+            gameObject->AddComponent(shader_d);
+
+            gameObject->AddComponent(std::make_shared<SphereCollider>(false, true, CollisionLayer::GUI));
+            gameObject->GetComponent<SphereCollider>()->SetRadius(0.6f);
+            gameObject->GetComponent<SphereCollider>()->AddToCollidersManager(collisionManager);
+
+
+            auto light = std::make_shared<cmp::PointLight>();
+            auto lightGO = std::make_shared<GameObject>();
+            lightGO->AddComponent(light);
+            light->Create();
+            light->AddShader(shader);
+            light->SetPosition(bulbPos);
+            light->SetDamping(lightRange);
+            light->SetLightColor({ 0.8f, 0.8f, 1.0f });
+            shadowsManager->AddLight(lightGO.get());
+
+            if (!isEnabled)
+            {
+                bulbModel->SetTintColor(0.4f, 0.4f, 0.8f);
+                light->SetPosition({ 999, 999, 999 });
+            }
+
+            gameObject->AddComponent(std::make_shared<cmp::Scriptable>());
+
+            LightActivator* activator = new LightActivator();
+            activator->bulbModel = bulbModel.get();
+            activator->lightComponent = light.get();
+            activator->isAlwaysLit = isEnabled;
+            gameObject->GetComponent<cmp::Scriptable>()->Add(activator);
+
+
+            auto rangeGO = std::make_shared<GameObject>();
+            rangeGO->AddComponent(std::make_shared<cmp::Transform>());
+            rangeGO->AddComponent(std::make_shared<cmp::Name>("range" + std::to_string(generatorCounter)));
+
+            rangeGO->AddComponent(std::make_shared<SphereCollider>(true, false, CollisionLayer::Ignore));
+            rangeGO->GetComponent<SphereCollider>()->SetRadius(lightRange);
+            rangeGO->GetComponent<SphereCollider>()->AddToCollidersManager(collisionManager);
+
+            rangeGO->AddComponent(std::make_shared<cmp::Scriptable>());
+            LanternRange* range = new LanternRange();
+            range->colMan = collisionManager;
+            range->isAlwaysLit = isEnabled;
+            range->ChangeLightPower(isEnabled);
+            rangeGO->GetComponent<cmp::Scriptable>()->Add(range);
+
+            activator->range = range;
+
+            auto gfxGO = std::make_shared<GameObject>();
+            gfxGO->AddComponent(std::make_shared<cmp::Transform>());
+            gfxGO->GetComponent<cmp::Transform>()->SetPosition(0.0f, -lightbulbOffset, 0.0f);
+            gfxGO->AddComponent(std::make_shared<cmp::Name>("gfxGen" + std::to_string(generatorCounter)));
+
+            auto mc = std::make_shared<cmp::Model>();
+            mc->Create(
+                resMan->GetMesh("Resources/models/Wieze/Latarnia.obj"),
+                resMan->GetMaterial("Resources/models/Wieze/Latarnia.mtl")
+            );
+            gfxGO->AddComponent(mc);
+
+            gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
+            gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
+                resMan->GetMesh("Resources/models/Wieze/Latarnia.obj")
+            );
+            gfxGO->AddComponent(shader);
+
+            generatorCounter++;
+
+            auto node = root->AddChild(gameObject);
+            node->AddChild(gfxGO);
+            node->AddChild(rangeGO);
+            root->AddChild(lightGO);
+        }
+        else if (line == "Spawner:")
+        {
+            gameObject->AddComponent(std::make_shared<cmp::Name>("spawner" + std::to_string(spawnerCounter)));
+
+            auto scriptHolder = std::make_shared<cmp::Scriptable>();
+            gameObject->AddComponent(scriptHolder);
+
+            auto spawnerScript = new EnemySpawnerScript(root, shader_dis, collisionManager, scn, multiToolScript, p);
+
+            std::string ln;
+            file >> std::dec >> ln;
+            line_id++;
+
+            glm::vec3 position;
+
+            while (ln == "Node:")
+            {
+                file >> std::dec >> position.x;
+                file >> std::dec >> position.y;
+                file >> std::dec >> position.z;
+                line_id += 3;
+
+                spawnerScript->AddWayPoint(position);
+
+                file >> std::dec >> ln;
+                line_id++;
+            }
+
+            scriptHolder->Add(spawnerScript);
+
+            spawnerCounter++;
         }
         else if(line == "END")
         {

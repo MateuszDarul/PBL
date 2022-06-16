@@ -502,6 +502,8 @@ void SceneNode::PrivateDelete()
     {
         scriptable->Clear();
     }
+
+    this->GetGameObject()->SetDestroyed();
     
     for (unsigned short int i = 0; i < this->children.size(); i++)
     {

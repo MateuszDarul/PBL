@@ -29,6 +29,8 @@ bool TextComponent::Create(const std::string& text, Font* font)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    calcCurrentWidth();
+
     return true;
 }
 
@@ -38,6 +40,22 @@ void TextComponent::Clear()
 
     glDeleteBuffers(1, &VBO);
     glDeleteVertexArrays(1, &VAO);
+}
+
+float TextComponent::GetWidth() const
+{
+    return currentWidth;
+}
+
+void TextComponent::calcCurrentWidth()
+{
+    currentWidth = 0.0f;
+    std::string::const_iterator c;
+    for (c = text.begin(); c != text.end(); c++)
+    {
+        currentWidth += font->characters[*c].Size.x;
+    }
+    currentWidth *= 0.01f * 0.25f * 0.07;
 }
 
 bool TextComponent::Draw(std::shared_ptr<ShaderComponent> shader)
@@ -108,6 +126,7 @@ bool TextComponent::Draw(std::shared_ptr<ShaderComponent> shader)
 void TextComponent::SetText(std::string text)
 {
     this->text = text;
+    calcCurrentWidth();
 }
 
 std::string TextComponent::GetText()

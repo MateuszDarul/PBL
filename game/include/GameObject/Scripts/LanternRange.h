@@ -2,18 +2,20 @@
 
 #include "Components.h"
 
-class TurretLaser;
+class Turret;
 
 
 class LanternRange : public Script
 {
 public:
-	std::vector<TurretLaser*> turretsInRange;
+	std::vector<Turret*> turretsInRange;
+
+	GameObject* playerInRange;
 	
 	bool isAlwaysLit = false;
 
 	CollidersManager* colMan;
-	int lineOfSightIgnoreLayerMask = ~(CollisionLayer::Player | CollisionLayer::Ignore);
+	int lineOfSightIgnoreLayerMask = ~(CollisionLayer::Player | CollisionLayer::ENEMY | CollisionLayer::Ignore);
 
 private:
 
@@ -25,8 +27,8 @@ public:
 
 	void ChangeLightPower(bool enabled);
 	
-	bool IsInRange(TurretLaser* turret);
-	bool HasLineOfSight(TurretLaser* turret);
+	bool IsInRange(Turret* turret);
+	bool HasLineOfSight(Turret* turret);
 
 	void TriggerEnter(std::shared_ptr<ColliderComponent> collider) override;
 	void TriggerExit(std::shared_ptr<ColliderComponent> collider) override;

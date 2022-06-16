@@ -82,6 +82,16 @@ SceneNode* GameObject::GetNode()
     return node;
 }
 
+bool GameObject::IsDestroyed() const
+{
+    return isDestroyed;
+}
+
+void GameObject::SetDestroyed(bool destroyed)
+{
+    isDestroyed = destroyed;
+}
+
 
 ///***
 

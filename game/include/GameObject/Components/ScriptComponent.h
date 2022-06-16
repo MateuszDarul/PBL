@@ -89,6 +89,9 @@ protected:
     bool enabled = true;
 
     friend ScriptComponent;
+
+public:
+    virtual ~Script() = default;
 };
 
 
@@ -204,6 +207,10 @@ ScriptType* ScriptComponent::Get()
         if (typeid(*s) == typeid(ScriptType)) 
         {
            return (ScriptType*)s;
+        }
+        else if(ScriptType* v = dynamic_cast<ScriptType*>(s)) 
+        {
+            return v;
         }
     }
 
