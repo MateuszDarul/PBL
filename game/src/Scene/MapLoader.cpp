@@ -2,6 +2,7 @@
 #include "Scripts/PlayerPlaceTurret.h"
 #include "Scripts/Blueprint.h"
 #include "Scripts/Resource.h"
+#include "Scripts/MirrorRotate.h"
 
 #include "ShadowsManager.h"
 #include "EnemySpawnerScript.h"
@@ -23,6 +24,7 @@ bool MapLoader::Load(
     int predefinedLasersCounter = 0;
     int generatorCounter = 0;
     int spawnerCounter = 0;
+    int mirrorCounter = 0;
     ResourceManager* resMan = GameApplication::GetResourceManager();
 
     std::shared_ptr<GameObject> gameObject;
@@ -642,6 +644,77 @@ bool MapLoader::Load(
             scriptHolder->Add(spawnerScript);
 
             spawnerCounter++;
+        }
+        else if (line == "Mirror:")
+        {
+            glm::vec3 offset, initialRot, maxRot;
+            
+            std::string ln;
+            file >> ln;
+            line_id++;
+            while (ln != "END" && ln != "")
+            {
+                if (ln == "Offset:")
+                {
+                    file >> std::dec >> offset.x;
+                    file >> std::dec >> offset.y;
+                    file >> std::dec >> offset.z;
+                    
+                    file >> ln;
+                    line_id += 4;
+                }
+                if (ln == "Facing:")
+                {
+                    file >> std::dec >> initialRot.x;
+                    file >> std::dec >> initialRot.y;
+
+                    file >> ln;
+                    line_id += 3;
+                }
+                if (ln == "MaxRot:")
+                {
+                    file >> std::dec >> maxRot.x;
+                    file >> std::dec >> maxRot.y;
+
+                    file >> ln;
+                    line_id += 3;
+                }
+            }
+            
+            gameObject->AddComponent(std::make_shared<cmp::Name>("Mirror" + std::to_string(mirrorCounter++)));
+
+            auto mirrorGO = std::make_shared<GameObject>();
+            mirrorGO->AddComponent(std::make_shared<BoxCollider>(false, true, CollisionLayer::Mirror));
+            mirrorGO->GetComponent<cmp::BoxCol>()->setLengths({ 2.0, 2.0, 2.0 });
+            mirrorGO->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
+
+            mirrorGO->AddComponent(std::make_shared<cmp::Transform>());
+            mirrorGO->GetComponent<cmp::Transform>()->SetPosition(offset);
+
+            auto model = std::make_shared<cmp::Model>();
+            model->Create(
+                resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+                resMan->GetMaterial("Resources/models/floor/floor.mtl")
+            );
+            mirrorGO->AddComponent(model);
+            mirrorGO->AddComponent(shader_d);
+
+            mirrorGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
+            mirrorGO->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+
+
+            gameObject->AddComponent(std::make_shared<cmp::Scriptable>());
+
+            auto mirrorScript = new MirrorRotate();
+            mirrorScript->SetEnabled(false);
+            mirrorScript->initialRotationOffsetX = initialRot.x;
+            mirrorScript->initialRotationOffsetY = initialRot.y;
+            mirrorScript->maxRotationX = maxRot.x;
+            mirrorScript->maxRotationY = maxRot.y;
+            gameObject->GetComponent<cmp::Scriptable>()->Add(mirrorScript);
+
+
+            root->AddChild(gameObject)->AddChild(mirrorGO);
         }
         else if(line == "END")
         {
