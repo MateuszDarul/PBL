@@ -250,7 +250,7 @@ bool MapLoader::Load(
             {
                 file >> modelName;
                 line_id++;
-
+                std::cout << line_id << " " << modelName << "\n";
                 file >> std::dec >> amount;
                 line_id++;
 
@@ -426,6 +426,18 @@ bool MapLoader::Load(
             auto resourceScript = new Resource();
             gameObject->AddComponent(std::make_shared<cmp::Scriptable>());
             gameObject->GetComponent<cmp::Scriptable>()->Add(resourceScript);
+
+            std::string endOrAmount;
+            file >> endOrAmount;
+            line_id++;
+            if (endOrAmount.compare("END") == 0)
+            {
+                root->AddChild(gameObject);
+            }
+            else
+            {
+                resourceScript->energy = std::stoi(endOrAmount);
+            }
         }
         else if (line == "Blueprints:")
         {

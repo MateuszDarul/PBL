@@ -46,7 +46,7 @@ private:
     bool isPaused;
 
     void LoadLevelTutorial(const SceneInfo& sceneInfo);
-    void LoadLevelPuzzle1();
+    void LoadLevelPuzzle1(const SceneInfo& sceneInfo);
 
 public:
     /** @brief Domyslny konstruktor.

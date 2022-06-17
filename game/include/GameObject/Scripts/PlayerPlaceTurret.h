@@ -159,14 +159,20 @@ public:
             RayHitInfo hit;
             if (colMan->Raycast(transform->GetPosition(), camera->GetForward(), hit, placingRange + turretWallOffset, false, ignoreLayerMask))
             {
-                hit.point -= turretWallOffset * camera->GetForward();
-
                 line->Set(1, hit.point - transform->GetPosition());
 
                 float dot = glm::dot(glm::vec3(0.0f, 1.0f, 0.0f), hit.normal);
                 if (dot > 0.9f)  //hit floor
                 {
-                    lineIndexToPlace = 1;
+                    if (hit.distance > placingRange)
+                    {
+                        line->Set(1, camera->GetForward() * placingRange);
+                    }
+                    else
+                    {
+                        line->Set(1, camera->GetForward() * hit.distance);
+                        lineIndexToPlace = 1;
+                    }
                 }
                 else if (dot < -0.7f) //hit ceiling
                 {
@@ -179,7 +185,7 @@ public:
                 }
                 else //hit wall
                 {
-                    line->Set(1, hit.point - transform->GetPosition());
+                    line->Set(1, hit.point - transform->GetPosition() - turretWallOffset * camera->GetForward());
                 }
             }
             else
