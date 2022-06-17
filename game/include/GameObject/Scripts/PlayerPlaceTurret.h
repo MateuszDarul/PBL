@@ -34,7 +34,8 @@ public:
     int turretCosts[3] = { 30, 80, 40 };
 
 
-    glm::vec4 turretGhostColor = { 0.0f, 1.0f, 0.0f,   0.5f };
+    glm::vec4 turretGhostColorOK = { 0.0f, 1.0f, 0.0f,   0.5f };
+    glm::vec4 turretGhostColorWrong = { 0.98f, 0.4f, 0.35f,   0.5f };
 
 
     //set these in 'inspector'
@@ -66,6 +67,8 @@ private:
     std::shared_ptr<cmp::Camera> camera;
 
     std::shared_ptr<GameObject> turretPrefabs[3];
+    
+    float turretWallOffset = 1.5f;
 
 SoundPlayer* sfxplay;
 public:
@@ -146,43 +149,100 @@ public:
         turretPrefabs[1]->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
         turretPrefabs[2]->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
 
+        std::shared_ptr<cmp::Model> model;
+
         if (isPlacing)
         {
-            if (Input()->Mouse()->OnPressed(MouseButton::Left_MB) && gameManager->GetCurrentEnergy() >= turretCosts[selectedTurretType]) 
-            {
-                hasPlacedTurret = true;
-            }
-            else if (Input()->Mouse()->OnPressed(MouseButton::Right_MB))
-            {
-                isPlacing = false;
-            }
+            bool canPlace = true;
 
+            //Find point for placing
             RayHitInfo hit;
-            if (colMan->Raycast(transform->GetPosition(), camera->GetForward(), hit, placingRange, false, ignoreLayerMask))
+            if (colMan->Raycast(transform->GetPosition(), camera->GetForward(), hit, placingRange + turretWallOffset, false, ignoreLayerMask))
             {
                 line->Set(1, hit.point - transform->GetPosition());
+
+                float dot = glm::dot(glm::vec3(0.0f, 1.0f, 0.0f), hit.normal);
+                if (dot > 0.9f)  //hit floor
+                {
+                    if (hit.distance > placingRange)
+                    {
+                        line->Set(1, camera->GetForward() * placingRange);
+                    }
+                    else
+                    {
+                        line->Set(1, camera->GetForward() * hit.distance);
+                        lineIndexToPlace = 1;
+                    }
+                }
+                else if (dot < -0.7f) //hit ceiling
+                {
+                    line->Set(1, glm::vec3(0.0f));
+                }
+                else if (abs(dot) > 0.2f) //hit some weird angle
+                {
+                    lineIndexToPlace = 1;
+                    canPlace = false;
+                }
+                else //hit wall
+                {
+                    line->Set(1, hit.point - transform->GetPosition() - turretWallOffset * camera->GetForward());
+                }
             }
             else
             {
                 line->Set(1, camera->GetForward() * placingRange); 
             }            
 
-            if (colMan->Raycast(transform->GetPosition() + line->Get(1), {0.0f, -1.0f, 0.0f}, hit, 10.0f, false, ignoreLayerMask))
+            if (lineIndexToPlace != 1)
             {
-                line->Set(2, hit.point - transform->GetPosition());
-            }
-            else
-            {
-                line->Set(2, line->Get(1) + glm::vec3(0.0f, -1.0f, 0.0f));
-                lineIndexToPlace = 1;
-            }  
+                if (colMan->Raycast(transform->GetPosition() + line->Get(1), {0.0f, -1.0f, 0.0f}, hit, 15.0f, false, ignoreLayerMask))
+                {
+                    line->Set(2, hit.point - transform->GetPosition());
 
+                    float dot = glm::dot(glm::vec3(0.0f, 1.0f, 0.0f), hit.normal);
+                    if (abs(dot) > 0.2f && dot < 0.9f) //hit some weird angle
+                    {
+                        canPlace = false;
+                    }
+                }
+                else
+                {
+                    line->Set(2, line->Get(1) + glm::vec3(0.0f, -1.0f, 0.0f));
+                    canPlace = false;
+                }  
+            }
+
+            // Position the turret
             if (selectedTurretType != TurretType::None)
             {
                 glm::vec3 adjust = {0.0f, 0.0f, 0.0f};
                 turretPrefabs[selectedTurretType]->GetComponent<cmp::Transform>()->SetPosition(line->Get(lineIndexToPlace) + transform->GetPosition() + adjust);
                 turretPrefabs[selectedTurretType]->GetComponent<cmp::Transform>()->SetRotation(0.0f, -camera->GetYaw(), 0.0f);
             }   
+
+
+            // Handle ghost color
+            bool hasEnoughResources = gameManager->GetCurrentEnergy() >= turretCosts[selectedTurretType];
+
+            model = turretPrefabs[selectedTurretType]->GetComponent<cmp::Model>();
+            if (!model)
+                if (auto gfxNode = turretPrefabs[selectedTurretType]->GetNode()->FindNode("gfx"))
+                    model = gfxNode->GetGameObject()->GetComponent<cmp::Model>();
+
+            if (model)
+            {
+                model->SetTintColor(hasEnoughResources && canPlace ? turretGhostColorOK : turretGhostColorWrong);
+            }
+
+            // Handle player input
+            if (Input()->Mouse()->OnPressed(MouseButton::Left_MB) && hasEnoughResources && canPlace)
+            {
+                hasPlacedTurret = true;
+            }
+            else if (Input()->Mouse()->OnPressed(MouseButton::Right_MB) || Input()->Keyboard()->OnPressed(KeyboardKey::Escape_KB))
+            {
+                isPlacing = false;
+            }
         }
         else
         {
@@ -208,12 +268,6 @@ public:
                 }
             }
 
-            
-            auto model = turretPrefabs[selectedTurretType]->GetComponent<cmp::Model>();
-            if(!model)
-                if (auto gfxNode = turretPrefabs[selectedTurretType]->GetNode()->FindNode("gfx"))
-                    model = gfxNode->GetGameObject()->GetComponent<cmp::Model>();
-            
             if (model)
             {
                 model->SetTintColor(1.0, 1.0, 1.0);
@@ -268,7 +322,7 @@ public:
             resMan->GetMaterial("Resources/models/Wieze/Latarnia.mtl")
         );
         gfxGO->AddComponent(mc);
-        mc->SetTintColor(turretGhostColor);
+        mc->SetTintColor(turretGhostColorOK);
         
         gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
         gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
@@ -296,7 +350,7 @@ public:
             resMan->GetMaterial("Resources/models/Wieze/Strzelajaca.mtl")
         );
         turretPrefabs[type]->AddComponent(mc);
-        mc->SetTintColor(turretGhostColor);
+        mc->SetTintColor(turretGhostColorOK);
         turretPrefabs[type]->AddComponent(turretShader);
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::Transform>());
         turretPrefabs[type]->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
@@ -379,7 +433,7 @@ public:
             resMan->GetMesh("Resources/models/Wieze/laser.obj"),
             resMan->GetMaterial("Resources/models/Wieze/laser.mtl")
         );
-        mc->SetTintColor(turretGhostColor);
+        mc->SetTintColor(turretGhostColorOK);
         gfxGO->AddComponent(mc);
         
         gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());

@@ -1,6 +1,9 @@
 #include "TextComponent.h"
 #include "SceneNode.h"
 
+float TextComponent::s_ScaleFactor = 0.01f * 0.25f;
+float TextComponent::s_LineSpacing = 0.05f;
+
 TextComponent::TextComponent()
 	: Component(13)
 {
@@ -47,15 +50,32 @@ float TextComponent::GetWidth() const
     return currentWidth;
 }
 
+float TextComponent::GetHeight() const
+{
+    return currentHeight;
+}
+
 void TextComponent::calcCurrentWidth()
 {
     currentWidth = 0.0f;
+    maxLineHeight = 0.0f;
+
+    int linesCount = 1;
     std::string::const_iterator c;
     for (c = text.begin(); c != text.end(); c++)
     {
+        if (*c == '\n')
+        {
+            linesCount += 1;
+            continue;
+        }
         currentWidth += font->characters[*c].Size.x;
+        if (font->characters[*c].Size.y > maxLineHeight) maxLineHeight = font->characters[*c].Size.y;
     }
-    currentWidth *= 0.01f * 0.25f * 0.07;
+
+    currentWidth *= s_ScaleFactor;
+    maxLineHeight *= s_ScaleFactor;
+    currentHeight = (maxLineHeight + s_LineSpacing) * linesCount - s_LineSpacing;
 }
 
 bool TextComponent::Draw(std::shared_ptr<ShaderComponent> shader)
@@ -76,7 +96,7 @@ bool TextComponent::Draw(std::shared_ptr<ShaderComponent> shader)
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
 
-    float scale = 0.01f * 0.25f;
+    float scale = s_ScaleFactor;
     float x = (isCentered) ? (-font->characters[text.at(0)].Size.x * scale * text.size() * 0.5f) : 0.0f;
     float y = 0.0f;
 
@@ -84,6 +104,13 @@ bool TextComponent::Draw(std::shared_ptr<ShaderComponent> shader)
     std::string::const_iterator c;
     for (c = text.begin(); c != text.end(); c++)
     {
+        if (*c == '\n')
+        {
+            x = 0.0f;
+            y -= maxLineHeight + s_LineSpacing;
+            continue;
+        }
+
         Character ch = font->characters[*c];
 
         float xpos = x + ch.Bearing.x * scale;
@@ -113,6 +140,9 @@ bool TextComponent::Draw(std::shared_ptr<ShaderComponent> shader)
         // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
         x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
     }
+
+
+
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -123,7 +153,7 @@ bool TextComponent::Draw(std::shared_ptr<ShaderComponent> shader)
     return true;
 }
 
-void TextComponent::SetText(std::string text)
+void TextComponent::SetText(const std::string& text)
 {
     this->text = text;
     calcCurrentWidth();
