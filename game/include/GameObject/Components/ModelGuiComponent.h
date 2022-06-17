@@ -15,12 +15,16 @@
  */
 class ModelGuiComponent :public Component
 {
+public:
+    glm::vec4 tintColor = { 1.0f, 1.0f, 1.0f, 1.0f }; //!< Kolor gui
+    bool alwaysSeen = false; //!< Flaga, czy widac przez sciany
+    bool isGuiElement = false; //<! Flaga, czy uzywac projekcji prostokatnej
 private:
     unsigned int VAO; //!< Vertex Array Object.
     unsigned int VBO; //!< Vertex Buffer Object.
-
-    Mesh* mesh; //!< Wskazanie na siatke, z ktorej korzysta model.
-    Material* material; //!< Wskazanie na material, z ktorego korzysta model.
+    unsigned int TexID; //!< Texture id
+    int width; //!< Texture width
+    int height; //!< Texture height
 
 public:
     /** @brief Domyslny konstruktor.
@@ -32,12 +36,10 @@ public:
     ~ModelGuiComponent();
 
     /** @brief Tworzy nowy model.
-     * @param mesh - Wskazanie na siatke, z ktorej bedzie korzystal model.
-     * @param material - Wskazanie na material, z ktorego bedzie korzystal model.
      * @return true - Stworzono nowy model.
      * @return false - Wystapil blad podczas tworzenia modelu.
      */
-    bool Create(Mesh* mesh, Material* material);
+    bool Create(const std::string& pathToTexture);
 
     /** @brief Usuwa wybrany model.
      */
