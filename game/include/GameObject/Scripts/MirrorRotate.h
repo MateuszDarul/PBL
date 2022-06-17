@@ -90,8 +90,8 @@ public:
         {
             modifier *= rotationSpeed * dt;
 
-            if (Input()->Keyboard()->IsPressed(KeyboardKey::W)) currentRotationX -= modifier * invertRotationX_temp * invertRotationX_const;
-            if (Input()->Keyboard()->IsPressed(KeyboardKey::S)) currentRotationX += modifier * invertRotationX_temp * invertRotationX_const;
+            if (Input()->Keyboard()->IsPressed(KeyboardKey::W)) currentRotationX += modifier * invertRotationX_temp * invertRotationX_const;
+            if (Input()->Keyboard()->IsPressed(KeyboardKey::S)) currentRotationX -= modifier * invertRotationX_temp * invertRotationX_const;
             if (Input()->Keyboard()->IsPressed(KeyboardKey::D)) currentRotationY += modifier * invertRotationY_temp * invertRotationY_const;
             if (Input()->Keyboard()->IsPressed(KeyboardKey::A)) currentRotationY -= modifier * invertRotationY_temp * invertRotationY_const;
         }

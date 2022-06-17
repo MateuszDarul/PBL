@@ -34,7 +34,8 @@ public:
     int turretCosts[3] = { 30, 80, 40 };
 
 
-    glm::vec4 turretGhostColor = { 0.0f, 1.0f, 0.0f,   0.5f };
+    glm::vec4 turretGhostColorOK = { 0.0f, 1.0f, 0.0f,   0.5f };
+    glm::vec4 turretGhostColorWrong = { 0.98f, 0.4f, 0.35f,   0.5f };
 
 
     //set these in 'inspector'
@@ -146,9 +147,23 @@ public:
         turretPrefabs[1]->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
         turretPrefabs[2]->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
 
+        std::shared_ptr<cmp::Model> model;
+
         if (isPlacing)
         {
-            if (Input()->Mouse()->OnPressed(MouseButton::Left_MB) && gameManager->GetCurrentEnergy() >= turretCosts[selectedTurretType]) 
+            bool hasEnoughResources = gameManager->GetCurrentEnergy() >= turretCosts[selectedTurretType];
+
+            model = turretPrefabs[selectedTurretType]->GetComponent<cmp::Model>();
+            if (!model)
+                if (auto gfxNode = turretPrefabs[selectedTurretType]->GetNode()->FindNode("gfx"))
+                    model = gfxNode->GetGameObject()->GetComponent<cmp::Model>();
+
+            if (model)
+            {
+                model->SetTintColor(hasEnoughResources ? turretGhostColorOK : turretGhostColorWrong);
+            }
+
+            if (Input()->Mouse()->OnPressed(MouseButton::Left_MB) && hasEnoughResources)
             {
                 hasPlacedTurret = true;
             }
@@ -208,12 +223,6 @@ public:
                 }
             }
 
-            
-            auto model = turretPrefabs[selectedTurretType]->GetComponent<cmp::Model>();
-            if(!model)
-                if (auto gfxNode = turretPrefabs[selectedTurretType]->GetNode()->FindNode("gfx"))
-                    model = gfxNode->GetGameObject()->GetComponent<cmp::Model>();
-            
             if (model)
             {
                 model->SetTintColor(1.0, 1.0, 1.0);
@@ -268,7 +277,7 @@ public:
             resMan->GetMaterial("Resources/models/Wieze/Latarnia.mtl")
         );
         gfxGO->AddComponent(mc);
-        mc->SetTintColor(turretGhostColor);
+        mc->SetTintColor(turretGhostColorOK);
         
         gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
         gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
@@ -296,7 +305,7 @@ public:
             resMan->GetMaterial("Resources/models/Wieze/Strzelajaca.mtl")
         );
         turretPrefabs[type]->AddComponent(mc);
-        mc->SetTintColor(turretGhostColor);
+        mc->SetTintColor(turretGhostColorOK);
         turretPrefabs[type]->AddComponent(turretShader);
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::Transform>());
         turretPrefabs[type]->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
@@ -379,7 +388,7 @@ public:
             resMan->GetMesh("Resources/models/Wieze/laser.obj"),
             resMan->GetMaterial("Resources/models/Wieze/laser.mtl")
         );
-        mc->SetTintColor(turretGhostColor);
+        mc->SetTintColor(turretGhostColorOK);
         gfxGO->AddComponent(mc);
         
         gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
