@@ -81,31 +81,28 @@ public:
 
         if (!disableMouseRotation)
         {
-            currentRotationX -= mouseOffset.y * mouseRotationSpeed * modifier * invertRotationX_temp * invertRotationX_const;
-            currentRotationY += mouseOffset.x * mouseRotationSpeed * modifier * invertRotationY_temp * invertRotationY_const;
+            modifier *= mouseRotationSpeed;
 
-            currentRotationX = std::clamp(currentRotationX, -maxRotationX + initialRotationOffsetX, maxRotationX + initialRotationOffsetX);
-            currentRotationY = std::clamp(currentRotationY, -maxRotationY + initialRotationOffsetY, maxRotationY + initialRotationOffsetY);
-
-            float factor = 0.48f;
-            smoothedRotationX = smoothedRotationX + factor * (currentRotationX - smoothedRotationX);
-            smoothedRotationY = smoothedRotationY + factor * (currentRotationY - smoothedRotationY);
-
-            transform->SetRotation(smoothedRotationX, smoothedRotationY, 0.0f);
+            currentRotationX -= mouseOffset.y * modifier * invertRotationX_temp * invertRotationX_const;
+            currentRotationY += mouseOffset.x * modifier * invertRotationY_temp * invertRotationY_const;
         }
         else
         {
-            float rotationAmount = rotationSpeed * modifier * dt;
+            modifier *= rotationSpeed * dt;
 
-            if (Input()->Keyboard()->IsPressed(KeyboardKey::W)) currentRotationX += rotationAmount * invertRotationX_temp * invertRotationX_const;
-            if (Input()->Keyboard()->IsPressed(KeyboardKey::S)) currentRotationX -= rotationAmount * invertRotationX_temp * invertRotationX_const;
-            if (Input()->Keyboard()->IsPressed(KeyboardKey::D)) currentRotationY -= rotationAmount * invertRotationX_temp * invertRotationX_const;
-            if (Input()->Keyboard()->IsPressed(KeyboardKey::A)) currentRotationY += rotationAmount * invertRotationX_temp * invertRotationX_const;
-
-            currentRotationX = std::clamp(currentRotationX, -maxRotationX + initialRotationOffsetX, maxRotationX + initialRotationOffsetX);
-            currentRotationY = std::clamp(currentRotationY, -maxRotationY + initialRotationOffsetY, maxRotationY + initialRotationOffsetY);
-
-            transform->SetRotation(currentRotationX, currentRotationY, 0.0f);
+            if (Input()->Keyboard()->IsPressed(KeyboardKey::W)) currentRotationX -= modifier * invertRotationX_temp * invertRotationX_const;
+            if (Input()->Keyboard()->IsPressed(KeyboardKey::S)) currentRotationX += modifier * invertRotationX_temp * invertRotationX_const;
+            if (Input()->Keyboard()->IsPressed(KeyboardKey::D)) currentRotationY += modifier * invertRotationY_temp * invertRotationY_const;
+            if (Input()->Keyboard()->IsPressed(KeyboardKey::A)) currentRotationY -= modifier * invertRotationY_temp * invertRotationY_const;
         }
+
+        currentRotationX = std::clamp(currentRotationX, -maxRotationX + initialRotationOffsetX, maxRotationX + initialRotationOffsetX);
+        currentRotationY = std::clamp(currentRotationY, -maxRotationY + initialRotationOffsetY, maxRotationY + initialRotationOffsetY);
+
+        float factor = 0.48f;
+        smoothedRotationX = smoothedRotationX + factor * (currentRotationX - smoothedRotationX);
+        smoothedRotationY = smoothedRotationY + factor * (currentRotationY - smoothedRotationY);
+
+        transform->SetRotation(smoothedRotationX, smoothedRotationY, 0.0f);
     }
 };

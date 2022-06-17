@@ -152,7 +152,7 @@ public:
             {
                 hasPlacedTurret = true;
             }
-            else if (Input()->Mouse()->OnPressed(MouseButton::Right_MB))
+            else if (Input()->Mouse()->OnPressed(MouseButton::Right_MB) || Input()->Keyboard()->OnPressed(KeyboardKey::Escape_KB))
             {
                 isPlacing = false;
             }

@@ -352,6 +352,14 @@ void SceneNode::Render(const glm::mat4& matrixPV)
                             {
                                 linePtr->Draw(shaderPtr);
                             }
+                            else
+                            {
+                                std::shared_ptr<cmp::ModelGui> modelGui = this->gameObject->GetComponent<cmp::ModelGui>();
+                                if (modelGui != nullptr)
+                                {
+                                    modelGui->Draw(shaderPtr);
+                                }
+                            }
                         }
                     }
                 }

@@ -58,11 +58,12 @@ public:
      */
     bool Draw(std::shared_ptr<ShaderComponent> shader);
 
-    void SetText(std::string text);
+    void SetText(const std::string& text);
 
     std::string GetText();
 
     float GetWidth() const;
+    float GetHeight() const;
 
 private:
     unsigned int VAO; //!< Vertex Array Object.
@@ -71,5 +72,10 @@ private:
     std::string text; //!< Tekst do wyswietlenia
     Font* font; //!< Wskazanie na czcionke
     float currentWidth;
+    float currentHeight;
+    float maxLineHeight;
     void calcCurrentWidth();
+
+    static float s_ScaleFactor;
+    static float s_LineSpacing;
 };
