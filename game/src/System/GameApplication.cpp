@@ -53,6 +53,7 @@ bool GameApplication::inGame = false;
 InputManager* GameApplication::s_InputManager = nullptr;
 ResourceManager* GameApplication::s_ResourceManager = nullptr;
 
+float GameApplication::s_TotalElapsedTime = 0.0f;
 
 
 struct MemoryStatistics
@@ -205,6 +206,8 @@ void GameApplication::Run()
         dt = t1 - t2;
         t2 = t1;
 
+        s_TotalElapsedTime += dt;
+
         if(inGame)
         {
             //update logic
@@ -304,4 +307,9 @@ void GameApplication::SetFov(float fov)
 float GameApplication::GetAspectRatio()
 {
     return s_AspectRatio;
+}
+
+float GameApplication::GetTotalElapsedTime()
+{
+    return s_TotalElapsedTime;
 }

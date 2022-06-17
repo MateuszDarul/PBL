@@ -32,6 +32,16 @@ public:
         return front;
     }
 
+    glm::vec3 GetRight()
+    {
+        return right;
+    }
+
+    glm::vec3 GetUp()
+    {
+        return up;
+    }
+
     /** @brief Zwraca kąt obrotu kamery w osi Y
      */
     float GetYaw()
@@ -58,6 +68,12 @@ private:
     bool isEnabledMovement;
     bool isEnabledRotation;
     bool isGrounded;
+    bool isMoving;
+
+    float shakeTimer;
+    float shakeAmount;
+    float shakeSpeed;
+    float shakeSlowFactor;
 
     glm::mat4 view; //!< Macierz widoku kamery.
 
@@ -157,11 +173,18 @@ public:
     bool GetIsGrounded();
     void SetIsGrounded(bool grounded);
 
+    bool IsMoving() const;
 
     float GetPitch() const;
     float GetYaw() const;
     void SetRotation(float pitch, float yaw);
     void SetRotationOffset(float pitch, float yaw);
+
+
+    void ShakeCamera(float time, float amount, float speed, float slowFactor = 0.9f);
+    float GetShakeTime() { return shakeTimer; }
+    float GetShakeSpeed() { return shakeSpeed; }
+    float GetShakeAmount() { return shakeAmount; }
 
 
     /** @brief Pozwala na przemieszczanie kamery w wybranym kierunku.

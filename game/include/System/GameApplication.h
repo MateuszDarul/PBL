@@ -29,6 +29,8 @@ private:
     static InputManager* s_InputManager;
     static ResourceManager* s_ResourceManager;
 
+    static float s_TotalElapsedTime;
+
 public:
     static MenuScene* s_Menu;
     static bool inGame;
@@ -97,6 +99,8 @@ public:
     static glm::uvec2 GetWindowSize();
 
     static float GetAspectRatio();
+
+    static float GetTotalElapsedTime();
 
     /**
      * @brief Get the Projection Range

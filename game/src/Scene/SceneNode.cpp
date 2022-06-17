@@ -164,7 +164,6 @@ extern std::shared_ptr<GameObject> GO_CROSSHAIR;
 
 Frustum SceneNode::cameraFrustum;
 std::vector<SceneNode::NodeToDelete> SceneNode::nodesToDelete;
-float GlobalElapsedTime = 0.0f;
 
 SceneNode::SceneNode(std::shared_ptr<GameObject> gameObject)
     :parent(nullptr), gameObject(gameObject)
@@ -223,7 +222,6 @@ void SceneNode::Update(float dt)
     }
 #endif
 
-    GlobalElapsedTime += dt;
     this->PrivateUpdate(dt, glm::mat4(1.f));
 
     SceneNode::cameraFrustum = 
@@ -316,7 +314,7 @@ void SceneNode::Render(const glm::mat4& matrixPV)
             shaderPtr->SetMat4("transform", matrixPV);
             shaderPtr->SetMat4("model", this->globalTransformations);
             shaderPtr->SetVec4("u_TintColor", {1, 1, 1, 1});
-            shaderPtr->SetFloat("u_Time", GlobalElapsedTime);
+            shaderPtr->SetFloat("u_Time", GameApplication::GetTotalElapsedTime());
             shaderPtr->SetVec3("u_CameraPos", this->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Transform>()->GetPosition());
 
             std::shared_ptr<cmp::Model> modelPtr = this->gameObject->GetComponent<cmp::Model>();

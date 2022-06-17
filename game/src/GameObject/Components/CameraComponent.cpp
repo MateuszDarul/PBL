@@ -1,6 +1,9 @@
 #include "CameraComponent.h"
+#include "GameApplication.h"
 
-#define ENABLE_JUMP_SETTINGS
+#include <glm/gtx/rotate_vector.hpp>
+
+//#define ENABLE_JUMP_SETTINGS
 
 CameraComponent::CameraComponent()
     :Component(7)
@@ -53,6 +56,12 @@ bool CameraComponent::Create(const glm::vec3& position)
     
     this->position = position;
 
+    isMoving = false;
+    shakeTimer = -1.0f;
+    shakeAmount = 0.01f;
+    shakeSpeed = 50.0f;
+    shakeSlowFactor = 0.99f;
+
     UpdateVectors();
 
     return true;
@@ -78,17 +87,42 @@ void CameraComponent::SetSpeed(const float& speedPerSec)
     this->speedPerSec = speedPerSec;
 }
 
+//bob settings
+static glm::mat4 viewcopy;
+static float bobAmount = 0.034909f;
+static float bobSpeed = 12.3f;
 const glm::mat4& CameraComponent::GetView()
 {
+    glm::vec3 newUp = up;
+    glm::vec3 newFront = front;
+
+    if (shakeTimer > 0.0f)
+    {
+        float s = sin(GameApplication::GetTotalElapsedTime() * shakeSpeed) * shakeAmount;
+        newUp = glm::rotate(this->up, 0.69f * s, this->front);
+        newFront = glm::rotate(this->front, s, this->right);
+        newFront = glm::rotate(newFront, -0.3f * s, glm::vec3(0.0f, 1.0f, 0.0f));
+    }
+
     if(this->needUpdate)
     {
-        this->view = glm::lookAt(this->position, this->position + this->front, this->up);
+        this->view = glm::lookAt(this->position, this->position + newFront, newUp);
     }
-    return this->view;
+    viewcopy = this->view;
+
+    if (isGrounded && isMoving) //handle head bob
+    viewcopy[3][1] += sin(GameApplication::GetTotalElapsedTime() * bobSpeed) * bobAmount;
+
+    return viewcopy;
 }
 
-
-//float JUMP_TIMER = 0.0f; //temporary 'is grounded' check
+void CameraComponent::ShakeCamera(float time, float amount, float speed, float slowFactor)
+{
+    shakeTimer = time;
+    shakeAmount = amount;
+    shakeSpeed = speed;
+    shakeSlowFactor = slowFactor;
+}
 
 void CameraComponent::CalculateJumpParams()
 {
@@ -107,9 +141,15 @@ void CameraComponent::Update(InputManager* inputManager, const float& deltaTime)
     if(inputManager->Keyboard()->IsPressed(KeyboardKey::Left))  SetJumpTimeToPeak(jumpTimeToPeak - deltaTime);
 #endif
 
+    if (shakeTimer > 0.0f)
+    {
+        shakeTimer -= deltaTime;
+        shakeAmount *= shakeSlowFactor;
+    }
 
     this->ProcessMouseMovement(inputManager->Mouse()->GetPosition());
 
+    isMoving = false;
     if (isEnabledMovement)
     {        
         float velocity = this->speedPerSec * deltaTime;
@@ -118,21 +158,25 @@ void CameraComponent::Update(InputManager* inputManager, const float& deltaTime)
         {
             this->position += glm::normalize(glm::vec3(this->front.x, 0, this->front.z)) * velocity;
             this->needUpdate = true;
+            isMoving = true;
         }
         if(inputManager->Keyboard()->IsPressed(KeyboardKey::S))
         {
             this->position -= glm::normalize(glm::vec3(this->front.x, 0, this->front.z)) * velocity;
             this->needUpdate = true;
+            isMoving = true;
         }
         if(inputManager->Keyboard()->IsPressed(KeyboardKey::A))
         {
             this->position -= glm::normalize(glm::vec3(this->right.x, 0, this->right.z)) * velocity;
             this->needUpdate = true;
+            isMoving = true;
         }
         if(inputManager->Keyboard()->IsPressed(KeyboardKey::D))
         {
             this->position += glm::normalize(glm::vec3(this->right.x, 0, this->right.z)) * velocity;
             this->needUpdate = true;
+            isMoving = true;
         }
     }
 
@@ -334,4 +378,9 @@ bool CameraComponent::GetIsGrounded()
 void CameraComponent::SetIsGrounded(bool grounded)
 {
     this->isGrounded = grounded;
+}
+
+bool CameraComponent::IsMoving() const
+{
+    return isMoving;
 }
