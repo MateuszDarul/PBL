@@ -17,6 +17,20 @@
 
 class ShadowsManager;
 
+struct SceneInfo
+{
+    std::shared_ptr<cmp::Shader> shader_l;
+    std::shared_ptr<cmp::Shader> shader_d;
+    std::shared_ptr<cmp::Shader> lineShader;
+    std::shared_ptr<cmp::Shader> displShader;
+    ResourceManager* resourceManager;
+    CollidersManager* collidersManager;
+    ShadowsManager* shadowsManager;
+    Scene* scene;
+    MultiToolController* multiToolScript;
+    std::shared_ptr<GameObject> cameraGO;
+};
+
 /** @brief Scena do zarzadzania SceneNode'ami
  */
 class Scene
@@ -30,6 +44,9 @@ private:
     MusicBuffer* musicBuffer;
 
     bool isPaused;
+
+    void LoadLevelTutorial(const SceneInfo& sceneInfo);
+    void LoadLevelPuzzle1();
 
 public:
     /** @brief Domyslny konstruktor.
