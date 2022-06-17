@@ -116,7 +116,7 @@ Scene::Scene()
     go->AddComponent(std::make_shared<CameraComponent>());
     go->GetComponent<cmp::Camera>()->Create(glm::vec3(-4,4.5,10)); // spawn room 0
     // go->GetComponent<cmp::Camera>()->Create(glm::vec3(-80.0f, 4.5f, 60.5f)); // spawn shooting blueprint
-    go->GetComponent<cmp::Camera>()->SetSpeed(6.89251f);
+    go->GetComponent<cmp::Camera>()->SetSpeed(6.19251f);
     collidersManager = new CollidersManager(go); //mened�er kolider�w
     collidersManager->SetDistanceFromPlayer(10.0f);
     go->AddComponent(std::make_shared<BoxCollider>(false, false));
@@ -765,9 +765,23 @@ void Scene::Update(float dt)
 
     glm::vec4 mtNewPosition = m * glm::vec4(mtTransform->GetPosition(), 1.0f);
 
-    m[3][0] = mtNewPosition.x;
-    m[3][1] = mtNewPosition.y;
-    m[3][2] = mtNewPosition.z;
+    glm::vec3 swing = glm::vec3(0.0f);
+    if (camera->IsMoving() && camera->GetIsGrounded())
+    {
+        float swingAmountX = 0.0014f;
+        float swingAmountY = 0.0009f;
+        float swingSpeed = camera->GetSpeed() * 0.5f;
+        swing = (camera->GetRight() * swingAmountX + camera->GetUp() * swingAmountY) * sin(GameApplication::GetTotalElapsedTime() * swingSpeed);
+    }
+
+    if (camera->GetShakeTime() > 0.0f)
+    {
+        swing += camera->GetRight() * 0.07f * camera->GetShakeAmount() * cos(GameApplication::GetTotalElapsedTime() * camera->GetShakeSpeed());
+    }
+
+    m[3][0] = mtNewPosition.x + swing.x;
+    m[3][1] = mtNewPosition.y + swing.y;
+    m[3][2] = mtNewPosition.z + swing.z;
     mtTransform->SetModelMatrix(m);
 
 
@@ -791,6 +805,12 @@ void Scene::Update(float dt)
             if (isPaused) glfwSetInputMode(GameApplication::GetWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             else glfwSetInputMode(GameApplication::GetWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
+    }
+
+    //delete me
+    if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr0))
+    {
+        camera->ShakeCamera(2.0, 0.15f, 55.0f, 0.95f);
     }
 
 

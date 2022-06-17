@@ -15,6 +15,7 @@ public:
     //adjust these
 
     float interactRange = 4.0f;
+    float isLookingAtMirrorDotThreshold = 0.81f;
 
     int ignoreLayerMask = ~(CollisionLayer::Player | CollisionLayer::GUI | CollisionLayer::Ignore);
 
@@ -170,7 +171,7 @@ public:
                 if (!isCurrentlyRotatingWASD)
                 {
                     const auto& mirrorPos = selectedMirror->gameObject->GetComponent<cmp::Transform>()->GetPosition();
-                    bool isLookingAtMirror = glm::dot(camera->GetForward(), glm::normalize(mirrorPos - camera->GetPosition())) > 0.7f;
+                    bool isLookingAtMirror = glm::dot(camera->GetForward(), glm::normalize(mirrorPos - camera->GetPosition())) > isLookingAtMirrorDotThreshold;
                     mirrorRotInversion = (isLookingAtMirror) ? 1.0f : -1.0f;
                 }
 
