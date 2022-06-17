@@ -27,6 +27,7 @@
 std::shared_ptr<GameObject> GO_MULTITOOL;
 std::shared_ptr<GameObject> GO_FLASHLIGHT;
 std::shared_ptr<GameObject> GO_CROSSHAIR;
+std::shared_ptr<GameObject> GO_TOOLTIP;
 
 std::shared_ptr<SceneNode> NODE_MAIN;
 std::shared_ptr<SceneNode> NODE_GUI;
@@ -36,6 +37,8 @@ Scene::Scene()
 {
     glfwSetInputMode(GameApplication::GetWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     ResourceManager* resMan = GameApplication::GetResourceManager();
+
+    isPaused = false;
 
     ///***
 
@@ -83,6 +86,9 @@ Scene::Scene()
 
     auto displShader = std::make_shared<ShaderComponent>();
     displShader->Create("Resources/shaders/displ.vert", "Resources/shaders/displ.frag");
+
+    auto textShader = std::make_shared<ShaderComponent>();
+    textShader->Create("Resources/shaders/text.vert", "Resources/shaders/text.frag");
 
     ///***
 
@@ -291,32 +297,6 @@ Scene::Scene()
         GO_FLASHLIGHT = flashLightGO;
     }
 
-    //slope test
-    // {
-    //     go = std::make_shared<GameObject>();
-        
-    //     go->AddComponent(std::make_shared<cmp::Transform>());
-    //     go->GetComponent<cmp::Transform>()->SetPosition(-35, 4.1-1.0, 44.5+3.0);
-    //     go->GetComponent<cmp::Transform>()->SetRotation(90.0, 0.0, 90.0-36.87);
-    //     go->GetComponent<cmp::Transform>()->SetScale(1.5);
-
-    //     go->AddComponent(std::make_shared<SlopeCollider>(false, true));
-    //     go->GetComponent<SlopeCollider>()->SetDimensions(64.0f/6.0f, 8.2f, 4.0f);
-    //     go->GetComponent<SlopeCollider>()->SetOffset({0.0f, 1.0f, -3.0f});        
-    //     go->GetComponent<SlopeCollider>()->SetDirection(SlopeCollider::Direction::X_NEG);
-    //     go->GetComponent<SlopeCollider>()->AddToCollidersManager(collidersManager);
-
-
-    //     mc = std::make_shared<ModelComponent>();
-    //     mc->Create(
-    //         resMan->GetMesh("Resources/models/Exported/Sciana.NR1.obj"),
-    //         resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
-    //     );
-    //     go->AddComponent(shader_l);
-    //     go->AddComponent(mc);
-
-    //     world->FindNode("MAIN")->AddChild(go);
-    // }
 
     //===enemy
     {      
@@ -498,7 +478,27 @@ Scene::Scene()
     //=== text
 
     //renderowany jako ostatni bo inaczej sa te dziwne artefakty
+    {
+        Font* font = resMan->GetFont("Resources/fonts/arial.ttf");
 
+        go = std::make_shared<GameObject>();
+        auto tc = std::make_shared<TransformComponent>();
+        auto textComponent = std::make_shared<TextComponent>();
+        textComponent->Create("WASD / LMB - Rotate\nSHIFT - Slow down", font);
+        textComponent->alwaysSeen = true;
+        textComponent->isGuiElement = true;
+        textComponent->color = { 0.8f, 0.8f, 0.8f };
+
+        go->AddComponent(textShader);
+        go->AddComponent(tc);
+        go->AddComponent(textComponent);
+
+        go->GetComponent<TransformComponent>()->SetPosition(0.05f, 0.1f, 0.0f);
+        go->GetComponent<TransformComponent>()->SetScale(0.0f);
+        go->AddComponent(std::make_shared<cmp::Name>("MirrorControlsText"));
+
+        world->FindNode("GUI")->AddChild(go);
+    }
     {
         Font* font = resMan->GetFont("Resources/fonts/Segment7-4Gml.otf");
 
@@ -510,9 +510,6 @@ Scene::Scene()
         //energyTextComponentTEMP->isCentered = true;
         // energyTextComponentTEMP->isGuiElement = true;
         energyTextComponentTEMP->color = {1.0f, 0.6f, 0.0f};
-
-        auto textShader = std::make_shared<ShaderComponent>();
-        textShader->Create("Resources/shaders/text.vert", "Resources/shaders/text.frag");
 
         
         go->AddComponent(textShader);
@@ -526,35 +523,29 @@ Scene::Scene()
         multiToolDisplayNode->AddChild(go);
     }
 
-    //renderowany jako ostatni bo inaczej sa te dziwne artefakty
 
+    //== tooltip
     {
-        Font* font = resMan->GetFont("Resources/fonts/arial.ttf");
-
         go = std::make_shared<GameObject>();
         auto tc = std::make_shared<TransformComponent>();
-        auto energyTextComponentTEMP = std::make_shared<TextComponent>();
-        energyTextComponentTEMP->Create("E", font);
-        energyTextComponentTEMP->alwaysSeen = true;
-        //energyTextComponentTEMP->isCentered = true;
-        energyTextComponentTEMP->isGuiElement = true;
-        energyTextComponentTEMP->color = {1.0f, 1.0f, 1.0f};
+        auto modelGui = std::make_shared<ModelGuiComponent>();
+        modelGui->Create("Resources/textures/mouse256.png");
+        modelGui->alwaysSeen = true;
+        modelGui->isGuiElement = true;
 
-        auto textShader = std::make_shared<ShaderComponent>();
-        textShader->Create("Resources/shaders/text.vert", "Resources/shaders/text.frag");
-
-        
-        go->AddComponent(textShader);
+        go->AddComponent(shader_d);
         go->AddComponent(tc);
-        go->AddComponent(energyTextComponentTEMP);
+        go->AddComponent(modelGui);
 
-        go->GetComponent<TransformComponent>()->SetPosition(0.02341f, 0.035f, 0.0f);
         go->GetComponent<TransformComponent>()->SetScale(0.0f);
 
         go->AddComponent(std::make_shared<cmp::Name>("Tooltip"));
-        
+
         world->FindNode("GUI")->AddChild(go);
+
+        GO_TOOLTIP = go;
     }
+
     //
     //crosshair
     {
@@ -568,10 +559,6 @@ Scene::Scene()
         crosshairTextTEMP->isGuiElement = true;
         crosshairTextTEMP->color = {1.0f, 0.0f, 0.0f};
         crosshairTextTEMP->isCentered = true;
-
-        auto textShader = std::make_shared<ShaderComponent>();
-        textShader->Create("Resources/shaders/text.vert", "Resources/shaders/text.frag");
-
         
         go->AddComponent(textShader);
         go->AddComponent(tc);
@@ -604,7 +591,7 @@ Scene::Scene()
     goCamera->GetComponent<CameraComponent>()->SetPosition(transformCamera->GetPosition());
     transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();
 
-    world->Update(0.0f); 
+    world->Update(0.0f);
 }
 
 Scene::~Scene()
@@ -617,17 +604,20 @@ Scene::~Scene()
     delete collidersManager;
     collidersManager = nullptr;
 }
-bool ispl = true; bool shs = false;
+
 void Scene::Update(float dt)
 {
     GO_CROSSHAIR->GetComponent<cmp::Transform>()->SetPosition(GameApplication::GetAspectRatio() * 0.5f, 0.5f, 0.1f);
+    GO_TOOLTIP->GetComponent<cmp::Transform>()->SetPosition(GameApplication::GetAspectRatio() * 0.5f + 0.001f, 0.453f, 0.1f);
+
 
     //Update camera
     std::shared_ptr<GameObject> goCamera = world->FindNode("CAMERA")->GetGameObject();
     std::shared_ptr<TransformComponent> transformCamera = goCamera->GetComponent<cmp::Transform>();
+    std::shared_ptr<cmp::Camera> camera = goCamera->GetComponent<CameraComponent>();
 
-    goCamera->GetComponent<CameraComponent>()->Update(GameApplication::GetInputManager(), dt);
-    transformCamera->SetPosition(goCamera->GetComponent<CameraComponent>()->GetPosition());
+    camera->Update(GameApplication::GetInputManager(), dt);
+    transformCamera->SetPosition(camera->GetPosition());
 
 
     //Detect collision
@@ -636,8 +626,8 @@ void Scene::Update(float dt)
 
 
     //Prevent camera jiggle and set correct position
-    goCamera->GetComponent<CameraComponent>()->SetPosition(transformCamera->GetPosition());
-    transform = GameApplication::GetProjection() * goCamera->GetComponent<CameraComponent>()->GetView();
+    camera->SetPosition(transformCamera->GetPosition());
+    transform = GameApplication::GetProjection() * camera->GetView();
 
     //SOUND
     musicBuffer->UpdateBufferStream();
@@ -645,7 +635,7 @@ void Scene::Update(float dt)
     //Position multitool
 
     auto mtTransform = GO_MULTITOOL->GetComponent<cmp::Transform>();
-    auto m = glm::inverse(goCamera->GetComponent<cmp::Camera>()->GetView());
+    auto m = glm::inverse(camera->GetView());
 
     glm::vec4 mtNewPosition = m * glm::vec4(mtTransform->GetPosition(), 1.0f);
 
@@ -657,7 +647,21 @@ void Scene::Update(float dt)
 
     auto flashLight = GO_FLASHLIGHT->GetComponent<cmp::SpotLight>();
     flashLight->SetPosition({ mtNewPosition.x, mtNewPosition.y, mtNewPosition.z });
-    flashLight->SetDirection(goCamera->GetComponent<cmp::Camera>()->GetForward());
+    flashLight->SetDirection(camera->GetForward());
+
+
+    // Handle game pausing
+    if (!goCamera->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->isPlacing)
+    {
+        if (Input()->Keyboard()->OnPressed(KeyboardKey::Escape_KB) || (isPaused && Input()->Mouse()->OnPressed(MouseButton::Left_MB)))
+        {
+            isPaused = !isPaused;
+            camera->SetMovementEnable(!isPaused);
+            camera->SetRotationEnable(!isPaused);
+            if (isPaused) glfwSetInputMode(GameApplication::GetWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            else glfwSetInputMode(GameApplication::GetWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        }
+    }
 
 
     //Update scene

@@ -29,6 +29,8 @@ private:
     glm::mat4 transform; //!< Macierz transformacji widoku i kamery.
     MusicBuffer* musicBuffer;
 
+    bool isPaused;
+
 public:
     /** @brief Domyslny konstruktor.
      */

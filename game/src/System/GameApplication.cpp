@@ -192,10 +192,10 @@ void GameApplication::Run()
             printf("=== Current memory usage: %f (Total allocated: %f, total freed: %f) ===\n", 
             s_MemoryStatistics.CurrentUsageMB(), s_MemoryStatistics.TotalAllocatedMB(), s_MemoryStatistics.TotalFreedMB());
         }
-        if(s_InputManager->Keyboard()->OnPressed(KeyboardKey::Escape_KB))
-        {
-            glfwSetWindowShouldClose(s_Window, true);
-        }
+        //if(s_InputManager->Keyboard()->OnPressed(KeyboardKey::Escape_KB))
+        //{
+        //    glfwSetWindowShouldClose(s_Window, true);
+        //}
 
         glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
