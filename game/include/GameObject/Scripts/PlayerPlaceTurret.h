@@ -67,6 +67,8 @@ private:
     std::shared_ptr<cmp::Camera> camera;
 
     std::shared_ptr<GameObject> turretPrefabs[3];
+    
+    float turretWallOffset = 1.5f;
 
 SoundPlayer* sfxplay;
 public:
@@ -151,6 +153,69 @@ public:
 
         if (isPlacing)
         {
+            bool canPlace = true;
+
+            //Find point for placing
+            RayHitInfo hit;
+            if (colMan->Raycast(transform->GetPosition(), camera->GetForward(), hit, placingRange + turretWallOffset, false, ignoreLayerMask))
+            {
+                hit.point -= turretWallOffset * camera->GetForward();
+
+                line->Set(1, hit.point - transform->GetPosition());
+
+                float dot = glm::dot(glm::vec3(0.0f, 1.0f, 0.0f), hit.normal);
+                if (dot > 0.9f)  //hit floor
+                {
+                    lineIndexToPlace = 1;
+                }
+                else if (dot < -0.7f) //hit ceiling
+                {
+                    line->Set(1, glm::vec3(0.0f));
+                }
+                else if (abs(dot) > 0.2f) //hit some weird angle
+                {
+                    lineIndexToPlace = 1;
+                    canPlace = false;
+                }
+                else //hit wall
+                {
+                    line->Set(1, hit.point - transform->GetPosition());
+                }
+            }
+            else
+            {
+                line->Set(1, camera->GetForward() * placingRange); 
+            }            
+
+            if (lineIndexToPlace != 1)
+            {
+                if (colMan->Raycast(transform->GetPosition() + line->Get(1), {0.0f, -1.0f, 0.0f}, hit, 15.0f, false, ignoreLayerMask))
+                {
+                    line->Set(2, hit.point - transform->GetPosition());
+
+                    float dot = glm::dot(glm::vec3(0.0f, 1.0f, 0.0f), hit.normal);
+                    if (abs(dot) > 0.2f && dot < 0.9f) //hit some weird angle
+                    {
+                        canPlace = false;
+                    }
+                }
+                else
+                {
+                    line->Set(2, line->Get(1) + glm::vec3(0.0f, -1.0f, 0.0f));
+                    canPlace = false;
+                }  
+            }
+
+            // Position the turret
+            if (selectedTurretType != TurretType::None)
+            {
+                glm::vec3 adjust = {0.0f, 0.0f, 0.0f};
+                turretPrefabs[selectedTurretType]->GetComponent<cmp::Transform>()->SetPosition(line->Get(lineIndexToPlace) + transform->GetPosition() + adjust);
+                turretPrefabs[selectedTurretType]->GetComponent<cmp::Transform>()->SetRotation(0.0f, -camera->GetYaw(), 0.0f);
+            }   
+
+
+            // Handle ghost color
             bool hasEnoughResources = gameManager->GetCurrentEnergy() >= turretCosts[selectedTurretType];
 
             model = turretPrefabs[selectedTurretType]->GetComponent<cmp::Model>();
@@ -160,10 +225,11 @@ public:
 
             if (model)
             {
-                model->SetTintColor(hasEnoughResources ? turretGhostColorOK : turretGhostColorWrong);
+                model->SetTintColor(hasEnoughResources && canPlace ? turretGhostColorOK : turretGhostColorWrong);
             }
 
-            if (Input()->Mouse()->OnPressed(MouseButton::Left_MB) && hasEnoughResources)
+            // Handle player input
+            if (Input()->Mouse()->OnPressed(MouseButton::Left_MB) && hasEnoughResources && canPlace)
             {
                 hasPlacedTurret = true;
             }
@@ -171,33 +237,6 @@ public:
             {
                 isPlacing = false;
             }
-
-            RayHitInfo hit;
-            if (colMan->Raycast(transform->GetPosition(), camera->GetForward(), hit, placingRange, false, ignoreLayerMask))
-            {
-                line->Set(1, hit.point - transform->GetPosition());
-            }
-            else
-            {
-                line->Set(1, camera->GetForward() * placingRange); 
-            }            
-
-            if (colMan->Raycast(transform->GetPosition() + line->Get(1), {0.0f, -1.0f, 0.0f}, hit, 10.0f, false, ignoreLayerMask))
-            {
-                line->Set(2, hit.point - transform->GetPosition());
-            }
-            else
-            {
-                line->Set(2, line->Get(1) + glm::vec3(0.0f, -1.0f, 0.0f));
-                lineIndexToPlace = 1;
-            }  
-
-            if (selectedTurretType != TurretType::None)
-            {
-                glm::vec3 adjust = {0.0f, 0.0f, 0.0f};
-                turretPrefabs[selectedTurretType]->GetComponent<cmp::Transform>()->SetPosition(line->Get(lineIndexToPlace) + transform->GetPosition() + adjust);
-                turretPrefabs[selectedTurretType]->GetComponent<cmp::Transform>()->SetRotation(0.0f, -camera->GetYaw(), 0.0f);
-            }   
         }
         else
         {

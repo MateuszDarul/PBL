@@ -35,7 +35,7 @@ public:
     float invertRotationY_temp  = 1.0f; //use for temporary rotation inverse
 
     bool disableMouseRotation = false;
-    bool isPlayerInside = false;
+    bool disableKeyboardRotation = false;
 
     std::shared_ptr<GameObject> cameraHandle;
 
@@ -86,7 +86,7 @@ public:
             currentRotationX -= mouseOffset.y * modifier * invertRotationX_temp * invertRotationX_const;
             currentRotationY += mouseOffset.x * modifier * invertRotationY_temp * invertRotationY_const;
         }
-        else
+        else if (!disableKeyboardRotation)
         {
             modifier *= rotationSpeed * dt;
 

@@ -651,9 +651,13 @@ void Scene::Update(float dt)
 
 
     // Handle game pausing
-    if (!goCamera->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->isPlacing)
+    auto playerInteractScript = goCamera->GetComponent<cmp::Scriptable>()->Get<PlayerInteract>();
+    if (!playerInteractScript->selectedMirror && !playerInteractScript->placeTurretScript->isPlacing)
     {
-        if (Input()->Keyboard()->OnPressed(KeyboardKey::Escape_KB) || (isPaused && Input()->Mouse()->OnPressed(MouseButton::Left_MB)))
+        if (Input()->Keyboard()->OnPressed(KeyboardKey::Escape_KB)
+        || (isPaused && (Input()->Mouse()->OnPressed(MouseButton::Left_MB) 
+                     ||  Input()->Mouse()->OnPressed(MouseButton::Right_MB)
+                     ||  Input()->Keyboard()->OnPressed(KeyboardKey::E))))
         {
             isPaused = !isPaused;
             camera->SetMovementEnable(!isPaused);
