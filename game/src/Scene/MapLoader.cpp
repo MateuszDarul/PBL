@@ -356,9 +356,49 @@ bool MapLoader::Load(
                     sphereCollider->SetRadius(size);
                 }
             break;
+
+            case 2: /// SLOPE
+                gameObject->AddComponent(std::make_shared<SlopeCollider>(false, true));
+                {
+                    auto slopeCollider = gameObject->GetComponent<SlopeCollider>();
+
+                    glm::vec3 size;
+                    file >> std::dec >> size.x;
+                    file >> std::dec >> size.y;
+                    file >> std::dec >> size.z;
+                    line_id += 3;
+                    
+                    int dir = 0;
+                    file >> std::dec >> dir;
+                    line_id++;
+
+                    SlopeCollider::Direction direction;
+                    switch (dir)
+                    {
+                    case 0:
+                        direction = SlopeCollider::Direction::X;
+                        break;
+                    case 1:
+                        direction = SlopeCollider::Direction::X_NEG;
+                        break;
+                    case 2:
+                        direction = SlopeCollider::Direction::Z;
+                        break;
+                    case 3:
+                        direction = SlopeCollider::Direction::Z_NEG;
+                        break;
+                    default:
+                        direction = SlopeCollider::Direction::X;
+                    }
+
+                    slopeCollider->SetDimensions(size);
+                    slopeCollider->SetDirection(direction);
+                    slopeCollider->AddToCollidersManager(collisionManager);
+                }
+            break;
             
             default:
-                std::cerr << "Undefined collider type:" << type << " supported [0,1]" << std::endl;
+                std::cerr << "Undefined collider type:" << type << " supported [0,1,2]" << std::endl;
             }
         }
         else if (line == "Resource:")
@@ -414,7 +454,7 @@ bool MapLoader::Load(
 
                 gameObject->AddComponent(std::make_shared<BoxCollider>(true, true));
                 gameObject->GetComponent<cmp::BoxCol>()->setLengths({ 1.1, 1.1, 1.1 });
-                gameObject->GetComponent<cmp::BoxCol>()->SetOffset({0.0, 1.25, 0.0});
+                gameObject->GetComponent<cmp::BoxCol>()->SetOffset({0.0, 1.0, 0.0});
                 gameObject->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
 
                 auto model = std::make_shared<cmp::Model>();
@@ -431,7 +471,7 @@ bool MapLoader::Load(
                 //shooting
                 if (i == 1)
                 {
-                    gameObject->GetComponent<cmp::BoxCol>()->setLengths({ 4.1, 2.5, 0.6 });
+                    gameObject->GetComponent<cmp::BoxCol>()->setLengths({ 4.0, 2.5, 0.3 });
                     model->Create(
                         resMan->GetMesh("Resources/models/Board/Board.obj"),
                         resMan->GetMaterial("Resources/models/Board/blueprintOffensive.mtl")
@@ -441,7 +481,7 @@ bool MapLoader::Load(
                 //laser
                 if (i == 2)
                 {
-                    gameObject->GetComponent<cmp::BoxCol>()->setLengths({ 0.6, 2.5, 4.1 });
+                    gameObject->GetComponent<cmp::BoxCol>()->setLengths({ 0.3, 2.5, 4.0 });
                     model->Create(
                         resMan->GetMesh("Resources/models/Board/Board.obj"),
                         resMan->GetMaterial("Resources/models/Board/blueprintLaser.mtl")
@@ -647,6 +687,27 @@ bool MapLoader::Load(
         }
         else if (line == "Mirror:")
         {
+            /*NEW
+            Transformations:
+            x
+            y
+            z
+            rx      - obrot gora/dol
+            ry      - obrot lewo/prawo
+            0.0     - zawsze 0
+            Mirror:
+            Offset:
+            x       - przesuniecie punktu obrotu w lewo/prawo
+            y       - przesuniecie punktu obrotu w dol/gore
+            z       - przesuniecie punktu obrotu do przodu/tylu
+            Facing:
+            x       - obrot gora/dol w pozycji zerowej
+            y       - obrot lewo/prawo w pozycji zerowej
+            MaxRot:
+            x       - maksymalne wychylenie w gore/dol
+            y       - maksymalne wychylenie w lewo/prawo
+            END*/
+
             glm::vec3 offset, initialRot, maxRot;
             
             std::string ln;
@@ -681,9 +742,11 @@ bool MapLoader::Load(
                 }
             }
             
-            gameObject->AddComponent(std::make_shared<cmp::Name>("Mirror" + std::to_string(mirrorCounter++)));
+            gameObject->AddComponent(std::make_shared<cmp::Name>("MirrorHolder" + std::to_string(mirrorCounter)));
 
             auto mirrorGO = std::make_shared<GameObject>();
+            mirrorGO->AddComponent(std::make_shared<cmp::Name>("MirrorCol" + std::to_string(mirrorCounter)));
+
             mirrorGO->AddComponent(std::make_shared<BoxCollider>(false, true, CollisionLayer::Mirror));
             mirrorGO->GetComponent<cmp::BoxCol>()->setLengths({ 2.0, 2.0, 2.0 });
             mirrorGO->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
@@ -715,6 +778,7 @@ bool MapLoader::Load(
 
 
             root->AddChild(gameObject)->AddChild(mirrorGO);
+            mirrorCounter++;
         }
         else if(line == "END")
         {
