@@ -14,17 +14,26 @@ public:
 	void Pause();
 	void Resume();
 
+	void FadeOut(float time);
+
 	void SetBufferToPlay(const ALuint& buffer_to_play);
 	void SetLooping(const bool& loop);
 	void SetPosition(const float& x, const float& y, const float& z);
-	void SetVolume(float volume);
 	void SetPitch(float pitch);
 
-	bool isPlaying();
+	void SetVolume(float volume);
+	float GetVolume() const;
+
+	void SetCurrentVolume(float volume);
+	float GetCurrentVolume() const;
+
+	bool IsPlaying();
 
 private:
 	ALuint p_Source;
 	ALuint p_Buffer = 0;
+
+	float p_Volume = 1.0f;
 };
 
 #endif

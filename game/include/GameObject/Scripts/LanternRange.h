@@ -3,7 +3,7 @@
 #include "Components.h"
 
 class Turret;
-
+class SoundPlayer;
 
 class LanternRange : public Script
 {
@@ -20,6 +20,7 @@ public:
 private:
 
 	bool isTurnedOn = false;
+	SoundPlayer* buzzingSFX = nullptr;
 
 public:
 	void Start() override;
@@ -32,4 +33,6 @@ public:
 
 	void TriggerEnter(std::shared_ptr<ColliderComponent> collider) override;
 	void TriggerExit(std::shared_ptr<ColliderComponent> collider) override;
+
+	~LanternRange();
 };

@@ -186,11 +186,14 @@ void GameApplication::Run()
         glfwRestoreWindow(GameApplication::GetWindow());
     double t1, t2 = glfwGetTime();
     double dt;
+    double fpsMeasureTimer = 1.0f;
+    int framesCountLastSecond = 0;
+    int fps = 0;
     while (!glfwWindowShouldClose(s_Window))
     {
         if(s_InputManager->Keyboard()->OnPressed(KeyboardKey::F10))
         {
-            printf("=== Current memory usage: %f (Total allocated: %f, total freed: %f) ===\n", 
+            printf("=== FPS: %i === Current memory usage: %.2f (Total allocated: %.2f, total freed: %.2f) ===\n", fps,
             s_MemoryStatistics.CurrentUsageMB(), s_MemoryStatistics.TotalAllocatedMB(), s_MemoryStatistics.TotalFreedMB());
         }
         //if(s_InputManager->Keyboard()->OnPressed(KeyboardKey::Escape_KB))
@@ -205,6 +208,18 @@ void GameApplication::Run()
         t1 = glfwGetTime();
         dt = t1 - t2;
         t2 = t1;
+
+        if (fpsMeasureTimer > 0.0f)
+        {
+            fpsMeasureTimer -= dt;
+            framesCountLastSecond++;
+        }
+        else
+        {
+            fps = framesCountLastSecond;
+            framesCountLastSecond = 0;
+            fpsMeasureTimer = 1.0f;
+        }
 
         s_TotalElapsedTime += dt;
 

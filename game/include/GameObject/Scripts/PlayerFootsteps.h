@@ -56,5 +56,9 @@ public:
                 footstepSFX->Play();
             }
         }
+        else
+        {
+            footstepTimer -= dt;
+        }
     }
 };

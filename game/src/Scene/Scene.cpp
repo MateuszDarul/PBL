@@ -5,6 +5,7 @@
 #include "SoundDevice.h"
 #include "SoundBuffer.h"
 #include "MusicBuffer.h"
+#include "AudioManager.h"
 
 #include "Scripts/RaycastTest.h"
 #include "Scripts/DoorActivator.h"
@@ -49,10 +50,20 @@ Scene::Scene()
 
     SoundDevice* soundDevice = SoundDevice::get();
 
-    musicBuffer = new MusicBuffer("Resources/Music/agresive.wav", true);
-
+    musicBuffer = new MusicBuffer("Resources/Music/agresive.wav");
     musicBuffer->SetVolume(0.11f);
-    musicBuffer->Play();
+
+    AudioManager::Enqueue(musicBuffer);
+
+    //MusicBuffer* memoryLeak1 = new MusicBuffer("Resources/sounds/creepy1.wav");
+    //MusicBuffer* memoryLeak2 = new MusicBuffer("Resources/Music/rapid_turnaround.wav");
+    //
+    //memoryLeak1->SetVolume(0.13f);
+    //memoryLeak2->SetVolume(0.16f);
+    //
+    //AudioManager::Enqueue(memoryLeak1);
+    //AudioManager::Enqueue(memoryLeak2);
+    
 
     /// *** SKYBOX
 
@@ -785,7 +796,7 @@ void Scene::Update(float dt)
     transform = GameApplication::GetProjection() * camera->GetView();
 
     //SOUND
-    musicBuffer->UpdateBufferStream();
+    AudioManager::Update(dt);
 
     //Position multitool
 
@@ -840,6 +851,16 @@ void Scene::Update(float dt)
     if (Input()->Keyboard()->OnPressed(KeyboardKey::Nr0))
     {
         camera->ShakeCamera(2.0, 0.15f, 55.0f, 0.95f);
+    }
+
+    if (Input()->Keyboard()->OnPressed(KeyboardKey::K))
+    {
+        AudioManager::PauseQueue();
+    }
+
+    if (Input()->Keyboard()->OnPressed(KeyboardKey::L))
+    {
+        AudioManager::ResumeQueue();
     }
 
     //Update scene
