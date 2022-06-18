@@ -496,10 +496,10 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
     };
 
     std::vector<DoorAndActivatorPair> doorsAndButtons = {  //0 rot = Z aligned; 90 rot = X aligned
-        { { -15.00,  1.0,  25.0 }, 90.0f,   { -20.0,  2.5,  19.90 }, 180.0f },  //room 1
-        { { -25.00,  1.0,  50.5 }, 90.0f,   { -20.0,  2.5,  46.90 }, 180.0f },  //room 2
-        { { -64.75,  1.0,  60.0 },  0.0f,   { -60.9,  3.0,  55.50 },  90.0f },  //room 3 - cutscene close (important id)
-        { { -73.00,  1.0,  74.5 }, 90.0f,   { -60.9, -9.0,  64.60 },   0.0f },  //room 4 - cutscene open  (important id)
+        { { -15.00, 3.0,  25.0 }, 90.0f,   { -20.0,  2.5,  19.90 }, 180.0f },  //room 1
+        { { -25.00, 3.0,  50.5 }, 90.0f,   { -20.0,  2.5,  46.90 }, 180.0f },  //room 2
+        { { -64.75, 3.0,  60.0 },  0.0f,   { -60.9,  3.0,  55.50 },  90.0f },  //room 3 - cutscene close (important id)
+        { { -73.00, 3.0,  74.5 }, 90.0f,   { -60.9, -9.0,  64.60 },   0.0f },  //room 4 - cutscene open  (important id)
     };
 
     int i = 0;
@@ -513,25 +513,47 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
         auto doorTransform = std::make_shared<cmp::Transform>();
         doorTransform->SetPosition(doorPosition);
         doorTransform->SetRotation(0, doorRotation, 0);
-        float scl = 2.0f;
+        float scl = 1.0f;
         doorTransform->SetScale(scl);
         go->AddComponent(doorTransform);
 
         go->AddComponent(std::make_shared<BoxCollider>(false, true));
-        if (doorRotation < 0.001f) go->GetComponent<cmp::BoxCol>()->setLengths({ 1.0 * scl, 5.0 * scl, 5.0 * scl });
-        else go->GetComponent<cmp::BoxCol>()->setLengths({ 5.0 * scl, 5.0 * scl, 1.0 * scl });
+        if (doorRotation < 0.001f) go->GetComponent<cmp::BoxCol>()->setLengths({ 2.0 * scl, 7.0 * scl, 8.0 * scl });
+        else go->GetComponent<cmp::BoxCol>()->setLengths({ 8.0 * scl, 7.0 * scl, 2.0 * scl });
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
         auto model = std::make_shared<cmp::Model>();
         model->Create(
-            sceneInfo.resourceManager->GetMesh("Resources/models/ny/drzwi2/drzwi2/drzwi2.obj"),
-            sceneInfo.resourceManager->GetMaterial("Resources/models/ny/drzwi2/drzwi2/drzwi2.mtl")
+            sceneInfo.resourceManager->GetMesh("Resources/models/doors/drzwi.obj"),
+            sceneInfo.resourceManager->GetMaterial("Resources/models/doors/drzwi.mtl")
         );
         // model->SetTintColor(1.0, 0.5, 0.0);
         go->AddComponent(model);
         go->AddComponent(sceneInfo.shader_l);
 
         world->FindNode("MAIN")->AddChild(go);
+        
+        //prowadnica
+        {
+            auto go = std::make_shared<GameObject>();
+
+            auto doorTransform = std::make_shared<cmp::Transform>();
+            doorTransform->SetPosition(doorPosition);
+            doorTransform->SetRotation(0, doorRotation, 0);
+            float scl = 1.0f;
+            doorTransform->SetScale(scl);
+            go->AddComponent(doorTransform);
+
+            auto model = std::make_shared<cmp::Model>();
+            model->Create(
+                sceneInfo.resourceManager->GetMesh("Resources/models/doors/prowadnica.obj"),
+                sceneInfo.resourceManager->GetMaterial("Resources/models/doors/drzwi.mtl")
+            );
+            go->AddComponent(model);
+            go->AddComponent(sceneInfo.shader_l);
+
+            world->FindNode("MAIN")->AddChild(go);
+        }
 
         //create activator
         go = std::make_shared<GameObject>();
@@ -771,12 +793,12 @@ void Scene::Update(float dt)
         float swingAmountX = 0.0014f;
         float swingAmountY = 0.0009f;
         float swingSpeed = camera->GetSpeed() * 0.5f;
-        swing = (camera->GetRight() * swingAmountX + camera->GetUp() * swingAmountY) * sin(GameApplication::GetTotalElapsedTime() * swingSpeed);
+        swing = (camera->GetRight() * swingAmountX + camera->GetUp() * swingAmountY) * (float)sin(GameApplication::GetTotalElapsedTime() * swingSpeed);
     }
 
     if (camera->GetShakeTime() > 0.0f)
     {
-        swing += camera->GetRight() * 0.07f * camera->GetShakeAmount() * cos(GameApplication::GetTotalElapsedTime() * camera->GetShakeSpeed());
+        swing += camera->GetRight() * 0.07f * camera->GetShakeAmount() * (float)cos(GameApplication::GetTotalElapsedTime() * camera->GetShakeSpeed());
     }
 
     m[3][0] = mtNewPosition.x + swing.x;
