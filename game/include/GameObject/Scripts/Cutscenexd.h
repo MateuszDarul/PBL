@@ -38,6 +38,7 @@ public:
 
         if (enemy) enemyHealth = enemy->GetComponent<cmp::Scriptable>()->Get<Health>();
         siren = new SoundPlayer("Resources/sounds/siren.wav");
+        siren->SetVolume(0.2f);
     }
 
     void Update(float dt)

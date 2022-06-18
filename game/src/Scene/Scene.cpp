@@ -16,7 +16,7 @@
 #include "Scripts/PlayerGroundCheck.h"
 #include "Scripts/Health.h"
 #include "EnemyScript.h"
-
+#include "Scripts/PlayerFootsteps.h"
 #include "Scripts/Cutscenexd.h"
 #include "Scripts/LightActivator.h"
 #include "Scripts/LanternRange.h"
@@ -51,6 +51,7 @@ Scene::Scene()
 
     musicBuffer = new MusicBuffer("Resources/Music/agresive.wav", true);
 
+    musicBuffer->SetVolume(0.11f);
     musicBuffer->Play();
 
     /// *** SKYBOX
@@ -207,6 +208,12 @@ Scene::Scene()
     playerInteract->textTEMP = crosshairTextTEMP;
 
     go->GetComponent<ScriptComponent>()->Add(playerInteract);
+
+
+    auto playerFootsteps = new PlayerFootsteps();
+    playerFootsteps->camera = go->GetComponent<cmp::Camera>().get();
+    go->GetComponent<ScriptComponent>()->Add(playerFootsteps);
+
     
     //MultiToolController* multiToolScript; MOVED BEFORE MAP LOADER
     //multi tool
@@ -752,7 +759,7 @@ Scene::~Scene()
     delete collidersManager;
     collidersManager = nullptr;
 }
-
+float vol = 0.3f;
 void Scene::Update(float dt)
 {
     GO_CROSSHAIR->GetComponent<cmp::Transform>()->SetPosition(GameApplication::GetAspectRatio() * 0.5f, 0.5f, 0.1f);
@@ -834,7 +841,6 @@ void Scene::Update(float dt)
     {
         camera->ShakeCamera(2.0, 0.15f, 55.0f, 0.95f);
     }
-
 
     //Update scene
     world->Update(dt);

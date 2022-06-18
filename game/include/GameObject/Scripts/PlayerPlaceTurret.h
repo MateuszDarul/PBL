@@ -70,7 +70,14 @@ private:
     
     float turretWallOffset = 1.5f;
 
-SoundPlayer* sfxplay;
+    SoundPlayer* selectClickSFX  = nullptr;
+    SoundPlayer* selectTurretSFX = nullptr;
+    SoundPlayer* placeTurretSFX  = nullptr;
+    SoundPlayer* pickupTurretSFX = nullptr;
+    SoundPlayer* cancelTurretSFX = nullptr;
+    SoundPlayer* cantPlaceSFX    = nullptr;
+
+
 public:
 
     void Start()
@@ -91,7 +98,18 @@ public:
         selectedTurretType = TurretType::Laser;
         multiTool->SetActiveIcon(selectedTurretType);
 
-        sfxplay = new SoundPlayer("Resources/sounds/Click_01mono.wav");
+        if (!selectClickSFX ) selectClickSFX  = new SoundPlayer("Resources/sounds/Click_01mono.wav");
+        if (!selectTurretSFX) selectTurretSFX = new SoundPlayer("Resources/sounds/selectturret.wav");
+        if (!placeTurretSFX ) placeTurretSFX  = new SoundPlayer("Resources/sounds/placeturret.wav");
+        if (!pickupTurretSFX) pickupTurretSFX = new SoundPlayer("Resources/sounds/pickupturret.wav");
+        if (!cancelTurretSFX) cancelTurretSFX = new SoundPlayer("Resources/sounds/cancelturret.wav");
+        if (!cantPlaceSFX   ) cantPlaceSFX    = new SoundPlayer("Resources/sounds/cantplaceturret.wav");
+
+        cancelTurretSFX->SetVolume(0.15f);
+        selectTurretSFX->SetVolume(0.2f);
+        pickupTurretSFX->SetVolume(0.3f);
+        placeTurretSFX->SetVolume(0.2f);
+        selectClickSFX->SetVolume(0.7f);
     }
 
     void Update(float dt)
@@ -137,7 +155,7 @@ public:
 
         if (needUpdate)
         {
-            sfxplay->Play();
+            selectClickSFX->Play();
             multiTool->SetActiveIcon(selectedTurretType);
         }
 
@@ -235,13 +253,17 @@ public:
             }
 
             // Handle player input
-            if (Input()->Mouse()->OnPressed(MouseButton::Left_MB) && hasEnoughResources && canPlace)
+            if (Input()->Mouse()->OnPressed(MouseButton::Left_MB))
             {
-                hasPlacedTurret = true;
+                if (hasEnoughResources && canPlace)
+                    hasPlacedTurret = true;
+                else
+                    cantPlaceSFX->Play();
             }
             else if (Input()->Mouse()->OnPressed(MouseButton::Right_MB) || Input()->Keyboard()->OnPressed(KeyboardKey::Escape_KB))
             {
                 isPlacing = false;
+                cancelTurretSFX->Play();
             }
         }
         else
@@ -250,6 +272,7 @@ public:
             if (!isLookingAtMirror && Input()->Mouse()->OnPressed(MouseButton::Left_MB) && selectedTurretType != TurretType::None && unlocked[selectedTurretType])
             {
                 isPlacing = true;
+                selectTurretSFX->Play();
             }
         }
 
@@ -282,6 +305,7 @@ public:
             // selectedTurretType = TurretType::None;
             // multiTool->SetActiveIcon(selectedTurretType);
             isPlacing = false;
+            placeTurretSFX->Play();
         }
     }
 
@@ -452,6 +476,16 @@ public:
         gameManager->IncreaseEnergy(turretCosts[type]);
 
         turretsHolder->RemoveNode(turretGO->GetNode());
+        pickupTurretSFX->Play();
     }
 
+    ~PlayerPlaceTurret()
+    {
+        delete cantPlaceSFX;
+        delete cancelTurretSFX;
+        delete pickupTurretSFX;
+        delete placeTurretSFX;
+        delete selectTurretSFX;
+        delete selectClickSFX;
+    }
 };

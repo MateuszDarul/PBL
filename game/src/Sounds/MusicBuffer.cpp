@@ -151,6 +151,11 @@ void MusicBuffer::SetLooping(bool looping)
 	p_IsLooping = looping;
 }
 
+void MusicBuffer::SetVolume(float volume)
+{
+	alSourcef(p_Source, AL_GAIN, volume);
+}
+
 MusicBuffer::MusicBuffer(const char* filename, bool looping)
 	: p_IsLooping(looping)
 {
@@ -189,7 +194,6 @@ MusicBuffer::MusicBuffer(const char* filename, bool looping)
 
 	frame_size = ((size_t)BUFFER_SAMPLES * (size_t)p_Sfinfo.channels) * sizeof(short);
 	p_Membuf = static_cast<short*>(malloc(frame_size));
-
 }
 
 MusicBuffer::~MusicBuffer()

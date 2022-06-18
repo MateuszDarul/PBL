@@ -17,6 +17,8 @@ public:
 	void SetBufferToPlay(const ALuint& buffer_to_play);
 	void SetLooping(const bool& loop);
 	void SetPosition(const float& x, const float& y, const float& z);
+	void SetVolume(float volume);
+	void SetPitch(float pitch);
 
 	bool isPlaying();
 

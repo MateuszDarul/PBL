@@ -12,6 +12,7 @@ public:
 	void Stop();
 
 	void SetLooping(bool looping);
+	void SetVolume(float volume);
 
 	void UpdateBufferStream();
 

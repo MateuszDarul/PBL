@@ -147,3 +147,13 @@ bool SoundPlayer::isPlaying()
 	alGetSourcei(p_Source, AL_SOURCE_STATE, &playState);
 	return (playState == AL_PLAYING);
 }
+
+void SoundPlayer::SetVolume(float volume)
+{
+	alSourcef(p_Source, AL_GAIN, volume);
+}
+
+void SoundPlayer::SetPitch(float pitch)
+{
+	alSourcef(p_Source, AL_PITCH, pitch);
+}
