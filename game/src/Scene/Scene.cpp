@@ -197,6 +197,7 @@ Scene::Scene()
     playerPlace->colMan = collidersManager;
     playerPlace->resMan = resMan;
     playerPlace->turretShader = shader_l;
+    playerPlace->ghostShader = shader_d;
     playerPlace->lineShader = lineShader;
 
     //to fix rendering order - moved at the end

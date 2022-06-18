@@ -36,6 +36,7 @@ public:
 
     glm::vec4 turretGhostColorOK = { 0.0f, 1.0f, 0.0f,   0.5f };
     glm::vec4 turretGhostColorWrong = { 0.98f, 0.4f, 0.35f,   0.5f };
+    glm::vec4 turretGhostColorNoLight = { 1.0f, 1.0f, 0.0f,    0.5f };
 
 
     //set these in 'inspector'
@@ -49,6 +50,7 @@ public:
     std::shared_ptr<cmp::Line> line;
     
     std::shared_ptr<cmp::Shader> turretShader;
+    std::shared_ptr<cmp::Shader> ghostShader;
     std::shared_ptr<cmp::Shader> lineShader;
 
     
@@ -67,6 +69,7 @@ private:
     std::shared_ptr<cmp::Camera> camera;
 
     std::shared_ptr<GameObject> turretPrefabs[3];
+    std::shared_ptr<GameObject> dummyTurret;
     
     float turretWallOffset = 1.5f;
 
@@ -94,6 +97,8 @@ public:
         CreateTurret(TurretType::Lantern);
         CreateTurret(TurretType::Shooting);
         CreateTurret(TurretType::Laser);
+
+        CreateDummy();
 
         selectedTurretType = TurretType::Laser;
         multiTool->SetActiveIcon(selectedTurretType);
@@ -166,6 +171,7 @@ public:
         turretPrefabs[0]->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
         turretPrefabs[1]->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
         turretPrefabs[2]->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
+        dummyTurret->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
 
         std::shared_ptr<cmp::Model> model;
 
@@ -236,6 +242,8 @@ public:
                 glm::vec3 adjust = {0.0f, 0.0f, 0.0f};
                 turretPrefabs[selectedTurretType]->GetComponent<cmp::Transform>()->SetPosition(line->Get(lineIndexToPlace) + transform->GetPosition() + adjust);
                 turretPrefabs[selectedTurretType]->GetComponent<cmp::Transform>()->SetRotation(0.0f, -camera->GetYaw(), 0.0f);
+
+                dummyTurret->GetComponent<cmp::Transform>()->SetPosition(line->Get(lineIndexToPlace) + transform->GetPosition() + adjust);
             }   
 
 
@@ -249,7 +257,17 @@ public:
 
             if (model)
             {
-                model->SetTintColor(hasEnoughResources && canPlace ? turretGhostColorOK : turretGhostColorWrong);
+                if (hasEnoughResources && canPlace)
+                {
+                    if (dummyTurret->GetComponent<cmp::Scriptable>()->Get<Turret>()->lightSourcesInRange > 0)
+                        model->SetTintColor(turretGhostColorOK);
+                    else
+                        model->SetTintColor(turretGhostColorNoLight);
+                }
+                else
+                {
+                    model->SetTintColor(turretGhostColorWrong);
+                }
             }
 
             // Handle player input
@@ -278,6 +296,8 @@ public:
 
         if (hasPlacedTurret)
         {
+            dummyTurret->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
+
             if (auto scriptHolder = turretPrefabs[selectedTurretType]->GetComponent<cmp::Scriptable>())
             {
                 scriptHolder->EnableAll();
@@ -293,6 +313,8 @@ public:
 
             if (model)
             {
+                model->GetOwner()->RemoveComponent(ghostShader);
+                model->GetOwner()->AddComponent(turretShader);
                 model->SetTintColor(1.0, 1.0, 1.0);
 
                 model->GetOwner()->AddComponent(std::make_shared<cmp::Shade>());
@@ -352,7 +374,7 @@ public:
         gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
             resMan->GetMesh("Resources/models/Wieze/Latarnia.obj")
         );
-        gfxGO->AddComponent(turretShader);
+        gfxGO->AddComponent(ghostShader);
 
 
         // gfxGO->AddComponent(std::make_shared<cmp::Shade>());
@@ -375,7 +397,7 @@ public:
         );
         turretPrefabs[type]->AddComponent(mc);
         mc->SetTintColor(turretGhostColorOK);
-        turretPrefabs[type]->AddComponent(turretShader);
+        turretPrefabs[type]->AddComponent(ghostShader);
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::Transform>());
         turretPrefabs[type]->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::FrustumCulling>());
@@ -384,7 +406,7 @@ public:
         
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
         std::shared_ptr<cmp::BoxCol> col = turretPrefabs[type]->GetComponent<cmp::BoxCol>();
-        col->setLengths({2.5, 3.5, 2.5});
+        col->setLengths({2.0, 2.5, 2.0});
         col->SetOffset({0.0, 2.0, 0.0});
 
         turretPrefabs[type]->AddComponent(std::make_shared<cmp::Scriptable>());
@@ -464,10 +486,31 @@ public:
         gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
             resMan->GetMesh("Resources/models/Wieze/laser.obj")
         );
-        gfxGO->AddComponent(turretShader);
+        gfxGO->AddComponent(ghostShader);
 
 
         turretsHolder->AddChild(turretPrefabs[type])->AddChild(gfxGO);
+    }
+
+    void CreateDummy()
+    {
+        dummyTurret = std::make_shared<GameObject>();
+        dummyTurret->AddComponent(std::make_shared<cmp::Transform>());
+        dummyTurret->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
+
+        dummyTurret->AddComponent(std::make_shared<cmp::BoxCol>(true, true, CollisionLayer::GUI));
+        std::shared_ptr<cmp::BoxCol> col = dummyTurret->GetComponent<cmp::BoxCol>();
+        col->setLengths({2.0, 2.5, 2.0});
+        col->SetOffset({0.0, 2.0, 0.0});
+        col->AddToCollidersManager(colMan);
+
+        auto scriptHolder = std::make_shared<cmp::Scriptable>();
+        dummyTurret->AddComponent(scriptHolder);
+
+        auto turretScript = new Turret();
+        scriptHolder->Add(turretScript);
+
+        turretsHolder->AddChild(dummyTurret);
     }
 
     void PickUpTurret(TurretType type, std::shared_ptr<GameObject> turretGO)

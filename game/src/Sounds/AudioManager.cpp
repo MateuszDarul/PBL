@@ -3,9 +3,11 @@
 #include "MusicBuffer.h"
 
 #include <AL/alext.h>
-#include "stdlib.h"
 #include <sndfile.h>
-#include "limits.h"
+
+#include <stdlib.h>
+#include <algorithm>
+#include <limits.h>
 
 std::unordered_map<ALuint, std::string> AudioManager::s_LoadedSounds;
 std::vector<std::pair<SoundPlayer*, float>> AudioManager::s_SoundsToFadeOut;

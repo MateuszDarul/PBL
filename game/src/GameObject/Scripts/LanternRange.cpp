@@ -108,8 +108,7 @@ void LanternRange::TriggerEnter(std::shared_ptr<ColliderComponent> collider)
 	auto scriptable = collider->GetOwner()->GetComponent<cmp::Scriptable>();
 	if (scriptable)
 	{
-		Turret* turret = scriptable->Get<TurretLaser>();
-		if (!turret) turret = scriptable->Get<TurretShoot>();
+		Turret* turret = scriptable->Get<Turret>();
 		if (turret)
 		{
 			printf("Adding turret to range\n");
@@ -137,8 +136,7 @@ void LanternRange::TriggerExit(std::shared_ptr<ColliderComponent> collider)
 	auto scriptable = collider->GetOwner()->GetComponent<cmp::Scriptable>();
 	if (scriptable)
 	{
-		Turret* turret = scriptable->Get<TurretLaser>();
-		if (!turret) turret = scriptable->Get<TurretShoot>();
+		Turret* turret = scriptable->Get<Turret>();
 		if (turret)
 		{
 			if (isTurnedOn && HasLineOfSight(turret)) turret->lightSourcesInRange -= 1;
