@@ -448,7 +448,7 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
         auto go = std::make_shared<GameObject>();
         auto mc = std::make_shared<ModelComponent>();
         mc->Create(
-            sceneInfo.resourceManager->GetMesh("Resources/models/ny/przeciwnik/przeciwnik/przeciwnik.obj"),
+            sceneInfo.resourceManager->GetMesh("Resources/models/ny/przeciwnik/przeciwnik/przeciwniksmooth.obj"),
             sceneInfo.resourceManager->GetMaterial("Resources/models/displacement test/capsule.mtl")
         );
         go->AddComponent(sceneInfo.displShader);
