@@ -12,7 +12,7 @@ bool MapLoader::Load(
     SceneNode* root, 
     std::shared_ptr<cmp::Shader> shader, 
     std::shared_ptr<cmp::Shader> shader_d, 
-    std::shared_ptr<cmp::Shader> shader_l, 
+    std::shared_ptr<cmp::Shader> shader_line, 
     std::shared_ptr<cmp::Shader> shader_dis, 
     CollidersManager* collisionManager, 
     ShadowsManager* shadowsManager, 
@@ -533,7 +533,7 @@ bool MapLoader::Load(
             line->color2 = { 1.0f, 0.7f, 0.0f };
 
             gameObject->AddComponent(line);
-            gameObject->AddComponent(shader_l);
+            gameObject->AddComponent(shader_line);
             turretScript->line = line.get();
 
             scriptHolder->Add(turretScript);
@@ -769,14 +769,15 @@ bool MapLoader::Load(
 
             auto model = std::make_shared<cmp::Model>();
             model->Create(
-                resMan->GetMesh("Resources/models/mirror2/mirror2adjusted.obj"),
+                resMan->GetMesh("Resources/models/mirror2/mirror2alt.obj"),
                 resMan->GetMaterial("Resources/models/mirror2/mirror2.mtl")
             );
+            model->SetTintColor(0.85, 0.68, 0.30);
             mirrorGO->AddComponent(model);
-            mirrorGO->AddComponent(shader_d);
+            mirrorGO->AddComponent(shader);
 
             mirrorGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
-            mirrorGO->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/mirror2/mirror2adjusted.obj"));
+            mirrorGO->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/mirror2/mirror2alt.obj"));
 
 
             gameObject->AddComponent(std::make_shared<cmp::Scriptable>());
@@ -790,7 +791,22 @@ bool MapLoader::Load(
             gameObject->GetComponent<cmp::Scriptable>()->Add(mirrorScript);
 
 
-            root->AddChild(gameObject)->AddChild(mirrorGO);
+            auto emissiveGO = std::make_shared<GameObject>();
+            emissiveGO->AddComponent(std::make_shared<cmp::Transform>());
+            auto emissiveModel = std::make_shared<cmp::Model>();
+            emissiveModel->Create(
+                resMan->GetMesh("Resources/models/mirror2/mirror2emission.obj"),
+                resMan->GetMaterial("Resources/models/multitool/icon.mtl")
+            );
+            emissiveModel->SetTintColor(0.9, 0.9, 1.0);
+            emissiveGO->AddComponent(emissiveModel);
+            emissiveGO->AddComponent(shader_d);
+
+            emissiveGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
+            emissiveGO->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/mirror2/mirror2emission.obj"));
+
+
+            root->AddChild(gameObject)->AddChild(mirrorGO)->AddChild(emissiveGO);
             mirrorCounter++;
         }
         else if(line == "END")
