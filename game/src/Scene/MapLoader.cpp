@@ -760,22 +760,23 @@ bool MapLoader::Load(
             mirrorGO->AddComponent(std::make_shared<cmp::Name>("MirrorCol" + std::to_string(mirrorCounter)));
 
             mirrorGO->AddComponent(std::make_shared<BoxCollider>(false, true, CollisionLayer::Mirror));
-            mirrorGO->GetComponent<cmp::BoxCol>()->setLengths({ 2.0, 2.0, 2.0 });
+            mirrorGO->GetComponent<cmp::BoxCol>()->setLengths({ 1.7, 2.4, 0.1515 });
             mirrorGO->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
 
             mirrorGO->AddComponent(std::make_shared<cmp::Transform>());
             mirrorGO->GetComponent<cmp::Transform>()->SetPosition(offset);
 
+
             auto model = std::make_shared<cmp::Model>();
             model->Create(
-                resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-                resMan->GetMaterial("Resources/models/floor/floor.mtl")
+                resMan->GetMesh("Resources/models/mirror2/mirror2adjusted.obj"),
+                resMan->GetMaterial("Resources/models/mirror2/mirror2.mtl")
             );
             mirrorGO->AddComponent(model);
             mirrorGO->AddComponent(shader_d);
 
             mirrorGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
-            mirrorGO->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+            mirrorGO->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/mirror2/mirror2adjusted.obj"));
 
 
             gameObject->AddComponent(std::make_shared<cmp::Scriptable>());

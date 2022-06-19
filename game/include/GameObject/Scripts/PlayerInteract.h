@@ -191,6 +191,7 @@ public:
                     selectedMirror->SetEnabled(false);
                     selectedMirror = nullptr;
                     camera->SetMovementEnable(true);
+                    camera->SetRotationEnable(true);
                 }
             //}
             //else if (!selectedMirror->disableMouseRotation)
