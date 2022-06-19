@@ -22,6 +22,9 @@ namespace rj = rapidjson;
 
 #include <iostream>
 
+
+//#define FULLSCREEN_MODE
+
 #define DEFAULT_FOV 83.0f
 #define DEFAULT_SCREEN_WIDTH 800
 #define DEFAULT_SCREEN_HEIGHT 600
@@ -91,7 +94,29 @@ int GameApplication::Init()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_SAMPLES, 4);
 
-    s_Window = glfwCreateWindow(s_ScreenWidth, s_ScreenHeight, "Enlite Game Engine", NULL, NULL);
+    GLFWmonitor* monitor = nullptr;
+    
+#ifdef FULLSCREEN_MODE
+    monitor = glfwGetPrimaryMonitor();
+    s_ScreenWidth  = glfwGetVideoMode(monitor)->width;
+    s_ScreenHeight = glfwGetVideoMode(monitor)->height;
+
+    s_AspectRatio = (float)s_ScreenWidth / s_ScreenHeight;
+
+    s_ProjectionMatrix = glm::perspective(
+        DEFAULT_FOV,
+        s_AspectRatio,
+        DEFAULT_NEAR_PLANE,
+        DEFAULT_FAR_PLANE
+    );
+
+   s_OrthographicMatrix = glm::ortho(
+        0.0f, s_AspectRatio,
+        0.0f, 1.0f
+    );
+#endif // FULLSCREEN_MODE
+
+    s_Window = glfwCreateWindow(s_ScreenWidth, s_ScreenHeight, "Enlite Game Engine", monitor, NULL);
     if(s_Window == NULL)
     {
         std::cerr << "Failed to create GLFW window" << std::endl;

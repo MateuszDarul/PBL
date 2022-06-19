@@ -518,7 +518,7 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
         { { -15.00, 3.0,  25.0 }, 90.0f,   { -20.0,  2.5,  19.90 }, 180.0f },  //room 1
         { { -25.00, 3.0,  50.5 }, 90.0f,   { -20.0,  2.5,  46.90 }, 180.0f },  //room 2
         { { -64.75, 3.0,  60.0 },  0.0f,   { -60.9,  3.0,  55.50 },  90.0f },  //room 3 - cutscene close (important id)
-        { { -73.00, 3.0,  74.5 }, 90.0f,   { -60.9, -9.0,  64.60 },   0.0f },  //room 4 - cutscene open  (important id)
+        { { -83.00, 3.0,  -3.5 }, 90.0f,   { -60.9, -9.0,  64.60 },   0.0f },  //room 4 - cutscene open  (important id)
     };
 
     int i = 0;
@@ -632,11 +632,10 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
         go->AddComponent(std::make_shared<cmp::Name>("cutscene"));
 
         go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(-83.0f, 2.5f, 69.0f);
-        go->GetComponent<cmp::Transform>()->SetScale(2.5);
+        go->GetComponent<cmp::Transform>()->SetPosition(-83.0f, 5.0f, 42.0f);
 
         go->AddComponent(std::make_shared<BoxCollider>(true, true));
-        go->GetComponent<cmp::BoxCol>()->setLengths({ 5.0, 5.0, 5.0 });
+        go->GetComponent<cmp::BoxCol>()->setLengths({ 10.0, 10.0, 5.0 });
         go->GetComponent<cmp::BoxCol>()->layer = CollisionLayer::Ignore;
         go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 

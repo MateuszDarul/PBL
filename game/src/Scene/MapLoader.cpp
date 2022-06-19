@@ -448,8 +448,8 @@ bool MapLoader::Load(
             };
             std::vector<BlueprintPosition> blueprints = {
                 {{ -73.0f, 1.25f, 89.5f },  PlayerPlaceTurret::TurretType::Lantern  },    //baricade
-                {{ -83.0f, 1.25f, 69.5f },  PlayerPlaceTurret::TurretType::Shooting },    //Shooting
-                {{ -26.8f, 1.25f, 5.0f },  PlayerPlaceTurret::TurretType::Laser    }     //Laser
+                {{ -83.0f, 1.25f, 68.8f },  PlayerPlaceTurret::TurretType::Shooting },    //Shooting
+                {{ -26.8f, 1.25f,  5.0f },  PlayerPlaceTurret::TurretType::Laser    }     //Laser
             };
             for (int i = 0; i < 3; i++)
             {

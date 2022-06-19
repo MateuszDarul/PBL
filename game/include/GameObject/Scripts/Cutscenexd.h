@@ -94,7 +94,7 @@ public:
             alarmLightGO->AddComponent(lightCmp);
             lightCmp->Create();
             lightCmp->AddShader(lightShader);
-            lightCmp->SetPosition({-73.75, 4.0, 63.0});
+            lightCmp->SetPosition({ -83.0f, 5.75f, 4.5f });
             lightCmp->SetLightColor({0.2f, 0.0f, 0.0f});
             lightCmp->SetDamping(20.0f);
 
