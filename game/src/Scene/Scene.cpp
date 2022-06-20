@@ -33,6 +33,13 @@ std::shared_ptr<GameObject> GO_TOOLTIP;
 std::shared_ptr<SceneNode> NODE_MAIN;
 std::shared_ptr<SceneNode> NODE_GUI;
 
+static SceneInfo SCENE_INFO;
+
+const SceneInfo& Scene::GetSceneInfo()
+{
+    return SCENE_INFO;
+}
+
 Scene::Scene()
 {
     glfwSetInputMode(GameApplication::GetWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -151,12 +158,16 @@ Scene::Scene()
     MultiToolController* multiToolScript;
     multiToolScript = new MultiToolController();
     
-    SceneInfo sceneInfo = {
+    auto levelsNode = std::make_shared<SceneNode>(std::make_shared<GameObject>());
+    levelsNode->GetGameObject()->AddComponent(std::make_shared<cmp::Name>("LEVELS"));
+    world->FindNode("MAIN")->AddChild(levelsNode);
+
+    SCENE_INFO = {
         shader_l, shader_d, lineShader, displShader, shadowParticleShader, resMan, collidersManager, shadowsManager, this, multiToolScript, go
     };
 
-    LoadLevelTutorial(sceneInfo);
-    //LoadLevelPuzzle1(sceneInfo);
+    LoadLevelTutorial(SCENE_INFO);
+    //LoadLevelPuzzle1(SCENE_INFO);
 
     ///***
 
@@ -327,9 +338,14 @@ Scene::Scene()
     }
 
     //=== fixing rendering order
+    auto turretsHolderParentGO = std::make_shared<GameObject>();
+    turretsHolderParentGO->AddComponent(std::make_shared<cmp::Transform>());
+    turretsHolderParentGO->AddComponent(std::make_shared<cmp::Name>("TURRETS_HOLDER"));
+    auto turretsHolderParentNode = world->FindNode("MAIN")->AddChild(turretsHolderParentGO);
+
     auto turretsHolderGO = std::make_shared<GameObject>();
     turretsHolderGO->AddComponent(std::make_shared<cmp::Transform>());
-    auto turretsHolderNode = world->FindNode("MAIN")->AddChild(turretsHolderGO);
+    auto turretsHolderNode = turretsHolderParentNode->AddChild(turretsHolderGO);
 
     playerPlace->turretsHolder = turretsHolderNode.get();
 
@@ -456,7 +472,10 @@ Scene::Scene()
 
 void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
 {
-    MapLoader::Load("Resources/maps/world_tutorial.map", world->FindNode("MAIN"), 
+    auto levelNode = std::make_shared<SceneNode>(std::make_shared<GameObject>());
+    levelNode->GetGameObject()->AddComponent(std::make_shared<cmp::Name>("LEVEL_TUTORIAL"));
+    world->FindNode("LEVELS")->AddChild(levelNode);
+    MapLoader::Load("Resources/maps/world_tutorial.map", levelNode.get(), 
         sceneInfo.shader_l, 
         sceneInfo.shader_d, 
         sceneInfo.lineShader, 
@@ -467,6 +486,8 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
         sceneInfo.scene, 
         sceneInfo.multiToolScript,
         sceneInfo.cameraGO);
+
+    world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>()->RestartMovement(-4, 4.5, 10);
 
     //===enemy
     {
@@ -507,7 +528,7 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
         enemyScript->SetPath(e_path);
         go->GetComponent<cmp::Scriptable>()->Add(enemyScript);
         
-        world->FindNode("MAIN")->AddChild(go);
+        levelNode->AddChild(go);
     }
 
 
@@ -556,7 +577,7 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
         go->AddComponent(model);
         go->AddComponent(sceneInfo.shader_l);
 
-        world->FindNode("MAIN")->AddChild(go);
+        levelNode->AddChild(go);
         
         //prowadnica
         {
@@ -577,7 +598,7 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
             go->AddComponent(model);
             go->AddComponent(sceneInfo.shader_l);
 
-            world->FindNode("MAIN")->AddChild(go);
+            levelNode->AddChild(go);
         }
 
         //create activator
@@ -629,7 +650,7 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
         frameGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
         frameGO->GetComponent<cmp::FrustumCulling>()->Create(sceneInfo.resourceManager->GetMesh("Resources/models/ny/przelacznikLaserowy/przelacznikLaserowy/przelacznikFrame.obj"));
 
-        world->FindNode("MAIN")->AddChild(go)->AddChild(frameGO);
+        levelNode->AddChild(go)->AddChild(frameGO);
     }
 
     //cutscene
@@ -657,13 +678,16 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
         go->GetComponent<cmp::Scriptable>()->Add(cutscene);
 
 
-        world->FindNode("MAIN")->AddChild(go);
+        levelNode->AddChild(go);
     }
 }
 
 void Scene::LoadLevelPuzzle1(const SceneInfo& sceneInfo)
 {
-    MapLoader::Load("Resources/maps/world_puzzle1.map", world->FindNode("MAIN"),
+    auto levelNode = std::make_shared<SceneNode>(std::make_shared<GameObject>());
+    levelNode->GetGameObject()->AddComponent(std::make_shared<cmp::Name>("LEVEL_PUZZLE1"));
+    world->FindNode("LEVELS")->AddChild(levelNode);
+    MapLoader::Load("Resources/maps/world_puzzle1.map", levelNode.get(),
         sceneInfo.shader_l,
         sceneInfo.shader_d,
         sceneInfo.lineShader,
@@ -674,6 +698,8 @@ void Scene::LoadLevelPuzzle1(const SceneInfo& sceneInfo)
         sceneInfo.scene,
         sceneInfo.multiToolScript,
         sceneInfo.cameraGO);
+
+    world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>()->RestartMovement(-4, 4.5, 10);
 
     struct DoorAndActivatorPair
     {
@@ -714,7 +740,7 @@ void Scene::LoadLevelPuzzle1(const SceneInfo& sceneInfo)
         go->AddComponent(model);
         go->AddComponent(sceneInfo.shader_l);
 
-        world->FindNode("MAIN")->AddChild(go);
+        levelNode->AddChild(go);
 
         //create activator
         go = std::make_shared<GameObject>();
@@ -763,7 +789,7 @@ void Scene::LoadLevelPuzzle1(const SceneInfo& sceneInfo)
         frameGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
         frameGO->GetComponent<cmp::FrustumCulling>()->Create(sceneInfo.resourceManager->GetMesh("Resources/models/ny/przelacznikLaserowy/przelacznikLaserowy/przelacznikFrame.obj"));
 
-        world->FindNode("MAIN")->AddChild(go)->AddChild(frameGO);
+        levelNode->AddChild(go)->AddChild(frameGO);
     }
 }
 
@@ -782,6 +808,26 @@ void Scene::Update(float dt)
 {
     GO_CROSSHAIR->GetComponent<cmp::Transform>()->SetPosition(GameApplication::GetAspectRatio() * 0.5f, 0.5f, 0.1f);
     GO_TOOLTIP->GetComponent<cmp::Transform>()->SetPosition(GameApplication::GetAspectRatio() * 0.5f + 0.001f, 0.453f, 0.1f);
+
+    if (Input()->Keyboard()->OnPressed(KeyboardKey::V))
+    {
+        auto levelsNode = world->FindNode("LEVELS");
+        levelsNode->RemoveNode(levelsNode->FindNode("LEVEL_TUTORIAL"));
+        LoadLevelPuzzle1(SCENE_INFO);
+        levelsNode->LoadScripts();
+
+        auto placeTurretScript = world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>();
+        auto turretsHolder = placeTurretScript->turretsHolder;
+        auto turretsHolderParent = world->FindNode("TURRETS_HOLDER");
+        turretsHolderParent->RemoveNode(turretsHolder);
+        turretsHolderParent->DeleteNodes();
+
+        auto turretsHolderGO = std::make_shared<GameObject>();
+        turretsHolderGO->AddComponent(std::make_shared<cmp::Transform>());
+        auto turretsHolderNode = turretsHolderParent->AddChild(turretsHolderGO);
+        placeTurretScript->turretsHolder = turretsHolderNode.get();
+        placeTurretScript->PrepareNewTurrets();
+    }
 
 
     //Update camera

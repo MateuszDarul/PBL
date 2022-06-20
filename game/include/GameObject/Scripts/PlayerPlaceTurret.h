@@ -84,6 +84,15 @@ private:
     SoundPlayer* sfxplay;
 public:
 
+    void PrepareNewTurrets()
+    {
+        CreateTurret(TurretType::Blockade);
+        CreateTurret(TurretType::Shooting);
+        CreateTurret(TurretType::Laser);
+
+        CreateDummy();
+    }
+
     void Start()
     {
         transform = gameObject->GetComponent<cmp::Transform>();
@@ -95,11 +104,7 @@ public:
         line->Set(1, { 1,  1, -2 });
         line->Set(2, { 1,  2, -3 });
 
-        CreateTurret(TurretType::Blockade);
-        CreateTurret(TurretType::Shooting);
-        CreateTurret(TurretType::Laser);
-
-        CreateDummy();
+        PrepareNewTurrets();
 
         selectedTurretType = TurretType::Laser;
         multiTool->SetActiveIcon(selectedTurretType);

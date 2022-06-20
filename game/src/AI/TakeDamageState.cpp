@@ -6,7 +6,7 @@ void TakeDamageState::Enter(std::shared_ptr<GameObject> gameObject)
 {
 	std::cout << "started taking damage" << std::endl;
 	gameObject->GetComponent<ScriptComponent>()->Get<EnemyScript>()->GetSteering()->SetFleeTarget(
-		gameObject->GetNode()->GetParent()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Transform>()->GetPosition()
+		gameObject->GetNode()->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Transform>()->GetPosition()
 	);
 	gameObject->GetComponent<ScriptComponent>()->Get<EnemyScript>()->GetSteering()->SetFlee(true);
 }
@@ -14,7 +14,7 @@ void TakeDamageState::Enter(std::shared_ptr<GameObject> gameObject)
 void TakeDamageState::Execute(std::shared_ptr<GameObject> gameObject, float dt)
 {
 	gameObject->GetComponent<ScriptComponent>()->Get<EnemyScript>()->GetSteering()->SetFleeTarget(
-		gameObject->GetNode()->GetParent()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Transform>()->GetPosition()
+		gameObject->GetNode()->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Transform>()->GetPosition()
 	);
 }
 

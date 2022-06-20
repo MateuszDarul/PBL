@@ -72,6 +72,7 @@ public:
     SceneNode* GetWorldNode();
     CollidersManager* GetCollidersManager();
 
+    static const SceneInfo& GetSceneInfo();
 };
 
 #endif // __SCENE_H__

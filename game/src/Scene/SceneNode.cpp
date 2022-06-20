@@ -1,5 +1,6 @@
 #include "SceneNode.h"
 #include "Scene.h"
+#include "ShadowsManager.h"
 
 #define ENABLE_DEBUG_INFO
 
@@ -507,6 +508,11 @@ void SceneNode::PrivateDelete()
     if (auto scriptable = this->GetGameObject()->GetComponent<cmp::Scriptable>())
     {
         scriptable->Clear();
+    }
+    if (auto pointLight = this->GetGameObject()->GetComponent<cmp::PointLight>())
+    {
+        Scene::GetSceneInfo().shadowsManager->RemoveLight(this->GetGameObject().get());
+        pointLight->Destroy();
     }
 
     this->GetGameObject()->SetDestroyed();
