@@ -298,7 +298,7 @@ public:
                 selectTurretSFX->Play();
             }
         }
-
+        
         if (hasPlacedTurret)
         {
             dummyTurret->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);

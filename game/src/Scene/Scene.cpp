@@ -833,6 +833,7 @@ void Scene::SwitchLevel(int newLevelIndex)
     auto turretsHolderNode = turretsHolderParent->AddChild(turretsHolderGO);
     placeTurretScript->turretsHolder = turretsHolderNode.get();
     placeTurretScript->PrepareNewTurrets();
+    placeTurretScript->isPlacing = false;
 }
 
 void Scene::Update(float dt)
