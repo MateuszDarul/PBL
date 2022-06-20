@@ -27,6 +27,7 @@ void ScriptComponent::Clear()
     for (int i = 0; i < m_ScriptInstances.size(); i++)
     {
         delete m_ScriptInstances[i];
+        m_ScriptInstances[i] = nullptr;
     }
 }
 #include "GameObject.h"
