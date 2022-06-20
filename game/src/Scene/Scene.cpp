@@ -167,7 +167,7 @@ Scene::Scene()
     };
 
     LoadLevelTutorial(SCENE_INFO);
-    //LoadLevelPuzzle1(SCENE_INFO);
+    currentLevelIndex = 0;
 
     ///***
 
@@ -803,7 +803,38 @@ Scene::~Scene()
     delete collidersManager;
     collidersManager = nullptr;
 }
-float vol = 0.3f;
+
+void Scene::SwitchLevel(int newLevelIndex)
+{
+    if (newLevelIndex == currentLevelIndex) return;
+
+    auto levelsNode = world->FindNode("LEVELS");
+
+    if (currentLevelIndex == 0)
+        levelsNode->RemoveNode(levelsNode->FindNode("LEVEL_TUTORIAL"));
+
+    currentLevelIndex = newLevelIndex;
+
+
+    if (newLevelIndex == 1)
+        LoadLevelPuzzle1(SCENE_INFO);
+    
+    
+    levelsNode->LoadScripts();
+
+    auto placeTurretScript = world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>();
+    auto turretsHolder = placeTurretScript->turretsHolder;
+    auto turretsHolderParent = world->FindNode("TURRETS_HOLDER");
+    turretsHolderParent->RemoveNode(turretsHolder);
+    turretsHolderParent->DeleteNodes();
+
+    auto turretsHolderGO = std::make_shared<GameObject>();
+    turretsHolderGO->AddComponent(std::make_shared<cmp::Transform>());
+    auto turretsHolderNode = turretsHolderParent->AddChild(turretsHolderGO);
+    placeTurretScript->turretsHolder = turretsHolderNode.get();
+    placeTurretScript->PrepareNewTurrets();
+}
+
 void Scene::Update(float dt)
 {
     GO_CROSSHAIR->GetComponent<cmp::Transform>()->SetPosition(GameApplication::GetAspectRatio() * 0.5f, 0.5f, 0.1f);
@@ -811,22 +842,7 @@ void Scene::Update(float dt)
 
     if (Input()->Keyboard()->OnPressed(KeyboardKey::V))
     {
-        auto levelsNode = world->FindNode("LEVELS");
-        levelsNode->RemoveNode(levelsNode->FindNode("LEVEL_TUTORIAL"));
-        LoadLevelPuzzle1(SCENE_INFO);
-        levelsNode->LoadScripts();
-
-        auto placeTurretScript = world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>();
-        auto turretsHolder = placeTurretScript->turretsHolder;
-        auto turretsHolderParent = world->FindNode("TURRETS_HOLDER");
-        turretsHolderParent->RemoveNode(turretsHolder);
-        turretsHolderParent->DeleteNodes();
-
-        auto turretsHolderGO = std::make_shared<GameObject>();
-        turretsHolderGO->AddComponent(std::make_shared<cmp::Transform>());
-        auto turretsHolderNode = turretsHolderParent->AddChild(turretsHolderGO);
-        placeTurretScript->turretsHolder = turretsHolderNode.get();
-        placeTurretScript->PrepareNewTurrets();
+        SwitchLevel(1);
     }
 
 

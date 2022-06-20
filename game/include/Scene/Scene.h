@@ -73,6 +73,10 @@ public:
     CollidersManager* GetCollidersManager();
 
     static const SceneInfo& GetSceneInfo();
+
+private:
+    void SwitchLevel(int newLevelIndex);
+    int currentLevelIndex;
 };
 
 #endif // __SCENE_H__
