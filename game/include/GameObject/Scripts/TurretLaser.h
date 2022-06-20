@@ -104,6 +104,7 @@ public:
                         if (auto doorActivator = scriptHolder->Get<DoorActivator>())
                         {
                             doorActivator->Activate();
+                            line->Set(hits, hit.point + dir * 0.1f);
                         }
                         else if (auto lightActivator = scriptHolder->Get<LightActivator>())
                         {

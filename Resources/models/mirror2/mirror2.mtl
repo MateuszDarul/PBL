@@ -1,0 +1,7 @@
+
+
+newmtl Material.033
+
+illum 2
+map_Kd mirror2_None_BaseColor.png
+map_Ks mirror2_None_Specular.png

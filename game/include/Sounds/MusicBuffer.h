@@ -12,8 +12,16 @@ public:
 	void Stop();
 
 	void SetLooping(bool looping);
+	void SetVolume(float volume);
+	float GetVolume() const;
+
+	void SetCurrentVolume(float volume);
+	float GetCurrentVolume() const;
 
 	void UpdateBufferStream();
+
+	bool IsPlaying() const;
+	bool IsPaused() const;
 
 	ALint getSource();
 
@@ -31,6 +39,10 @@ private:
 	ALenum p_Format;
 
 	bool p_IsLooping;
+	bool p_IsPlaying;
+	bool p_IsPaused;
+
+	float p_Volume;
 
 	MusicBuffer() = delete;
 };

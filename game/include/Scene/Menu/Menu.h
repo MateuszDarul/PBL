@@ -10,6 +10,7 @@ protected:
     std::shared_ptr<ShaderComponent> shader_d;
     glm::vec2 prev_pos;
     int begin = 0;
+    float maxCursorOffset = 2.25f;
 
 protected:
     void UpdateMenu()
@@ -17,6 +18,13 @@ protected:
         menu->Update(1);
         glm::vec2 pos = GetCursorOffser(GameApplication::GetInputManager()->Mouse()->GetPosition());
         menu->FindNode("CURSOR")->GetLocalTransformations()->Move(glm::vec3(pos.x, pos.y, 0));
+
+        auto m = menu->FindNode("CURSOR")->GetLocalTransformations()->GetPosition();
+        if (m.y < -maxCursorOffset) m.y = -maxCursorOffset;
+        else if (m.y > maxCursorOffset) m.y = maxCursorOffset;
+        if (m.x < -maxCursorOffset * GameApplication::GetAspectRatio()) m.x = -maxCursorOffset * GameApplication::GetAspectRatio();
+        else if (m.x > maxCursorOffset * GameApplication::GetAspectRatio()) m.x = maxCursorOffset * GameApplication::GetAspectRatio();
+        menu->FindNode("CURSOR")->GetLocalTransformations()->SetPosition(m);
     }
 
     void PrepareMenu()

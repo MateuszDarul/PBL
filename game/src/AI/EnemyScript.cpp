@@ -50,6 +50,9 @@ void EnemyScript::Update(float dt)
 
 	gameObject->GetComponent<TransformComponent>()->Move(velocity * dt);
 
+	float angle = Angle(glm::vec3(0.0f), heading) + 90.0f;
+	gameObject->GetComponent<cmp::Transform>()->SetRotation(0, glm::degrees(angle), 0);
+
 	if (glm::length(velocity) > 0.0000001f)
 	{
 		heading = glm::normalize(velocity);

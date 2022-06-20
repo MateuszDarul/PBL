@@ -22,6 +22,9 @@ namespace rj = rapidjson;
 
 #include <iostream>
 
+
+//#define FULLSCREEN_MODE
+
 #define DEFAULT_FOV 83.0f
 #define DEFAULT_SCREEN_WIDTH 800
 #define DEFAULT_SCREEN_HEIGHT 600
@@ -53,6 +56,7 @@ bool GameApplication::inGame = false;
 InputManager* GameApplication::s_InputManager = nullptr;
 ResourceManager* GameApplication::s_ResourceManager = nullptr;
 
+float GameApplication::s_TotalElapsedTime = 0.0f;
 
 
 struct MemoryStatistics
@@ -90,7 +94,29 @@ int GameApplication::Init()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_SAMPLES, 4);
 
-    s_Window = glfwCreateWindow(s_ScreenWidth, s_ScreenHeight, "Enlite Game Engine", NULL, NULL);
+    GLFWmonitor* monitor = nullptr;
+    
+#ifdef FULLSCREEN_MODE
+    monitor = glfwGetPrimaryMonitor();
+    s_ScreenWidth  = glfwGetVideoMode(monitor)->width;
+    s_ScreenHeight = glfwGetVideoMode(monitor)->height;
+
+    s_AspectRatio = (float)s_ScreenWidth / s_ScreenHeight;
+
+    s_ProjectionMatrix = glm::perspective(
+        DEFAULT_FOV,
+        s_AspectRatio,
+        DEFAULT_NEAR_PLANE,
+        DEFAULT_FAR_PLANE
+    );
+
+   s_OrthographicMatrix = glm::ortho(
+        0.0f, s_AspectRatio,
+        0.0f, 1.0f
+    );
+#endif // FULLSCREEN_MODE
+
+    s_Window = glfwCreateWindow(s_ScreenWidth, s_ScreenHeight, "Enlite Game Engine", monitor, NULL);
     if(s_Window == NULL)
     {
         std::cerr << "Failed to create GLFW window" << std::endl;
@@ -185,17 +211,20 @@ void GameApplication::Run()
         glfwRestoreWindow(GameApplication::GetWindow());
     double t1, t2 = glfwGetTime();
     double dt;
+    double fpsMeasureTimer = 1.0f;
+    int framesCountLastSecond = 0;
+    int fps = 0;
     while (!glfwWindowShouldClose(s_Window))
     {
         if(s_InputManager->Keyboard()->OnPressed(KeyboardKey::F10))
         {
-            printf("=== Current memory usage: %f (Total allocated: %f, total freed: %f) ===\n", 
+            printf("=== FPS: %i === Current memory usage: %.2f (Total allocated: %.2f, total freed: %.2f) ===\n", fps,
             s_MemoryStatistics.CurrentUsageMB(), s_MemoryStatistics.TotalAllocatedMB(), s_MemoryStatistics.TotalFreedMB());
         }
-        if(s_InputManager->Keyboard()->OnPressed(KeyboardKey::Escape_KB))
-        {
-            glfwSetWindowShouldClose(s_Window, true);
-        }
+        //if(s_InputManager->Keyboard()->OnPressed(KeyboardKey::Escape_KB))
+        //{
+        //    glfwSetWindowShouldClose(s_Window, true);
+        //}
 
         glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -204,6 +233,20 @@ void GameApplication::Run()
         t1 = glfwGetTime();
         dt = t1 - t2;
         t2 = t1;
+
+        if (fpsMeasureTimer > 0.0f)
+        {
+            fpsMeasureTimer -= dt;
+            framesCountLastSecond++;
+        }
+        else
+        {
+            fps = framesCountLastSecond;
+            framesCountLastSecond = 0;
+            fpsMeasureTimer = 1.0f;
+        }
+
+        s_TotalElapsedTime += dt;
 
         if(inGame)
         {
@@ -304,4 +347,9 @@ void GameApplication::SetFov(float fov)
 float GameApplication::GetAspectRatio()
 {
     return s_AspectRatio;
+}
+
+float GameApplication::GetTotalElapsedTime()
+{
+    return s_TotalElapsedTime;
 }

@@ -51,7 +51,7 @@ private:
 public:
 	ParticleComponent();
 	~ParticleComponent();
-	void Create(std::shared_ptr<CameraComponent> playerCam, bool isBurst, int maxAmount, std::weak_ptr<ShaderComponent> shader);
+	void Create(std::shared_ptr<CameraComponent> playerCam, bool isBurst, int maxAmount, std::shared_ptr<ShaderComponent> shader);
 	void SetTexture(const std::string& path);
 	void Update(float dt);
 	void Draw(const glm::mat4& matrixPV);

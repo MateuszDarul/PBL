@@ -11,8 +11,8 @@ bool MapLoader::Load(
     std::string path, 
     SceneNode* root, 
     std::shared_ptr<cmp::Shader> shader, 
-    std::shared_ptr<cmp::Shader> shader_d, 
-    std::shared_ptr<cmp::Shader> shader_l, 
+    std::shared_ptr<cmp::Shader> shader_d,
+    std::shared_ptr<cmp::Shader> shader_line,
     std::shared_ptr<cmp::Shader> shader_dis,
     std::shared_ptr<cmp::Shader> shader_part_light,
     CollidersManager* collisionManager, 
@@ -252,7 +252,7 @@ bool MapLoader::Load(
             {
                 file >> modelName;
                 line_id++;
-
+                std::cout << line_id << " " << modelName << "\n";
                 file >> std::dec >> amount;
                 line_id++;
 
@@ -358,9 +358,49 @@ bool MapLoader::Load(
                     sphereCollider->SetRadius(size);
                 }
             break;
+
+            case 2: /// SLOPE
+                gameObject->AddComponent(std::make_shared<SlopeCollider>(false, true));
+                {
+                    auto slopeCollider = gameObject->GetComponent<SlopeCollider>();
+
+                    glm::vec3 size;
+                    file >> std::dec >> size.x;
+                    file >> std::dec >> size.y;
+                    file >> std::dec >> size.z;
+                    line_id += 3;
+                    
+                    int dir = 0;
+                    file >> std::dec >> dir;
+                    line_id++;
+
+                    SlopeCollider::Direction direction;
+                    switch (dir)
+                    {
+                    case 0:
+                        direction = SlopeCollider::Direction::X;
+                        break;
+                    case 1:
+                        direction = SlopeCollider::Direction::X_NEG;
+                        break;
+                    case 2:
+                        direction = SlopeCollider::Direction::Z;
+                        break;
+                    case 3:
+                        direction = SlopeCollider::Direction::Z_NEG;
+                        break;
+                    default:
+                        direction = SlopeCollider::Direction::X;
+                    }
+
+                    slopeCollider->SetDimensions(size);
+                    slopeCollider->SetDirection(direction);
+                    slopeCollider->AddToCollidersManager(collisionManager);
+                }
+            break;
             
             default:
-                std::cerr << "Undefined collider type:" << type << " supported [0,1]" << std::endl;
+                std::cerr << "Undefined collider type:" << type << " supported [0,1,2]" << std::endl;
             }
         }
         else if (line == "Resource:")
@@ -388,6 +428,18 @@ bool MapLoader::Load(
             auto resourceScript = new Resource();
             gameObject->AddComponent(std::make_shared<cmp::Scriptable>());
             gameObject->GetComponent<cmp::Scriptable>()->Add(resourceScript);
+
+            std::string endOrAmount;
+            file >> endOrAmount;
+            line_id++;
+            if (endOrAmount.compare("END") == 0)
+            {
+                root->AddChild(gameObject);
+            }
+            else
+            {
+                resourceScript->energy = std::stoi(endOrAmount);
+            }
         }
         else if (line == "Blueprints:")
         {
@@ -398,8 +450,8 @@ bool MapLoader::Load(
             };
             std::vector<BlueprintPosition> blueprints = {
                 {{ -73.0f, 1.25f, 89.5f },  PlayerPlaceTurret::TurretType::Blockade  },    //baricade
-                {{ -83.0f, 1.25f, 69.5f },  PlayerPlaceTurret::TurretType::Shooting },    //Shooting
-                {{ -26.8f, 1.25f, 5.0f },  PlayerPlaceTurret::TurretType::Laser    }     //Laser
+                {{ -83.0f, 1.25f, 68.8f },  PlayerPlaceTurret::TurretType::Shooting },    //Shooting
+                {{ -26.8f, 1.25f,  5.0f },  PlayerPlaceTurret::TurretType::Laser    }     //Laser
             };
             for (int i = 0; i < 3; i++)
             {
@@ -416,7 +468,7 @@ bool MapLoader::Load(
 
                 gameObject->AddComponent(std::make_shared<BoxCollider>(true, true));
                 gameObject->GetComponent<cmp::BoxCol>()->SetLengths({ 1.1, 1.1, 1.1 });
-                gameObject->GetComponent<cmp::BoxCol>()->SetOffset({0.0, 1.25, 0.0});
+                gameObject->GetComponent<cmp::BoxCol>()->SetOffset({0.0, 1.0, 0.0});
                 gameObject->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
 
                 auto model = std::make_shared<cmp::Model>();
@@ -433,7 +485,7 @@ bool MapLoader::Load(
                 //shooting
                 if (i == 1)
                 {
-                    gameObject->GetComponent<cmp::BoxCol>()->SetLengths({ 4.1, 2.5, 0.6 });
+                    gameObject->GetComponent<cmp::BoxCol>()->SetLengths({ 4.0, 2.5, 0.3 });
                     model->Create(
                         resMan->GetMesh("Resources/models/Board/Board.obj"),
                         resMan->GetMaterial("Resources/models/Board/blueprintOffensive.mtl")
@@ -443,7 +495,7 @@ bool MapLoader::Load(
                 //laser
                 if (i == 2)
                 {
-                    gameObject->GetComponent<cmp::BoxCol>()->SetLengths({ 0.6, 2.5, 4.1 });
+                    gameObject->GetComponent<cmp::BoxCol>()->SetLengths({ 0.3, 2.5, 4.0 });
                     model->Create(
                         resMan->GetMesh("Resources/models/Board/Board.obj"),
                         resMan->GetMaterial("Resources/models/Board/blueprintLaser.mtl")
@@ -483,7 +535,7 @@ bool MapLoader::Load(
             line->color2 = { 1.0f, 0.7f, 0.0f };
 
             gameObject->AddComponent(line);
-            gameObject->AddComponent(shader_l);
+            gameObject->AddComponent(shader_line);
             turretScript->line = line.get();
 
             scriptHolder->Add(turretScript);
@@ -668,82 +720,121 @@ bool MapLoader::Load(
                 sParticles->SetForce({ 0.0f, -0.01f, 0.0f });
                 root->AddChild(sParticlesGO);
             }
-
-
             scriptHolder->Add(spawnerScript);
 
             spawnerCounter++;
         }
         else if (line == "Mirror:")
         {
-            glm::vec3 offset, initialRot, maxRot;
-            
-            std::string ln;
-            file >> ln;
-            line_id++;
-            while (ln != "END" && ln != "")
+        /*NEW
+        Transformations:
+        x
+        y
+        z
+        rx      - obrot gora/dol
+        ry      - obrot lewo/prawo
+        0.0     - zawsze 0
+        Mirror:
+        Offset:
+        x       - przesuniecie punktu obrotu w lewo/prawo
+        y       - przesuniecie punktu obrotu w dol/gore
+        z       - przesuniecie punktu obrotu do przodu/tylu
+        Facing:
+        x       - obrot gora/dol w pozycji zerowej
+        y       - obrot lewo/prawo w pozycji zerowej
+        MaxRot:
+        x       - maksymalne wychylenie w gore/dol
+        y       - maksymalne wychylenie w lewo/prawo
+        END*/
+
+        glm::vec3 offset, initialRot, maxRot;
+
+        std::string ln;
+        file >> ln;
+        line_id++;
+        while (ln != "END" && ln != "")
+        {
+            if (ln == "Offset:")
             {
-                if (ln == "Offset:")
-                {
-                    file >> std::dec >> offset.x;
-                    file >> std::dec >> offset.y;
-                    file >> std::dec >> offset.z;
-                    
-                    file >> ln;
-                    line_id += 4;
-                }
-                if (ln == "Facing:")
-                {
-                    file >> std::dec >> initialRot.x;
-                    file >> std::dec >> initialRot.y;
+                file >> std::dec >> offset.x;
+                file >> std::dec >> offset.y;
+                file >> std::dec >> offset.z;
 
-                    file >> ln;
-                    line_id += 3;
-                }
-                if (ln == "MaxRot:")
-                {
-                    file >> std::dec >> maxRot.x;
-                    file >> std::dec >> maxRot.y;
-
-                    file >> ln;
-                    line_id += 3;
-                }
+                file >> ln;
+                line_id += 4;
             }
-            
-            gameObject->AddComponent(std::make_shared<cmp::Name>("Mirror" + std::to_string(mirrorCounter++)));
+            if (ln == "Facing:")
+            {
+                file >> std::dec >> initialRot.x;
+                file >> std::dec >> initialRot.y;
 
-            auto mirrorGO = std::make_shared<GameObject>();
-            mirrorGO->AddComponent(std::make_shared<BoxCollider>(false, true, CollisionLayer::Mirror));
-            mirrorGO->GetComponent<cmp::BoxCol>()->SetLengths({ 2.0, 2.0, 2.0 });
-            mirrorGO->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
+                file >> ln;
+                line_id += 3;
+            }
+            if (ln == "MaxRot:")
+            {
+                file >> std::dec >> maxRot.x;
+                file >> std::dec >> maxRot.y;
 
-            mirrorGO->AddComponent(std::make_shared<cmp::Transform>());
-            mirrorGO->GetComponent<cmp::Transform>()->SetPosition(offset);
+                file >> ln;
+                line_id += 3;
+            }
+        }
 
-            auto model = std::make_shared<cmp::Model>();
-            model->Create(
-                resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-                resMan->GetMaterial("Resources/models/floor/floor.mtl")
-            );
-            mirrorGO->AddComponent(model);
-            mirrorGO->AddComponent(shader_d);
+        gameObject->AddComponent(std::make_shared<cmp::Name>("MirrorHolder" + std::to_string(mirrorCounter)));
 
-            mirrorGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
-            mirrorGO->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+        auto mirrorGO = std::make_shared<GameObject>();
+        mirrorGO->AddComponent(std::make_shared<cmp::Name>("MirrorCol" + std::to_string(mirrorCounter)));
 
+        mirrorGO->AddComponent(std::make_shared<BoxCollider>(false, true, CollisionLayer::Mirror));
+        mirrorGO->GetComponent<cmp::BoxCol>()->SetLengths({ 1.7, 2.4, 0.1515 });
+        mirrorGO->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
 
-            gameObject->AddComponent(std::make_shared<cmp::Scriptable>());
-
-            auto mirrorScript = new MirrorRotate();
-            mirrorScript->SetEnabled(false);
-            mirrorScript->initialRotationOffsetX = initialRot.x;
-            mirrorScript->initialRotationOffsetY = initialRot.y;
-            mirrorScript->maxRotationX = maxRot.x;
-            mirrorScript->maxRotationY = maxRot.y;
-            gameObject->GetComponent<cmp::Scriptable>()->Add(mirrorScript);
+        mirrorGO->AddComponent(std::make_shared<cmp::Transform>());
+        mirrorGO->GetComponent<cmp::Transform>()->SetPosition(offset);
 
 
-            root->AddChild(gameObject)->AddChild(mirrorGO);
+        auto model = std::make_shared<cmp::Model>();
+        model->Create(
+            resMan->GetMesh("Resources/models/mirror2/mirror2alt.obj"),
+            resMan->GetMaterial("Resources/models/mirror2/mirror2.mtl")
+        );
+        model->SetTintColor(0.85, 0.68, 0.30);
+        mirrorGO->AddComponent(model);
+        mirrorGO->AddComponent(shader);
+
+        mirrorGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        mirrorGO->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/mirror2/mirror2alt.obj"));
+
+
+        gameObject->AddComponent(std::make_shared<cmp::Scriptable>());
+
+        auto mirrorScript = new MirrorRotate();
+        mirrorScript->SetEnabled(false);
+        mirrorScript->initialRotationOffsetX = initialRot.x;
+        mirrorScript->initialRotationOffsetY = initialRot.y;
+        mirrorScript->maxRotationX = maxRot.x;
+        mirrorScript->maxRotationY = maxRot.y;
+        gameObject->GetComponent<cmp::Scriptable>()->Add(mirrorScript);
+
+
+        auto emissiveGO = std::make_shared<GameObject>();
+        emissiveGO->AddComponent(std::make_shared<cmp::Transform>());
+        auto emissiveModel = std::make_shared<cmp::Model>();
+        emissiveModel->Create(
+            resMan->GetMesh("Resources/models/mirror2/mirror2emission.obj"),
+            resMan->GetMaterial("Resources/models/multitool/icon.mtl")
+        );
+        emissiveModel->SetTintColor(0.9, 0.9, 1.0);
+        emissiveGO->AddComponent(emissiveModel);
+        emissiveGO->AddComponent(shader_d);
+
+        emissiveGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        emissiveGO->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/mirror2/mirror2emission.obj"));
+
+
+        root->AddChild(gameObject)->AddChild(mirrorGO)->AddChild(emissiveGO);
+        mirrorCounter++;
         }
         else if(line == "END")
         {

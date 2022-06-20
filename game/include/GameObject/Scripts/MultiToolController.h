@@ -66,6 +66,7 @@ bool manuallyTurnedOn = false;
 
         if (currentFlashlightCharge < 0.00001f)
         {
+            currentFlashlightCharge = 0.0f;
             isFlashlightOn = false;
             manuallyTurnedOn = false;
         }

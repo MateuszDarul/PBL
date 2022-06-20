@@ -33,7 +33,7 @@ public:
         SceneNode* root, 
         std::shared_ptr<cmp::Shader> shader, 
         std::shared_ptr<cmp::Shader> shader_d, 
-        std::shared_ptr<cmp::Shader> shader_l, 
+        std::shared_ptr<cmp::Shader> shader_line,
         std::shared_ptr<cmp::Shader> shader_dis,
         std::shared_ptr<cmp::Shader> shader_part_light,
         CollidersManager* collisionManager, 

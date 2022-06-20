@@ -15,7 +15,7 @@ class TurretShoot : public Turret
 {
 public:
 	TurretRange* turretRange;
-	std::weak_ptr<ShaderComponent> particleShader;
+	std::shared_ptr<ShaderComponent> particleShader;
 private:
 	float shootTimer = 1.0f;
 	float Angle(glm::vec3 origin, glm::vec3 other)

@@ -17,6 +17,21 @@
 
 class ShadowsManager;
 
+struct SceneInfo
+{
+    std::shared_ptr<cmp::Shader> shader_l;
+    std::shared_ptr<cmp::Shader> shader_d;
+    std::shared_ptr<cmp::Shader> lineShader;
+    std::shared_ptr<cmp::Shader> displShader;
+    std::shared_ptr<cmp::Shader> shadowParticlesShader;
+    ResourceManager* resourceManager;
+    CollidersManager* collidersManager;
+    ShadowsManager* shadowsManager;
+    Scene* scene;
+    MultiToolController* multiToolScript;
+    std::shared_ptr<GameObject> cameraGO;
+};
+
 /** @brief Scena do zarzadzania SceneNode'ami
  */
 class Scene
@@ -28,6 +43,11 @@ private:
     ShadowsManager* shadowsManager;
     glm::mat4 transform; //!< Macierz transformacji widoku i kamery.
     MusicBuffer* musicBuffer;
+
+    bool isPaused;
+
+    void LoadLevelTutorial(const SceneInfo& sceneInfo);
+    void LoadLevelPuzzle1(const SceneInfo& sceneInfo);
 
 public:
     /** @brief Domyslny konstruktor.

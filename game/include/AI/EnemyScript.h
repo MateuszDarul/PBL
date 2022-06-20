@@ -42,6 +42,16 @@ private:
 
     std::shared_ptr<GameObject> player;
 
+    float Angle(glm::vec3 origin, glm::vec3 other)
+    {
+        float toReturn = glm::acos(glm::dot(glm::vec3(1, 0, 0), glm::normalize(other - origin)));
+        if (origin.z - other.z < 0)
+        {
+            toReturn = -toReturn;
+        }
+        return toReturn;
+    }
+
 public:
 
     /**

@@ -37,15 +37,18 @@ void MusicBuffer::Play()
 		throw("Error starting playback");
 	}
 
+	p_IsPlaying = true;
 }
 
 void MusicBuffer::Pause()
 {
 	alSourcePause(p_Source);
+	p_IsPaused = true;
 }
 
 void MusicBuffer::Stop()
 {
+	p_IsPlaying = false;
 	alSourceStop(p_Source);
 
 	ALint queued;
@@ -63,6 +66,7 @@ void MusicBuffer::Stop()
 void MusicBuffer::Resume()
 {
 	alSourcePlay(p_Source);
+	p_IsPaused = false;
 }
 
 void MusicBuffer::UpdateBufferStream()
@@ -109,6 +113,7 @@ void MusicBuffer::UpdateBufferStream()
 
 				/* Reset sound file */
 				sf_seek(p_SndFile, 0, SEEK_SET);
+				p_IsPlaying = false;
 
 				if (p_IsLooping)
 				{
@@ -151,6 +156,29 @@ void MusicBuffer::SetLooping(bool looping)
 	p_IsLooping = looping;
 }
 
+void MusicBuffer::SetVolume(float volume)
+{
+	p_Volume = volume;
+	alSourcef(p_Source, AL_GAIN, volume);
+}
+
+void MusicBuffer::SetCurrentVolume(float volume)
+{
+	alSourcef(p_Source, AL_GAIN, volume);
+}
+
+float MusicBuffer::GetVolume() const
+{
+	return p_Volume;
+}
+
+float MusicBuffer::GetCurrentVolume() const
+{
+	float result = 0.0f;
+	alGetSourcef(p_Source, AL_GAIN, &result);
+	return result;
+}
+
 MusicBuffer::MusicBuffer(const char* filename, bool looping)
 	: p_IsLooping(looping)
 {
@@ -190,6 +218,9 @@ MusicBuffer::MusicBuffer(const char* filename, bool looping)
 	frame_size = ((size_t)BUFFER_SAMPLES * (size_t)p_Sfinfo.channels) * sizeof(short);
 	p_Membuf = static_cast<short*>(malloc(frame_size));
 
+	p_IsPlaying = false;
+	p_IsPaused = false;
+	p_Volume = 1.0f;
 }
 
 MusicBuffer::~MusicBuffer()
@@ -205,4 +236,14 @@ MusicBuffer::~MusicBuffer()
 
 	alDeleteBuffers(NUM_BUFFERS, p_Buffers);
 
+}
+
+bool MusicBuffer::IsPlaying() const
+{
+	return p_IsPlaying;
+}
+
+bool MusicBuffer::IsPaused() const
+{
+	return p_IsPaused;
 }

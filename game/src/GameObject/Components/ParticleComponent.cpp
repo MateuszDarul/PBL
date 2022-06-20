@@ -35,7 +35,7 @@ ParticleComponent::~ParticleComponent()
 	glDeleteBuffers(1, &this->VBOinstances);
 }
 
-void ParticleComponent::Create(std::shared_ptr<CameraComponent> playerCam, bool isBurst, int maxAmount, std::weak_ptr<ShaderComponent> shader)
+void ParticleComponent::Create(std::shared_ptr<CameraComponent> playerCam, bool isBurst, int maxAmount, std::shared_ptr<ShaderComponent> shader)
 {
 	srand(time(NULL));
 	particleMaxAmount = maxAmount;
@@ -45,7 +45,7 @@ void ParticleComponent::Create(std::shared_ptr<CameraComponent> playerCam, bool 
 	{
 		transformations.push_back(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f)));
 	}
-	this->shader = shader.lock();
+	this->shader = shader;
 	float particle_quad[] = {
 		-0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
 		 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,

@@ -1,3 +1,4 @@
+
     ["Schodek.NR2","map_models/schody/stair",[5.25,0.5,2.0]],
     ["Podloga.NR3","map_models/podloga10_20/podloga10_20",[10, 1, 20]],
     ["Podloga.NR4","map_models/podloga6_6/podloga6_6",[6, 1, 6]],

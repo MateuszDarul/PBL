@@ -69,6 +69,7 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/Sounds/SoundSource.cpp
 	src/Sounds/MusicBuffer.cpp
 	src/Sounds/SoundPlayer.cpp
+	src/Sounds/AudioManager.cpp
 
 	main.cpp
 )
@@ -148,6 +149,7 @@ file(GLOB_RECURSE HEADER_FILES
 	include/Sounds/SoundSource.h
 	include/Sounds/MusicBuffer.h
 	include/Sounds/SoundPlayer.h
+	include/Sounds/AudioManager.h
 
 	include/GameObject/Scripts/*.h
 )
