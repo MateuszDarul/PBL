@@ -1,0 +1,5 @@
+
+newmtl Material.063
+
+illum 2
+map_Kd komputer_Material_BaseColor.png

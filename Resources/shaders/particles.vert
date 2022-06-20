@@ -13,18 +13,23 @@ uniform mat4 cameraView;
 uniform float width;
 uniform float height;
 
+
 void main()
 {
-    vec4 trans = {0,0,0,1};
-    mat4 newModel = inverse(cameraView);
-    newModel[3] = trans;
-
     lifetimePercentage = mInstanceMatrix[0][3];
     
-    mat4 correctedInstanceMatrix = mInstanceMatrix;
-    correctedInstanceMatrix[0][3] = 0.0;
+    mat4 newModel = inverse(cameraView);
+    newModel[3] = mInstanceMatrix[3] + model[3];
+    newModel[3][3] = 1.0;
 
-    gl_Position = matrixPV * model * correctedInstanceMatrix * newModel * vec4(vPos,1.0f);
+    float scl = mInstanceMatrix[0][0];
+    float t = lifetimePercentage * 0.04;
+    float s = sin(t);
+    float c = cos(t) * scl;
+    
+    mat4 rotnscale  = mat4(c, s, 0.0, 0.0,  -s, c, 0.0, 0.0,  0.0, 0.0, scl, 0.0,  0.0, 0.0, 0.0, 1.0); // Z-azis
+
+    gl_Position = matrixPV * newModel * rotnscale * vec4(vPos,1.0f);
     
     vertexTexture = vTex;
 }

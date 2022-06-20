@@ -1,0 +1,6 @@
+
+newmtl Material.035
+
+illum 2
+map_Kd stol.png
+map_Ks stolspecular.png

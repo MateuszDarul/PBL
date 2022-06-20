@@ -1,0 +1,5 @@
+
+newmtl Material.064
+
+illum 2
+map_Kd panel_Material_BaseColor.png

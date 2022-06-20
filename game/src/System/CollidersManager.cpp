@@ -129,28 +129,14 @@ void CollidersManager::ExecuteOnCollidingScripts(std::vector<std::pair<std::shar
 void CollidersManager::OnRemoveExecuteScript(std::vector<std::pair<std::shared_ptr<ColliderComponent>, std::shared_ptr<ColliderComponent>>>* currentCollisions,
 	std::shared_ptr<ColliderComponent> removedCollider)
 {
-	std::shared_ptr<cmp::Scriptable> script = nullptr;
 	std::pair<std::shared_ptr<ColliderComponent>, std::shared_ptr<ColliderComponent>> pair;
-	for (int i = 0; i < currentCollisions->size(); i++)
+	int size = currentCollisions->size();
+	for (int i = 0; i < size; i++)
 	{
 		pair = currentCollisions->at(i);
-		if (pair.first == removedCollider) 
+		if (pair.first == removedCollider || pair.second == removedCollider)
 		{
-			script = pair.second->GetOwner()->GetComponent<cmp::Scriptable>();
-			if (script != nullptr)
-			{
-				if (pair.first->isTrigger || pair.second->isTrigger)
-				{
-					script->OnTriggerExit(pair.first);
-				}
-				else
-				{
-					script->OnCollisionExit(pair.first);
-				}
-			}
-		}
-		else if (pair.second == removedCollider)
-		{
+			std::shared_ptr<cmp::Scriptable> script = nullptr;
 			script = pair.first->GetOwner()->GetComponent<cmp::Scriptable>();
 			if (script != nullptr)
 			{
@@ -163,6 +149,22 @@ void CollidersManager::OnRemoveExecuteScript(std::vector<std::pair<std::shared_p
 					script->OnCollisionExit(pair.second);
 				}
 			}
+			script = nullptr;
+			script = pair.second->GetOwner()->GetComponent<cmp::Scriptable>();
+			if (script != nullptr)
+			{
+				if (pair.first->isTrigger || pair.second->isTrigger)
+				{
+					script->OnTriggerExit(pair.first);
+				}
+				else
+				{
+					script->OnCollisionExit(pair.first);
+				}
+			}
+			currentCollisions->erase(currentCollisions->begin() + i, currentCollisions->begin() + i + 1);
+			size--;
+			i--;
 		}
 	}
 }

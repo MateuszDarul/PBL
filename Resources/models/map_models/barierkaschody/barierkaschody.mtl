@@ -1,0 +1,6 @@
+
+
+newmtl Material.040
+
+illum 2
+map_Kd barierkaschody_Material.040_BaseColor.png

@@ -72,6 +72,11 @@ public:
         wayPoints.push_back(new_point);
     }
 
+    std::vector<glm::vec3> GetWayPoints()
+    {
+        return wayPoints;
+    }
+
     void SpawnEnemy(int nr);
 };
 

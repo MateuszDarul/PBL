@@ -28,7 +28,8 @@ void main()
 {
  
     TexCoord = vTex;
-    Normal = vNor;
+    mat3 fixnormal = mat3(model[0][0], model[0][1], model[0][2], model[1][0], model[1][1], model[1][2], model[2][0], model[2][1], model[2][2]);
+    Normal = fixnormal * vNor;
     
 
     /* ===== TEXTURES

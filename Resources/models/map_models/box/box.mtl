@@ -1,0 +1,5 @@
+
+newmtl Material.033
+
+illum 2
+map_Kd box_Material_BaseColor.png

@@ -28,8 +28,11 @@ public:
 
     float mouseRotationSpeed = 0.069f;
 
-    float invertRotationX = 1.0f;
-    float invertRotationY = 1.0f;
+    float invertRotationX_const = 1.0f; //use when setting up a mirror
+    float invertRotationY_const = 1.0f; //use when setting up a mirror
+
+    float invertRotationX_temp  = 1.0f; //use for temporary rotation inverse
+    float invertRotationY_temp  = 1.0f; //use for temporary rotation inverse
 
     bool disableMouseRotation = false;
     bool isPlayerInside = false;
@@ -78,8 +81,8 @@ public:
 
         if (!disableMouseRotation)
         {
-            currentRotationX -= mouseOffset.y * mouseRotationSpeed * modifier * invertRotationX;
-            currentRotationY += mouseOffset.x * mouseRotationSpeed * modifier * invertRotationY;
+            currentRotationX -= mouseOffset.y * mouseRotationSpeed * modifier * invertRotationX_temp * invertRotationX_const;
+            currentRotationY += mouseOffset.x * mouseRotationSpeed * modifier * invertRotationY_temp * invertRotationY_const;
 
             currentRotationX = std::clamp(currentRotationX, -maxRotationX + initialRotationOffsetX, maxRotationX + initialRotationOffsetX);
             currentRotationY = std::clamp(currentRotationY, -maxRotationY + initialRotationOffsetY, maxRotationY + initialRotationOffsetY);
@@ -94,24 +97,15 @@ public:
         {
             float rotationAmount = rotationSpeed * modifier * dt;
 
-            if (Input()->Keyboard()->IsPressed(KeyboardKey::W)) currentRotationX += rotationAmount * invertRotationX;
-            if (Input()->Keyboard()->IsPressed(KeyboardKey::S)) currentRotationX -= rotationAmount * invertRotationX;
-            if (Input()->Keyboard()->IsPressed(KeyboardKey::D)) currentRotationY -= rotationAmount * invertRotationY;
-            if (Input()->Keyboard()->IsPressed(KeyboardKey::A)) currentRotationY += rotationAmount * invertRotationY;
+            if (Input()->Keyboard()->IsPressed(KeyboardKey::W)) currentRotationX += rotationAmount * invertRotationX_temp * invertRotationX_const;
+            if (Input()->Keyboard()->IsPressed(KeyboardKey::S)) currentRotationX -= rotationAmount * invertRotationX_temp * invertRotationX_const;
+            if (Input()->Keyboard()->IsPressed(KeyboardKey::D)) currentRotationY -= rotationAmount * invertRotationX_temp * invertRotationX_const;
+            if (Input()->Keyboard()->IsPressed(KeyboardKey::A)) currentRotationY += rotationAmount * invertRotationX_temp * invertRotationX_const;
 
             currentRotationX = std::clamp(currentRotationX, -maxRotationX + initialRotationOffsetX, maxRotationX + initialRotationOffsetX);
             currentRotationY = std::clamp(currentRotationY, -maxRotationY + initialRotationOffsetY, maxRotationY + initialRotationOffsetY);
 
             transform->SetRotation(currentRotationX, currentRotationY, 0.0f);
-
-            if (isPlayerInside)
-            {
-                const auto& m = cameraHandle->GetNode()->GetGlobalTransformations();
-                auto newPos = glm::vec3(m[3][0], m[3][1], m[3][2]);
-                camera->SetPosition(newPos);
-                camera->SetRotationOffset(currentRotationX, -currentRotationY);
-                camera->SetIsGrounded(true);
-            }
         }
     }
 };

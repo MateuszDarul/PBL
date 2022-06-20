@@ -18,7 +18,7 @@ void main()
 
     vec4 col = u_ColorStart * (1.0 - t) + u_ColorEnd * t;
     
-    frag.rgb = frag.rrr * col.rgb;
+    frag.rgb = frag.rgb * col.rgb;
     frag.a *= col.a;
 
     if(frag.a < 0.05)

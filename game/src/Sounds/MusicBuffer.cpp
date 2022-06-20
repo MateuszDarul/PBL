@@ -39,13 +39,31 @@ void MusicBuffer::Play()
 
 }
 
-//void MusicBuffer::Pause()
-//{
-//}
+void MusicBuffer::Pause()
+{
+	alSourcePause(p_Source);
+}
 
-//void MusicBuffer::Stop()
-//{
-//}
+void MusicBuffer::Stop()
+{
+	alSourceStop(p_Source);
+
+	ALint queued;
+	alGetSourcei(p_Source, AL_BUFFERS_QUEUED, &queued);
+
+	if (queued > 0)
+	{
+		ALuint bufid[NUM_BUFFERS];
+		alSourceUnqueueBuffers(p_Source, queued, bufid);
+	}
+	
+	sf_seek(p_SndFile, 0, SEEK_SET);
+}
+
+void MusicBuffer::Resume()
+{
+	alSourcePlay(p_Source);
+}
 
 void MusicBuffer::UpdateBufferStream()
 {
@@ -80,6 +98,24 @@ void MusicBuffer::UpdateBufferStream()
 				p_Sfinfo.samplerate);
 			alSourceQueueBuffers(p_Source, 1, &bufid);
 		}
+		else
+		{
+			p_NumFinishedBuffers += 1;
+
+			/* Wait for all buffers to finish */
+			if(p_NumFinishedBuffers == NUM_BUFFERS)
+			{
+				p_NumFinishedBuffers = 0;
+
+				/* Reset sound file */
+				sf_seek(p_SndFile, 0, SEEK_SET);
+
+				if (p_IsLooping)
+				{
+					Play();
+				}
+			}
+		}
 		if (alGetError() != AL_NO_ERROR)
 		{
 			throw("error buffering music data");
@@ -110,7 +146,13 @@ ALint MusicBuffer::getSource()
 	return p_Source;
 }
 
-MusicBuffer::MusicBuffer(const char* filename)
+void MusicBuffer::SetLooping(bool looping)
+{
+	p_IsLooping = looping;
+}
+
+MusicBuffer::MusicBuffer(const char* filename, bool looping)
+	: p_IsLooping(looping)
 {
 	alGenSources(1, &p_Source);
 	alGenBuffers(NUM_BUFFERS, p_Buffers);

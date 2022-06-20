@@ -15,6 +15,7 @@ class TurretShoot : public Turret
 {
 public:
 	TurretRange* turretRange;
+	std::weak_ptr<ShaderComponent> particleShader;
 private:
 	float shootTimer = 1.0f;
 	float Angle(glm::vec3 origin, glm::vec3 other)
@@ -39,17 +40,17 @@ public:
 		{
 			muzzleParticles = std::make_shared<ParticleComponent>();
 			
-			muzzleParticles->Create(gameObject->GetNode()->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>(), true, 10);
-			muzzleParticles->SetTexture("Resources/textures/particle.png");
-			muzzleParticles->SetParticlesPerSecond(50.0f);
-			muzzleParticles->SetOffset(glm::vec3(2.44f, 2.3f, 0));
+			muzzleParticles->Create(gameObject->GetNode()->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>(), true, 20, particleShader);
+			muzzleParticles->SetTexture("Resources/textures/muzzle.png");
+			muzzleParticles->SetParticlesPerSecond(20.0f);
+			muzzleParticles->SetOffset(glm::vec3(2.50f, 2.3f, 0));
 			muzzleParticles->SetDirection({ 0.0f, 0.4f, 0.0f });
 			muzzleParticles->SetDirectionVar(15);
-			muzzleParticles->SetParticleLifetime(0.4f);
-			muzzleParticles->SetScale(0.2f, 0.01f);
-			muzzleParticles->SetSpeed(3.0f);
-			muzzleParticles->SetColor({ 1.0f, 1.0f, 0.0f,   1.0f }, { 1.0f, 0.3f, 0.1f,   0.2f });
-			muzzleParticles->SetForce({ 0.0f, -2.5f, 0.0f });
+			muzzleParticles->SetParticleLifetime(0.18f);
+			muzzleParticles->SetScale(0.70f, 0.75f);
+			muzzleParticles->SetSpeed(0.0f);
+			muzzleParticles->SetColor({ 1.0f, 1.0f, 1.0f,   1.0f }, { 1.0f, 1.0f, 1.0f,   0.5f });
+			muzzleParticles->SetForce({ 0.0f, -0.01f, 0.0f });
 			muzzleParticles->Stop();
 
 			gameObject->AddComponent(muzzleParticles);

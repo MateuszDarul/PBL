@@ -2,6 +2,7 @@
 #include "Scripts/PlayerPlaceTurret.h"
 #include "Scripts/Blueprint.h"
 #include "Scripts/Resource.h"
+#include "Scripts/MirrorRotate.h"
 
 #include "ShadowsManager.h"
 #include "EnemySpawnerScript.h"
@@ -12,7 +13,8 @@ bool MapLoader::Load(
     std::shared_ptr<cmp::Shader> shader, 
     std::shared_ptr<cmp::Shader> shader_d, 
     std::shared_ptr<cmp::Shader> shader_l, 
-    std::shared_ptr<cmp::Shader> shader_dis, 
+    std::shared_ptr<cmp::Shader> shader_dis,
+    std::shared_ptr<cmp::Shader> shader_part_light,
     CollidersManager* collisionManager, 
     ShadowsManager* shadowsManager, 
     Scene* scn,
@@ -23,6 +25,7 @@ bool MapLoader::Load(
     int predefinedLasersCounter = 0;
     int generatorCounter = 0;
     int spawnerCounter = 0;
+    int mirrorCounter = 0;
     ResourceManager* resMan = GameApplication::GetResourceManager();
 
     std::shared_ptr<GameObject> gameObject;
@@ -76,6 +79,7 @@ bool MapLoader::Load(
                 {
                     lightCmp->Create();
                     lightCmp->AddShader(shader);
+                    lightCmp->AddShader(shader_part_light);
 
                     for(int i=0; i<4; i++)
                     {
@@ -291,6 +295,7 @@ bool MapLoader::Load(
                 file >> std::dec >> type;
                 line_id++;
 
+                // shadeCmp->Create(gameObject->GetComponent<cmp::ModelInst>() == nullptr);
                 shadeCmp->Create(type);
             }
         }
@@ -411,6 +416,7 @@ bool MapLoader::Load(
 
                 gameObject->AddComponent(std::make_shared<BoxCollider>(true, true));
                 gameObject->GetComponent<cmp::BoxCol>()->SetLengths({ 1.1, 1.1, 1.1 });
+                gameObject->GetComponent<cmp::BoxCol>()->SetOffset({0.0, 1.25, 0.0});
                 gameObject->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
 
                 auto model = std::make_shared<cmp::Model>();
@@ -427,6 +433,7 @@ bool MapLoader::Load(
                 //shooting
                 if (i == 1)
                 {
+                    gameObject->GetComponent<cmp::BoxCol>()->SetLengths({ 4.1, 2.5, 0.6 });
                     model->Create(
                         resMan->GetMesh("Resources/models/Board/Board.obj"),
                         resMan->GetMaterial("Resources/models/Board/blueprintOffensive.mtl")
@@ -436,6 +443,7 @@ bool MapLoader::Load(
                 //laser
                 if (i == 2)
                 {
+                    gameObject->GetComponent<cmp::BoxCol>()->SetLengths({ 0.6, 2.5, 4.1 });
                     model->Create(
                         resMan->GetMesh("Resources/models/Board/Board.obj"),
                         resMan->GetMaterial("Resources/models/Board/blueprintLaser.mtl")
@@ -483,7 +491,7 @@ bool MapLoader::Load(
             gameObject->AddComponent(std::make_shared<cmp::BoxCol>(true, true, CollisionLayer::GUI));
             std::shared_ptr<cmp::BoxCol> col = gameObject->GetComponent<cmp::BoxCol>();
             col->SetLengths({ 2.0, 2.5, 2.0 });
-            col->SetOffset({ 0.0, 1.75, 0.0 });
+           col->SetOffset({ 0.0, 1.75, 0.0 });
             col->AddToCollidersManager(collisionManager);
 
             auto gfxGO = std::make_shared<GameObject>();
@@ -492,14 +500,14 @@ bool MapLoader::Load(
 
             auto mc = std::make_shared<cmp::Model>();
             mc->Create(
-                resMan->GetMesh("Resources/models/Wieze/Laser.obj"),
-                resMan->GetMaterial("Resources/models/Wieze/Laser.mtl")
+                resMan->GetMesh("Resources/models/Wieze/laser.obj"),
+                resMan->GetMaterial("Resources/models/Wieze/laser.mtl")
             );
             gfxGO->AddComponent(mc);
 
             gfxGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
             gfxGO->GetComponent<cmp::FrustumCulling>()->Create(
-                resMan->GetMesh("Resources/models/Wieze/Laser.obj")
+                resMan->GetMesh("Resources/models/Wieze/laser.obj")
             );
             gfxGO->AddComponent(shader);
 
@@ -545,6 +553,7 @@ bool MapLoader::Load(
             lightGO->AddComponent(light);
             light->Create();
             light->AddShader(shader);
+            //light->AddShader(shader_part_light);
             light->SetPosition(bulbPos);
             light->SetDamping(lightRange);
             light->SetLightColor({ 0.8f, 0.8f, 1.0f });
@@ -635,9 +644,106 @@ bool MapLoader::Load(
                 line_id++;
             }
 
+            std::vector<glm::vec3> waypoints = spawnerScript->GetWayPoints();
+            for (int i = 0; waypoints.size() > 1 && i < waypoints.size() - 1; i++)
+            {
+                float wDistance = glm::distance(waypoints[i], waypoints[i + 1]);
+                auto sParticlesGO = std::make_shared<GameObject>();
+                sParticlesGO->AddComponent(std::make_shared<cmp::Transform>());
+                sParticlesGO->GetComponent<cmp::Transform>()->SetPosition(waypoints[i]);
+                sParticlesGO->AddComponent(std::make_shared<cmp::Particles>());
+                auto sParticles = sParticlesGO->GetComponent<cmp::Particles>();
+                sParticles->Create(p->GetComponent<cmp::Camera>(), false, 30, shader_part_light);
+                sParticles->SetTexture("Resources/textures/shadowParticle.png");
+                sParticles->SetSpeed(3.0f);
+                float lifeTime = wDistance / sParticles->GetSpeed();
+                sParticles->SetParticlesPerSecond(30 / lifeTime);
+                sParticles->SetOffset(glm::vec3(0.0f, 0.0f, 0));
+                sParticles->SetDirection(glm::normalize(waypoints[i+1] - waypoints[i]));
+                sParticles->SetDirectionVar(0);
+                sParticles->SetSpeed(3.0f);
+                sParticles->SetParticleLifetime(lifeTime);
+                sParticles->SetScale(0.25f, 0.25f);
+                sParticles->SetColor({ 1.0f, 1.0f, 1.0f,   1.0f }, { 1.0f, 1.0f, 1.0f,   1.0f });
+                sParticles->SetForce({ 0.0f, -0.01f, 0.0f });
+                root->AddChild(sParticlesGO);
+            }
+
+
             scriptHolder->Add(spawnerScript);
 
             spawnerCounter++;
+        }
+        else if (line == "Mirror:")
+        {
+            glm::vec3 offset, initialRot, maxRot;
+            
+            std::string ln;
+            file >> ln;
+            line_id++;
+            while (ln != "END" && ln != "")
+            {
+                if (ln == "Offset:")
+                {
+                    file >> std::dec >> offset.x;
+                    file >> std::dec >> offset.y;
+                    file >> std::dec >> offset.z;
+                    
+                    file >> ln;
+                    line_id += 4;
+                }
+                if (ln == "Facing:")
+                {
+                    file >> std::dec >> initialRot.x;
+                    file >> std::dec >> initialRot.y;
+
+                    file >> ln;
+                    line_id += 3;
+                }
+                if (ln == "MaxRot:")
+                {
+                    file >> std::dec >> maxRot.x;
+                    file >> std::dec >> maxRot.y;
+
+                    file >> ln;
+                    line_id += 3;
+                }
+            }
+            
+            gameObject->AddComponent(std::make_shared<cmp::Name>("Mirror" + std::to_string(mirrorCounter++)));
+
+            auto mirrorGO = std::make_shared<GameObject>();
+            mirrorGO->AddComponent(std::make_shared<BoxCollider>(false, true, CollisionLayer::Mirror));
+            mirrorGO->GetComponent<cmp::BoxCol>()->SetLengths({ 2.0, 2.0, 2.0 });
+            mirrorGO->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
+
+            mirrorGO->AddComponent(std::make_shared<cmp::Transform>());
+            mirrorGO->GetComponent<cmp::Transform>()->SetPosition(offset);
+
+            auto model = std::make_shared<cmp::Model>();
+            model->Create(
+                resMan->GetMesh("Resources/models/Crate/Crate.obj"),
+                resMan->GetMaterial("Resources/models/floor/floor.mtl")
+            );
+            mirrorGO->AddComponent(model);
+            mirrorGO->AddComponent(shader_d);
+
+            mirrorGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
+            mirrorGO->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+
+
+            gameObject->AddComponent(std::make_shared<cmp::Scriptable>());
+
+            auto mirrorScript = new MirrorRotate();
+            mirrorScript->SetEnabled(false);
+            mirrorScript->initialRotationOffsetX = initialRot.x;
+            mirrorScript->initialRotationOffsetY = initialRot.y;
+            mirrorScript->maxRotationX = maxRot.x;
+            mirrorScript->maxRotationY = maxRot.y;
+            gameObject->GetComponent<cmp::Scriptable>()->Add(mirrorScript);
+
+
+            root->AddChild(gameObject)->AddChild(mirrorGO);
         }
         else if(line == "END")
         {

@@ -1,0 +1,5 @@
+
+newmtl Material.051
+
+illum 2
+map_Kd generator_Material_BaseColor.png
