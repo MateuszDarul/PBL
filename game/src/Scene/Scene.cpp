@@ -19,6 +19,7 @@
 #include "EnemyScript.h"
 #include "Scripts/PlayerFootsteps.h"
 #include "Scripts/Cutscenexd.h"
+#include "Scripts/CutsceneFinal.h"
 #include "Scripts/LightActivator.h"
 #include "Scripts/LanternRange.h"
 
@@ -546,11 +547,16 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
         { { -25.00, 3.0,  50.5 }, 90.0f,   { -20.0,  2.5,  46.90 }, 180.0f },  //room 2
         { { -64.75, 3.0,  60.0 },  0.0f,   { -60.9,  3.0,  55.50 },  90.0f },  //room 3 - cutscene close (important id)
         { { -83.00, 3.0,  -3.5 }, 90.0f,   { -60.9, -9.0,  64.60 },   0.0f },  //room 4 - cutscene open  (important id)
+
+        { { -65.30, 13.1, -12.0 },  0.0f,  { -68.0,  2.5, -16.65 },  -90.0f }, //room 4 - enemy side door
+        { { -83.00, 3.0, -28.5 }, 90.0f,   { -83.00, -9.0, -27.5 },  90.0f },  //room 4 - elevator door
     };
 
     int i = 0;
     DoorActivator* cutsceneDoorActivator = nullptr;
     DoorActivator* openDoorAfterEnemyDies = nullptr;
+    DoorActivator* cutsceneDoorActivator2 = nullptr;
+    DoorActivator* openElevator = nullptr;
     for (auto& [doorPosition, doorRotation, activatorPosition, activatorRotation] : doorsAndButtons)
     {
         //create door
@@ -635,6 +641,12 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
 
         if (i == 2) cutsceneDoorActivator = activator;
         if (i == 3) openDoorAfterEnemyDies = activator;
+        if (i == 4)
+        {
+            cutsceneDoorActivator2 = activator;
+            activator->openedOffset = glm::vec3(0.0f, -10.1f, 0.0f);
+        }
+        if (i == 5) openElevator = activator;
         i++;
 
         //- frame model
@@ -654,32 +666,57 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
     }
 
     //cutscene
-    {
-        auto go = std::make_shared<GameObject>();
-        go->AddComponent(std::make_shared<cmp::Name>("cutscene"));
+    
+    auto go = std::make_shared<GameObject>();
+    go->AddComponent(std::make_shared<cmp::Name>("cutscene"));
 
-        go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(-83.0f, 5.0f, 42.0f);
+    go->AddComponent(std::make_shared<cmp::Transform>());
+    go->GetComponent<cmp::Transform>()->SetPosition(-83.0f, 5.0f, 42.0f);
 
-        go->AddComponent(std::make_shared<BoxCollider>(true, true));
-        go->GetComponent<cmp::BoxCol>()->SetLengths({ 10.0, 10.0, 5.0 });
-        go->GetComponent<cmp::BoxCol>()->layer = CollisionLayer::Ignore;
-        go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
-
-
-        go->AddComponent(std::make_shared<cmp::Scriptable>());
-
-        auto cutscene = new Cutscenexd();
-        cutscene->doorsToShut = cutsceneDoorActivator;
-        cutscene->doorsToOpen = openDoorAfterEnemyDies;
-        cutscene->lightShader = sceneInfo.shader_l;
-        cutscene->shadowManager = shadowsManager;
-        cutscene->enemy = world->FindNode("Enemy")->GetGameObject();
-        go->GetComponent<cmp::Scriptable>()->Add(cutscene);
+    go->AddComponent(std::make_shared<BoxCollider>(true, true));
+    go->GetComponent<cmp::BoxCol>()->SetLengths({ 10.0, 10.0, 5.0 });
+    go->GetComponent<cmp::BoxCol>()->layer = CollisionLayer::Ignore;
+    go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
 
-        levelNode->AddChild(go);
-    }
+    go->AddComponent(std::make_shared<cmp::Scriptable>());
+
+    auto cutscene = new Cutscenexd();
+    cutscene->doorsToShut = cutsceneDoorActivator;
+    cutscene->doorsToOpen = openDoorAfterEnemyDies;
+    cutscene->lightShader = sceneInfo.shader_l;
+    cutscene->shadowManager = shadowsManager;
+    cutscene->enemy = world->FindNode("Enemy")->GetGameObject();
+    go->GetComponent<cmp::Scriptable>()->Add(cutscene);
+
+
+    levelNode->AddChild(go);
+    
+
+    //cutscene 2
+
+    go = std::make_shared<GameObject>();
+    go->AddComponent(std::make_shared<cmp::Name>("cutsceneFinal"));
+
+    go->AddComponent(std::make_shared<cmp::Transform>());
+    go->GetComponent<cmp::Transform>()->SetPosition(-83.0f, 5.0f, -10.0f);
+
+    go->AddComponent(std::make_shared<BoxCollider>(true, true));
+    go->GetComponent<cmp::BoxCol>()->SetLengths({ 10.0, 10.0, 5.0 });
+    go->GetComponent<cmp::BoxCol>()->layer = CollisionLayer::Ignore;
+    go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
+
+    go->AddComponent(std::make_shared<cmp::Scriptable>());
+
+    auto cutscenef = new CutsceneFinal();
+    cutscenef->doorsToShut = openDoorAfterEnemyDies;
+    cutscenef->doorsToOpen = openElevator;
+    cutscenef->spawner = world->FindNode("spawner0")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<EnemySpawnerScript>();
+    cutscenef->prevScene = cutscene;
+    go->GetComponent<cmp::Scriptable>()->Add(cutscenef);
+
+
+    levelNode->AddChild(go);
 }
 
 void Scene::LoadLevelPuzzle1(const SceneInfo& sceneInfo)

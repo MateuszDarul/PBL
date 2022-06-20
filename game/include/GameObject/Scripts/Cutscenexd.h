@@ -101,4 +101,10 @@ public:
             shadowManager->AddLight(alarmLightGO.get());
         }
     }
+
+    void turnOffLight()
+    {
+        lightCmp->SetDamping(1.0f);
+        lightCmp->SetPosition(glm::vec3(999.99f, 999.99f, 999.99f));
+    }
 };

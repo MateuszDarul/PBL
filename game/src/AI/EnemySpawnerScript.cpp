@@ -7,8 +7,7 @@
 
 void EnemySpawnerScript::Start() {
 
-    SpawnEnemy(1);
-    std::cout << "----------------------------------------------------------------------------------------" << std::endl;
+    //SpawnEnemy(1);
 
 }
 
@@ -16,14 +15,14 @@ void EnemySpawnerScript::Update(float dt) {
 
 }
 
-void EnemySpawnerScript::SpawnEnemy(int nr) 
+void EnemySpawnerScript::SpawnEnemy(int nr)
 {
     ResourceManager* resMan = GameApplication::GetResourceManager();
 
     std::shared_ptr<GameObject> go = std::make_shared<GameObject>();
     std::shared_ptr<ModelComponent> mc = std::make_shared<ModelComponent>();
     mc->Create(
-        resMan->GetMesh("Resources/models/ny/przeciwnik/przeciwnik/przeciwnik.obj"),
+        resMan->GetMesh("Resources/models/ny/przeciwnik/przeciwnik/przeciwniksmooth.obj"),
         resMan->GetMaterial("Resources/models/displacement test/capsule.mtl")
     );
     go->AddComponent(displShader);
@@ -31,7 +30,7 @@ void EnemySpawnerScript::SpawnEnemy(int nr)
 
     go->AddComponent(std::make_shared<FrustumCullingComponent>());
     go->GetComponent<cmp::FrustumCulling>()->Create(
-        resMan->GetMesh("Resources/models/ny/przeciwnik/przeciwnik/przeciwnik.obj")
+        resMan->GetMesh("Resources/models/ny/przeciwnik/przeciwnik/przeciwniksmooth.obj")
     );
 
     go->AddComponent(std::make_shared<cmp::Transform>());
@@ -53,11 +52,14 @@ void EnemySpawnerScript::SpawnEnemy(int nr)
     std::shared_ptr<Path> path = std::make_shared<Path>(true);
     path->Clear();
 
-    for(int i = 0; i < wayPoints.size(); i++)
+    for (int i = 0; i < wayPoints.size(); i++)
     {
         path->AddWayPoint(wayPoints.at(i));
     }
-    go->GetComponent<cmp::Transform>()->SetPosition(wayPoints.at(0));
+
+    float randomDispl = 3.0f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (-3.0f)));
+
+    go->GetComponent<cmp::Transform>()->SetPosition(wayPoints.at(0) + glm::vec3(randomDispl, randomDispl, randomDispl));
     path->Set();
 
     auto enemyScript = new EnemyScript(playerGO);
@@ -67,6 +69,8 @@ void EnemySpawnerScript::SpawnEnemy(int nr)
     go->GetComponent<cmp::Scriptable>()->Add(enemyScript);
 
     root->AddChild(go);
+
+    go->GetComponent<cmp::Scriptable>()->OnStart();
 
     enemyEnumerator++;
 }

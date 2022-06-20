@@ -405,41 +405,56 @@ bool MapLoader::Load(
         }
         else if (line == "Resource:")
         {
-            gameObject->AddComponent(std::make_shared<cmp::Name>("Resource " + std::to_string(resourceBoxCounter)));
-            resourceBoxCounter++;
+        gameObject->AddComponent(std::make_shared<cmp::Name>("Resource " + std::to_string(resourceBoxCounter)));
+        resourceBoxCounter++;
 
-            gameObject->GetComponent<cmp::Transform>()->SetScale(0.4);
+        gameObject->AddComponent(std::make_shared<BoxCollider>(true, true));
+        gameObject->GetComponent<cmp::BoxCol>()->SetLengths({ 2.5, 2.5, 2.5 });
+        gameObject->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
 
-            gameObject->AddComponent(std::make_shared<BoxCollider>(true, true));
-            gameObject->GetComponent<cmp::BoxCol>()->SetLengths({ 1.0, 1.0, 1.0 });
-            gameObject->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
+        auto model = std::make_shared<cmp::Model>();
+        model->Create(
+            resMan->GetMesh("Resources/models/ny/skrzynia2/skrzynia2/skrzynia2.obj"),
+            resMan->GetMaterial("Resources/models/ny/skrzynia2/skrzynia2/skrzynia2.mtl")
+        );
+        gameObject->AddComponent(model);
+        gameObject->AddComponent(shader);
 
-            auto model = std::make_shared<cmp::Model>();
-            model->Create(
-                resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-                resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
-            );
-            gameObject->AddComponent(model);
-            gameObject->AddComponent(shader);
+        gameObject->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        gameObject->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
 
-            gameObject->AddComponent(std::make_shared<cmp::FrustumCulling>());
-            gameObject->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+        auto resourceScript = new Resource();
+        gameObject->AddComponent(std::make_shared<cmp::Scriptable>());
+        gameObject->GetComponent<cmp::Scriptable>()->Add(resourceScript);
 
-            auto resourceScript = new Resource();
-            gameObject->AddComponent(std::make_shared<cmp::Scriptable>());
-            gameObject->GetComponent<cmp::Scriptable>()->Add(resourceScript);
+        std::string endOrAmount;
+        file >> endOrAmount;
+        line_id++;
+        if (endOrAmount.compare("END") == 0)
+        {
+            root->AddChild(gameObject);
+        }
+        else
+        {
+            resourceScript->energy = std::stoi(endOrAmount);
+        }
 
-            std::string endOrAmount;
-            file >> endOrAmount;
-            line_id++;
-            if (endOrAmount.compare("END") == 0)
-            {
-                root->AddChild(gameObject);
-            }
-            else
-            {
-                resourceScript->energy = std::stoi(endOrAmount);
-            }
+        auto emissiveGO = std::make_shared<GameObject>();
+        emissiveGO->AddComponent(std::make_shared<cmp::Transform>());
+        auto emissiveModel = std::make_shared<cmp::Model>();
+        emissiveModel->Create(
+            resMan->GetMesh("Resources/models/mirror2/mirror2emission.obj"),
+            resMan->GetMaterial("Resources/models/multitool/icon.mtl")
+        );
+        emissiveModel->SetTintColor(0.9, 0.9, 1.0);
+        emissiveGO->AddComponent(emissiveModel);
+        emissiveGO->AddComponent(shader_d);
+
+        emissiveGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        emissiveGO->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/mirror2/mirror2emission.obj"));
+
+        root->AddChild(gameObject)->AddChild(emissiveGO);
+
         }
         else if (line == "Blueprints:")
         {
