@@ -295,8 +295,8 @@ bool MapLoader::Load(
                 file >> std::dec >> type;
                 line_id++;
 
-                shadeCmp->Create(gameObject->GetComponent<cmp::ModelInst>() == nullptr);
-                // shadeCmp->Create(type);
+                // shadeCmp->Create(gameObject->GetComponent<cmp::ModelInst>() == nullptr);
+                shadeCmp->Create(type);
             }
         }
         else if(line == "Transformations:")
