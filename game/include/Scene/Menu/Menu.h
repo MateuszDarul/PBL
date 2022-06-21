@@ -233,6 +233,12 @@ public:
             {
                 glfwSetWindowShouldClose(GameApplication::GetWindow(), GLFW_TRUE);
             }
+
+            else if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
+                menu->FindNode("Menu_b4")->GetGameObject()->GetComponent<cmp::BoxCol>()))
+            {
+                ChangeMenu("CreditsMenu");
+            }
         }
     }
 };
@@ -546,6 +552,76 @@ public:
     }
 };
 
+class CreditsMenu :public MenuScene
+{
+public:
+    CreditsMenu()
+    {
+        PrepareMenu();
+        ///***
+        ResourceManager* resMan = GameApplication::GetResourceManager();
+
+        shader_d = std::make_shared<ShaderComponent>();
+        shader_d->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
+        shader_d->Use();
+        shader_d->SetFloat("brightness", GameApplication::GetBright());
+        shader_d->SetFloat("gamma", GameApplication::GetGamma());
+        shader_d->SetFloat("contrast", GameApplication::GetContrast());
+
+        std::shared_ptr<GameObject> go;
+        std::shared_ptr<cmp::Model> mc;
+
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Cursor.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_CREDITSTEXT.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(0.0, 0.5f, -3.0);
+        go->GetComponent<cmp::Transform>()->SetScale(15.0f);
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_creditsText"));
+        menu->AddChild(go);
+
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Button.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_BACK.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(0.0, -1.5, -3.0);
+        go->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
+        go->GetComponent<cmp::BoxCol>()->SetLengths(glm::vec3(2, 0.6, 10));
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_b2"));
+        menu->AddChild(go);
+        ///***
+        FinishMenu();
+    }
+
+    ~CreditsMenu()
+    {
+
+    }
+
+    void Update()
+    {
+        UpdateMenu();
+        if (GameApplication::GetInputManager()->Mouse()->OnPressed(MouseButton::Left_MB))
+        {
+            if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
+                menu->FindNode("Menu_b2")->GetGameObject()->GetComponent<cmp::BoxCol>()))
+            {
+                ChangeMenu("MainMenu");
+            }
+        }
+    }
+};
+
 void ChangeMenu(std::string newMenu)
 {
     if(newMenu == "LevelsMenu")
@@ -557,6 +633,11 @@ void ChangeMenu(std::string newMenu)
     {
         delete GameApplication::s_Menu;
         GameApplication::s_Menu = new SettingsMenu();
+    }
+    else if (newMenu == "CreditsMenu")
+    {
+        delete GameApplication::s_Menu;
+        GameApplication::s_Menu = new CreditsMenu();
     }
     else
     {
