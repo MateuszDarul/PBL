@@ -12,6 +12,7 @@ class CutsceneFinal : public Script
 {
 public:
 
+    DoorActivator* objectiveDoor;
     DoorActivator* doorsToOpen;
     DoorActivator* doorsToShut;
     EnemySpawnerScript* spawner;
@@ -24,6 +25,8 @@ public:
     bool spawned;
 
 private:
+
+    float elevatorDoorTimer = 0.78f;
 
 public:
 
@@ -38,7 +41,8 @@ public:
     {
         if (hasFinished)
         {
-            doorsToOpen->Activate();
+            if (elevatorDoorTimer > 0.0f) elevatorDoorTimer -= dt;
+            else doorsToOpen->Activate();
         }
         else if (hasStarted)
         {
@@ -48,6 +52,11 @@ public:
                 spawner->SpawnEnemy(1);
                 spawned = true;
                 prevScene->turnOffLight();
+            }
+
+            if (objectiveDoor && objectiveDoor->state == DoorActivator::State::ACTIVE)
+            {
+                EndCutscene();
             }
         }
     }

@@ -35,6 +35,7 @@ file(GLOB_RECURSE SOURCE_FILES
 	src/GameObject/Components/SlopeCollider.cpp
 
 	src/GameObject/Scripts/LanternRange.cpp
+	src/GameObject/Scripts/SwitchLevelTrigger.cpp
 
 	src/Resource/Font.cpp
 	src/Resource/Mesh.cpp

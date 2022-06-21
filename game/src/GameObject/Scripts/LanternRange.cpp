@@ -138,7 +138,7 @@ void LanternRange::TriggerExit(std::shared_ptr<ColliderComponent> collider)
 	{
 		Turret* turret = scriptable->Get<Turret>();
 		if (turret)
-		{printf("REMOVING TURRET\n");
+		{
 			if (isTurnedOn && HasLineOfSight(turret)) turret->lightSourcesInRange -= 1;
 			turret->lightSourcesInRange = std::max(0, turret->lightSourcesInRange);
 			turretsInRange.erase(std::remove(turretsInRange.begin(), turretsInRange.end(), turret));

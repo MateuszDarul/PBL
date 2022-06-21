@@ -22,6 +22,7 @@
 #include "Scripts/CutsceneFinal.h"
 #include "Scripts/LightActivator.h"
 #include "Scripts/LanternRange.h"
+#include "Scripts/SwitchLevelTrigger.h"
 
 
 
@@ -167,8 +168,9 @@ Scene::Scene()
         shader_l, shader_d, lineShader, displShader, shadowParticleShader, resMan, collidersManager, shadowsManager, this, multiToolScript, go
     };
 
-    LoadLevelTutorial(SCENE_INFO);
     currentLevelIndex = 0;
+    newLevelToSwitch = -1;
+    LoadLevelTutorial(SCENE_INFO);
 
     ///***
 
@@ -538,18 +540,19 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
     {
         glm::vec3 doorPosition;
         float doorRotationY;
+        bool openOnStart;
         glm::vec3 activatorPosition;
         float activatorRotation;
     };
 
     std::vector<DoorAndActivatorPair> doorsAndButtons = {  //0 rot = Z aligned; 90 rot = X aligned
-        { { -15.00, 3.0,  25.0 }, 90.0f,   { -20.0,  2.5,  19.90 }, 180.0f },  //room 1
-        { { -25.00, 3.0,  50.5 }, 90.0f,   { -20.0,  2.5,  46.90 }, 180.0f },  //room 2
-        { { -64.75, 3.0,  60.0 },  0.0f,   { -60.9,  3.0,  55.50 },  90.0f },  //room 3 - cutscene close (important id)
-        { { -83.00, 3.0,  -3.5 }, 90.0f,   { -60.9, -9.0,  64.60 },   0.0f },  //room 4 - cutscene open  (important id)
-
-        { { -65.30, 13.1, -12.0 },  0.0f,  { -68.0,  2.5, -16.65 },  -90.0f }, //room 4 - enemy side door
-        { { -83.00, 3.0, -28.5 }, 90.0f,   { -83.00, -9.0, -27.5 },  90.0f },  //room 4 - elevator door
+        { { -15.00, 3.0,  25.0 }, 90.0f, false,  { -20.0,  2.5,  19.90 }, 180.0f },  //room 1
+        { { -25.00, 3.0,  50.5 }, 90.0f, false,  { -20.0,  2.5,  46.90 }, 180.0f },  //room 2
+        { { -64.75, 3.0,  60.0 },  0.0f, false,  { -60.9,  3.0,  55.50 },  90.0f },  //room 3 - cutscene close (important id)
+        { { -83.00, 3.0,  -3.5 }, 90.0f, false,  { -60.9, -9.0,  64.60 },   0.0f },  //room 4 - cutscene open  (important id)
+                                         
+        { { -65.30, 3.0, -12.0 },  0.0f,  true,  { -68.0,  2.5, -16.65 },  -90.0f }, //room 4 - enemy side door
+        { { -83.00, 3.0, -28.5 }, 90.0f, false,  { -83.00, -9.0, -27.5 },  90.0f },  //room 4 - elevator door
     };
 
     int i = 0;
@@ -557,13 +560,15 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
     DoorActivator* openDoorAfterEnemyDies = nullptr;
     DoorActivator* cutsceneDoorActivator2 = nullptr;
     DoorActivator* openElevator = nullptr;
-    for (auto& [doorPosition, doorRotation, activatorPosition, activatorRotation] : doorsAndButtons)
+    for (auto& [doorPosition, doorRotation, openOnStart, activatorPosition, activatorRotation] : doorsAndButtons)
     {
+        glm::vec3 doorOffset = { 0.0f, 10.1f, 0.0f };
+
         //create door
         auto go = std::make_shared<GameObject>();
 
         auto doorTransform = std::make_shared<cmp::Transform>();
-        doorTransform->SetPosition(doorPosition);
+        doorTransform->SetPosition(doorPosition + (openOnStart ? doorOffset : glm::vec3(0)));
         doorTransform->SetRotation(0, doorRotation, 0);
         float scl = 1.0f;
         doorTransform->SetScale(scl);
@@ -636,7 +641,7 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
 
         auto activator = new DoorActivator();
         activator->doorTransform = doorTransform;
-        activator->openedOffset = { 0.0f, 10.1f, 0.0f };
+        activator->openedOffset = doorOffset * (openOnStart ? -1.0f : 1.0f);
         go->GetComponent<cmp::Scriptable>()->Add(activator);
 
         if (i == 2) cutsceneDoorActivator = activator;
@@ -644,7 +649,6 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
         if (i == 4)
         {
             cutsceneDoorActivator2 = activator;
-            activator->openedOffset = glm::vec3(0.0f, -10.1f, 0.0f);
         }
         if (i == 5) openElevator = activator;
         i++;
@@ -709,6 +713,7 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
     go->AddComponent(std::make_shared<cmp::Scriptable>());
 
     auto cutscenef = new CutsceneFinal();
+    cutscenef->objectiveDoor = cutsceneDoorActivator2;
     cutscenef->doorsToShut = openDoorAfterEnemyDies;
     cutscenef->doorsToOpen = openElevator;
     cutscenef->spawner = world->FindNode("spawner0")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<EnemySpawnerScript>();
@@ -717,6 +722,47 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
 
 
     levelNode->AddChild(go);
+
+
+    // load next level
+
+    go = std::make_shared<GameObject>(); 
+
+    go->AddComponent(std::make_shared<cmp::Transform>());
+    go->GetComponent<cmp::Transform>()->SetPosition(-83.00, 3.0, -32.5);
+
+    go->AddComponent(std::make_shared<BoxCollider>(true, true));
+    go->GetComponent<cmp::BoxCol>()->SetLengths({ 10.0, 10.0, 5.0 });
+    go->GetComponent<cmp::BoxCol>()->layer = CollisionLayer::Ignore;
+    go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
+
+    go->AddComponent(std::make_shared<cmp::Scriptable>());
+
+    auto switchTrigger = new SwitchLevelTrigger();
+    switchTrigger->newLevelIndex = 1;
+    go->GetComponent<cmp::Scriptable>()->Add(switchTrigger);
+
+    levelNode->AddChild(go);
+}
+
+void Scene::LoadLevel1(const SceneInfo& sceneInfo)
+{
+    auto levelNode = std::make_shared<SceneNode>(std::make_shared<GameObject>());
+    levelNode->GetGameObject()->AddComponent(std::make_shared<cmp::Name>("LEVEL_1"));
+    world->FindNode("LEVELS")->AddChild(levelNode);
+    MapLoader::Load("Resources/maps/world_level1.map", levelNode.get(),
+        sceneInfo.shader_l,
+        sceneInfo.shader_d,
+        sceneInfo.lineShader,
+        sceneInfo.displShader,
+        sceneInfo.shadowParticlesShader,
+        sceneInfo.collidersManager,
+        sceneInfo.shadowsManager,
+        sceneInfo.scene,
+        sceneInfo.multiToolScript,
+        sceneInfo.cameraGO);
+
+    world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>()->RestartMovement(-4, 4.5, 10);
 }
 
 void Scene::LoadLevelPuzzle1(const SceneInfo& sceneInfo)
@@ -843,19 +889,47 @@ Scene::~Scene()
 
 void Scene::SwitchLevel(int newLevelIndex)
 {
+    newLevelToSwitch = -1;
     if (newLevelIndex == currentLevelIndex) return;
 
     auto levelsNode = world->FindNode("LEVELS");
 
-    if (currentLevelIndex == 0)
+    switch (currentLevelIndex)
+    {
+    case 0:
         levelsNode->RemoveNode(levelsNode->FindNode("LEVEL_TUTORIAL"));
+        break;
+    case 1:
+        levelsNode->RemoveNode(levelsNode->FindNode("LEVEL_1"));
+        break;
+    case 2:
+        levelsNode->RemoveNode(levelsNode->FindNode("LEVEL_PUZZLE1"));
+        break;
+    default:
+        printf("UNKNOWN LEVEL\n");
+        break;
+    }
+
+    levelsNode->DeleteNodes();
 
     currentLevelIndex = newLevelIndex;
-
-
-    if (newLevelIndex == 1)
-        LoadLevelPuzzle1(SCENE_INFO);
     
+    switch (currentLevelIndex)
+    {
+    case 0:
+        LoadLevelTutorial(SCENE_INFO);
+        break;
+    case 1:
+        LoadLevel1(SCENE_INFO);
+        break;
+    case 2:
+        LoadLevelPuzzle1(SCENE_INFO);
+        break;
+    default:
+        printf("UNKNOWN LEVEL\n");
+        break;
+    }
+
     
     levelsNode->LoadScripts();
 
@@ -873,14 +947,20 @@ void Scene::SwitchLevel(int newLevelIndex)
     placeTurretScript->isPlacing = false;
 }
 
+void Scene::SafeSwitchLevel(int newLevelIndex)
+{
+    newLevelToSwitch = newLevelIndex;
+}
+
 void Scene::Update(float dt)
 {
     GO_CROSSHAIR->GetComponent<cmp::Transform>()->SetPosition(GameApplication::GetAspectRatio() * 0.5f, 0.5f, 0.1f);
     GO_TOOLTIP->GetComponent<cmp::Transform>()->SetPosition(GameApplication::GetAspectRatio() * 0.5f + 0.001f, 0.453f, 0.1f);
 
-    if (Input()->Keyboard()->OnPressed(KeyboardKey::V))
+    if (newLevelToSwitch >= 0)
     {
-        SwitchLevel(1);
+        printf("baanana\n");
+        SwitchLevel(newLevelToSwitch);
     }
 
 

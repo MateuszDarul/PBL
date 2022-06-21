@@ -15,6 +15,12 @@ public:
 
     std::shared_ptr<cmp::Transform> doorTransform;
 
+    enum class State
+    {
+        ACTIVE, INACTIVE, SHUTDOWN
+    };
+
+    State state;
 
 private:
 
@@ -33,6 +39,7 @@ public:
         isPrimed = true;
         isActivated = false;
         isShutdown = false;
+        state = State::INACTIVE;
 
         if (doorTransform) targetPosition = doorTransform->GetPosition();
         buttonModel = gameObject->GetComponent<cmp::Model>();
@@ -44,23 +51,25 @@ public:
         {
             isActivated = false;
             isPrimed = true;
+            state = State::SHUTDOWN;
         }
         else if (isActivated)    //on being powered
         {
             isActivated = false;
-
+            state = State::ACTIVE;
             
         }
         else if (!isPrimed)  //on power off
         {
             isPrimed = true;
+            state = State::INACTIVE;
 
             if (doorTransform) targetPosition -= openedOffset;
             if (buttonModel) buttonModel->SetTintColor(0.88, 0.21, 0.21);
         }
         else                //on being unpowered
         {
-            
+            state = State::INACTIVE;
         }
 
         if (doorTransform)
@@ -77,6 +86,7 @@ public:
             if (isPrimed) //on power on
             {
                 isPrimed = false;
+                state = State::ACTIVE;
 
                 if (doorTransform) targetPosition += openedOffset;
                 if (buttonModel) buttonModel->SetTintColor(0.21, 0.88, 0.21);
@@ -91,6 +101,7 @@ public:
         isShutdown = shutdown;
         if (isShutdown) 
         { 
+            state = State::SHUTDOWN;
             if (doorTransform) targetPosition -= openedOffset;
             if (buttonModel) buttonModel->SetTintColor({ 0.5f, 0.0f, 0.0f,  1.0f });
         }

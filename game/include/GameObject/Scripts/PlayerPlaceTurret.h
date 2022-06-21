@@ -20,7 +20,7 @@ class PlayerPlaceTurret : public Script
 public:
 
     //adjust these
-    float placingRange = 5.0f;
+    float placingRange = 4.5f;
     float shootingTurretRange = 15.0f;
 
     int ignoreLayerMask = ~(CollisionLayer::Player | CollisionLayer::GUI | CollisionLayer::Ignore);
