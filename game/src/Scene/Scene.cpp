@@ -62,16 +62,16 @@ Scene::Scene()
     musicBuffer = new MusicBuffer("Resources/Music/agresive.wav");
     musicBuffer->SetVolume(0.11f);
 
-    AudioManager::Enqueue(musicBuffer);
 
-    //MusicBuffer* memoryLeak1 = new MusicBuffer("Resources/sounds/creepy1.wav");
-    //MusicBuffer* memoryLeak2 = new MusicBuffer("Resources/Music/rapid_turnaround.wav");
-    //
-    //memoryLeak1->SetVolume(0.13f);
-    //memoryLeak2->SetVolume(0.16f);
-    //
-    //AudioManager::Enqueue(memoryLeak1);
-    //AudioManager::Enqueue(memoryLeak2);
+    // MusicBuffer* memoryLeak1 = new MusicBuffer("Resources/sounds/creepy1.wav");
+    // MusicBuffer* memoryLeak2 = new MusicBuffer("Resources/Music/rapid_turnaround.wav");
+    
+    // memoryLeak1->SetVolume(0.13f);
+    // memoryLeak2->SetVolume(0.16f);
+    
+    // AudioManager::Enqueue(memoryLeak1);
+    // AudioManager::Enqueue(memoryLeak2);
+    AudioManager::Enqueue(musicBuffer);
 
     /// *** SKYBOX
 
@@ -336,6 +336,8 @@ Scene::Scene()
         world->FindNode("MAIN")->AddChild(flashLightGO);
 
         multiToolScript->flashlight = lightCmp;
+
+        
 
         GO_MULTITOOL = multiTool;
         GO_FLASHLIGHT = flashLightGO;
@@ -965,7 +967,7 @@ void Scene::Update(float dt)
 
     if (Input()->Keyboard()->OnPressed(KeyboardKey::V))
     {
-        SwitchLevel(1);
+        SwitchLevel((currentLevelIndex+1) % 3);
     }
 
 
@@ -977,6 +979,11 @@ void Scene::Update(float dt)
     camera->Update(GameApplication::GetInputManager(), dt);
     transformCamera->SetPosition(camera->GetPosition());
 
+    if (isPaused)
+    {
+        isPaused = false;
+        camera->SetRotationEnable(true);
+    }
 
     //Detect collision
     goCamera->GetNode()->ResetGlobalTransformations();
@@ -1031,11 +1038,14 @@ void Scene::Update(float dt)
                      ||  Input()->Mouse()->OnPressed(MouseButton::Right_MB)
                      ||  Input()->Keyboard()->OnPressed(KeyboardKey::E))))
         {
-            isPaused = !isPaused;
-            camera->SetMovementEnable(!isPaused);
-            camera->SetRotationEnable(!isPaused);
-            if (isPaused) glfwSetInputMode(GameApplication::GetWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            else glfwSetInputMode(GameApplication::GetWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            isPaused = true;
+            camera->SetRotationEnable(false);
+            // camera->SetMovementEnable(!isPaused);
+            
+            GameApplication::inGame = false;
+
+            //if (isPaused) glfwSetInputMode(GameApplication::GetWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            //else glfwSetInputMode(GameApplication::GetWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
     }
 
@@ -1096,78 +1106,3 @@ CollidersManager* Scene::GetCollidersManager()
 {
     return collidersManager;
 }
-
-/*void Scene::CreateLanternTurret(bool turnedOn, glm::vec3 position, std::shared_ptr<cmp::Shader> crystalShader, std::shared_ptr<cmp::Shader> turretShader)
-{
-    ResourceManager* resMan = GameApplication::GetResourceManager();
-    std::shared_ptr<GameObject> mainObject = std::make_shared<GameObject>();
-    mainObject->AddComponent(std::make_shared<cmp::Transform>());
-    mainObject->GetComponent<cmp::Transform>()->SetPosition(position);
-
-    mainObject->AddComponent(std::make_shared<cmp::Name>("gfx"));
-
-    auto mc = std::make_shared<cmp::Model>();
-    mc->Create(
-        resMan->GetMesh("Resources/models/Wieze/Latarnia.obj"),
-        resMan->GetMaterial("Resources/models/Wieze/Latarnia.mtl")
-    );
-    mainObject->AddComponent(mc);
-
-    mainObject->AddComponent(std::make_shared<cmp::FrustumCulling>());
-    mainObject->GetComponent<cmp::FrustumCulling>()->Create(
-        resMan->GetMesh("Resources/models/Wieze/Latarnia.obj")
-    );
-    mainObject->AddComponent(std::make_shared<cmp::Scriptable>());
-    TurretLight* script = new TurretLight();
-    script->SetEnabled(false);
-    script->SetRange(12);
-    mainObject->GetComponent<cmp::Scriptable>()->Add(script);
-    mainObject->AddComponent(crystalShader);
-
-    mainObject->AddComponent(std::make_shared<cmp::SphereCol>(true, true, CollisionLayer::Light));
-
-    std::shared_ptr<cmp::SphereCol> col = mainObject->GetComponent<cmp::SphereCol>();
-    col->SetRadius(script->GetRange());
-    col->AddToCollidersManager(collidersManager);
-
-    auto gfxGO = std::make_shared<GameObject>();
-    gfxGO->AddComponent(std::make_shared<cmp::PointLight>());
-    gfxGO->GetComponent<cmp::PointLight>()->Create();
-    gfxGO->GetComponent<cmp::PointLight>()->AddShader(turretShader);
-    gfxGO->GetComponent<cmp::PointLight>()->SetDamping(script->GetRange());
-    mc = std::make_shared<cmp::Model>();
-    mc->Create(
-        resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-        resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
-    );
-    gfxGO->AddComponent(mc);
-    gfxGO->AddComponent(crystalShader);
-    gfxGO->AddComponent(std::make_shared<cmp::Transform>());
-    gfxGO->GetComponent<cmp::Transform>()->SetScale(0.5f);
-    gfxGO->GetComponent<cmp::Transform>()->SetPosition(glm::vec3(0.0f, 2.0f, 0.0f));
-    gfxGO->AddComponent(std::make_shared<cmp::BoxCol>(true, true, CollisionLayer::LightTrigger));
-
-    std::shared_ptr<cmp::BoxCol> col2 = gfxGO->GetComponent<cmp::BoxCol>();
-    col2->SetLengths(glm::vec3(1.0, 1.0f, 1.0f));
-    col2->AddToCollidersManager(collidersManager);
-
-    script->light = gfxGO;
-
-    if (turnedOn)
-    {
-        gfxGO->GetComponent<cmp::PointLight>()->TurnOn();
-    }
-    else
-    {
-        gfxGO->GetComponent<cmp::PointLight>()->TurnOff();
-    }
-
-
-    // gfxGO->AddComponent(std::make_shared<cmp::Shade>());
-    // std::shared_ptr<cmp::Shade> shadeCmp = gfxGO->GetComponent<cmp::Shade>();
-    // shadeCmp->Create(1);
-
-
-    world->AddChild(mainObject)->AddChild(gfxGO);
-}
-*/
