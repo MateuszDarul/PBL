@@ -356,7 +356,7 @@ Scene::Scene()
 
     //renderowany jako ostatni bo inaczej sa te dziwne artefakty
     {
-        Font* font = resMan->GetFont("Resources/fonts/Segment7-4Gml.otf");
+        Font* font = resMan->GetFont("Resources/fonts/good-times-rg.otf");
 
         go = std::make_shared<GameObject>();
         auto tc = std::make_shared<TransformComponent>();
@@ -562,7 +562,7 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
     DoorActivator* openElevator = nullptr;
     for (auto& [doorPosition, doorRotation, openOnStart, activatorPosition, activatorRotation] : doorsAndButtons)
     {
-        glm::vec3 doorOffset = { 0.0f, 10.1f, 0.0f };
+        glm::vec3 doorOffset = { 0.0f, 6.1f, 0.0f };
 
         //create door
         auto go = std::make_shared<GameObject>();

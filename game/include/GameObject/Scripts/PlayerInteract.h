@@ -159,7 +159,6 @@ public:
 
         if (selectedMirror)
         {
-            textTEMP->SetText("<>");
             placeTurretScript->isLookingAtMirror = true;
             mirrorControlsText->GetComponent<TransformComponent>()->SetScale(0.07f);
 
@@ -180,7 +179,17 @@ public:
                 }
 
                 // when looking away (inverted rotation) - cursor red; when no inverted rotation - green
-                textTEMP->color = (mirrorRotInversion < 0 ? glm::vec3(1.0f, 0.0f, 0.0f) : glm::vec3(0.0f, 1.0f, 0.0f));
+                if (mirrorRotInversion < 0)
+                {
+                    textTEMP->SetText("><");
+                    textTEMP->color = glm::vec3(1.0f, 0.0f, 0.0f);
+                }
+                else
+                {
+                    textTEMP->SetText("<>");
+                    textTEMP->color = glm::vec3(0.0f, 1.0f, 0.0f);
+                }
+                 
                 
                 selectedMirror->disableMouseRotation = isLmbReleased;
                 selectedMirror->invertRotationY_temp = mirrorRotInversion;
