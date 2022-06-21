@@ -3,15 +3,19 @@
 #include "Components.h"
 #include "SoundPlayer.h"
 
+#include "PlayerGroundCheck.h"
+
 
 class PlayerFootsteps : public Script
 {
 public:
     cmp::Camera* camera;
+    PlayerGroundCheck* groundCheck;
 
 private:
 
     SoundPlayer* footstepSFX;
+    SoundPlayer* stairFootstepSFX;
 
     float footstepPeriod = 1.0f;
     float footstepTimer = -1.0f;
@@ -29,10 +33,12 @@ public:
         footstepPeriod = 3.14159265f / camera->GetSpeed();
 
         if (!footstepSFX) footstepSFX = new SoundPlayer("Resources/sounds/footstep.wav");
+        if (!stairFootstepSFX) stairFootstepSFX = new SoundPlayer("Resources/sounds/footstep_metal.wav");
     }
 
     ~PlayerFootsteps()
     {
+        delete stairFootstepSFX;
         delete footstepSFX;
     }
 
@@ -51,9 +57,14 @@ public:
                 float volume = minVolume + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxVolume - minVolume)));
                 float pitch = minPitch + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxPitch - minPitch)));
 
-                footstepSFX->SetVolume(volume);
-                footstepSFX->SetPitch(pitch);
-                footstepSFX->Play();
+                SoundPlayer* sound = footstepSFX;
+
+                if (groundCheck->state == PlayerGroundCheck::State::STAIRS)
+                    sound = stairFootstepSFX;
+
+                sound->SetVolume(volume);
+                sound->SetPitch(pitch);
+                sound->Play();
             }
         }
         else

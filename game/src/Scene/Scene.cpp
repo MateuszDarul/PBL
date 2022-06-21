@@ -177,23 +177,23 @@ Scene::Scene()
     auto playerGO = go;
 
     //ground check
-    {
-        auto groundCheckGO = std::make_shared<GameObject>();
-        groundCheckGO->AddComponent(std::make_shared<cmp::Transform>());
-        groundCheckGO->GetComponent<cmp::Transform>()->SetPosition(0.0, -3.35, 0.0);
+    
+    auto groundCheckGO = std::make_shared<GameObject>();
+    groundCheckGO->AddComponent(std::make_shared<cmp::Transform>());
+    groundCheckGO->GetComponent<cmp::Transform>()->SetPosition(0.0, -3.35, 0.0);
 
-        groundCheckGO->AddComponent(std::make_shared<SphereCollider>(true, false));
-        groundCheckGO->GetComponent<cmp::SphereCol>()->SetRadius(0.45f);
-        groundCheckGO->GetComponent<cmp::SphereCol>()->AddToCollidersManager(collidersManager);
+    groundCheckGO->AddComponent(std::make_shared<SphereCollider>(true, false));
+    groundCheckGO->GetComponent<cmp::SphereCol>()->SetRadius(0.45f);
+    groundCheckGO->GetComponent<cmp::SphereCol>()->AddToCollidersManager(collidersManager);
 
-        groundCheckGO->AddComponent(std::make_shared<cmp::Scriptable>());
+    groundCheckGO->AddComponent(std::make_shared<cmp::Scriptable>());
 
-        auto groundCheckScript = new PlayerGroundCheck();
-        groundCheckGO->GetComponent<cmp::Scriptable>()->Add(groundCheckScript);
-        groundCheckScript->player = playerGO->GetComponent<cmp::Camera>();
+    auto groundCheckScript = new PlayerGroundCheck();
+    groundCheckGO->GetComponent<cmp::Scriptable>()->Add(groundCheckScript);
+    groundCheckScript->player = playerGO->GetComponent<cmp::Camera>();
 
-        world->FindNode("CAMERA")->AddChild(groundCheckGO);
-    }
+    world->FindNode("CAMERA")->AddChild(groundCheckGO);
+    
 
     //skrypty gracza
     go->AddComponent(std::make_shared<cmp::Scriptable>());
@@ -243,6 +243,7 @@ Scene::Scene()
 
     auto playerFootsteps = new PlayerFootsteps();
     playerFootsteps->camera = go->GetComponent<cmp::Camera>().get();
+    playerFootsteps->groundCheck = groundCheckScript;
     go->GetComponent<ScriptComponent>()->Add(playerFootsteps);
 
     
@@ -959,8 +960,12 @@ void Scene::Update(float dt)
 
     if (newLevelToSwitch >= 0)
     {
-        printf("baanana\n");
         SwitchLevel(newLevelToSwitch);
+    }
+
+    if (Input()->Keyboard()->OnPressed(KeyboardKey::V))
+    {
+        SwitchLevel(1);
     }
 
 
