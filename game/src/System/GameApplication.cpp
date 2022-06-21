@@ -26,6 +26,9 @@ namespace rj = rapidjson;
 //#define FULLSCREEN_MODE
 
 #define DEFAULT_FOV 83.0f
+#define DEFAULT_BRIGHTNESS 1.0f
+#define DEFAULT_GAMMA 1.0f
+#define DEFAULT_CONTRAST -1.0f
 #define DEFAULT_SCREEN_WIDTH 800
 #define DEFAULT_SCREEN_HEIGHT 600
 #define DEFAULT_NEAR_PLANE 0.1f
@@ -34,6 +37,9 @@ namespace rj = rapidjson;
 GLFWwindow* GameApplication::s_Window = nullptr;
 
 float GameApplication::s_Fov = DEFAULT_FOV;
+float GameApplication::brightness = DEFAULT_BRIGHTNESS;
+float GameApplication::gamma = DEFAULT_GAMMA;
+float GameApplication::contrast = DEFAULT_CONTRAST;
 float GameApplication::s_AspectRatio = (float)DEFAULT_SCREEN_WIDTH/DEFAULT_SCREEN_HEIGHT;
 int GameApplication::s_ScreenWidth = DEFAULT_SCREEN_WIDTH;
 int GameApplication::s_ScreenHeight = DEFAULT_SCREEN_HEIGHT;
@@ -194,7 +200,6 @@ int GameApplication::Init()
     s_InputManager = new InputManager(s_Window);
     s_ResourceManager = new ResourceManager();
 
-
     //Load scene
     //Scene OnCreate
     s_Scene = new Scene();
@@ -352,4 +357,34 @@ float GameApplication::GetAspectRatio()
 float GameApplication::GetTotalElapsedTime()
 {
     return s_TotalElapsedTime;
+}
+
+float GameApplication::GetBright()
+{
+    return brightness;
+}
+
+float GameApplication::GetGamma()
+{
+    return gamma;
+}
+
+float GameApplication::GetContrast()
+{
+    return contrast;
+}
+
+void GameApplication::SetBright(float b)
+{
+    brightness = b;
+}
+
+void GameApplication::SetGamma(float g)
+{
+    gamma = g;
+}
+
+void GameApplication::SetContrast(float c)
+{
+    contrast = c;
 }

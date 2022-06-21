@@ -1,4 +1,5 @@
 #include "ShaderComponent.h"
+#include "GameApplication.h"
 
 ShaderComponent::ShaderComponent()
     :Component(5)
@@ -144,6 +145,9 @@ bool ShaderComponent::Create(const std::string& vertexShaderPath, const std::str
 void ShaderComponent::Use()
 {
     glUseProgram(this->shaderProgram);
+    SetFloat("brightness", GameApplication::GetBright());
+    SetFloat("gamma", GameApplication::GetGamma());
+    SetFloat("contrast", GameApplication::GetContrast());
 }
 
 void ShaderComponent::SetBool(const std::string& name, bool value) const

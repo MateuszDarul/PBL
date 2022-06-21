@@ -25,6 +25,8 @@ private:
     static float s_NearPlane, s_FarPlane;
     static glm::mat4 s_ProjectionMatrix, s_OrthographicMatrix;
 
+    static float brightness, gamma, contrast;
+
     static Scene* s_Scene;
     static InputManager* s_InputManager;
     static ResourceManager* s_ResourceManager;
@@ -119,6 +121,18 @@ public:
     static float GetFov();
 
     static void SetFov(float fov);
+
+    static float GetBright();
+
+    static float GetGamma();
+
+    static float GetContrast();
+
+    static void SetBright(float b);
+
+    static void SetGamma(float g);
+
+    static void SetContrast(float c);
 };
 
 /**

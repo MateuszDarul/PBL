@@ -26,7 +26,7 @@
 
 
 
-// for quick access (avoiding string comparisions in FindNode)
+// for quick access (avoiding string comparisions in FindNode)//
 std::shared_ptr<GameObject> GO_MULTITOOL;
 std::shared_ptr<GameObject> GO_FLASHLIGHT;
 std::shared_ptr<GameObject> GO_CROSSHAIR;
@@ -91,28 +91,67 @@ Scene::Scene()
     /// ***
 
     std::shared_ptr<ShaderComponent> shader_d = std::make_shared<ShaderComponent>();
-    std::shared_ptr<ShaderComponent> shader_l = std::make_shared<ShaderComponent>();
     shader_d->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
+    shader_d->Use();
+    shader_d->SetFloat("brightness", GameApplication::GetBright());
+    shader_d->SetFloat("gamma", GameApplication::GetGamma());
+    shader_d->SetFloat("contrast", GameApplication::GetContrast());
+
+    std::shared_ptr<ShaderComponent> shader_l = std::make_shared<ShaderComponent>();
     shader_l->Create("Resources/shaders/light.vert", "Resources/shaders/light.frag");
+    shader_l->Use();
+    shader_l->SetFloat("brightness", GameApplication::GetBright());
+    shader_l->SetFloat("gamma", GameApplication::GetGamma());
+    shader_l->SetFloat("contrast", GameApplication::GetContrast());
+
     std::shared_ptr<ShaderComponent> shader_r = std::make_shared<ShaderComponent>();
     shader_r->Create("Resources/shaders/refraction.vert", "Resources/shaders/refraction.frag");
+    shader_r->Use();
+    shader_r->SetFloat("brightness", GameApplication::GetBright());
+    shader_r->SetFloat("gamma", GameApplication::GetGamma());
+    shader_r->SetFloat("contrast", GameApplication::GetContrast());
 
     auto lineShader = std::make_shared<cmp::Shader>();
     lineShader->Create("Resources/shaders/line.vert", "Resources/shaders/line.frag");
+    lineShader->Use();
+    lineShader->SetFloat("brightness", GameApplication::GetBright());
+    lineShader->SetFloat("gamma", GameApplication::GetGamma());
+    lineShader->SetFloat("contrast", GameApplication::GetContrast());
 
     auto radialShader = std::make_shared<cmp::Shader>();
     radialShader->Create("Resources/shaders/radial.vert", "Resources/shaders/radial.frag");
+    radialShader->Use();
+    radialShader->SetFloat("brightness", GameApplication::GetBright());
+    radialShader->SetFloat("gamma", GameApplication::GetGamma());
+    radialShader->SetFloat("contrast", GameApplication::GetContrast());
 
     auto displShader = std::make_shared<ShaderComponent>();
     displShader->Create("Resources/shaders/displ.vert", "Resources/shaders/displ.frag");
+    displShader->Use();
+    displShader->SetFloat("brightness", GameApplication::GetBright());
+    displShader->SetFloat("gamma", GameApplication::GetGamma());
+    displShader->SetFloat("contrast", GameApplication::GetContrast());
 
     auto particleShader = std::make_shared<ShaderComponent>();
     particleShader->Create("Resources/shaders/particles.vert", "Resources/shaders/particles.frag");
+    particleShader->Use();
+    particleShader->SetFloat("brightness", GameApplication::GetBright());
+    particleShader->SetFloat("gamma", GameApplication::GetGamma());
+    particleShader->SetFloat("contrast", GameApplication::GetContrast());
 
     auto shadowParticleShader = std::make_shared<ShaderComponent>();
     shadowParticleShader->Create("Resources/shaders/shadowParticles.vert", "Resources/shaders/shadowParticles.frag");
+    shadowParticleShader->Use();
+    shadowParticleShader->SetFloat("brightness", GameApplication::GetBright());
+    shadowParticleShader->SetFloat("gamma", GameApplication::GetGamma());
+    shadowParticleShader->SetFloat("contrast", GameApplication::GetContrast());
+
     auto textShader = std::make_shared<ShaderComponent>();
     textShader->Create("Resources/shaders/text.vert", "Resources/shaders/text.frag");
+    textShader->Use();
+    textShader->SetFloat("brightness", GameApplication::GetBright());
+    textShader->SetFloat("gamma", GameApplication::GetGamma());
+    textShader->SetFloat("contrast", GameApplication::GetContrast());
 
     ///***
 
