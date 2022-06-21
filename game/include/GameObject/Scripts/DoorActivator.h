@@ -44,7 +44,7 @@ private:
     bool canPlayCloseSound = true;
     bool fixFirstSound = false;
 
-    float cooldownOpen = 0.5f;
+    float cooldownOpen = 0.3f;
     float cooldownClose = 0.1f;
     float cooldownTimer = -1.0f;
     float movingTimer = -1.0f;

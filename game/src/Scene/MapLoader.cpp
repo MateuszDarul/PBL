@@ -409,7 +409,10 @@ bool MapLoader::Load(
         resourceBoxCounter++;
 
         gameObject->AddComponent(std::make_shared<BoxCollider>(true, true));
-        gameObject->GetComponent<cmp::BoxCol>()->SetLengths({ 2.5, 2.5, 2.5 });
+        float y = gameObject->GetComponent<cmp::Transform>()->GetRotation().y;
+        glm::vec3 hitbox = glm::vec3(2.5, 2.5, 4.5);
+        if ((abs(y) < 135) && (abs(y) > 45)) hitbox = glm::vec3(4.5, 2.5, 2.5);
+        gameObject->GetComponent<cmp::BoxCol>()->SetLengths(hitbox);
         gameObject->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
 
         auto model = std::make_shared<cmp::Model>();
