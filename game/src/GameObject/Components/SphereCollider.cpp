@@ -284,7 +284,7 @@ bool SphereCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir,
 {
 	hitInfo.distance = maxDistance;
 
-	auto center = GetOwner()->GetComponent<TransformComponent>()->GetPosition() + offset;
+	auto center = GetOwner()->GetNode()->GetGlobalPosition() + offset;
 	float r2 = radius*radius;
 	if (glm::distance2(center, origin) <= r2) return false;
 

@@ -424,7 +424,7 @@ public:
         auto rangeGO = std::make_shared<GameObject>();
         rangeGO->AddComponent(std::make_shared<cmp::Transform>());
 
-        rangeGO->AddComponent(std::make_shared<cmp::SphereCol>(true, true));
+        rangeGO->AddComponent(std::make_shared<cmp::SphereCol>(true, true, CollisionLayer::Ignore));
         std::shared_ptr<cmp::SphereCol> rangeCol = rangeGO->GetComponent<cmp::SphereCol>();
         rangeCol->SetRadius(shootingTurretRange);
         rangeCol->AddToCollidersManager(colMan);

@@ -44,7 +44,7 @@ void LanternRange::ChangeLightPower(bool enabled)
 
 	for (auto turret : turretsInRange)
 	{
-		turret->lightSourcesInRange += (isTurnedOn && HasLineOfSight(turret)) ? 1 : -1;
+		turret->lightSourcesInRange += (isTurnedOn/* && HasLineOfSight(turret)*/) ? 1 : -1;
 	}
 	if (playerInRange)
 	{
@@ -57,40 +57,40 @@ bool LanternRange::IsInRange(Turret* turret)
 	return std::find(turretsInRange.begin(), turretsInRange.end(), turret) != turretsInRange.end();
 }
 
-bool LanternRange::HasLineOfSight(Turret* turret)
-{
-	glm::vec3 origin = gameObject->GetNode()->GetGlobalPosition();
-	glm::vec3 target = turret->gameObject->GetNode()->GetGlobalPosition();
-	target.y += 2.0f;
-	glm::vec3 dir = glm::normalize(target - origin);
+// bool LanternRange::HasLineOfSight(Turret* turret)
+// {
+// 	glm::vec3 origin = gameObject->GetNode()->GetGlobalPosition();
+// 	glm::vec3 target = turret->gameObject->GetNode()->GetGlobalPosition();
+// 	target.y += 2.0f;
+// 	glm::vec3 dir = glm::normalize(target - origin);
 
-	RayHitInfo hit;
-	while (colMan->Raycast(origin, dir, hit, 25.0f, true, lineOfSightIgnoreLayerMask))
-	{
-		if (turret->gameObject->Is(hit.gameObject))
-			return true;
+// 	RayHitInfo hit;
+// 	while (colMan->Raycast(origin, dir, hit, 25.0f, true, lineOfSightIgnoreLayerMask))
+// 	{
+// 		if (turret->gameObject->Is(hit.gameObject))
+// 			return true;
 
-		if (auto scriptable = hit.gameObject->GetComponent<cmp::Scriptable>())
-		{
-			if (auto turret = scriptable->Get<Turret>())
-			{
-				origin = hit.point + dir * 0.1f;
-				continue;
-			}
-		}
+// 		if (auto scriptable = hit.gameObject->GetComponent<cmp::Scriptable>())
+// 		{
+// 			if (auto turret = scriptable->Get<Turret>())
+// 			{
+// 				origin = hit.point + dir * 0.1f;
+// 				continue;
+// 			}
+// 		}
 
-		return false;
-	}
+// 		return false;
+// 	}
 
-	return true;
+// 	return true;
 
-	// printf("testing line of sight. origin: %f %f %f\ttarget: %f %f %f\n", origin.x, origin.y, origin.z, target.x, target.y, target.z);
-	// printf("tgo: %i hgo: %i\n", turret->gameObject.get(), hit.gameObject.get());
+// 	// printf("testing line of sight. origin: %f %f %f\ttarget: %f %f %f\n", origin.x, origin.y, origin.z, target.x, target.y, target.z);
+// 	// printf("tgo: %i hgo: %i\n", turret->gameObject.get(), hit.gameObject.get());
 
-	// auto namecmp = hit.gameObject->GetComponent<cmp::Name>();
-	// std::string name = (namecmp) ? namecmp->Get() : "Unnamed";
-	// printf("Hit go: %s \td: %f\n", name.c_str(), hit.distance);
-}
+// 	// auto namecmp = hit.gameObject->GetComponent<cmp::Name>();
+// 	// std::string name = (namecmp) ? namecmp->Get() : "Unnamed";
+// 	// printf("Hit go: %s \td: %f\n", name.c_str(), hit.distance);
+// }
 
 void LanternRange::TriggerEnter(std::shared_ptr<ColliderComponent> collider)
 {
@@ -112,11 +112,12 @@ void LanternRange::TriggerEnter(std::shared_ptr<ColliderComponent> collider)
 		if (turret)
 		{
 			printf("Adding turret to range\n");
-			bool hasSight = HasLineOfSight(turret);
-			if (isTurnedOn && hasSight) turret->lightSourcesInRange += 1;
+			// bool hasSight = HasLineOfSight(turret);
+			// printf("Has %sline of sight\n", hasSight ? "" : "no ");
+			// if (isTurnedOn && hasSight) turret->lightSourcesInRange += 1;
+			
+			if (isTurnedOn) turret->lightSourcesInRange += 1;
 			turretsInRange.push_back(turret);
-
-			printf("Has %sline of sight\n", hasSight ? "" : "no ");
 		}
 	}
 }
@@ -139,7 +140,7 @@ void LanternRange::TriggerExit(std::shared_ptr<ColliderComponent> collider)
 		Turret* turret = scriptable->Get<Turret>();
 		if (turret)
 		{
-			if (isTurnedOn && HasLineOfSight(turret)) turret->lightSourcesInRange -= 1;
+			if (isTurnedOn/* && HasLineOfSight(turret)*/) turret->lightSourcesInRange -= 1;
 			turret->lightSourcesInRange = std::max(0, turret->lightSourcesInRange);
 			turretsInRange.erase(std::remove(turretsInRange.begin(), turretsInRange.end(), turret));
 		}

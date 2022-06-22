@@ -29,7 +29,7 @@ public:
 	void ChangeLightPower(bool enabled);
 	
 	bool IsInRange(Turret* turret);
-	bool HasLineOfSight(Turret* turret);
+	// bool HasLineOfSight(Turret* turret);
 
 	void TriggerEnter(std::shared_ptr<ColliderComponent> collider) override;
 	void TriggerExit(std::shared_ptr<ColliderComponent> collider) override;
