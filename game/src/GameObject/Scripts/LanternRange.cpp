@@ -55,6 +55,14 @@ void LanternRange::ChangeLightPower(bool enabled)
 	for (auto turret : turretsInRange)
 	{
 		turret->lightSourcesInRange += (isTurnedOn/* && HasLineOfSight(turret)*/) ? 1 : -1;
+		if (isTurnedOn)
+		{
+			turretsActivated.push_back(turret);
+		}
+		else
+		{
+			turretsActivated.erase(std::remove(turretsActivated.begin(), turretsActivated.end(), turret));
+		}
 	}
 	if (playerInRange)
 	{
@@ -65,6 +73,11 @@ void LanternRange::ChangeLightPower(bool enabled)
 bool LanternRange::IsInRange(Turret* turret)
 {
 	return std::find(turretsInRange.begin(), turretsInRange.end(), turret) != turretsInRange.end();
+}
+
+bool LanternRange::IsBeingPoweredBy(Turret* turret)
+{
+	return std::find(turretsActivated.begin(), turretsActivated.end(), turret) != turretsActivated.end();
 }
 
 // bool LanternRange::HasLineOfSight(Turret* turret)
@@ -126,7 +139,11 @@ void LanternRange::TriggerEnter(std::shared_ptr<ColliderComponent> collider)
 			// printf("Has %sline of sight\n", hasSight ? "" : "no ");
 			// if (isTurnedOn && hasSight) turret->lightSourcesInRange += 1;
 			
-			if (isTurnedOn) turret->lightSourcesInRange += 1;
+			if (isTurnedOn)
+			{
+				turret->lightSourcesInRange += 1;
+				turretsActivated.push_back(turret);
+			}
 			turretsInRange.push_back(turret);
 		}
 	}
@@ -150,7 +167,11 @@ void LanternRange::TriggerExit(std::shared_ptr<ColliderComponent> collider)
 		Turret* turret = scriptable->Get<Turret>();
 		if (turret)
 		{
-			if (isTurnedOn/* && HasLineOfSight(turret)*/) turret->lightSourcesInRange -= 1;
+			if (isTurnedOn/* && HasLineOfSight(turret)*/)
+			{
+				turret->lightSourcesInRange -= 1;
+				turretsActivated.erase(std::remove(turretsActivated.begin(), turretsActivated.end(), turret));
+			}
 			turret->lightSourcesInRange = std::max(0, turret->lightSourcesInRange);
 			turretsInRange.erase(std::remove(turretsInRange.begin(), turretsInRange.end(), turret));
 		}

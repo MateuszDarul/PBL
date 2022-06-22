@@ -219,7 +219,7 @@ void GameApplication::Run()
     glfwMaximizeWindow(GameApplication::GetWindow());
         glfwRestoreWindow(GameApplication::GetWindow());
     double t1, t2 = glfwGetTime();
-    double dt, lag = 0.0;
+    double dt;
     double fpsMeasureTimer = 1.0f;
     int framesCountLastSecond = 0;
     int fps = 0;
@@ -242,7 +242,6 @@ void GameApplication::Run()
         t1 = glfwGetTime();
         dt = t1 - t2;
         t2 = t1;
-        lag = std::min(lag + dt, 1.618);
 
         if (fpsMeasureTimer > 0.0f)
         {
@@ -260,19 +259,15 @@ void GameApplication::Run()
 
         if(inGame)
         {
-            while (lag > MS_PER_UPDATE)
-            {
-                //update logic
-                s_Scene->Update(MS_PER_UPDATE);
-                lag -= MS_PER_UPDATE;
-            }
+            //update logic
+            if (dt < 0.5) s_Scene->Update(dt);
+
 
             //show scene
             s_Scene->Render();
         }
         else
         {
-            lag = 0.0;
             s_Menu->Update();
             s_Menu->Draw();
         }

@@ -124,7 +124,7 @@ public:
                         }
                         else if (auto lightActivator = scriptHolder->Get<LightActivator>())
                         {
-                            if(lightSourcesInRange > 1 || !lightActivator->range->IsInRange(this))
+                            if (lightSourcesInRange > 1 || !lightActivator->range->IsBeingPoweredBy(this))
                             {
                                 lightActivator->Activate();
                             }
