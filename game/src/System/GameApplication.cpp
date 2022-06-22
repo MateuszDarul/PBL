@@ -43,6 +43,7 @@ float GameApplication::s_Fov = DEFAULT_FOV;
 float GameApplication::brightness = DEFAULT_BRIGHTNESS;
 float GameApplication::gamma = DEFAULT_GAMMA;
 float GameApplication::contrast = DEFAULT_CONTRAST;
+float GameApplication::contrastMod = 0.0f;
 float GameApplication::s_AspectRatio = (float)DEFAULT_SCREEN_WIDTH/DEFAULT_SCREEN_HEIGHT;
 int GameApplication::s_ScreenWidth = DEFAULT_SCREEN_WIDTH;
 int GameApplication::s_ScreenHeight = DEFAULT_SCREEN_HEIGHT;
@@ -385,6 +386,11 @@ float GameApplication::GetContrast()
     return contrast;
 }
 
+float GameApplication::GetContrastWithMod()
+{
+    return contrast + contrastMod;
+}
+
 void GameApplication::SetBright(float b)
 {
     brightness = b;
@@ -398,4 +404,9 @@ void GameApplication::SetGamma(float g)
 void GameApplication::SetContrast(float c)
 {
     contrast = c;
+}
+
+void GameApplication::SetContrastMod(float cm)
+{
+    contrastMod = cm;
 }

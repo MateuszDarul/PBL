@@ -147,7 +147,16 @@ void ShaderComponent::Use()
     glUseProgram(this->shaderProgram);
     SetFloat("brightness", GameApplication::GetBright());
     SetFloat("gamma", GameApplication::GetGamma());
-    SetFloat("contrast", GameApplication::GetContrast());
+
+    if (GameApplication::inGame)
+    {
+        SetFloat("contrast", GameApplication::GetContrastWithMod());
+    }
+    else
+    {
+        SetFloat("contrast", GameApplication::GetContrast());
+    }
+    
 }
 
 void ShaderComponent::SetBool(const std::string& name, bool value) const

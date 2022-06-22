@@ -528,48 +528,48 @@ public:
             if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
                 menu->FindNode("Menu_brightnessAdd")->GetGameObject()->GetComponent<cmp::BoxCol>()))
             {
-                GameApplication::SetBright(GameApplication::GetBright() + 0.01f);
+                GameApplication::SetBright(GameApplication::GetBright() + 0.05f);
             }
             else 
             if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
                 menu->FindNode("Menu_brightnessSub")->GetGameObject()->GetComponent<cmp::BoxCol>()))
             {
-                GameApplication::SetBright(GameApplication::GetBright() - 0.01f);
+                GameApplication::SetBright(GameApplication::GetBright() - 0.05f);
             }
             else 
             if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
                 menu->FindNode("Menu_gammaAdd")->GetGameObject()->GetComponent<cmp::BoxCol>()))
             {
-                GameApplication::SetGamma(GameApplication::GetGamma() + 0.01f);
-                std::cout << GameApplication::GetGamma() << std::endl;
+                GameApplication::SetGamma(GameApplication::GetGamma() + 0.05f);
             }
             else
             if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
                 menu->FindNode("Menu_gammaSub")->GetGameObject()->GetComponent<cmp::BoxCol>()))
             {
-                GameApplication::SetGamma(GameApplication::GetGamma() - 0.01f);
+                GameApplication::SetGamma(GameApplication::GetGamma() - 0.05f);
             }
             else
             if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
                 menu->FindNode("Menu_contrastAdd")->GetGameObject()->GetComponent<cmp::BoxCol>()))
             {
-                GameApplication::SetContrast(GameApplication::GetContrast() + 0.01f);
+                GameApplication::SetContrast(GameApplication::GetContrast() + 0.05f);
+                std::cout << GameApplication::GetContrastWithMod() << std::endl;
             }
             else
             if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
                 menu->FindNode("Menu_contrastSub")->GetGameObject()->GetComponent<cmp::BoxCol>()))
             {
-                GameApplication::SetContrast(GameApplication::GetContrast() - 0.01f);
+                GameApplication::SetContrast(GameApplication::GetContrast() - 0.05f);
             }
             else
-                if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
-                    menu->FindNode("Menu_music")->GetGameObject()->GetComponent<cmp::BoxCol>()))
-                {
-                    AudioManager::ToggleMusic();
-                    auto mc = menu->FindNode("Menu_music")->GetGameObject()->GetComponent<cmp::Model>();
-                    if (AudioManager::IsMusicPlaying()) mc->SetTintColor(1.0f, 1.0f, 1.0f);
-                    else mc->SetTintColor(0.5f, 0.5f, 0.5f);
-                }
+            if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
+                menu->FindNode("Menu_music")->GetGameObject()->GetComponent<cmp::BoxCol>()))
+            {
+                AudioManager::ToggleMusic();
+                auto mc = menu->FindNode("Menu_music")->GetGameObject()->GetComponent<cmp::Model>();
+                if (AudioManager::IsMusicPlaying()) mc->SetTintColor(1.0f, 1.0f, 1.0f);
+                else mc->SetTintColor(0.5f, 0.5f, 0.5f);
+            }
             else 
             if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
                 menu->FindNode("Menu_back")->GetGameObject()->GetComponent<cmp::BoxCol>()))

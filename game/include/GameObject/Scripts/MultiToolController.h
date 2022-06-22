@@ -116,4 +116,14 @@ bool manuallyTurnedOn = false;
     {
         iconsGO[index]->GetComponent<cmp::Transform>()->Move(0.0f, 0.0f, disabledIconsOffset);
     }
+
+    bool IsFlashlightOn()
+    {
+        return isFlashlightOn;
+    }
+
+    int GetlightSourcesInRange()
+    {
+        return lightSourcesInRange;
+    }
 };
