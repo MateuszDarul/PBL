@@ -505,6 +505,10 @@ void SceneNode::PrivateDelete()
     {
         sphereCol->RemoveFromCollidersManager(sphereCol);
     }
+    if (auto slopeCol = this->GetGameObject()->GetComponent<cmp::SlopeCol>())
+    {
+        slopeCol->RemoveFromCollidersManager(slopeCol);
+    }
     if (auto scriptable = this->GetGameObject()->GetComponent<cmp::Scriptable>())
     {
         scriptable->Clear();

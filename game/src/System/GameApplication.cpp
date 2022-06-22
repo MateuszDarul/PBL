@@ -25,6 +25,8 @@ namespace rj = rapidjson;
 
 //#define FULLSCREEN_MODE
 
+#define MS_PER_UPDATE (1.0 / 60.0)
+
 #define DEFAULT_FOV 83.0f
 #define DEFAULT_BRIGHTNESS 1.0f
 #define DEFAULT_GAMMA 1.0f
@@ -215,7 +217,7 @@ void GameApplication::Run()
     glfwMaximizeWindow(GameApplication::GetWindow());
         glfwRestoreWindow(GameApplication::GetWindow());
     double t1, t2 = glfwGetTime();
-    double dt;
+    double dt, lag = 0.0;
     double fpsMeasureTimer = 1.0f;
     int framesCountLastSecond = 0;
     int fps = 0;
@@ -238,6 +240,7 @@ void GameApplication::Run()
         t1 = glfwGetTime();
         dt = t1 - t2;
         t2 = t1;
+        lag += dt;
 
         if (fpsMeasureTimer > 0.0f)
         {
@@ -255,8 +258,12 @@ void GameApplication::Run()
 
         if(inGame)
         {
-            //update logic
-            s_Scene->Update(dt);
+            while (lag > MS_PER_UPDATE)
+            {
+                //update logic
+                s_Scene->Update(MS_PER_UPDATE);
+                lag -= MS_PER_UPDATE;
+            }
 
             //show scene
             s_Scene->Render();
