@@ -97,9 +97,7 @@ public:
                 {
                     canPlayCloseSound = false;
                     canPlayOpenSound = true;
-                    doorCloseSFX->Play3D(
-                        originalPosition,
-                        gameObject->GetNode()->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>().get());
+                    doorCloseSFX->Play3D(originalPosition);
                 }
 
                 glm::vec3 move = targetPosition - doorTransform->GetPosition();
@@ -118,9 +116,7 @@ public:
                 {
                     canPlayOpenSound = false;
                     canPlayCloseSound = true;
-                    doorOpenSFX->Play3D(
-                        originalPosition,
-                        gameObject->GetNode()->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>().get());
+                    doorOpenSFX->Play3D(originalPosition);
                 }
 
                 glm::vec3 move = targetPosition - doorTransform->GetPosition();
@@ -131,9 +127,7 @@ public:
         {
             isPrimed = true;
             state = State::INACTIVE;
-            beepOFF->Play3D(
-                gameObject->GetNode()->GetGlobalPosition(), 
-                gameObject->GetNode()->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>().get());
+            beepOFF->Play3D(gameObject->GetNode()->GetGlobalPosition());
 
             cooldownTimer = cooldownClose;
             fixFirstSound = true;
@@ -152,9 +146,7 @@ public:
                 {
                     canPlayCloseSound = false;
                     canPlayOpenSound = true;
-                    doorOpenSFX->Play3D(
-                        originalPosition,
-                        gameObject->GetNode()->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>().get());
+                    doorOpenSFX->Play3D(originalPosition);
                 }
 
                 glm::vec3 move = targetPosition - doorTransform->GetPosition();
@@ -171,9 +163,7 @@ public:
             {
                 isPrimed = false;
                 state = State::ACTIVE;
-                beepON->Play3D(
-                    gameObject->GetNode()->GetGlobalPosition(),
-                    gameObject->GetNode()->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>().get());
+                beepON->Play3D(gameObject->GetNode()->GetGlobalPosition());
 
                 cooldownTimer = cooldownOpen;
                 fixFirstSound = true;

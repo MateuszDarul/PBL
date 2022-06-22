@@ -42,7 +42,7 @@ public:
         for (int i = 0; i < 3; i++)
         {
             // 'disabling' icons
-            iconsGO[i]->GetComponent<cmp::Transform>()->Move(0.0f, 0.0f, -disabledIconsOffset);
+            Lock(i);
         }
     }
 bool manuallyTurnedOn = false;
@@ -114,6 +114,15 @@ bool manuallyTurnedOn = false;
 
     void Unlock(int index)
     {
-        iconsGO[index]->GetComponent<cmp::Transform>()->Move(0.0f, 0.0f, disabledIconsOffset);
+        auto pos = iconsGO[index]->GetComponent<cmp::Transform>()->GetPosition();
+        pos.z = 0.0f;
+        iconsGO[index]->GetComponent<cmp::Transform>()->SetPosition(pos);
+    }
+
+    void Lock(int index)
+    {
+        auto pos = iconsGO[index]->GetComponent<cmp::Transform>()->GetPosition();
+        pos.z = -disabledIconsOffset;
+        iconsGO[index]->GetComponent<cmp::Transform>()->SetPosition(pos);
     }
 };

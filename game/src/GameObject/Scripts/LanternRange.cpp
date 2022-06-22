@@ -12,11 +12,15 @@ void LanternRange::Start()
 {
 	if (!buzzingSFX) buzzingSFX = new SoundPlayer("Resources/sounds/buzzing_mono.wav");
 	buzzingSFX->SetLooping(true);
+
+	if (!switchSFX) switchSFX = new SoundPlayer("Resources/sounds/lightswitch.wav");
+
 	isTurnedOn = isAlwaysLit;
 }
 
 LanternRange::~LanternRange()
 {
+	delete switchSFX;
 	delete buzzingSFX;
 }
 
@@ -40,6 +44,11 @@ void LanternRange::ChangeLightPower(bool enabled)
 	{
 		if (isTurnedOn && playerInRange) buzzingSFX->Play();
 		else buzzingSFX->Stop();
+	}
+
+	if (switchSFX)
+	{
+		switchSFX->Play();
 	}
 
 	for (auto turret : turretsInRange)

@@ -199,17 +199,7 @@ Scene::Scene()
     MultiToolController* multiToolScript;
     multiToolScript = new MultiToolController();
     
-    auto levelsNode = std::make_shared<SceneNode>(std::make_shared<GameObject>());
-    levelsNode->GetGameObject()->AddComponent(std::make_shared<cmp::Name>("LEVELS"));
-    world->FindNode("MAIN")->AddChild(levelsNode);
-
-    SCENE_INFO = {
-        shader_l, shader_d, lineShader, displShader, shadowParticleShader, resMan, collidersManager, shadowsManager, this, multiToolScript, go
-    };
-
-    currentLevelIndex = 0;
-    newLevelToSwitch = -1;
-    LoadLevelTutorial(SCENE_INFO);
+    
 
     ///***
 
@@ -382,6 +372,20 @@ Scene::Scene()
         GO_FLASHLIGHT = flashLightGO;
     }
 
+    //LOAD SCENE
+    auto levelsNode = std::make_shared<SceneNode>(std::make_shared<GameObject>());
+    levelsNode->GetGameObject()->AddComponent(std::make_shared<cmp::Name>("LEVELS"));
+    world->FindNode("MAIN")->AddChild(levelsNode);
+
+    SCENE_INFO = {
+        shader_l, shader_d, lineShader, displShader, shadowParticleShader, resMan, collidersManager, shadowsManager, this, multiToolScript, go
+    };
+
+    currentLevelIndex = 0;
+    newLevelToSwitch = -1;
+    LoadLevelTutorial(SCENE_INFO);
+
+
     //=== fixing rendering order
     auto turretsHolderParentGO = std::make_shared<GameObject>();
     turretsHolderParentGO->AddComponent(std::make_shared<cmp::Transform>());
@@ -532,7 +536,14 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
         sceneInfo.multiToolScript,
         sceneInfo.cameraGO);
 
-    world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>()->RestartMovement(-4, 4.5, 10);
+    sceneInfo.cameraGO->GetComponent<cmp::Camera>()->RestartMovement(-4, 4.5, 10);
+
+    //restart picked blueprints
+    sceneInfo.multiToolScript->Lock(0);
+    sceneInfo.multiToolScript->Lock(1);
+    sceneInfo.cameraGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->unlocked[0] = false;
+    sceneInfo.cameraGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->unlocked[1] = false;
+
 
     //===enemy
     {
@@ -804,7 +815,13 @@ void Scene::LoadLevel1(const SceneInfo& sceneInfo)
         sceneInfo.multiToolScript,
         sceneInfo.cameraGO);
 
-    world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>()->RestartMovement(-4, 4.5, 10);
+    sceneInfo.cameraGO->GetComponent<cmp::Camera>()->RestartMovement(-4, 4.5, 10);
+
+    //restart picked blueprints
+    sceneInfo.multiToolScript->Unlock(0);
+    sceneInfo.multiToolScript->Unlock(1);
+    sceneInfo.cameraGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->unlocked[0] = true;
+    sceneInfo.cameraGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->unlocked[1] = true;
 
 
     //doors and activators
@@ -951,6 +968,12 @@ void Scene::LoadLevelPuzzle1(const SceneInfo& sceneInfo)
 
     world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>()->RestartMovement(-4, 4.5, 10);
 
+    //restart picked blueprints
+    sceneInfo.multiToolScript->Unlock(0);
+    sceneInfo.multiToolScript->Unlock(1);
+    sceneInfo.cameraGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->unlocked[0] = true;
+    sceneInfo.cameraGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->unlocked[1] = true;
+
     struct DoorAndActivatorPair
     {
         glm::vec3 doorPosition;
@@ -1057,7 +1080,7 @@ Scene::~Scene()
 void Scene::SwitchLevel(int newLevelIndex)
 {
     newLevelToSwitch = -1;
-    if (newLevelIndex == currentLevelIndex) return;
+    //if (newLevelIndex == currentLevelIndex) return;
 
     auto levelsNode = world->FindNode("LEVELS");
 
@@ -1112,11 +1135,15 @@ void Scene::SwitchLevel(int newLevelIndex)
     placeTurretScript->turretsHolder = turretsHolderNode.get();
     placeTurretScript->PrepareNewTurrets();
     placeTurretScript->isPlacing = false;
+
+    auto gameManager = world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<GameManager>();
+    gameManager->SetEnergy(0);
 }
 
 void Scene::SafeSwitchLevel(int newLevelIndex)
 {
-    newLevelToSwitch = newLevelIndex;
+    if (newLevelIndex < 0) newLevelToSwitch = currentLevelIndex;
+    else newLevelToSwitch = newLevelIndex;
 }
 
 void Scene::Update(float dt)
@@ -1132,6 +1159,11 @@ void Scene::Update(float dt)
     if (Input()->Keyboard()->OnPressed(KeyboardKey::V))
     {
         SwitchLevel((currentLevelIndex+1) % 3);
+    }
+
+    if (Input()->Keyboard()->OnPressed(KeyboardKey::B))
+    {
+        SwitchLevel((currentLevelIndex));
     }
 
 

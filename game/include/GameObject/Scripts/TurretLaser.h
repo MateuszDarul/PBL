@@ -3,6 +3,7 @@
 #include "GameApplication.h"
 #include "Components.h"
 #include "CollidersManager.h"
+#include "SoundPlayer.h"
 
 #include "Turret.h"
 #include "DoorActivator.h"
@@ -39,12 +40,16 @@ private:
    
     cmp::Transform* transform;
 
+    SoundPlayer* mirrorSFX;
+    int previousMirrorHitCount = 0;
 
 public:
 
     void Start()
     {
         transform = gameObject->GetComponent<cmp::Transform>().get();
+
+        if (!mirrorSFX) mirrorSFX = new SoundPlayer("Resources/sounds/mirrorhit.wav");
     }
 
     void Update(float dt)
@@ -91,12 +96,13 @@ public:
 
                     if (hit.layer & CollisionLayer::Mirror)
                     {
+                        if (previousMirrorHitCount < hits) mirrorSFX->Play();
+
                         dir = glm::reflect(dir, hit.normal);
                         origin = hit.point;
                         totalLinePoints += 1;
                         continue;
                     }
-                    
 
                     auto scriptHolder = hit.gameObject->GetComponent<cmp::Scriptable>();
                     if (scriptHolder)
@@ -136,6 +142,8 @@ public:
             {
                 line->RemoveLast(line->Count() - totalLinePoints);
             }
+
+            previousMirrorHitCount = hits;
         }
     }
 };

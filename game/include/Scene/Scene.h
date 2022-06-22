@@ -74,7 +74,7 @@ public:
     CollidersManager* GetCollidersManager();
 
     static const SceneInfo& GetSceneInfo();
-    void SafeSwitchLevel(int newLevelIndex);
+    void SafeSwitchLevel(int newLevelIndex = -1);
 
 private:
     void SwitchLevel(int newLevelIndex);

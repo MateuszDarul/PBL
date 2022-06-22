@@ -21,6 +21,7 @@ private:
 
 	bool isTurnedOn = false;
 	SoundPlayer* buzzingSFX = nullptr;
+	SoundPlayer* switchSFX = nullptr;
 
 public:
 	void Start() override;

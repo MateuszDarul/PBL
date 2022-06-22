@@ -1,6 +1,7 @@
 #include "SoundPlayer.h"
 #include "AudioManager.h"
 
+#include "Scene.h"
 #include "CameraComponent.h"
 
 #include <AL/alext.h>
@@ -39,8 +40,10 @@ void SoundPlayer::Play()
 	AudioManager::StopFadeOut(this);
 }
 
-void SoundPlayer::Play3D(const glm::vec3& soundPos, CameraComponent* camera)
+void SoundPlayer::Play3D(const glm::vec3& soundPos)
 {
+	CameraComponent* camera = Scene::GetSceneInfo().cameraGO->GetComponent<cmp::Camera>().get();
+
 	glm::vec3 playerPos = camera->GetPosition();
 	float playerRot = glm::radians(camera->GetYaw() - 90.0f);
 	

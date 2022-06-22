@@ -52,6 +52,12 @@ public:
 		UpdateResourcesText();
 	}
 
+	void SetEnergy(int energy)
+	{
+		this->energy = energy;
+		UpdateResourcesText();
+	}
+
 	int GetCurrentEnergy()
 	{
 		return energy;
