@@ -1,0 +1,6 @@
+
+
+newmtl Material.061
+
+illum 2
+map_Kd windowwall_Material.061_BaseColor.png
