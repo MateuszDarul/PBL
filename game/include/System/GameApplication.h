@@ -26,6 +26,7 @@ private:
     static glm::mat4 s_ProjectionMatrix, s_OrthographicMatrix;
 
     static float brightness, gamma, contrast;
+    static float contrastMod;
 
     static Scene* s_Scene;
     static InputManager* s_InputManager;
@@ -128,11 +129,17 @@ public:
 
     static float GetContrast();
 
+    static float GetContrastWithMod();
+
     static void SetBright(float b);
 
     static void SetGamma(float g);
 
     static void SetContrast(float c);
+
+    static void SetContrastMod(float cm);
+
+    static void LoadSceneLevel(int newLevelIndex = -1);
 };
 
 /**

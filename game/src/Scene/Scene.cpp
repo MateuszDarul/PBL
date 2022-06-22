@@ -15,6 +15,7 @@
 #include "Scripts/Blueprint.h"
 #include "Scripts/PlayerInteract.h"
 #include "Scripts/PlayerGroundCheck.h"
+#include "Scripts/PlayerHealthScript.h"
 #include "Scripts/Health.h"
 #include "EnemyScript.h"
 #include "Scripts/PlayerFootsteps.h"
@@ -222,7 +223,6 @@ Scene::Scene()
     groundCheckScript->player = playerGO->GetComponent<cmp::Camera>();
 
     world->FindNode("CAMERA")->AddChild(groundCheckGO);
-    
 
     //skrypty gracza
     go->AddComponent(std::make_shared<cmp::Scriptable>());
@@ -371,6 +371,24 @@ Scene::Scene()
         GO_MULTITOOL = multiTool;
         GO_FLASHLIGHT = flashLightGO;
     }
+
+    //"Zdrowie" gracza
+    auto healthGo = std::make_shared<GameObject>();
+    healthGo->AddComponent(std::make_shared<cmp::Transform>());
+    healthGo->GetComponent<cmp::Transform>()->SetPosition(0.0, 0.0, 0.0);
+
+    healthGo->AddComponent(std::make_shared<SphereCollider>(true, false));
+    healthGo->GetComponent<cmp::SphereCol>()->SetRadius(0.45f);
+    healthGo->GetComponent<cmp::SphereCol>()->AddToCollidersManager(collidersManager);
+
+    healthGo->AddComponent(std::make_shared<cmp::Scriptable>());
+
+    auto healthScript = new PlayerHealthScript();
+    healthGo->GetComponent<cmp::Scriptable>()->Add(healthScript);
+    healthScript->player = playerGO->GetComponent<cmp::Camera>();
+
+    world->FindNode("CAMERA")->AddChild(healthGo);
+
 
     //LOAD SCENE
     auto levelsNode = std::make_shared<SceneNode>(std::make_shared<GameObject>());
@@ -543,6 +561,7 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
     sceneInfo.multiToolScript->Lock(1);
     sceneInfo.cameraGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->unlocked[0] = false;
     sceneInfo.cameraGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->unlocked[1] = false;
+    sceneInfo.cameraGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->selectedTurretType = PlayerPlaceTurret::Laser;
 
 
     //===enemy
@@ -1191,7 +1210,7 @@ void Scene::Update(float dt)
     transform = GameApplication::GetProjection() * camera->GetView();
 
     //SOUND
-//    AudioManager::Update(dt);
+    //AudioManager::Update(dt);
 
     //Position multitool
 
