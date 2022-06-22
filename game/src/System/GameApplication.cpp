@@ -1,6 +1,7 @@
 #include "GameApplication.h"
 #include "InputManager.h"
 #include "ResourceManager.h"
+#include "AudioManager.h"
 #include "Scene.h"
 #include "Menu.h"
 
@@ -270,9 +271,12 @@ void GameApplication::Run()
         }
         else
         {
+            lag = 0.0;
             s_Menu->Update();
             s_Menu->Draw();
         }
+
+        AudioManager::Update(dt);
 
         glfwPollEvents();
         glfwSwapBuffers(s_Window);

@@ -1159,7 +1159,7 @@ void Scene::Update(float dt)
     transform = GameApplication::GetProjection() * camera->GetView();
 
     //SOUND
-    AudioManager::Update(dt);
+//    AudioManager::Update(dt);
 
     //Position multitool
 

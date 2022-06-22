@@ -18,6 +18,7 @@ float AudioManager::s_TimeToPause = 0.3f;
 float AudioManager::s_PauseTimer = -1.0f;
 bool AudioManager::s_IsPausing = false;
 bool AudioManager::s_IsResuming = false;
+bool AudioManager::s_IsMusicPaused = false;
 
 ALuint AudioManager::GetSound(const char* filename)
 {
@@ -176,6 +177,22 @@ void AudioManager::Update(float dt)
 	}
 }
 
+void AudioManager::ToggleMusic()
+{
+	if (s_IsMusicPaused) ResumeQueue();
+	else PauseQueue();
+}
+
+bool AudioManager::IsMusicPlaying()
+{
+	return !s_IsMusicPaused;
+}
+
+void AudioManager::SetMasterVolume(float volume)
+{
+	alListenerf(AL_GAIN, volume);
+}
+
 void AudioManager::FadeOut(SoundPlayer* sound, float amount)
 {
 	for (int i = 0; i < s_SoundsToFadeOut.size(); i++)
@@ -219,6 +236,7 @@ void AudioManager::PauseQueue()
 	s_PausedMusicVolumePerUpdate = s_MusicQueue[s_CurrentMusicIndex]->GetVolume() / s_TimeToPause;
 	s_IsPausing = true;
 	s_IsResuming = false;
+	s_IsMusicPaused = true;
 }
 
 void AudioManager::ResumeQueue()
@@ -226,4 +244,5 @@ void AudioManager::ResumeQueue()
 	s_MusicQueue[s_CurrentMusicIndex]->Resume();
 	s_IsPausing = false;
 	s_IsResuming = true;
+	s_IsMusicPaused = false;
 }

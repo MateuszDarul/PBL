@@ -22,6 +22,11 @@ public:
 	static void Enqueue(MusicBuffer* music);
 	static void PauseQueue();
 	static void ResumeQueue();
+	
+	static void ToggleMusic();
+	static bool IsMusicPlaying();
+
+	static void SetMasterVolume(float volume);
 
 	static void FadeOut(SoundPlayer* sound, float fadeAmount);
 	static void StopFadeOut(SoundPlayer* sound);
@@ -38,4 +43,5 @@ private:
 	static float s_PauseTimer;
 	static bool s_IsPausing;
 	static bool s_IsResuming;
+	static bool s_IsMusicPaused;
 };

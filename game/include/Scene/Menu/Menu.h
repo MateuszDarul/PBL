@@ -2,6 +2,7 @@
 #define __MENU_H__
 
 #include "SceneNode.h"
+#include "AudioManager.h"
 
 class MenuScene
 {
@@ -477,6 +478,24 @@ public:
         go->AddComponent(std::make_shared<cmp::Name>("Menu_contrastSub"));
         menu->AddChild(go);
 
+        //music
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Cursor.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_SPEAKER.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(2.0, 1.5, -3.0);
+        go->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
+        go->GetComponent<cmp::BoxCol>()->SetLengths(glm::vec3(0.6, 0.6, 10));
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_music"));
+        if (AudioManager::IsMusicPlaying()) mc->SetTintColor(1.0f, 1.0f, 1.0f);
+        else mc->SetTintColor(0.5f, 0.5f, 0.5f);
+        menu->AddChild(go);
+
         //go back
         go = std::make_shared<GameObject>();
         mc = std::make_shared<cmp::Model>();
@@ -542,6 +561,15 @@ public:
             {
                 GameApplication::SetContrast(GameApplication::GetContrast() - 0.01f);
             }
+            else
+                if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
+                    menu->FindNode("Menu_music")->GetGameObject()->GetComponent<cmp::BoxCol>()))
+                {
+                    AudioManager::ToggleMusic();
+                    auto mc = menu->FindNode("Menu_music")->GetGameObject()->GetComponent<cmp::Model>();
+                    if (AudioManager::IsMusicPlaying()) mc->SetTintColor(1.0f, 1.0f, 1.0f);
+                    else mc->SetTintColor(0.5f, 0.5f, 0.5f);
+                }
             else 
             if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
                 menu->FindNode("Menu_back")->GetGameObject()->GetComponent<cmp::BoxCol>()))
