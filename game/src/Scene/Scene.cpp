@@ -1359,6 +1359,9 @@ void Scene::Render()
     glm::mat4 skyboxTransform = GameApplication::GetProjection() * glm::mat4(glm::mat3(goCamera->GetComponent<CameraComponent>()->GetView()));
     skybox->Render(skyboxTransform);
     world->Render(transform);
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+    GO_MULTITOOL->GetNode()->Render(transform);
 }
 
 void Scene::AddGameObject(std::shared_ptr<GameObject> child, std::shared_ptr<GameObject> parent)
