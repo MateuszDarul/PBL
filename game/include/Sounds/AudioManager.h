@@ -26,6 +26,9 @@ public:
 	static void ToggleMusic();
 	static bool IsMusicPlaying();
 
+	static void FadeOutMusic(float time);
+	static void FadeInMusic(float time);
+
 	static void SetMasterVolume(float volume);
 
 	static void FadeOut(SoundPlayer* sound, float fadeAmount);

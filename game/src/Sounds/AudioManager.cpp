@@ -246,3 +246,20 @@ void AudioManager::ResumeQueue()
 	s_IsResuming = true;
 	s_IsMusicPaused = false;
 }
+
+void AudioManager::FadeOutMusic(float time)
+{
+	if (s_IsPausing || s_IsMusicPaused) return;
+	s_PausedMusicVolumePerUpdate = s_MusicQueue[s_CurrentMusicIndex]->GetVolume() / time;
+	s_IsPausing = true;
+	s_IsResuming = false;
+}
+
+void AudioManager::FadeInMusic(float time)
+{
+	if (s_IsResuming || s_IsMusicPaused) return;
+	s_PausedMusicVolumePerUpdate = s_MusicQueue[s_CurrentMusicIndex]->GetVolume() / time;
+	s_MusicQueue[s_CurrentMusicIndex]->Resume();
+	s_IsPausing = false;
+	s_IsResuming = true;
+}

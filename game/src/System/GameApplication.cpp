@@ -242,7 +242,7 @@ void GameApplication::Run()
         t1 = glfwGetTime();
         dt = t1 - t2;
         t2 = t1;
-        lag += dt;
+        lag = std::min(lag + dt, 1.618);
 
         if (fpsMeasureTimer > 0.0f)
         {

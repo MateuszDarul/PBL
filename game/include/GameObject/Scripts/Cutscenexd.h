@@ -89,7 +89,7 @@ public:
             siren->Play();
 
             alarmLightGO = std::make_shared<GameObject>();
-            gameObject->GetNode()->GetRoot()->FindNode("MAIN")->AddChild(alarmLightGO);
+            gameObject->GetNode()->GetRoot()->FindNode("LEVEL_TUTORIAL")->AddChild(alarmLightGO);
             lightCmp = std::make_shared<cmp::PointLight>();
             alarmLightGO->AddComponent(lightCmp);
             lightCmp->Create();

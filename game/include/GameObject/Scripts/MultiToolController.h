@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Components.h"
-
+#include "AudioManager.h"
 
 
 class MultiToolController : public Script
@@ -23,7 +23,7 @@ public:
 
     //for public read
     bool isFlashlightOn = false;
-    float maxFlashlightCharge = 10.0f; //10 seconds
+    float maxFlashlightCharge = 15.0f; //15 seconds
     float currentFlashlightCharge;
 
     //
@@ -32,6 +32,8 @@ public:
 private:
 
     float disabledIconsOffset = 0.1f;
+    bool manuallyTurnedOn = false;
+    bool turnedOffMusic = false;
 
 public:
 
@@ -45,7 +47,6 @@ public:
             Lock(i);
         }
     }
-bool manuallyTurnedOn = false;
     void Update(float dt)
     {
         if (lightSourcesInRange > 0) 
@@ -66,10 +67,23 @@ bool manuallyTurnedOn = false;
 
         if (currentFlashlightCharge < 0.00001f)
         {
+            if (isFlashlightOn)
+            {
+                AudioManager::FadeOutMusic(1.0f);
+                turnedOffMusic = true;
+            }
+
             currentFlashlightCharge = 0.0f;
             isFlashlightOn = false;
             manuallyTurnedOn = false;
         }
+        else if (turnedOffMusic && (currentFlashlightCharge > 0.5f * maxFlashlightCharge))
+        {
+            turnedOffMusic = false;
+            AudioManager::FadeInMusic(2.0f);
+        }
+
+
         if (Input()->Keyboard()->OnPressed(KeyboardKey::R))
         {
             currentFlashlightCharge = maxFlashlightCharge;

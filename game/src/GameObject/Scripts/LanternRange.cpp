@@ -14,6 +14,7 @@ void LanternRange::Start()
 	buzzingSFX->SetLooping(true);
 
 	if (!switchSFX) switchSFX = new SoundPlayer("Resources/sounds/lightswitch.wav");
+	switchSFX->SetVolume(0.6f);
 
 	isTurnedOn = isAlwaysLit;
 }

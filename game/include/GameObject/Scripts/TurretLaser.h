@@ -20,7 +20,7 @@ public:
 
     int ignoreLayerMask = ~(CollisionLayer::Player | CollisionLayer::Ignore);
     int maxBounces = 15;
-    float maxDistance = 150.0f;
+    float maxDistance = 350.0f;
 
     float originOffsetUp = 2.38f;
     float originOffsetForward = 0.45f;
@@ -50,6 +50,12 @@ public:
         transform = gameObject->GetComponent<cmp::Transform>().get();
 
         if (!mirrorSFX) mirrorSFX = new SoundPlayer("Resources/sounds/mirrorhit.wav");
+        mirrorSFX->SetVolume(0.5f);
+    }
+
+    ~TurretLaser()
+    {
+        if (mirrorSFX) delete mirrorSFX;
     }
 
     void Update(float dt)
@@ -96,7 +102,11 @@ public:
 
                     if (hit.layer & CollisionLayer::Mirror)
                     {
-                        if (previousMirrorHitCount < hits) mirrorSFX->Play();
+                        if (previousMirrorHitCount < hits && hits < 6)
+                        {
+                            mirrorSFX->SetPitch(hits * 0.25f + 0.75f);
+                            mirrorSFX->Play();
+                        }
 
                         dir = glm::reflect(dir, hit.normal);
                         origin = hit.point;
@@ -143,7 +153,8 @@ public:
                 line->RemoveLast(line->Count() - totalLinePoints);
             }
 
-            previousMirrorHitCount = hits;
+            previousMirrorHitCount = hits-1;
+            if (hits >= maxBounces) previousMirrorHitCount = 2 * maxBounces;
         }
     }
 };

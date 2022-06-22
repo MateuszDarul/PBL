@@ -284,12 +284,13 @@ Scene::Scene()
         multiTool->AddComponent(std::make_shared<cmp::Name>("MultiTool"));
 
         multiTool->AddComponent(std::make_shared<cmp::Transform>());
-        multiTool->GetComponent<cmp::Transform>()->SetPosition(0.5f, -0.45f, -1.0f);
+        multiTool->GetComponent<cmp::Transform>()->SetPosition(0.5f, -0.33f, -1.0f);
+        multiTool->GetComponent<cmp::Transform>()->SetRotation(0.0f, 0.0f, 0.0f);
 
         auto baseMesh = std::make_shared<cmp::Model>();
         baseMesh->Create(
-            resMan->GetMesh("Resources/models/multitool/multitool.obj"),
-            resMan->GetMaterial("Resources/models/multitool/multitool.mtl")
+            resMan->GetMesh("Resources/models/multitool_new/multitool.obj"),
+            resMan->GetMaterial("Resources/models/multitool_new/multitool.mtl")
         );
        
         multiTool->AddComponent(baseMesh);
@@ -309,11 +310,11 @@ Scene::Scene()
 
         auto mutliToolDisplayHolder = std::make_shared<GameObject>();
         mutliToolDisplayHolder->AddComponent(std::make_shared<cmp::Transform>());
-        mutliToolDisplayHolder->GetComponent<cmp::Transform>()->SetPosition(0, 0.2, 0.5);
+        mutliToolDisplayHolder->GetComponent<cmp::Transform>()->SetPosition(-0.045, 0.04, 0.285);
         mutliToolDisplayHolder->GetComponent<cmp::Transform>()->SetRotation(-10, 0, 0);
         auto displayNode = multiToolNode->AddChild(mutliToolDisplayHolder);
         multiToolDisplayNode = displayNode.get();
-
+        mutliToolDisplayHolder->AddComponent(std::make_shared<cmp::Name>("mtDisplay"));
 
         auto radialBar = std::make_shared<GameObject>();
         auto radialBarModel = std::make_shared<cmp::Model>();
@@ -374,6 +375,7 @@ Scene::Scene()
 
     //"Zdrowie" gracza
     auto healthGo = std::make_shared<GameObject>();
+    healthGo->AddComponent(std::make_shared<cmp::Name>("PlayerHealthGO"));
     healthGo->AddComponent(std::make_shared<cmp::Transform>());
     healthGo->GetComponent<cmp::Transform>()->SetPosition(0.0, 0.0, 0.0);
 
@@ -542,7 +544,7 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
     auto levelNode = std::make_shared<SceneNode>(std::make_shared<GameObject>());
     levelNode->GetGameObject()->AddComponent(std::make_shared<cmp::Name>("LEVEL_TUTORIAL"));
     world->FindNode("LEVELS")->AddChild(levelNode);
-    MapLoader::Load("Resources/maps/world_tutorial.map", levelNode.get(), 
+    MapLoader::Load("Resources/maps/world_newtutorial.map", levelNode.get(), 
         sceneInfo.shader_l, 
         sceneInfo.shader_d, 
         sceneInfo.lineShader, 
@@ -562,6 +564,7 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
     sceneInfo.cameraGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->unlocked[0] = false;
     sceneInfo.cameraGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->unlocked[1] = false;
     sceneInfo.cameraGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->selectedTurretType = PlayerPlaceTurret::Laser;
+    sceneInfo.multiToolScript->SetActiveIcon(0);
 
 
     //===enemy
@@ -620,11 +623,14 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
     std::vector<DoorAndActivatorPair> doorsAndButtons = {  //0 rot = Z aligned; 90 rot = X aligned
         { { -15.00, 3.0,  25.0 }, 90.0f, false,  { -20.0,  2.5,  19.90 }, 180.0f },  //room 1
         { { -25.00, 3.0,  50.5 }, 90.0f, false,  { -20.0,  2.5,  46.90 }, 180.0f },  //room 2
-        { { -64.75, 3.0,  60.0 },  0.0f, false,  { -60.9,  3.0,  55.50 },  90.0f },  //room 3 - cutscene close (important id)
+        { { -64.75, 3.0,  60.0 },  0.0f, false,  { -60.9, -9.0,  55.50 },  90.0f },  //room 3 - cutscene close (important id)
         { { -83.00, 3.0,  -3.5 }, 90.0f, false,  { -60.9, -9.0,  64.60 },   0.0f },  //room 4 - cutscene open  (important id)
                                          
+
         { { -65.30, 3.0, -12.0 },  0.0f,  true,  { -68.0,  2.5, -16.65 },  -90.0f }, //room 4 - enemy side door
         { { -83.00, 3.0, -28.5 }, 90.0f, false,  { -83.00, -9.0, -27.5 },  90.0f },  //room 4 - elevator door
+
+        { { -64.75, 9.0,  77.0 },  0.0f, false,  { -60.75, 9.0,  81.90 },  180.0f },  // vent path
     };
 
     int i = 0;
@@ -726,6 +732,41 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
         i++;
 
         //- frame model
+        auto frameGO = std::make_shared<GameObject>();
+        frameGO->AddComponent(std::make_shared<cmp::Transform>());
+        model = std::make_shared<cmp::Model>();
+        model->Create(
+            sceneInfo.resourceManager->GetMesh("Resources/models/ny/przelacznikLaserowy/przelacznikLaserowy/przelacznikFrame.obj"),
+            sceneInfo.resourceManager->GetMaterial("Resources/models/ny/przelacznikLaserowy/przelacznikLaserowy/przelacznikLaserowy.mtl")
+        );
+        frameGO->AddComponent(model);
+        frameGO->AddComponent(sceneInfo.shader_l);
+        frameGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        frameGO->GetComponent<cmp::FrustumCulling>()->Create(sceneInfo.resourceManager->GetMesh("Resources/models/ny/przelacznikLaserowy/przelacznikLaserowy/przelacznikFrame.obj"));
+
+        levelNode->AddChild(go)->AddChild(frameGO);
+    }
+
+    {//broken aactivator activator
+        auto go = std::make_shared<GameObject>();
+        go->AddComponent(std::make_shared<cmp::Name>("BrokenActivator"));
+        
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(-59.34, 0.1, 57.45);
+        go->GetComponent<cmp::Transform>()->SetRotation(-90.0f, 30.0f, 0.0f);
+
+        auto model = std::make_shared<cmp::Model>();
+        model->Create(
+            sceneInfo.resourceManager->GetMesh("Resources/models/ny/przelacznikLaserowy/przelacznikLaserowy/przelacznikDetector.obj"),
+            sceneInfo.resourceManager->GetMaterial("Resources/models/ny/przelacznikLaserowy/przelacznikLaserowy/przelacznikLaserowy.mtl")
+        );
+        model->SetTintColor(0.51, 0.01, 0.01);
+        go->AddComponent(model);
+        go->AddComponent(sceneInfo.shader_d);
+
+        go->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        go->GetComponent<cmp::FrustumCulling>()->Create(sceneInfo.resourceManager->GetMesh("Resources/models/ny/przelacznikLaserowy/przelacznikLaserowy/przelacznikDetector.obj"));
+
         auto frameGO = std::make_shared<GameObject>();
         frameGO->AddComponent(std::make_shared<cmp::Transform>());
         model = std::make_shared<cmp::Model>();
@@ -854,12 +895,12 @@ void Scene::LoadLevel1(const SceneInfo& sceneInfo)
     };
 
     std::vector<DoorAndActivatorPair> doorsAndButtons = {  //0 rot = Z aligned; 90 rot = X aligned
-        { { -16.0,  2.50,  24.5 }, 90.0f, false,  { -20.5, 2.50, 20.9 }, 180.0f }, ///X start 
-        { { -56.5,  2.50,  11.0 }, 0.00f,  true,  { -52.9, 2.50, 6.50 }, 90.00f }, /// Prawy dol
-        { { 35.50,  2.50,  4.00 }, 0.00f,  true,  { 31.00, 2.50, 0.50 }, -90.0f }, /// Lewy dol
-        { { -69.0,  8.75,  72.5 }, 90.0f,  true,  { -73.5, 10.0, 68.9 }, 180.0f }, ///X Prawa gora
-        { { 57.50,  8.75,  33.0 }, 0.00f,  true,  { 53.90, 10.0, 37.5 }, -90.0f }, /// Lewa gora
-        { { -16.0,  2.50,  71.5 }, 90.0f,  true,  { -20.5, 3.00, 68.5 }, 180.0f },
+        { { -16.0,  3.00,  24.5 }, 90.0f, false,  { -20.5, 2.50, 20.9 }, 180.0f }, ///X start 
+        { { -56.5,  3.00,  11.0 }, 0.00f,  true,  { -52.9, 2.50, 6.50 }, 90.00f }, /// Prawy dol
+        { { 35.50,  3.00,  4.00 }, 0.00f,  true,  { 31.00, 2.50, 0.50 }, -90.0f }, /// Lewy dol
+        { { -69.0,  9.00,  72.5 }, 90.0f,  true,  { -73.5, 10.0, 68.9 }, 180.0f }, ///X Prawa gora
+        { { 57.50,  9.00,  33.0 }, 0.00f,  true,  { 53.90, 10.0, 37.5 }, -90.0f }, /// Lewa gora
+        { { -16.0,  3.00,  71.5 }, 90.0f,  true,  { -20.5, 3.00, 68.5 }, 180.0f },
     };
 
     int i = 0;
@@ -1157,6 +1198,9 @@ void Scene::SwitchLevel(int newLevelIndex)
 
     auto gameManager = world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<GameManager>();
     gameManager->SetEnergy(0);
+
+    auto playerHealth = world->FindNode("PlayerHealthGO")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<PlayerHealthScript>();
+    playerHealth->Start();
 }
 
 void Scene::SafeSwitchLevel(int newLevelIndex)
@@ -1216,6 +1260,26 @@ void Scene::Update(float dt)
 
     auto mtTransform = GO_MULTITOOL->GetComponent<cmp::Transform>();
     auto m = glm::inverse(camera->GetView());
+    
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::Up))    mtTransform->Move(0,  dt, 0);
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::Down))  mtTransform->Move(0, -dt, 0);
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::Right)) mtTransform->Rotate(dt, 0, 0);
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::Left))  mtTransform->Rotate(-dt, 0, 0);
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::LBracket)) mtTransform->Move(-dt, 0, 0);
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::RBracket)) mtTransform->Move(dt, 0, 0);
+
+    //printf("p %f %f \tr %f\n", mtTransform->GetPosition().x, mtTransform->GetPosition().y, mtTransform->GetRotation().x);
+    /*auto displ = world->FindNode("mtDisplay")->GetGameObject()->GetComponent<cmp::Transform>();
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::LBracket)) displ->Move(0, 0, -dt*0.1);
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::RBracket))  displ->Move(0, 0,  dt * 0.1);
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::O)) displ->Move(0,  -dt * 0.1,0);
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::P))  displ->Move(0,dt * 0.1,0);
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::U)) displ->Move( -dt * 0.1,0, 0);
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::I))  displ->Move( dt * 0.1,0, 0);
+
+    printf("p %f \tr %f \t|\t x %f y %f z %f\n", mtTransform->GetPosition().y, mtTransform->GetRotation().x,
+        displ->GetPosition().x, displ->GetPosition().y, displ->GetPosition().z);*/
+
 
     glm::vec4 mtNewPosition = m * glm::vec4(mtTransform->GetPosition(), 1.0f);
 
@@ -1236,6 +1300,7 @@ void Scene::Update(float dt)
     m[3][0] = mtNewPosition.x + swing.x;
     m[3][1] = mtNewPosition.y + swing.y;
     m[3][2] = mtNewPosition.z + swing.z;
+    m = glm::rotate(m, mtTransform->GetRotation().x, glm::vec3(1, 0, 0));
     mtTransform->SetModelMatrix(m);
 
 
