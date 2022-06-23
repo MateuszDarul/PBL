@@ -754,8 +754,9 @@ bool MapLoader::Load(
                 sParticles->SetParticleLifetime(lifeTime);
                 sParticles->SetScale(0.25f, 0.25f);
                 sParticles->SetColor({ 1.0f, 1.0f, 1.0f,   1.0f }, { 1.0f, 1.0f, 1.0f,   1.0f });
-                sParticles->SetForce({ 0.0f, -0.01f, 0.0f });
+                sParticles->SetForce({ 0.0f, 0.0f, 0.0f });
                 root->AddChild(sParticlesGO);
+                spawnerScript->AddParticleSystem(sParticles.get());
             }
             scriptHolder->Add(spawnerScript);
 

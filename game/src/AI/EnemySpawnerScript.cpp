@@ -7,12 +7,28 @@
 
 void EnemySpawnerScript::Start() {
 
-    SpawnEnemy(1);
+    //SpawnEnemy(1);
 
 }
 
 void EnemySpawnerScript::Update(float dt) {
+    if (!isActive)
+    {
+        spawnTimer = minimumTimePerSpawn;
+        return;
+    }
 
+    if (spawnTimer < 0.0f)
+    {
+        SpawnEnemy(1);
+
+        float offset = 3.0f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (17.0f)));
+        spawnTimer = minimumTimePerSpawn + offset;
+    }
+    else
+    {
+        spawnTimer -= dt;
+    }
 }
 
 void EnemySpawnerScript::SpawnEnemy(int nr)

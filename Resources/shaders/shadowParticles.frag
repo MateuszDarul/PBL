@@ -37,16 +37,6 @@ uniform PointLight pointLight[10];
 uniform int spotLightAmount;
 uniform SpotLight spotLight[10];
 
-uniform float brightness;
-uniform float gamma;
-uniform float contrast;
-
-///--------------------------------------------------------- CODE
-
-vec4 bright(vec4 colorIn, float brightnessVal);
-vec4 gam(vec4 colorIn, float gammaVal);
-vec4 cont(vec4 colorIn, float contrastVal);
-
 float GetPointLight(PointLight pointLight);
 float GetSpotLight(SpotLight sLight);
 
@@ -71,13 +61,6 @@ void main()
     else
     {
 	float light = 0;
-        for(int i=0; i<pointLightAmount; i++)
-        {
-            float intensity = GetPointLight(pointLight[i]);
-            if(intensity >= 0.1f && intensity > light)
-                light = intensity;
-        }
-
         for(int i=0; i<spotLightAmount; i++)
         {
             float intensity = GetSpotLight(spotLight[i]);
@@ -88,19 +71,8 @@ void main()
 	        discard;
     }
     FragColor = frag;
-
-    FragColor = bright(FragColor, brightness);
-    FragColor = cont(FragColor, contrast);
-    FragColor = gam(FragColor, gamma);
 }
 
-float GetPointLight(PointLight pLight)
-{
-    float distance = length(pLight.position - fragPos);
-    float attenuation = 1 - pow(distance * pLight.distance, 5.0);
-
-    return attenuation;
-}
 
 float GetSpotLight(SpotLight sLight)
 {
@@ -117,20 +89,4 @@ float GetSpotLight(SpotLight sLight)
     intensity *= attenuation;
 
     return intensity;
-}
-
-vec4 bright(vec4 colorIn, float brightnessVal)
-{
-    return vec4(colorIn.x * brightnessVal, colorIn.y * brightnessVal, colorIn.z * brightnessVal, colorIn.a);
-}
-
-vec4 gam(vec4 colorIn, float gammaVal)
-{
-    return vec4(pow(colorIn.x, gammaVal), pow(colorIn.y, gammaVal), pow(colorIn.z, gammaVal), colorIn.a);
-}
-
-vec4 cont(vec4 colorIn, float contrastVal)
-{
-    float t = 0.5f - contrastVal * 0.5;
-    return vec4(colorIn.x * t, colorIn.y * t, colorIn.z * t, colorIn.a);
 }

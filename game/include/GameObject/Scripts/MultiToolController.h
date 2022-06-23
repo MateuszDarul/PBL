@@ -23,7 +23,7 @@ public:
 
     //for public read
     bool isFlashlightOn = false;
-    float maxFlashlightCharge = 15.0f; //15 seconds
+    float maxFlashlightCharge = 20.0f; //20 seconds
     float currentFlashlightCharge;
 
     //
@@ -51,7 +51,7 @@ public:
     {
         if (lightSourcesInRange > 0) 
         {
-            currentFlashlightCharge += 1.618f * dt;
+            currentFlashlightCharge += 2.71828f * dt;
             if (!manuallyTurnedOn) isFlashlightOn = false;
             
             if (Input()->Keyboard()->OnPressed(KeyboardKey::T)) 
@@ -69,7 +69,7 @@ public:
         {
             if (isFlashlightOn)
             {
-                AudioManager::FadeOutMusic(1.0f);
+                AudioManager::FadeOutMusic(3.0f);
                 turnedOffMusic = true;
             }
 
@@ -80,7 +80,7 @@ public:
         else if (turnedOffMusic && (currentFlashlightCharge > 0.5f * maxFlashlightCharge))
         {
             turnedOffMusic = false;
-            AudioManager::FadeInMusic(2.0f);
+            AudioManager::FadeInMusic(4.0f);
         }
 
 

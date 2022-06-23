@@ -261,7 +261,7 @@ void GameApplication::Run()
         {
             //update logic
             if (dt < 0.5) s_Scene->Update(dt);
-
+            else printf("Too big dt - skipping update\n");
 
             //show scene
             s_Scene->Render();

@@ -196,6 +196,7 @@ void CameraComponent::Update(InputManager* inputManager, const float& deltaTime)
 
     if (!isGrounded)
     {
+        if (deltaTime < 0.1618f)
         verticalVelocity += gravity * deltaTime;
         verticalVelocity = std::max(verticalVelocity, gravity);
     }

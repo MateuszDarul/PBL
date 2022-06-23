@@ -38,9 +38,18 @@ public:
 		if (player)
 		{
 			pickupSFX->Play();
-			player->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->unlocked[type] = true;
-            gameObject->GetNode()->GetRoot()->FindNode("MultiTool")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<MultiToolController>()->Unlock(type);			
-            gameObject->GetComponent<cmp::Transform>()->SetPosition(0, -100, 0);
+
+			if (type == PlayerPlaceTurret::TurretType::None)
+			{
+				gameObject->GetNode()->GetRoot()->FindNode("DoorActivator5")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<DoorActivator>()->ForceEnable();
+			}
+			else
+			{
+				player->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->unlocked[type] = true;
+				gameObject->GetNode()->GetRoot()->FindNode("MultiTool")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<MultiToolController>()->Unlock(type);
+			}
+			
+			gameObject->GetComponent<cmp::Transform>()->SetPosition(0, -100, 0);
 		}
 	}
 };

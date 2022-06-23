@@ -5,6 +5,8 @@
 #include "SoundPlayer.h"
 #include "SceneNode.h"
 
+#include "AI/EnemySpawnerScript.h"
+
 class DoorActivator : public Script 
 {
 public:
@@ -17,6 +19,7 @@ public:
     //set these in 'inspector'
 
     std::shared_ptr<cmp::Transform> doorTransform;
+    EnemySpawnerScript* spawner = nullptr;
 
     enum class State
     {
@@ -32,6 +35,7 @@ private:
     bool isPrimed;
     bool isActivated;
     bool isShutdown;
+    bool isForcedActive;
 
     glm::vec3 targetPosition;
     glm::vec3 originalPosition;
@@ -59,6 +63,7 @@ public:
         isPrimed = true;
         isActivated = false;
         isShutdown = false;
+        isForcedActive = false;
         state = State::INACTIVE;
 
         doorSpeedOpening = 1.0f / timeToOpen;
@@ -85,6 +90,11 @@ public:
 
     void Update(float dt)
     {
+        if (isForcedActive)
+        {
+            isActivated = true;
+        }
+
         if (isShutdown) 
         {
             isActivated = false;
@@ -134,6 +144,11 @@ public:
 
             targetPosition = originalPosition;
             if (buttonModel) buttonModel->SetTintColor(0.88, 0.21, 0.21);
+
+            if (spawner)
+            {
+                spawner->Activate();
+            }
         }
         else                //on being unpowered
         {
@@ -170,6 +185,11 @@ public:
 
                 targetPosition = originalPosition + openedOffset;
                 if (buttonModel) buttonModel->SetTintColor(0.21, 0.88, 0.21);
+
+                if (spawner)
+                {
+                    spawner->Deactivate();
+                }
             }
 
             isActivated = true;
@@ -185,6 +205,15 @@ public:
             state = State::SHUTDOWN;
             targetPosition = originalPosition;
             if (buttonModel) buttonModel->SetTintColor({ 0.5f, 0.0f, 0.0f,  1.0f });
+        }
+    }
+
+    void ForceEnable(bool enable = true)
+    {
+        isForcedActive = enabled;
+        if (isForcedActive)
+        {
+            Activate();
         }
     }
 };

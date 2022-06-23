@@ -878,7 +878,7 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
 
     levelNode->AddChild(go);
 
-
+    world->FindNode("spawner0")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<EnemySpawnerScript>()->spawnTimer = 9999.9f;
     // load next level
 
     go = std::make_shared<GameObject>(); 
@@ -925,6 +925,42 @@ void Scene::LoadLevel1(const SceneInfo& sceneInfo)
     sceneInfo.cameraGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->unlocked[0] = true;
     sceneInfo.cameraGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->unlocked[1] = true;
 
+    //computer
+    
+    {
+        auto gameObject = std::make_shared<GameObject>();
+        gameObject->AddComponent(std::make_shared<cmp::Name>("Computer0"));
+
+        gameObject->AddComponent(std::make_shared<cmp::Transform>());
+        gameObject->GetComponent<cmp::Transform>()->SetPosition(26.0, 8.0, 45.0);
+
+        gameObject->AddComponent(std::make_shared<BoxCollider>(true, true));
+        gameObject->GetComponent<cmp::BoxCol>()->SetLengths({ 3.1, 3.1, 3.1 });
+        gameObject->GetComponent<cmp::BoxCol>()->SetOffset({ 0.0, 1.0, 0.0 });
+        gameObject->GetComponent<cmp::BoxCol>()->AddToCollidersManager(sceneInfo.collidersManager);
+
+        auto resourceScript = new Blueprint();
+        resourceScript->type = PlayerPlaceTurret::TurretType::None;
+        gameObject->AddComponent(std::make_shared<cmp::Scriptable>());
+        gameObject->GetComponent<cmp::Scriptable>()->Add(resourceScript);
+
+        levelNode->AddChild(gameObject);
+
+        auto kabel = std::make_shared<GameObject>();
+        kabel->AddComponent(std::make_shared<cmp::Transform>());
+        kabel->GetComponent<cmp::Transform>()->SetPosition(0, 0.0, 2);
+        kabel->GetComponent<cmp::Transform>()->SetRotation(0, 180,0);
+        auto model = std::make_shared<cmp::Model>();
+        model->Create(
+            sceneInfo.resourceManager->GetMesh("Resources/models/kabel.obj"),
+            sceneInfo.resourceManager->GetMaterial("Resources/models/multitool/icon.mtl")
+        );
+        model->SetTintColor(0.2, 0.2, 0.2);
+        kabel->AddComponent(model);
+        kabel->AddComponent(sceneInfo.shader_l);
+        levelNode->AddChild(kabel);
+    }
+
 
     //doors and activators
     struct DoorAndActivatorPair
@@ -942,7 +978,7 @@ void Scene::LoadLevel1(const SceneInfo& sceneInfo)
         { { 35.50,  3.00,  4.00 }, 0.00f,  true,  { 31.00, 2.50, 0.50 }, -90.0f }, /// Lewy dol
         { { -69.0,  9.00,  72.5 }, 90.0f,  true,  { -73.5, 10.0, 68.9 }, 180.0f }, ///X Prawa gora
         { { 57.50,  9.00,  33.0 }, 0.00f,  true,  { 53.90, 10.0, 37.5 }, -90.0f }, /// Lewa gora
-        { { -16.0,  3.00,  71.5 }, 90.0f,  true,  { -20.5, 3.00, 68.5 }, 180.0f },
+        { { -16.0,  3.00,  71.5 }, 90.0f, false,  { -20.5, 3.00, 68.5 }, 180.0f },
     };
 
     int i = 0;
@@ -1031,7 +1067,11 @@ void Scene::LoadLevel1(const SceneInfo& sceneInfo)
         activator->openedOffset = doorOffset * (openOnStart ? -1.0f : 1.0f);
         go->GetComponent<cmp::Scriptable>()->Add(activator);
 
-        
+        if (i == 1) activator->spawner = world->FindNode("spawner1")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<EnemySpawnerScript>();
+        if (i == 3) activator->spawner = world->FindNode("spawner0")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<EnemySpawnerScript>();
+        if (i == 4) activator->spawner = world->FindNode("spawner2")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<EnemySpawnerScript>();
+        if (i == 2) activator->spawner = world->FindNode("spawner3")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<EnemySpawnerScript>();
+
         i++;
 
         //- frame model
@@ -1075,7 +1115,20 @@ void Scene::LoadLevelPuzzle1(const SceneInfo& sceneInfo)
     sceneInfo.multiToolScript->Unlock(1);
     sceneInfo.cameraGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->unlocked[0] = true;
     sceneInfo.cameraGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->unlocked[1] = true;
-
+    {
+        auto kabel = std::make_shared<GameObject>();
+        kabel->AddComponent(std::make_shared<cmp::Transform>());
+        kabel->GetComponent<cmp::Transform>()->SetPosition(0.0, 0.0, 0.0);
+        auto model = std::make_shared<cmp::Model>();
+        model->Create(
+            sceneInfo.resourceManager->GetMesh("Resources/models/kabel.obj"),
+            sceneInfo.resourceManager->GetMaterial("Resources/models/multitool/icon.mtl")
+        );
+        model->SetTintColor(0.2, 0.2, 0.2);
+        kabel->AddComponent(model);
+        kabel->AddComponent(sceneInfo.shader_l);
+        levelNode->AddChild(kabel);
+    }
     struct DoorAndActivatorPair
     {
         glm::vec3 doorPosition;
