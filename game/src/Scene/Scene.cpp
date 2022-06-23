@@ -1519,14 +1519,15 @@ void Scene::Update(float dt)
         SwitchLevel(newLevelToSwitch);
     }
 
-    if (Input()->Keyboard()->OnPressed(KeyboardKey::V))
+    //if (Input()->Keyboard()->OnPressed(KeyboardKey::V))
+    //{
+    //    SwitchLevel((currentLevelIndex + 1) % 3);
+    //}
+    //
+    if (Input()->Keyboard()->OnPressed(KeyboardKey::F9))
     {
-        SwitchLevel((currentLevelIndex + 1) % 3);
-    }
-
-    if (Input()->Keyboard()->OnPressed(KeyboardKey::B))
-    {
-        SwitchLevel((currentLevelIndex));
+        if (currentLevelIndex != 0)
+            SwitchLevel((currentLevelIndex));
     }
 
 

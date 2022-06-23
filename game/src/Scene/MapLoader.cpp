@@ -476,9 +476,9 @@ bool MapLoader::Load(
             };
             std::vector<BlueprintPosition> blueprints = {
                 {{ -73.0f, 1.25f, 89.5f },  PlayerPlaceTurret::TurretType::Blockade  },    //baricade
-                {{ -83.0f, 1.25f, 68.8f },  PlayerPlaceTurret::TurretType::Shooting },    //Shooting
+                {{ -86.3f, 1.25f, 55.0f },  PlayerPlaceTurret::TurretType::Shooting },    //Shooting
                 {{ -26.8f, 1.25f,  5.0f },  PlayerPlaceTurret::TurretType::Laser    }     //Laser
-            };
+            }; 
             for (int i = 0; i < 3; i++)
             {
                 gameObject = std::make_shared<GameObject>();
@@ -487,7 +487,7 @@ bool MapLoader::Load(
                 gameObject->AddComponent(std::make_shared<cmp::Transform>());
                 gameObject->GetComponent<cmp::Transform>()->SetPosition(blueprints[i].position);
 
-                if (i == 2)
+                if (i == 2 || i == 1)
                 {
                     gameObject->GetComponent<cmp::Transform>()->SetRotation(0.0f, 90.0f, 0.0f);
                 }
@@ -511,7 +511,7 @@ bool MapLoader::Load(
                 //shooting
                 if (i == 1)
                 {
-                    gameObject->GetComponent<cmp::BoxCol>()->SetLengths({ 4.0, 2.5, 0.3 });
+                    gameObject->GetComponent<cmp::BoxCol>()->SetLengths({ 0.3, 2.5, 4.0 });
                     model->Create(
                         resMan->GetMesh("Resources/models/Board/Board.obj"),
                         resMan->GetMaterial("Resources/models/Board/blueprintOffensive.mtl")
