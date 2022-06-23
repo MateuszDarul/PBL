@@ -50,7 +50,7 @@ public:
         }
         else if (multiTool->IsFlashlightOn() == false)
         {
-            playerHealth -= 15.0f * dt;
+            playerHealth -= 10.0f * dt;
         }
     }
 
