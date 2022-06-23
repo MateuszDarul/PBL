@@ -471,7 +471,7 @@ Scene::Scene()
         auto tc = std::make_shared<TransformComponent>();
 
         auto textComponent = std::make_shared<TextComponent>();
-        textComponent->Create("Press T for the toollight", font);
+        textComponent->Create("Press T for\n the toollight", font);
         textComponent->alwaysSeen = true;
         textComponent->isGuiElement = true;
         textComponent->color = { 0.8f, 0.8f, 0.8f };
