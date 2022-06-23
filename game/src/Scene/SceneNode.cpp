@@ -2,7 +2,7 @@
 #include "Scene.h"
 #include "ShadowsManager.h"
 
-#define ENABLE_DEBUG_INFO
+//#define ENABLE_DEBUG_INFO
 
 #ifdef ENABLE_DEBUG_INFO
 

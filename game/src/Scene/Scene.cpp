@@ -282,9 +282,9 @@ Scene::Scene()
         auto multiTool = std::make_shared<GameObject>();
         multiTool->AddComponent(std::make_shared<cmp::Name>("MultiTool"));
 
-        multiTool->AddComponent(std::make_shared<cmp::Transform>());
-        multiTool->GetComponent<cmp::Transform>()->SetPosition(0.5f, -0.33f, -1.0f);
-        multiTool->GetComponent<cmp::Transform>()->SetRotation(0.0f, 0.0f, 0.0f);
+        multiTool->AddComponent(std::make_shared<cmp::Transform>()); 
+        multiTool->GetComponent<cmp::Transform>()->SetPosition(0.509937, -0.257875, -0.8f);
+        multiTool->GetComponent<cmp::Transform>()->SetRotation(-0.076019f, 0.0f, 0.0f);
 
         auto baseMesh = std::make_shared<cmp::Model>();
         baseMesh->Create(
@@ -471,7 +471,7 @@ Scene::Scene()
         auto tc = std::make_shared<TransformComponent>();
 
         auto textComponent = std::make_shared<TextComponent>();
-        textComponent->Create("Press T for\n the toollight", font);
+        textComponent->Create("Press T for\nthe toollight", font);
         textComponent->alwaysSeen = true;
         textComponent->isGuiElement = true;
         textComponent->color = { 0.8f, 0.8f, 0.8f };
@@ -1496,6 +1496,11 @@ void Scene::SwitchLevel(int newLevelIndex)
 
     auto playerHealth = world->FindNode("PlayerHealthGO")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<PlayerHealthScript>();
     playerHealth->Start();
+
+    auto playerInteract = world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Scriptable>()->Get<PlayerInteract>();
+    playerInteract->selectedMirror = nullptr;
+    world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>()->SetMovementEnable(true);
+    world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>()->SetRotationEnable(true);
 }
 
 void Scene::SafeSwitchLevel(int newLevelIndex)
@@ -1516,7 +1521,7 @@ void Scene::Update(float dt)
 
     if (Input()->Keyboard()->OnPressed(KeyboardKey::V))
     {
-        SwitchLevel((currentLevelIndex+1) % 3);
+        SwitchLevel((currentLevelIndex + 1) % 3);
     }
 
     if (Input()->Keyboard()->OnPressed(KeyboardKey::B))
@@ -1532,6 +1537,9 @@ void Scene::Update(float dt)
 
     camera->Update(GameApplication::GetInputManager(), dt);
     transformCamera->SetPosition(camera->GetPosition());
+
+    if (camera->GetPosition().y < -5.0f)
+        camera->RestartMovement(-4, 4.5, 10);
 
     if (isPaused)
     {
@@ -1556,16 +1564,17 @@ void Scene::Update(float dt)
     auto mtTransform = GO_MULTITOOL->GetComponent<cmp::Transform>();
     auto m = glm::inverse(camera->GetView());
     
-    if (Input()->Keyboard()->IsPressed(KeyboardKey::Up))    mtTransform->Move(0,  dt, 0);
-    if (Input()->Keyboard()->IsPressed(KeyboardKey::Down))  mtTransform->Move(0, -dt, 0);
-    if (Input()->Keyboard()->IsPressed(KeyboardKey::Right)) mtTransform->Rotate(dt, 0, 0);
-    if (Input()->Keyboard()->IsPressed(KeyboardKey::Left))  mtTransform->Rotate(-dt, 0, 0);
-    if (Input()->Keyboard()->IsPressed(KeyboardKey::LBracket)) mtTransform->Move(-dt, 0, 0);
-    if (Input()->Keyboard()->IsPressed(KeyboardKey::RBracket)) mtTransform->Move(dt, 0, 0);
-    if (Input()->Keyboard()->IsPressed(KeyboardKey::O)) mtTransform->Move(0, 0, dt);
-    if (Input()->Keyboard()->IsPressed(KeyboardKey::P)) mtTransform->Move(0, 0, -dt);
-
-    //printf("p %f %f \tr %f\n", mtTransform->GetPosition().x, mtTransform->GetPosition().y, mtTransform->GetRotation().x);
+   //if (Input()->Keyboard()->IsPressed(KeyboardKey::Up))    mtTransform->Move(0,  dt, 0);
+   //if (Input()->Keyboard()->IsPressed(KeyboardKey::Down))  mtTransform->Move(0, -dt, 0);
+   //if (Input()->Keyboard()->IsPressed(KeyboardKey::Right)) mtTransform->Rotate(dt, 0, 0);
+   //if (Input()->Keyboard()->IsPressed(KeyboardKey::Left))  mtTransform->Rotate(-dt, 0, 0);
+   //if (Input()->Keyboard()->IsPressed(KeyboardKey::LBracket)) mtTransform->Move(-dt, 0, 0);
+   //if (Input()->Keyboard()->IsPressed(KeyboardKey::RBracket)) mtTransform->Move(dt, 0, 0);
+   //if (Input()->Keyboard()->IsPressed(KeyboardKey::O)) mtTransform->Move(0, 0, dt);
+   //if (Input()->Keyboard()->IsPressed(KeyboardKey::P)) mtTransform->Move(0, 0, -dt);
+   //printf("p %f \n", mtTransform->GetPosition().z);
+   //
+   //printf("p %f %f \tr %f\n", mtTransform->GetPosition().x, mtTransform->GetPosition().y, mtTransform->GetRotation().x);
     /*auto displ = world->FindNode("mtDisplay")->GetGameObject()->GetComponent<cmp::Transform>();
     if (Input()->Keyboard()->IsPressed(KeyboardKey::LBracket)) displ->Move(0, 0, -dt*0.1);
     if (Input()->Keyboard()->IsPressed(KeyboardKey::RBracket))  displ->Move(0, 0,  dt * 0.1);
