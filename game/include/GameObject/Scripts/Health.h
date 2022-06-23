@@ -26,7 +26,7 @@ public:
 	void DecreaseHealth(float health)
 	{
 		this->health -= health;
-		std::cout << this->health<<std::endl;
+		//std::cout << this->health<<std::endl;
 		if (this->health <= 0)
 		{
 			// to nie powinno byc tutaj - co jesli nie chcemy usunac objektu nawet jak ma 0 hp?

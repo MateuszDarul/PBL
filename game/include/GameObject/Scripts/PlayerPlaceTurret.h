@@ -20,7 +20,7 @@ class PlayerPlaceTurret : public Script
 public:
 
     //adjust these
-    float placingRange = 5.0f;
+    float placingRange = 4.5f;
     float shootingTurretRange = 15.0f;
 
     int ignoreLayerMask = ~(CollisionLayer::Player | CollisionLayer::GUI | CollisionLayer::Ignore);
@@ -84,6 +84,15 @@ private:
     SoundPlayer* sfxplay;
 public:
 
+    void PrepareNewTurrets()
+    {
+        CreateTurret(TurretType::Blockade);
+        CreateTurret(TurretType::Shooting);
+        CreateTurret(TurretType::Laser);
+
+        CreateDummy();
+    }
+
     void Start()
     {
         transform = gameObject->GetComponent<cmp::Transform>();
@@ -95,11 +104,7 @@ public:
         line->Set(1, { 1,  1, -2 });
         line->Set(2, { 1,  2, -3 });
 
-        CreateTurret(TurretType::Blockade);
-        CreateTurret(TurretType::Shooting);
-        CreateTurret(TurretType::Laser);
-
-        CreateDummy();
+        PrepareNewTurrets();
 
         selectedTurretType = TurretType::Laser;
         multiTool->SetActiveIcon(selectedTurretType);
@@ -293,7 +298,7 @@ public:
                 selectTurretSFX->Play();
             }
         }
-
+        
         if (hasPlacedTurret)
         {
             dummyTurret->GetComponent<cmp::Transform>()->SetPosition(0.0f, 999.9f, 0.0f);
@@ -419,7 +424,7 @@ public:
         auto rangeGO = std::make_shared<GameObject>();
         rangeGO->AddComponent(std::make_shared<cmp::Transform>());
 
-        rangeGO->AddComponent(std::make_shared<cmp::SphereCol>(true, true));
+        rangeGO->AddComponent(std::make_shared<cmp::SphereCol>(true, true, CollisionLayer::Ignore));
         std::shared_ptr<cmp::SphereCol> rangeCol = rangeGO->GetComponent<cmp::SphereCol>();
         rangeCol->SetRadius(shootingTurretRange);
         rangeCol->AddToCollidersManager(colMan);

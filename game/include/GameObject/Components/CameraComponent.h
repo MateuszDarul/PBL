@@ -57,6 +57,9 @@ public:
         return pitch;
     }
 
+    void RestartMovement(float x, float y, float z, float pitch = 0.0f, float yaw = 0.0f);
+    void RestartMovement(const glm::vec3& pos, const glm::vec2& rot);
+
 private:
     glm::vec3 position; //!< Aktualna pozycja kamery.
 

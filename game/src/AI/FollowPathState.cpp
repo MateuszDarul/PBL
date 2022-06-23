@@ -11,7 +11,7 @@ void FollowPathState::Enter(std::shared_ptr<GameObject> gameObject)
 
 void FollowPathState::Execute(std::shared_ptr<GameObject> gameObject, float dt)
 {
-	glm::vec3 playerPos = gameObject->GetNode()->GetParent()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Transform>()->GetPosition();
+	glm::vec3 playerPos = gameObject->GetNode()->GetRoot()->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Transform>()->GetPosition();
 
 	if (glm::length(gameObject->GetComponent<cmp::Transform>()->GetPosition() - playerPos) < 10.0f)
 	{

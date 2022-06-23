@@ -1,5 +1,6 @@
 #include "SceneNode.h"
 #include "Scene.h"
+#include "ShadowsManager.h"
 
 #define ENABLE_DEBUG_INFO
 
@@ -388,7 +389,7 @@ void SceneNode::Render(const glm::mat4& matrixPV)
     }
 
 #ifdef ENABLE_DEBUG_INFO
-    if (Input()->Keyboard()->IsPressed(KeyboardKey::F9))
+    /*if (Input()->Keyboard()->IsPressed(KeyboardKey::F9))
     {
         if (auto collider = gameObject->GetComponent<cmp::BoxCol>())
         {
@@ -405,7 +406,7 @@ void SceneNode::Render(const glm::mat4& matrixPV)
             glm::vec4 color = (collider->isTrigger) ? glm::vec4(1.0f, 1.0f, 0.0f, 1.0f) : glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
             drawDebugSlope(this->globalTransformations, matrixPV, collider, color);
         }
-    }
+    }*/
 
 #endif
 
@@ -504,9 +505,18 @@ void SceneNode::PrivateDelete()
     {
         sphereCol->RemoveFromCollidersManager(sphereCol);
     }
+    if (auto slopeCol = this->GetGameObject()->GetComponent<cmp::SlopeCol>())
+    {
+        slopeCol->RemoveFromCollidersManager(slopeCol);
+    }
     if (auto scriptable = this->GetGameObject()->GetComponent<cmp::Scriptable>())
     {
         scriptable->Clear();
+    }
+    if (auto pointLight = this->GetGameObject()->GetComponent<cmp::PointLight>())
+    {
+        Scene::GetSceneInfo().shadowsManager->RemoveLight(this->GetGameObject().get());
+        pointLight->Destroy();
     }
 
     this->GetGameObject()->SetDestroyed();

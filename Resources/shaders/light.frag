@@ -64,9 +64,15 @@ uniform samplerCube depthMap[10];
 
 uniform vec4 u_TintColor;
 
-
+uniform float brightness;
+uniform float gamma;
+uniform float contrast;
 
 ///--------------------------------------------------------- CODE
+
+vec4 bright(vec4 colorIn, float brightnessVal);
+vec4 gam(vec4 colorIn, float gammaVal);
+vec4 cont(vec4 colorIn, float contrastVal);
 
 vec3 GetPointLight(TextureMaps textureMaps, PointLight pointLight);
 vec3 GetSpotLight(TextureMaps textureMaps, SpotLight sLight);
@@ -126,6 +132,10 @@ void main()
 	FragColor = vec4(pixelColor*0.2f,1.0);
     else
     	FragColor = vec4(pixelColor, 1.0f) * u_TintColor;
+
+    FragColor = bright(FragColor, brightness);
+    FragColor = cont(FragColor, contrast);
+    FragColor = gam(FragColor, gamma);
 }
 
 vec3 GetPointLight(TextureMaps textureMaps, PointLight pLight)
@@ -197,4 +207,20 @@ float ShadowCalculation(int id, vec3 lightPos)
     float shadow = currentDepth - 0.41 > closestDepth ? 0.0 : 1.0;
     
     return shadow;
+}
+
+vec4 bright(vec4 colorIn, float brightnessVal)
+{
+    return vec4(colorIn.x * brightnessVal, colorIn.y * brightnessVal, colorIn.z * brightnessVal, colorIn.a);
+}
+
+vec4 gam(vec4 colorIn, float gammaVal)
+{
+    return vec4(pow(colorIn.x, gammaVal), pow(colorIn.y, gammaVal), pow(colorIn.z, gammaVal), colorIn.a);
+}
+
+vec4 cont(vec4 colorIn, float contrastVal)
+{
+    float t = 0.5f - contrastVal * 0.5;
+    return vec4(colorIn.x * t, colorIn.y * t, colorIn.z * t, colorIn.a);
 }

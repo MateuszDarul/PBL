@@ -8,13 +8,20 @@ class PlayerGroundCheck : public Script
 {
 public:
 
+    enum class State
+    {
+        AIR, DEFAULT, STAIRS
+    };
+
+    State state;
+
     bool isGrounded = false;
 
     std::shared_ptr<cmp::Camera> player;
 
     void Start()
     {
-        
+        state = State::DEFAULT;
     }
 
     void Update(float dt)
@@ -34,6 +41,11 @@ public:
         if (!other->isTrigger && other->layer != CollisionLayer::Player)
         {
             isGrounded = true;
+
+            if (other->GetClassUUID() == 18) // if slope           
+                state = State::STAIRS;
+            else           
+                state = State::DEFAULT;
         }
     }
 

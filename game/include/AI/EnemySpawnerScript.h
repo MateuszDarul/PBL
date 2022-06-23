@@ -13,6 +13,7 @@ class EnemySpawnerScript : public Script
 private:
 
     std::vector<glm::vec3> wayPoints;
+    std::vector<cmp::Particles*> shadowParticles;
 
     CollidersManager* collidersManager;
     std::shared_ptr<ShaderComponent> displShader;
@@ -24,6 +25,30 @@ private:
     SceneNode* root;
 
 public:
+
+    float minimumTimePerSpawn = 43.0f;
+    float spawnTimer = -1.0f;
+
+    bool isActive = true;
+
+    void Deactivate()
+    {
+        isActive = false;
+        for (auto p : shadowParticles)
+            p->Stop();
+    }
+
+    void Activate()
+    {
+        isActive = true;
+        for (auto p : shadowParticles)
+            p->Play();
+    }
+
+    void AddParticleSystem(cmp::Particles* particles)
+    {
+        shadowParticles.push_back(particles);
+    }
 
     /**
     * @brief Konstruktor

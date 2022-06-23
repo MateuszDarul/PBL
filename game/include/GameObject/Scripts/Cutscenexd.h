@@ -34,6 +34,8 @@ public:
 private:
     std::shared_ptr<GameObject> darkGO;
     SoundPlayer* explode = new SoundPlayer("Resources/sounds/bigimpact.wav");
+    SoundPlayer* doorClose = new SoundPlayer("Resources/sounds/metalimpact.wav");
+    SoundPlayer* doorOpen = new SoundPlayer("Resources/sounds/dooropen.wav");
     std::shared_ptr<cmp::PointLight> dark;
     std::shared_ptr<GameObject> alarmLightGO1;
     std::shared_ptr<GameObject> alarmLightGO2;
@@ -63,6 +65,7 @@ private:
     
 
     bool hasStarted, hasFinished, lightUsed = false;
+    ModelComponent* alarmModel;
     
     bool isFadingOutAnimation = true;
     CutsceneStages currentStage = stage1;
@@ -84,8 +87,10 @@ public:
         hasFinished = false;
 
         if (enemy) enemyHealth = enemy->GetComponent<cmp::Scriptable>()->Get<Health>();
-        siren = new SoundPlayer("Resources/sounds/siren.wav");
+        siren = new SoundPlayer("Resources/sounds/emergency.wav");
         siren->SetVolume(0.2f);
+
+        alarmModel = gameObject->GetNode()->GetParent()->FindNode("CutscenexdAlarmGO")->GetGameObject()->GetComponent<cmp::Model>().get();
     }
 
     void Update(float dt)
@@ -96,6 +101,7 @@ public:
             if (phase2Timer <= 0)
             {
                 currentStage = stage3;
+                siren->SetVolume(0.6f);
                 siren->Play();
 
                 alarmLightGO1 = std::make_shared<GameObject>();
@@ -250,6 +256,7 @@ public:
                 shooter2->GetComponent<cmp::Scriptable>()->DisableAll();
                 dummy->GetComponent<cmp::Scriptable>()->Get<Health>()->DecreaseHealth(1000);
                 shootingDoor->GetComponent<cmp::Transform>()->Move(0, -6, 0);
+                doorClose->Play();
                 std::cout << shootingDoor->GetComponent<cmp::Transform>()->GetPosition().x << " " << shootingDoor->GetComponent<cmp::Transform>()->GetPosition().y << " " << shootingDoor->GetComponent<cmp::Transform>()->GetPosition().z << std::endl;
                 balls.clear();
             }
@@ -284,6 +291,7 @@ public:
                     gameObject->GetNode()->GetRoot()->FindNode("MAIN")->AddChild(doorBalls.back());
                 }
                 doorsToOpen->GetComponent<cmp::Transform>()->Move(0, 3, 0);
+                doorOpen->Play();
                 currentStage = stage7;
             }
         }
@@ -362,7 +370,6 @@ public:
     void EndCutscene()
     {
         hasFinished = true;
-        printf("Finished cutscene\n");
         AudioManager::ResumeQueue();
 
         lightCmp1->SetLightColor({0,1,0});
@@ -380,6 +387,8 @@ public:
         }
         doorBalls.clear();
         doorsToOpen->GetComponent<cmp::Transform>()->Move(0, 3, 0);
+        doorOpen->Play();
+        alarmModel->SetTintColor(0.01, 0.51, 0.01);
     }
 
     void TriggerEnter(std::shared_ptr<ColliderComponent> other) override
@@ -389,7 +398,6 @@ public:
             // Player entered trigger
             hasStarted = true;
             currentStage = stage2;
-            printf("Triggering cutscene...\n");
             gameObject->GetNode()->GetRoot()->FindNode("MAIN")->FindNode("Flashlight")->GetGameObject()->GetComponent<cmp::SpotLight>()->SetLightColor({1.0f, 0.0f, 1.0f});
 
             darkGO = std::make_shared<GameObject>();
@@ -410,6 +418,15 @@ public:
             camera->ShakeCamera(2.0f, 2.0f, 4.0f);
             generatorLight->SetPosition({ -999, -999, -999 });
 
+            alarmModel->SetTintColor(0.51, 0.01, 0.01);
         }
+    }
+
+    void turnOffLight()
+    {
+        lightCmp1->SetDamping(1.0f);
+        lightCmp1->SetPosition(glm::vec3(999.99f, 999.99f, 999.99f));
+        lightCmp2->SetDamping(1.0f);
+        lightCmp2->SetPosition(glm::vec3(999.99f, 999.99f, 999.99f));
     }
 };

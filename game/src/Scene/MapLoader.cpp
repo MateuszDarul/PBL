@@ -330,10 +330,17 @@ bool MapLoader::Load(
             std::shared_ptr<BoxCollider> boxCollider = nullptr;
             std::shared_ptr<SphereCollider> sphereCollider = nullptr;
 
+            CollisionLayer layer = CollisionLayer::Default;
+            if (type >= 10)
+            {
+                layer = CollisionLayer::Ignore;
+                type -= 10;
+            }
+
             switch(type)
             {
             case 0: /// BOX
-                gameObject->AddComponent(std::make_shared<BoxCollider>(false, true));
+                gameObject->AddComponent(std::make_shared<BoxCollider>(false, true, layer));
                 boxCollider = gameObject->GetComponent<BoxCollider>();
                 {
                     glm::vec3 size;
@@ -348,7 +355,7 @@ bool MapLoader::Load(
             break;
 
             case 1: /// SPHERE
-                gameObject->AddComponent(std::make_shared<SphereCollider>(false, true));
+                gameObject->AddComponent(std::make_shared<SphereCollider>(false, true, layer));
                 sphereCollider = gameObject->GetComponent<SphereCollider>();
                 {
                     float size;
@@ -361,7 +368,7 @@ bool MapLoader::Load(
             break;
 
             case 2: /// SLOPE
-                gameObject->AddComponent(std::make_shared<SlopeCollider>(false, true));
+                gameObject->AddComponent(std::make_shared<SlopeCollider>(false, true, layer));
                 {
                     auto slopeCollider = gameObject->GetComponent<SlopeCollider>();
 
@@ -406,41 +413,59 @@ bool MapLoader::Load(
         }
         else if (line == "Resource:")
         {
-            gameObject->AddComponent(std::make_shared<cmp::Name>("Resource " + std::to_string(resourceBoxCounter)));
-            resourceBoxCounter++;
+        gameObject->AddComponent(std::make_shared<cmp::Name>("Resource " + std::to_string(resourceBoxCounter)));
+        resourceBoxCounter++;
 
-            gameObject->GetComponent<cmp::Transform>()->SetScale(0.4);
+        gameObject->AddComponent(std::make_shared<BoxCollider>(true, true));
+        float y = gameObject->GetComponent<cmp::Transform>()->GetRotation().y;
+        glm::vec3 hitbox = glm::vec3(2.5, 2.5, 4.5);
+        if ((abs(y) < 135) && (abs(y) > 45)) hitbox = glm::vec3(4.5, 2.5, 2.5);
+        gameObject->GetComponent<cmp::BoxCol>()->SetLengths(hitbox);
+        gameObject->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
 
-            gameObject->AddComponent(std::make_shared<BoxCollider>(true, true));
-            gameObject->GetComponent<cmp::BoxCol>()->SetLengths({ 1.0, 1.0, 1.0 });
-            gameObject->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collisionManager);
+        auto model = std::make_shared<cmp::Model>();
+        model->Create(
+            resMan->GetMesh("Resources/models/ny/skrzynia2/skrzynia2/skrzynia2.obj"),
+            resMan->GetMaterial("Resources/models/ny/skrzynia2/skrzynia2/skrzynia2.mtl")
+        );
+        gameObject->AddComponent(model);
+        gameObject->AddComponent(shader);
 
-            auto model = std::make_shared<cmp::Model>();
-            model->Create(
-                resMan->GetMesh("Resources/models/Crate/Crate.obj"),
-                resMan->GetMaterial("Resources/models/Crate/Crate.mtl")
-            );
-            gameObject->AddComponent(model);
-            gameObject->AddComponent(shader);
+        gameObject->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        gameObject->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
 
-            gameObject->AddComponent(std::make_shared<cmp::FrustumCulling>());
-            gameObject->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/Crate/Crate.obj"));
+        auto resourceScript = new Resource();
+        gameObject->AddComponent(std::make_shared<cmp::Scriptable>());
+        gameObject->GetComponent<cmp::Scriptable>()->Add(resourceScript);
 
-            auto resourceScript = new Resource();
-            gameObject->AddComponent(std::make_shared<cmp::Scriptable>());
-            gameObject->GetComponent<cmp::Scriptable>()->Add(resourceScript);
+        std::string endOrAmount;
+        file >> endOrAmount;
+        line_id++;
+        if (endOrAmount.compare("END") == 0)
+        {
+            root->AddChild(gameObject);
+        }
+        else
+        {
+            resourceScript->energy = std::stoi(endOrAmount);
+        }
 
-            std::string endOrAmount;
-            file >> endOrAmount;
-            line_id++;
-            if (endOrAmount.compare("END") == 0)
-            {
-                root->AddChild(gameObject);
-            }
-            else
-            {
-                resourceScript->energy = std::stoi(endOrAmount);
-            }
+        auto emissiveGO = std::make_shared<GameObject>();
+        emissiveGO->AddComponent(std::make_shared<cmp::Transform>());
+        auto emissiveModel = std::make_shared<cmp::Model>();
+        emissiveModel->Create(
+            resMan->GetMesh("Resources/models/mirror2/mirror2emission.obj"),
+            resMan->GetMaterial("Resources/models/multitool/icon.mtl")
+        );
+        emissiveModel->SetTintColor(0.9, 0.9, 1.0);
+        emissiveGO->AddComponent(emissiveModel);
+        emissiveGO->AddComponent(shader_d);
+
+        emissiveGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
+        emissiveGO->GetComponent<cmp::FrustumCulling>()->Create(resMan->GetMesh("Resources/models/mirror2/mirror2emission.obj"));
+
+        root->AddChild(gameObject)->AddChild(emissiveGO);
+
         }
         else if (line == "Blueprints:")
         {
@@ -589,10 +614,16 @@ bool MapLoader::Load(
             gameObject->AddComponent(std::make_shared<cmp::Name>("bulb" + std::to_string(generatorCounter)));
 
             auto bulbModel = std::make_shared<cmp::Model>();
+            if(!isEnabled)
             bulbModel->Create(
                 resMan->GetMesh("Resources/models/Sphere/Sphere.obj"),
                 resMan->GetMaterial("Resources/models/wall/wall.mtl")
             );
+            else
+                bulbModel->Create(
+                    resMan->GetMesh("Resources/models/Cube/Cube.obj"),
+                    resMan->GetMaterial("Resources/models/multitool/icon.mtl")
+                );
             gameObject->AddComponent(bulbModel);
             gameObject->AddComponent(shader_d);
 
@@ -609,15 +640,21 @@ bool MapLoader::Load(
             //light->AddShader(shader_part_light);
             light->SetPosition(bulbPos);
             light->SetDamping(lightRange);
-            light->SetLightColor({ 0.8f, 0.8f, 1.0f });
-            shadowsManager->AddLight(lightGO.get());
             lightGO->AddComponent(std::make_shared<cmp::Name>("generatorLight"+std::to_string(generatorCounter)));
 
             if (!isEnabled)
             {
                 bulbModel->SetTintColor(0.4f, 0.4f, 0.8f);
                 light->SetPosition({ 999, 999, 999 });
+                light->SetLightColor({ 0.8f, 0.8f, 1.0f });
             }
+            else
+            {
+                light->SetLightColor({ 1.0f, 0.9f, 0.85f });
+                bulbModel->SetTintColor(0.8f, 0.7f, 0.55f);
+            }
+
+            shadowsManager->AddLight(lightGO.get());
 
             gameObject->AddComponent(std::make_shared<cmp::Scriptable>());
 
@@ -719,8 +756,9 @@ bool MapLoader::Load(
                 sParticles->SetParticleLifetime(lifeTime);
                 sParticles->SetScale(0.25f, 0.25f);
                 sParticles->SetColor({ 1.0f, 1.0f, 1.0f,   1.0f }, { 1.0f, 1.0f, 1.0f,   1.0f });
-                sParticles->SetForce({ 0.0f, -0.01f, 0.0f });
+                sParticles->SetForce({ 0.0f, 0.0f, 0.0f });
                 root->AddChild(sParticlesGO);
+                spawnerScript->AddParticleSystem(sParticles.get());
             }
             scriptHolder->Add(spawnerScript);
 

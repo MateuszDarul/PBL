@@ -2,7 +2,7 @@
 
 #include "Components.h"
 #include "GameManager.h"
-
+#include "AudioManager.h"
 
 
 class MultiToolController : public Script
@@ -25,7 +25,7 @@ public:
 
     //for public read
     bool isFlashlightOn = false;
-    float maxFlashlightCharge = 10.0f; //10 seconds
+    float maxFlashlightCharge = 20.0f; //20 seconds
     float currentFlashlightCharge;
 
     //
@@ -34,6 +34,8 @@ public:
 private:
 
     float disabledIconsOffset = 0.1f;
+    bool manuallyTurnedOn = false;
+    bool turnedOffMusic = false;
 
 public:
 
@@ -44,10 +46,9 @@ public:
         for (int i = 0; i < 3; i++)
         {
             // 'disabling' icons
-            iconsGO[i]->GetComponent<cmp::Transform>()->Move(0.0f, 0.0f, -disabledIconsOffset);
+            Lock(i);
         }
     }
-bool manuallyTurnedOn = false;
     void Update(float dt)
     {
         if (Input()->Keyboard()->OnPressed(KeyboardKey::T) && !gm->immortal)
@@ -58,7 +59,7 @@ bool manuallyTurnedOn = false;
 
         if (lightSourcesInRange > 0) 
         {
-            currentFlashlightCharge += 1.618f * dt;
+            currentFlashlightCharge += 2.71828f * dt;
             if (!manuallyTurnedOn) isFlashlightOn = false;
             
             
@@ -70,10 +71,22 @@ bool manuallyTurnedOn = false;
 
         if (currentFlashlightCharge < 0.00001f)
         {
+            if (isFlashlightOn)
+            {
+                AudioManager::FadeOutMusic(3.0f);
+                turnedOffMusic = true;
+            }
+
             currentFlashlightCharge = 0.0f;
             isFlashlightOn = false;
             manuallyTurnedOn = false;
         }
+        else if (turnedOffMusic && (currentFlashlightCharge > 0.5f * maxFlashlightCharge))
+        {
+            turnedOffMusic = false;
+            AudioManager::FadeInMusic(4.0f);
+        }
+
 
         if (isFlashlightOn && !gm->immortal)
         {
@@ -114,6 +127,25 @@ bool manuallyTurnedOn = false;
 
     void Unlock(int index)
     {
-        iconsGO[index]->GetComponent<cmp::Transform>()->Move(0.0f, 0.0f, disabledIconsOffset);
+        auto pos = iconsGO[index]->GetComponent<cmp::Transform>()->GetPosition();
+        pos.z = 0.0f;
+        iconsGO[index]->GetComponent<cmp::Transform>()->SetPosition(pos);
+    }
+
+    void Lock(int index)
+    {
+        auto pos = iconsGO[index]->GetComponent<cmp::Transform>()->GetPosition();
+        pos.z = -disabledIconsOffset;
+        iconsGO[index]->GetComponent<cmp::Transform>()->SetPosition(pos);
+    }
+
+    bool IsFlashlightOn()
+    {
+        return isFlashlightOn;
+    }
+
+    int GetlightSourcesInRange()
+    {
+        return lightSourcesInRange;
     }
 };

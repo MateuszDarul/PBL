@@ -16,6 +16,19 @@ CameraComponent::~CameraComponent()
 
 }
 
+void CameraComponent::RestartMovement(const glm::vec3& pos, const glm::vec2& rot)
+{
+    SetPosition(pos);
+    SetRotation(rot.x, rot.y);
+    verticalVelocity = 0.0f;
+}
+
+void CameraComponent::RestartMovement(float x, float y, float z, float pitch, float yaw)
+{
+    RestartMovement({ x, y, z }, { pitch, yaw });
+}
+
+
 void CameraComponent::UpdateVectors()
 {
     float combinedYaw = yaw + yawOffset;
@@ -93,20 +106,19 @@ static float bobAmount = 0.034909f;
 static float bobSpeed = 12.3f;
 const glm::mat4& CameraComponent::GetView()
 {
-    glm::vec3 newUp = up;
     glm::vec3 newFront = front;
 
     if (shakeTimer > 0.0f)
     {
         float s = sin(GameApplication::GetTotalElapsedTime() * shakeSpeed) * shakeAmount;
-        newUp = glm::rotate(this->up, 0.69f * s, this->front);
+        float c = cos(GameApplication::GetTotalElapsedTime() * shakeSpeed * 5.0f) * shakeAmount * 0.2f;
         newFront = glm::rotate(this->front, s, this->right);
-        newFront = glm::rotate(newFront, -0.3f * s, glm::vec3(0.0f, 1.0f, 0.0f));
+        newFront = glm::rotate(newFront, c, glm::vec3(0.0f, 1.0f, 0.0f));
     }
 
     if(this->needUpdate)
     {
-        this->view = glm::lookAt(this->position, this->position + newFront, newUp);
+        this->view = glm::lookAt(this->position, this->position + newFront, up);
     }
     viewcopy = this->view;
 
@@ -184,6 +196,7 @@ void CameraComponent::Update(InputManager* inputManager, const float& deltaTime)
 
     if (!isGrounded)
     {
+        if (deltaTime < 0.1618f)
         verticalVelocity += gravity * deltaTime;
         verticalVelocity = std::max(verticalVelocity, gravity);
     }

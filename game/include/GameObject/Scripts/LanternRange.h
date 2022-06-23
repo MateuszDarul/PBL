@@ -9,6 +9,7 @@ class LanternRange : public Script
 {
 public:
 	std::vector<Turret*> turretsInRange;
+	std::vector<Turret*> turretsActivated;
 
 	GameObject* playerInRange;
 	
@@ -21,6 +22,7 @@ private:
 
 	bool isTurnedOn = false;
 	SoundPlayer* buzzingSFX = nullptr;
+	SoundPlayer* switchSFX = nullptr;
 
 public:
 	void Start() override;
@@ -29,7 +31,8 @@ public:
 	void ChangeLightPower(bool enabled);
 	
 	bool IsInRange(Turret* turret);
-	bool HasLineOfSight(Turret* turret);
+	bool IsBeingPoweredBy(Turret* turret);
+	bool IsTurnedOn() const { return isTurnedOn; }
 
 	void TriggerEnter(std::shared_ptr<ColliderComponent> collider) override;
 	void TriggerExit(std::shared_ptr<ColliderComponent> collider) override;

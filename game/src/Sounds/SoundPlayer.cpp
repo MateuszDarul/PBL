@@ -1,11 +1,15 @@
 #include "SoundPlayer.h"
 #include "AudioManager.h"
 
+#include "Scene.h"
+#include "CameraComponent.h"
+
 #include <AL/alext.h>
 #include "stdlib.h"
 #include <sndfile.h>
 #include "limits.h"
 
+#include <glm/gtx/rotate_vector.hpp>
 
 SoundPlayer::SoundPlayer(const char* filename)
 {
@@ -34,6 +38,20 @@ void SoundPlayer::Play()
 	}
 
 	AudioManager::StopFadeOut(this);
+}
+
+void SoundPlayer::Play3D(const glm::vec3& soundPos)
+{
+	CameraComponent* camera = Scene::GetSceneInfo().cameraGO->GetComponent<cmp::Camera>().get();
+
+	glm::vec3 playerPos = camera->GetPosition();
+	float playerRot = glm::radians(camera->GetYaw() - 90.0f);
+	
+	glm::vec3 pos = playerPos - soundPos;
+	pos = glm::rotate(pos, playerRot, glm::vec3(0.0f, 1.0f, 0.0f));
+	
+	SetPosition(pos.x, pos.y, pos.z);
+	Play();
 }
 
 void SoundPlayer::Stop()

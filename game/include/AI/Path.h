@@ -27,8 +27,8 @@ public:
     {
         m_WayPoints.clear();
 
-        m_WayPoints.push_back(glm::vec3(-100.0f, 2.5f, 25.0f));
-        m_WayPoints.push_back(glm::vec3(-100.0f, 2.5f, 40.0f));
+        m_WayPoints.push_back(glm::vec3(-100.0f, 2.5f, 15.0f));
+        m_WayPoints.push_back(glm::vec3(-100.0f, 2.5f, 36.0f));
 
         curWaypoint = m_WayPoints.begin();
     }

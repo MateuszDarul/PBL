@@ -48,6 +48,7 @@ private:
     bool isPaused;
 
     void LoadLevelTutorial(const SceneInfo& sceneInfo);
+    void LoadLevel1(const SceneInfo& sceneInfo);
     void LoadLevelPuzzle1(const SceneInfo& sceneInfo);
 
 public:
@@ -73,6 +74,13 @@ public:
     SceneNode* GetWorldNode();
     CollidersManager* GetCollidersManager();
 
+    static const SceneInfo& GetSceneInfo();
+    void SafeSwitchLevel(int newLevelIndex = -1);
+
+private:
+    void SwitchLevel(int newLevelIndex);
+    int currentLevelIndex;
+    int newLevelToSwitch;
 };
 
 #endif // __SCENE_H__

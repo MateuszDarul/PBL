@@ -2,6 +2,8 @@
 #define __SOUND_PLAYER_H__
 
 #include <AL/al.h>
+#include <glm/vec3.hpp>
+
 
 class SoundPlayer
 {
@@ -10,6 +12,7 @@ public:
 	~SoundPlayer();
 
 	void Play();
+	void Play3D(const glm::vec3& soundPos);
 	void Stop();
 	void Pause();
 	void Resume();

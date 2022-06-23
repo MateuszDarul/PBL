@@ -172,25 +172,74 @@ bool SphereCollider::CheckCollision(std::shared_ptr<ColliderComponent> collider)
 	else if (collider->GetClassUUID() == 18)
 	{
 		std::shared_ptr<SlopeCollider> other = std::dynamic_pointer_cast<SlopeCollider>(collider);
-
+		
+		float dot = glm::dot(thisPos - otherPos, other->GetNormal());
 		const auto& dim = other->GetDimensions();
+
+		if (dot < 0.0f)
+		{
+			// act like a box
+			float otherMinX = otherPos.x - dim.x * 0.5f;
+			float otherMaxX = otherPos.x + dim.x * 0.5f;
+			float otherMinY = otherPos.y - dim.y * 0.5f;
+			float otherMaxY = otherPos.y + dim.y * 0.5f;
+			float otherMinZ = otherPos.z - dim.z * 0.5f;
+			float otherMaxZ = otherPos.z + dim.z * 0.5f;
+
+			float thisRadius = this->GetRadius();
+			glm::vec3 closer = {
+				Clamp(thisPos.x, otherMinX, otherMaxX),
+				Clamp(thisPos.y, otherMinY, otherMaxY),
+				Clamp(thisPos.z, otherMinZ, otherMaxZ) };
+			float distance = glm::distance(closer, thisPos);
+			if (distance < thisRadius)
+			{
+				if (!this->isTrigger)
+				{
+					glm::vec3 thisMoveVec = { 0.0f,0.0f,0.0f };
+					glm::vec3 otherMoveVec = { 0.0f,0.0f,0.0f };
+					if (closer == thisPos)
+					{
+						float array[] = { glm::abs(thisPos.x - otherMinX + thisRadius), glm::abs(otherMaxX - thisPos.x + thisRadius),
+							glm::abs(thisPos.z - otherMinZ + thisRadius), glm::abs(otherMaxZ - thisPos.z + thisRadius),
+							glm::abs(thisPos.y - otherMinY + thisRadius), glm::abs(otherMaxY - thisPos.y + thisRadius) };
+						GetSeparationVectors(array, otherMoveVec, thisMoveVec);
+					}
+					else
+					{
+						glm::vec3 moveVec = glm::normalize(thisPos - closer) * (thisRadius - distance);
+						thisMoveVec = moveVec;
+						otherMoveVec = -moveVec;
+					}
+
+					thisTransform->SetPosition(thisTransform->GetPosition() + thisMoveVec);
+					thisModelMat[3][0] += thisMoveVec.x;
+					thisModelMat[3][1] += thisMoveVec.y;
+					thisModelMat[3][2] += thisMoveVec.z;
+					this->GetOwner()->GetNode()->SetGlobalTransformations(thisModelMat);
+
+				}
+				return true;
+			}
+		}
+
+		
 		if ((thisPos.x < otherPos.x + dim.x *.5f && thisPos.x > otherPos.x - dim.x * .5f)
 		&&  (thisPos.y - this->radius < otherPos.y + dim.y *.5f && thisPos.y + this->radius > otherPos.y - dim.y * .5f)
 		&&  (thisPos.z < otherPos.z + dim.z *.5f && thisPos.z > otherPos.z - dim.z * .5f))
 		{
-			float distance = glm::dot(thisPos - otherPos, other->GetNormal());
 
 			float moveAmount;
 			bool shouldMove;
 
-			if (distance < 0.0f) // we are under the slope
+			if (dot < 0.0f) // we are under the slope
 			{
-				moveAmount = distance + this->radius;
+				moveAmount = dot + this->radius;
 				shouldMove = moveAmount > 0.0f;
 			}
 			else //we are above the slope
 			{
-				moveAmount = distance - this->radius;
+				moveAmount = dot - this->radius;
 				shouldMove = moveAmount < 0.0f;
 			}
 
@@ -235,7 +284,7 @@ bool SphereCollider::RayCollision(const glm::vec3& origin, const glm::vec3& dir,
 {
 	hitInfo.distance = maxDistance;
 
-	auto center = GetOwner()->GetComponent<TransformComponent>()->GetPosition() + offset;
+	auto center = GetOwner()->GetNode()->GetGlobalPosition() + offset;
 	float r2 = radius*radius;
 	if (glm::distance2(center, origin) <= r2) return false;
 

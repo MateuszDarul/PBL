@@ -8,7 +8,7 @@
 class LightActivator : public Script
 {
 public:
-
+    
     cmp::Model* bulbModel;
     cmp::PointLight* lightComponent;
     LanternRange* range;
@@ -66,7 +66,7 @@ public:
 
     void Activate()
     {
-        if (!isShutdown)
+        if (!isAlwaysLit && !isShutdown)
         {
             if (isPrimed) //on power on
             {

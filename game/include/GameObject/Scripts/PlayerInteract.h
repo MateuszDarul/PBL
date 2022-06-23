@@ -112,7 +112,8 @@ public:
                         //else 
                         if (shouldInteract)
                         {
-                            shouldInteract = false;
+                            shouldInteract = false;                            
+                            
 
                             selectedMirror = mirror;
                             selectedMirror->SetEnabled(true);
@@ -148,6 +149,18 @@ public:
                     }
                 }
             }
+            //else
+            //{
+            //    auto nameCmp = hit.gameObject->GetComponent<cmp::Name>();
+            //
+            //    if (nameCmp) std::cout << nameCmp->Get() << " - interact\n";
+            //    if (auto bc = hit.gameObject->GetComponent<cmp::BoxCol>())
+            //    {
+            //        auto p = hit.gameObject->GetComponent <cmp::Transform>()->GetPosition();
+            //        std::cout << bc->GetLengths().x << " " << bc->GetLengths().y << " " << bc->GetLengths().z << "\n";
+            //        std::cout << p.x << " " << p.y << " " << p.z << "\n";
+            //    }
+            //}
         }
         if (showTooltip)
         {
@@ -159,7 +172,6 @@ public:
 
         if (selectedMirror)
         {
-            textTEMP->SetText("<>");
             placeTurretScript->isLookingAtMirror = true;
             mirrorControlsText->GetComponent<TransformComponent>()->SetScale(0.07f);
 
@@ -180,7 +192,17 @@ public:
                 }
 
                 // when looking away (inverted rotation) - cursor red; when no inverted rotation - green
-                textTEMP->color = (mirrorRotInversion < 0 ? glm::vec3(1.0f, 0.0f, 0.0f) : glm::vec3(0.0f, 1.0f, 0.0f));
+                if (mirrorRotInversion < 0)
+                {
+                    textTEMP->SetText("><");
+                    textTEMP->color = glm::vec3(1.0f, 0.0f, 0.0f);
+                }
+                else
+                {
+                    textTEMP->SetText("<>");
+                    textTEMP->color = glm::vec3(0.0f, 1.0f, 0.0f);
+                }
+                 
                 
                 selectedMirror->disableMouseRotation = isLmbReleased;
                 selectedMirror->invertRotationY_temp = mirrorRotInversion;

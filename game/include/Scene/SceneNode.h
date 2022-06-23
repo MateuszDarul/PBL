@@ -43,9 +43,9 @@ private:
         SceneNode* child;
     };
     static std::vector<NodeToDelete> nodesToDelete;
-    void DeleteNodes();
     void PrivateDelete();
 public:
+    void DeleteNodes();
     static Frustum cameraFrustum; //!< Ostroslup widzenia kamery.
     /** @brief Tworzy nowy wezel.
      * @param gameObject - Wskazanie na GameObject nowego wezla.

@@ -27,6 +27,7 @@ void ScriptComponent::Clear()
     for (int i = 0; i < m_ScriptInstances.size(); i++)
     {
         delete m_ScriptInstances[i];
+        m_ScriptInstances[i] = nullptr;
     }
 }
 #include "GameObject.h"
@@ -49,7 +50,7 @@ void ScriptComponent::OnUpdate(float dt)
 {
     for (Script* s : m_ScriptInstances)
     {
-        if (s->enabled)
+        if (s != nullptr && s->enabled)
             s->Update(dt);
     }
 }

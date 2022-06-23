@@ -5,6 +5,7 @@
 #include "GameObject.h"
 #include "SceneNode.h"
 #include "ColliderComponent.h"
+#include "SoundPlayer.h"
 #include "Scene.h"
 #include "Turret.h"
 #include "TurretRange.h"
@@ -29,6 +30,9 @@ private:
 	}
 
 	std::shared_ptr<ParticleComponent> muzzleParticles;
+
+	SoundPlayer* shootSFX;
+
 public:
 	float damage = 10.0f;
 	float shootCd = 1.0f;
@@ -55,6 +59,13 @@ public:
 
 			gameObject->AddComponent(muzzleParticles);
 		}
+
+		if (!shootSFX) shootSFX = new SoundPlayer("Resources/sounds/turretshoot.wav");
+	}
+
+	~TurretShoot()
+	{
+		if (shootSFX) delete shootSFX;
 	}
 
 	void Update(float dt)
@@ -79,6 +90,10 @@ public:
 					muzzleParticles->Burst();
 					turretRange->enemies[0]->DecreaseHealth(damage);
 					shootTimer = 0.0f;
+
+					float pitch = 0.8f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.4f)));
+					shootSFX->SetPitch(pitch);
+					shootSFX->Play3D(gameObject->GetNode()->GetGlobalPosition());
 				}
 			}
 		}

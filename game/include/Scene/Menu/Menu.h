@@ -2,6 +2,7 @@
 #define __MENU_H__
 
 #include "SceneNode.h"
+#include "AudioManager.h"
 
 class MenuScene
 {
@@ -112,6 +113,7 @@ void ChangeMenu(std::string newMenu);
 class MainMenu :public MenuScene
 {
 public:
+
     MainMenu()
     {
         PrepareMenu();
@@ -120,10 +122,13 @@ public:
 
         shader_d = std::make_shared<ShaderComponent>();
         shader_d->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
+        shader_d->Use();
+        shader_d->SetFloat("brightness", GameApplication::GetBright());
+        shader_d->SetFloat("gamma", GameApplication::GetGamma());
+        shader_d->SetFloat("contrast", GameApplication::GetContrast());
 
         std::shared_ptr<GameObject> go;
         std::shared_ptr<cmp::Model> mc;
-
 
         go = std::make_shared<GameObject>();
         mc = std::make_shared<cmp::Model>();
@@ -134,10 +139,69 @@ public:
         go->AddComponent(mc);
         go->AddComponent(shader_d);
         go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(0.0, 0.0, -3.0);
+        go->GetComponent<cmp::Transform>()->SetPosition(1.0, 1.5, -3.0);
         go->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
         go->GetComponent<cmp::BoxCol>()->SetLengths(glm::vec3(2, 0.6, 10));
         go->AddComponent(std::make_shared<cmp::Name>("Menu_b1"));
+        menu->AddChild(go);
+
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Button.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_SETTINGS.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(1.0, 0.5, -3.0);
+        go->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
+        go->GetComponent<cmp::BoxCol>()->SetLengths(glm::vec3(2, 0.6, 10));
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_b2"));
+        menu->AddChild(go);
+
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Button.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_CREDITS.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(1.0, -0.5, -3.0);
+        go->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
+        go->GetComponent<cmp::BoxCol>()->SetLengths(glm::vec3(2, 0.6, 10));
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_b4"));
+        menu->AddChild(go);
+
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Button.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_EXIT.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(1.0, -1.5, -3.0);
+        go->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
+        go->GetComponent<cmp::BoxCol>()->SetLengths(glm::vec3(2, 0.6, 10));
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_b3"));
+        menu->AddChild(go);
+
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Cursor.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_LOGO.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(-1.5, 0.0f, -3.0);
+        go->GetComponent<cmp::Transform>()->SetScale(25.0f);
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_logo"));
         menu->AddChild(go);
         ///***
         FinishMenu();
@@ -156,16 +220,34 @@ public:
             if(menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
                 menu->FindNode("Menu_b1")->GetGameObject()->GetComponent<cmp::BoxCol>()))
             {
+                ChangeMenu("LevelsMenu");
+            }
+
+            else if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
+                menu->FindNode("Menu_b2")->GetGameObject()->GetComponent<cmp::BoxCol>()))
+            {
                 ChangeMenu("SettingsMenu");
+            }
+
+            else if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
+                menu->FindNode("Menu_b3")->GetGameObject()->GetComponent<cmp::BoxCol>()))
+            {
+                glfwSetWindowShouldClose(GameApplication::GetWindow(), GLFW_TRUE);
+            }
+
+            else if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
+                menu->FindNode("Menu_b4")->GetGameObject()->GetComponent<cmp::BoxCol>()))
+            {
+                ChangeMenu("CreditsMenu");
             }
         }
     }
 };
 
-class SettingsMenu :public MenuScene
+class LevelsMenu :public MenuScene
 {
 public:
-    SettingsMenu()
+    LevelsMenu()
     {
         PrepareMenu();
         ///***
@@ -173,6 +255,10 @@ public:
 
         shader_d = std::make_shared<ShaderComponent>();
         shader_d->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
+        shader_d->Use();
+        shader_d->SetFloat("brightness", GameApplication::GetBright());
+        shader_d->SetFloat("gamma", GameApplication::GetGamma());
+        shader_d->SetFloat("contrast", GameApplication::GetContrast());
 
         std::shared_ptr<GameObject> go;
         std::shared_ptr<cmp::Model> mc;
@@ -211,7 +297,7 @@ public:
         FinishMenu();
     }
 
-    ~SettingsMenu()
+    ~LevelsMenu()
     {
         
     }
@@ -235,12 +321,351 @@ public:
     }
 };
 
+class SettingsMenu :public MenuScene
+{
+public:
+    SettingsMenu()
+    {
+        PrepareMenu();
+        ///***
+        ResourceManager* resMan = GameApplication::GetResourceManager();
+
+        shader_d = std::make_shared<ShaderComponent>();
+        shader_d->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
+        shader_d->Use();
+        shader_d->SetFloat("brightness", GameApplication::GetBright());
+        shader_d->SetFloat("gamma", GameApplication::GetGamma());
+        shader_d->SetFloat("contrast", GameApplication::GetContrast());
+
+        std::shared_ptr<GameObject> go;
+        std::shared_ptr<cmp::Model> mc;
+
+        //bright
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Button.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_BRIGHT.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(0.0, 1.5, -3.0);
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_BrightText"));
+        menu->AddChild(go);
+
+        //add bright
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Cursor.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_ADD.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(1.2, 1.5, -3.0);
+        go->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
+        go->GetComponent<cmp::BoxCol>()->SetLengths(glm::vec3(0.6, 0.6, 10));
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_brightnessAdd"));
+        menu->AddChild(go);
+
+        //sub bright
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Cursor.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_SUB.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(-1.2, 1.5, -3.0);
+        go->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
+        go->GetComponent<cmp::BoxCol>()->SetLengths(glm::vec3(0.6, 0.6, 10));
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_brightnessSub"));
+        menu->AddChild(go);
+
+        //gamma
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Button.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_GAMMA.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(0.0, 0.5, -3.0);
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_GammaText"));
+        menu->AddChild(go);
+
+        //add gamma
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Cursor.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_ADD.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(1.2, 0.5, -3.0);
+        go->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
+        go->GetComponent<cmp::BoxCol>()->SetLengths(glm::vec3(0.6, 0.6, 10));
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_gammaAdd"));
+        menu->AddChild(go);
+
+        //sub gamma
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Cursor.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_SUB.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(-1.2, 0.5, -3.0);
+        go->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
+        go->GetComponent<cmp::BoxCol>()->SetLengths(glm::vec3(0.6, 0.6, 10));
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_gammaSub"));
+        menu->AddChild(go);
+
+        //contrast
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Button.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_CONTRAST.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(0.0, -0.5, -3.0);
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_ContrastText"));
+        menu->AddChild(go);
+
+        //add contrast
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Cursor.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_ADD.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(1.2, -0.5, -3.0);
+        go->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
+        go->GetComponent<cmp::BoxCol>()->SetLengths(glm::vec3(0.6, 0.6, 10));
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_contrastAdd"));
+        menu->AddChild(go);
+
+        //sub contrast
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Cursor.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_SUB.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(-1.2, -0.5, -3.0);
+        go->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
+        go->GetComponent<cmp::BoxCol>()->SetLengths(glm::vec3(0.6, 0.6, 10));
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_contrastSub"));
+        menu->AddChild(go);
+
+        //music
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Cursor.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_SPEAKER.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(2.0, 1.5, -3.0);
+        go->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
+        go->GetComponent<cmp::BoxCol>()->SetLengths(glm::vec3(0.6, 0.6, 10));
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_music"));
+        if (AudioManager::IsMusicPlaying()) mc->SetTintColor(1.0f, 1.0f, 1.0f);
+        else mc->SetTintColor(0.5f, 0.5f, 0.5f);
+        menu->AddChild(go);
+
+        //go back
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Button.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_BACK.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(0.0, -1.5, -3.0);
+        go->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
+        go->GetComponent<cmp::BoxCol>()->SetLengths(glm::vec3(2, 0.6, 10));
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_back"));
+        menu->AddChild(go);
+        ///***
+        FinishMenu();
+    }
+
+    ~SettingsMenu()
+    {
+
+    }
+
+    void Update()
+    {
+        UpdateMenu();
+        if (GameApplication::GetInputManager()->Mouse()->OnPressed(MouseButton::Left_MB))
+        {
+            if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
+                menu->FindNode("Menu_brightnessAdd")->GetGameObject()->GetComponent<cmp::BoxCol>()))
+            {
+                GameApplication::SetBright(GameApplication::GetBright() + 0.1f);
+            }
+            else 
+            if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
+                menu->FindNode("Menu_brightnessSub")->GetGameObject()->GetComponent<cmp::BoxCol>()))
+            {
+                GameApplication::SetBright(GameApplication::GetBright() - 0.1f);
+            }
+            else 
+            if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
+                menu->FindNode("Menu_gammaAdd")->GetGameObject()->GetComponent<cmp::BoxCol>()))
+            {
+                GameApplication::SetGamma(GameApplication::GetGamma() + 0.1f);
+            }
+            else
+            if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
+                menu->FindNode("Menu_gammaSub")->GetGameObject()->GetComponent<cmp::BoxCol>()))
+            {
+                GameApplication::SetGamma(GameApplication::GetGamma() - 0.1f);
+            }
+            else
+            if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
+                menu->FindNode("Menu_contrastAdd")->GetGameObject()->GetComponent<cmp::BoxCol>()))
+            {
+                GameApplication::SetContrast(GameApplication::GetContrast() + 0.1f);
+                std::cout << GameApplication::GetContrastWithMod() << std::endl;
+            }
+            else
+            if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
+                menu->FindNode("Menu_contrastSub")->GetGameObject()->GetComponent<cmp::BoxCol>()))
+            {
+                GameApplication::SetContrast(GameApplication::GetContrast() - 0.1f);
+            }
+            else
+            if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
+                menu->FindNode("Menu_music")->GetGameObject()->GetComponent<cmp::BoxCol>()))
+            {
+                AudioManager::ToggleMusic();
+                auto mc = menu->FindNode("Menu_music")->GetGameObject()->GetComponent<cmp::Model>();
+                if (AudioManager::IsMusicPlaying()) mc->SetTintColor(1.0f, 1.0f, 1.0f);
+                else mc->SetTintColor(0.5f, 0.5f, 0.5f);
+            }
+            else 
+            if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
+                menu->FindNode("Menu_back")->GetGameObject()->GetComponent<cmp::BoxCol>()))
+            {
+                ChangeMenu("MainMenu");
+            }
+        }
+    }
+};
+
+class CreditsMenu :public MenuScene
+{
+public:
+    CreditsMenu()
+    {
+        PrepareMenu();
+        ///***
+        ResourceManager* resMan = GameApplication::GetResourceManager();
+
+        shader_d = std::make_shared<ShaderComponent>();
+        shader_d->Create("Resources/shaders/default.vert", "Resources/shaders/default.frag");
+        shader_d->Use();
+        shader_d->SetFloat("brightness", GameApplication::GetBright());
+        shader_d->SetFloat("gamma", GameApplication::GetGamma());
+        shader_d->SetFloat("contrast", GameApplication::GetContrast());
+
+        std::shared_ptr<GameObject> go;
+        std::shared_ptr<cmp::Model> mc;
+
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Cursor.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_CREDITSTEXT.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(0.0, 0.5f, -3.0);
+        go->GetComponent<cmp::Transform>()->SetScale(15.0f);
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_creditsText"));
+        menu->AddChild(go);
+
+        go = std::make_shared<GameObject>();
+        mc = std::make_shared<cmp::Model>();
+        mc->Create(
+            resMan->GetMesh("Resources/models/menu/Button.obj"),
+            resMan->GetMaterial("Resources/models/menu/Button_BACK.mtl")
+        );
+        go->AddComponent(mc);
+        go->AddComponent(shader_d);
+        go->AddComponent(std::make_shared<cmp::Transform>());
+        go->GetComponent<cmp::Transform>()->SetPosition(0.0, -1.5, -3.0);
+        go->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
+        go->GetComponent<cmp::BoxCol>()->SetLengths(glm::vec3(2, 0.6, 10));
+        go->AddComponent(std::make_shared<cmp::Name>("Menu_b2"));
+        menu->AddChild(go);
+        ///***
+        FinishMenu();
+    }
+
+    ~CreditsMenu()
+    {
+
+    }
+
+    void Update()
+    {
+        UpdateMenu();
+        if (GameApplication::GetInputManager()->Mouse()->OnPressed(MouseButton::Left_MB))
+        {
+            if (menu->FindNode("CURSOR")->GetGameObject()->GetComponent<cmp::BoxCol>()->CheckCollision(
+                menu->FindNode("Menu_b2")->GetGameObject()->GetComponent<cmp::BoxCol>()))
+            {
+                ChangeMenu("MainMenu");
+            }
+        }
+    }
+};
+
 void ChangeMenu(std::string newMenu)
 {
-    if(newMenu == "SettingsMenu")
+    if(newMenu == "LevelsMenu")
+    {
+        delete GameApplication::s_Menu;
+        GameApplication::s_Menu = new LevelsMenu();
+    }
+    else if (newMenu == "SettingsMenu")
     {
         delete GameApplication::s_Menu;
         GameApplication::s_Menu = new SettingsMenu();
+    }
+    else if (newMenu == "CreditsMenu")
+    {
+        delete GameApplication::s_Menu;
+        GameApplication::s_Menu = new CreditsMenu();
     }
     else
     {
