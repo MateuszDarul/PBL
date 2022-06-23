@@ -75,6 +75,7 @@ float ShadowCalculation(int id, vec3 lightPos);
 void main()
 {
     TextureMaps tm;
+    bool dark = false;
     tm.colorMAP = texture(diffuseMapData, vertexTexture).rgb;
     tm.specularMAP = texture(specularMapData, vertexTexture).rgb;
     tm.normalMAP = normalize(mat3(transpose(inverse(modelTransformations))) * normalVEC);
@@ -92,6 +93,8 @@ void main()
             vec3 col = GetPointLight(tm, pointLight[i]);
             if(col.x > 0.02 || col.y > 0.02 || col.z > 0.02)
                 pixelColor += col;
+	    else if (col == vec3(-1.0,-1.0,-1.0))
+		dark = true;
         }
 
         
@@ -118,15 +121,20 @@ void main()
     }
 
     pixelColor += tm.colorMAP * 0.07;
-    
-    FragColor = vec4(pixelColor, 1.0f) * u_TintColor;
+
+    if(dark && pixelColor.x < (tm.colorMAP + tm.colorMAP*0.07).x && pixelColor.y < (tm.colorMAP + tm.colorMAP*0.07).y && pixelColor.z < (tm.colorMAP + tm.colorMAP*0.07).z)
+	FragColor = vec4(pixelColor*0.2f,1.0);
+    else
+    	FragColor = vec4(pixelColor, 1.0f) * u_TintColor;
 }
 
 vec3 GetPointLight(TextureMaps textureMaps, PointLight pLight)
 {
-	float distance = length(pLight.position - fragPos);
-	float attenuation = 1 - pow(distance * pLight.distance, 5.0);
-	if (attenuation < 0.0001) return vec3(0.0, 0.0, 0.0);
+    if (pLight.lightColor == vec3(0.0,0.0,0.0)) return vec3(-1.0,-1.0,-1.0);
+
+    float distance = length(pLight.position - fragPos);
+    float attenuation = 1 - pow(distance * pLight.distance, 5.0);
+    if (attenuation < 0.0001) return vec3(0.0, 0.0, 0.0);
 
     vec3 viewDir = normalize(cameraPos - fragPos);
 

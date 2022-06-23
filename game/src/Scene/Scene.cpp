@@ -130,7 +130,8 @@ Scene::Scene()
     go->AddComponent(std::make_shared<cmp::Transform>());
     go->AddComponent(std::make_shared<NameComponent>("CAMERA"));
     go->AddComponent(std::make_shared<CameraComponent>());
-    go->GetComponent<cmp::Camera>()->Create(glm::vec3(-4,4.5,10)); // spawn room 0
+    //go->GetComponent<cmp::Camera>()->Create(glm::vec3(-4,4.5,10)); // spawn room 0
+    go->GetComponent<cmp::Camera>()->Create(glm::vec3(-67,4.5,60));
     // go->GetComponent<cmp::Camera>()->Create(glm::vec3(-80.0f, 4.5f, 60.5f)); // spawn shooting blueprint
     go->GetComponent<cmp::Camera>()->SetSpeed(6.19251f);
     collidersManager = new CollidersManager(go); //mened�er kolider�w
@@ -152,8 +153,11 @@ Scene::Scene()
     multiToolScript = new MultiToolController();
     
     SceneInfo sceneInfo = {
-        shader_l, shader_d, lineShader, displShader, shadowParticleShader, resMan, collidersManager, shadowsManager, this, multiToolScript, go
+        shader_l, shader_d, lineShader, displShader, particleShader, shadowParticleShader, resMan, collidersManager, shadowsManager, this, multiToolScript, go
     };
+    go->AddComponent(std::make_shared<cmp::Scriptable>());
+    GameManager* gm = new GameManager();
+    go->GetComponent<cmp::Scriptable>()->Add(gm);
 
     LoadLevelTutorial(sceneInfo);
     //LoadLevelPuzzle1(sceneInfo);
@@ -182,9 +186,6 @@ Scene::Scene()
     }
 
     //skrypty gracza
-    go->AddComponent(std::make_shared<cmp::Scriptable>());
-    GameManager* gm = new GameManager();
-    go->GetComponent<cmp::Scriptable>()->Add(gm);
     
 
     auto debugLineGO = std::make_shared<GameObject>();
@@ -260,7 +261,7 @@ Scene::Scene()
         //multiToolScript = new MultiToolController(); MOVED BEFORE MAP LOADER
         multiTool->GetComponent<cmp::Scriptable>()->Add(multiToolScript);
         playerGO->GetComponent<cmp::Scriptable>()->Get<PlayerPlaceTurret>()->multiTool = multiToolScript;
-        
+        multiToolScript->gm = gm;
 
 
         auto mutliToolDisplayHolder = std::make_shared<GameObject>();
@@ -381,6 +382,27 @@ Scene::Scene()
         
         multiToolDisplayNode->AddChild(go);
     }
+    {
+        Font* font = resMan->GetFont("Resources/fonts/Segment7-4Gml.otf");
+        go = std::make_shared<GameObject>();
+        auto tc = std::make_shared<TransformComponent>();
+
+        auto textComponent = std::make_shared<TextComponent>();
+        textComponent->Create("Press T for the toollight", font);
+        textComponent->alwaysSeen = true;
+        textComponent->isGuiElement = true;
+        textComponent->color = { 0.8f, 0.8f, 0.8f };
+
+        go->AddComponent(textShader);
+        go->AddComponent(tc);
+        go->AddComponent(textComponent);
+
+        go->GetComponent<TransformComponent>()->SetPosition(0.35f, 0.2f, 0.0f);
+        go->GetComponent<TransformComponent>()->SetScale(0.0f);
+        go->AddComponent(std::make_shared<cmp::Name>("TutorialFlash"));
+
+        world->FindNode("GUI")->AddChild(go);
+    }
 
 
     //== tooltip
@@ -461,6 +483,7 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
         sceneInfo.shader_d, 
         sceneInfo.lineShader, 
         sceneInfo.displShader,
+        sceneInfo.particlesShader,
         sceneInfo.shadowParticlesShader,
         sceneInfo.collidersManager, 
         sceneInfo.shadowsManager,
@@ -470,10 +493,12 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
 
     //===enemy
     {
+
         auto go = std::make_shared<GameObject>();
         auto mc = std::make_shared<ModelComponent>();
         mc->Create(
-            sceneInfo.resourceManager->GetMesh("Resources/models/ny/przeciwnik/przeciwnik/przeciwniksmooth.obj"),
+            //sceneInfo.resourceManager->GetMesh("Resources/models/ny/przeciwnik/przeciwnik/przeciwniksmooth.obj"),
+            sceneInfo.resourceManager->GetMesh("Resources/models/enemy/enemy.obj"),
             sceneInfo.resourceManager->GetMaterial("Resources/models/displacement test/capsule.mtl")
         );
         go->AddComponent(sceneInfo.displShader);
@@ -481,33 +506,124 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
 
         go->AddComponent(std::make_shared<FrustumCullingComponent>());
         go->GetComponent<cmp::FrustumCulling>()->Create(
-            sceneInfo.resourceManager->GetMesh("Resources/models/ny/przeciwnik/przeciwnik/przeciwnik.obj")
+            //sceneInfo.resourceManager->GetMesh("Resources/models/ny/przeciwnik/przeciwnik/przeciwnik.obj")
+            sceneInfo.resourceManager->GetMesh("Resources/models/enemy/enemy.obj")
         );
 
         go->AddComponent(std::make_shared<cmp::Transform>());
-        go->GetComponent<cmp::Transform>()->SetPosition(-100, 2, 25);
+        go->GetComponent<cmp::Transform>()->SetPosition(-83.0f, -10, 6);
+        //go->GetComponent<cmp::Transform>()->SetRotation(0,90,0);
+        go->GetComponent<cmp::Transform>()->SetScale(0.50f);
 
-        go->AddComponent(std::make_shared<cmp::Name>("Enemy"));
+
+        go->AddComponent(std::make_shared<cmp::Name>("CutsceneEnemy"));
 
         go->AddComponent(std::make_shared<BoxCollider>(true, false, CollisionLayer::ENEMY));
         go->GetComponent<cmp::BoxCol>()->SetLengths(glm::vec3(2, 2, 2));
         go->GetComponent<cmp::BoxCol>()->isOptimized = false;
-        go->GetComponent<cmp::BoxCol>()->AddToCollidersManager(collidersManager);
 
         go->AddComponent(std::make_shared<cmp::Scriptable>());
         Health* health = new Health();
         health->SetMaxHealth(50.0f);
         health->scene = this;
         go->GetComponent<cmp::Scriptable>()->Add(health);
+        auto particles = std::make_shared<ParticleComponent>();
+
+        particles->Create(sceneInfo.cameraGO->GetComponent<cmp::Camera>(), false, 40, sceneInfo.particlesShader);
+        particles->SetTexture("Resources/textures/shadowParticle.png");
+        particles->SetParticlesPerSecond(20.0f);
+        particles->SetOffset({ 0, 0, 0 });
+        particles->SetDirection({ 0.0f, -1.0f, 0.0f });
+        particles->SetDirectionVar(20);
+        particles->SetParticleLifetime(2.0f);
+        particles->SetScale(0.2f, 0.2f);
+        particles->SetSpeed(3.0f);
+        particles->SetColor({ 1.0,1.0,1.0,1.0 });
+        particles->SetForce({ 0.0f, -0.01f, 0.0f });
+
+        go->AddComponent(particles);
+
+        sceneInfo.cameraGO->GetComponent<cmp::Scriptable>()->Get<GameManager>()->immortal = true;
 
         auto enemyScript = new EnemyScript(sceneInfo.cameraGO);
         enemyScript->health = health;
         enemyScript->multitool = sceneInfo.multiToolScript;
-        std::shared_ptr<Path> e_path = std::make_shared<Path>(true);
-        enemyScript->SetPath(e_path);
+        std::shared_ptr<Path> path = std::make_shared<Path>(true);
+        path->Clear();
+        path->AddWayPoint({ - 83.0f, 2.0, 6});
+        path->AddWayPoint({ -84.72, 2.0, 28 });
+        path->Set();
+        enemyScript->SetPath(path);
         go->GetComponent<cmp::Scriptable>()->Add(enemyScript);
+        go->GetComponent<cmp::Scriptable>()->DisableAll();
+
+        //right arm
+        auto rightArm = std::make_shared<GameObject>();
+        mc = std::make_shared<ModelComponent>();
+        mc->Create(
+            //sceneInfo.resourceManager->GetMesh("Resources/models/ny/przeciwnik/przeciwnik/przeciwniksmooth.obj"),
+            sceneInfo.resourceManager->GetMesh("Resources/models/enemy/enemyRightArm.obj"),
+            sceneInfo.resourceManager->GetMaterial("Resources/models/displacement test/capsule.mtl")
+        );
+        rightArm->AddComponent(sceneInfo.displShader);
+        rightArm->AddComponent(mc);
+        rightArm->AddComponent(std::make_shared<FrustumCullingComponent>());
+        rightArm->GetComponent<cmp::FrustumCulling>()->Create(
+            //sceneInfo.resourceManager->GetMesh("Resources/models/ny/przeciwnik/przeciwnik/przeciwnik.obj")
+            sceneInfo.resourceManager->GetMesh("Resources/models/enemy/enemyRightArm.obj")
+        );
+
+        rightArm->AddComponent(std::make_shared<cmp::Transform>());
+        rightArm->GetComponent<cmp::Transform>()->SetPosition(-1, 4, 0);
+        rightArm->GetComponent<cmp::Transform>()->SetRotation(0, -90, 0);
+        rightArm->AddComponent(std::make_shared<cmp::Name>("EnemyRightArm"));
+
+        //left arm
+        auto leftArm = std::make_shared<GameObject>();
+        mc = std::make_shared<ModelComponent>();
+        mc->Create(
+            //sceneInfo.resourceManager->GetMesh("Resources/models/ny/przeciwnik/przeciwnik/przeciwniksmooth.obj"),
+            sceneInfo.resourceManager->GetMesh("Resources/models/enemy/enemyLeftArm.obj"),
+            sceneInfo.resourceManager->GetMaterial("Resources/models/displacement test/capsule.mtl")
+        );
+        leftArm->AddComponent(sceneInfo.displShader);
+        leftArm->AddComponent(mc);
+        leftArm->AddComponent(std::make_shared<FrustumCullingComponent>());
+        leftArm->GetComponent<cmp::FrustumCulling>()->Create(
+            //sceneInfo.resourceManager->GetMesh("Resources/models/ny/przeciwnik/przeciwnik/przeciwnik.obj")
+            sceneInfo.resourceManager->GetMesh("Resources/models/enemy/enemyLeftArm.obj")
+        );
+
+        leftArm->AddComponent(std::make_shared<cmp::Transform>());
+        leftArm->GetComponent<cmp::Transform>()->SetPosition(1, 4, 0);
+        leftArm->GetComponent<cmp::Transform>()->SetRotation(0, -90, 0);
+        leftArm->AddComponent(std::make_shared<cmp::Name>("EnemyLeftArm"));
+
+        world->FindNode("MAIN")->AddChild(go)->AddChild(rightArm);
+        go->GetNode()->AddChild(leftArm);
+
+        auto deathBall = std::make_shared<GameObject>();
+        mc = std::make_shared<ModelComponent>();
+        mc->Create(
+            //sceneInfo.resourceManager->GetMesh("Resources/models/ny/przeciwnik/przeciwnik/przeciwniksmooth.obj"),
+            sceneInfo.resourceManager->GetMesh("Resources/models/Sphere/Sphere.obj"),
+            sceneInfo.resourceManager->GetMaterial("Resources/models/displacement test/capsule.mtl")
+        );
+        deathBall->AddComponent(sceneInfo.displShader);
+        deathBall->AddComponent(mc);
+        deathBall->AddComponent(std::make_shared<FrustumCullingComponent>());
+        deathBall->GetComponent<cmp::FrustumCulling>()->Create(
+            //sceneInfo.resourceManager->GetMesh("Resources/models/ny/przeciwnik/przeciwnik/przeciwnik.obj")
+            sceneInfo.resourceManager->GetMesh("Resources/models/Sphere/Sphere.obj")
+        );
+
+        deathBall->AddComponent(std::make_shared<cmp::Transform>());
+        deathBall->GetComponent<cmp::Transform>()->SetScale(0.01f);
+        deathBall->AddComponent(std::make_shared<cmp::Name>("DeathBall"));
+
+        go->GetNode()->AddChild(deathBall);
         
-        world->FindNode("MAIN")->AddChild(go);
+        
     }
 
 
@@ -529,7 +645,7 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
 
     int i = 0;
     DoorActivator* cutsceneDoorActivator = nullptr;
-    DoorActivator* openDoorAfterEnemyDies = nullptr;
+    std::shared_ptr<GameObject> openDoorAfterEnemyDies = nullptr;
     for (auto& [doorPosition, doorRotation, activatorPosition, activatorRotation] : doorsAndButtons)
     {
         //create door
@@ -608,12 +724,13 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
         go->AddComponent(std::make_shared<cmp::Scriptable>());
 
         auto activator = new DoorActivator();
+        if(i!=3)
         activator->doorTransform = doorTransform;
         activator->openedOffset = { 0.0f, 10.1f, 0.0f };
         go->GetComponent<cmp::Scriptable>()->Add(activator);
 
         if (i == 2) cutsceneDoorActivator = activator;
-        if (i == 3) openDoorAfterEnemyDies = activator;
+        if (i == 3) openDoorAfterEnemyDies = doorTransform->GetOwner();
         i++;
 
         //- frame model
@@ -651,13 +768,99 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
         auto cutscene = new Cutscenexd();
         cutscene->doorsToShut = cutsceneDoorActivator;
         cutscene->doorsToOpen = openDoorAfterEnemyDies;
+        cutscene->blueprint = world->FindNode("Blueprint 1")->GetGameObject();
+        cutscene->camera = world->FindNode("CAMERA")->GetGameObject()->GetComponent<cmp::Camera>();
+        cutscene->enemy = world->FindNode("CutsceneEnemy")->GetGameObject();
         cutscene->lightShader = sceneInfo.shader_l;
         cutscene->shadowManager = shadowsManager;
-        cutscene->enemy = world->FindNode("Enemy")->GetGameObject();
+        cutscene->colMan = collidersManager;
+        cutscene->dispShader = sceneInfo.displShader;
+        cutscene->generator = world->FindNode("bulb2")->GetGameObject();
+        std::shared_ptr<cmp::PointLight> genLight = world->FindNode("generatorLight2")->GetGameObject()->GetComponent<cmp::PointLight>();
+        cutscene->generatorLight = genLight;
+        cutscene->resMan = sceneInfo.resourceManager;
         go->GetComponent<cmp::Scriptable>()->Add(cutscene);
 
 
         world->FindNode("MAIN")->AddChild(go);
+        
+        for (int i = 0; i < 2; i++)
+        {
+            std::shared_ptr<GameObject> turret = std::make_shared<GameObject>();
+            auto mc = std::make_shared<cmp::Model>();
+            mc->Create(
+                sceneInfo.resourceManager->GetMesh("Resources/models/Wieze/Strzelajaca.obj"),
+                sceneInfo.resourceManager->GetMaterial("Resources/models/Wieze/Strzelajaca.mtl")
+            );
+            turret->AddComponent(mc);
+            mc->SetTintColor(1.0,1.0,1.0);
+            turret->AddComponent(std::make_shared<cmp::Shade>());
+            turret->GetComponent<cmp::Shade>()->Create(1);
+            turret->AddComponent(sceneInfo.shader_l);
+            turret->AddComponent(std::make_shared<cmp::Transform>());
+            if (i == 0)
+            {
+                turret->GetComponent<cmp::Transform>()->SetPosition({ -92.72f, 0.0f, 24.0f });
+                cutscene->shooter1 = turret;
+            }
+            else
+            {
+                turret->GetComponent<cmp::Transform>()->SetPosition({ -92.72f, 0.0f, 32.0f });
+                cutscene->shooter2 = turret;
+            }
+            turret->GetComponent<cmp::Transform>()->SetRotation({ 0.0f, 180.0f, 0.0f });
+            turret->AddComponent(std::make_shared<cmp::FrustumCulling>());
+            turret->GetComponent<cmp::FrustumCulling>()->Create(
+                sceneInfo.resourceManager->GetMesh("Resources/models/Wieze/Strzelajaca.obj"));
+
+            turret->AddComponent(std::make_shared<cmp::BoxCol>(true, true));
+            std::shared_ptr<cmp::BoxCol> col = turret->GetComponent<cmp::BoxCol>();
+            col->SetLengths({ 2.0, 2.5, 2.0 });
+            col->SetOffset({ 0.0, 2.0, 0.0 });
+            col->AddToCollidersManager(collidersManager);
+
+            turret->AddComponent(std::make_shared<cmp::Scriptable>());
+            TurretShoot* script = new TurretShoot();
+            script->isPut = true;
+            script->particleShader = sceneInfo.particlesShader;
+            turret->GetComponent<cmp::Scriptable>()->Add(script);
+
+
+            auto rangeGO = std::make_shared<GameObject>();
+            rangeGO->AddComponent(std::make_shared<cmp::Transform>());
+
+            rangeGO->AddComponent(std::make_shared<cmp::SphereCol>(true, true));
+            std::shared_ptr<cmp::SphereCol> rangeCol = rangeGO->GetComponent<cmp::SphereCol>();
+            rangeCol->SetRadius(15.0f);
+            rangeCol->AddToCollidersManager(collidersManager);
+
+            rangeGO->AddComponent(std::make_shared<cmp::Scriptable>());
+            TurretRange* range = new TurretRange();
+            script->turretRange = range;
+            rangeGO->GetComponent<cmp::Scriptable>()->Add(range);
+
+
+            world->FindNode("MAIN")->AddChild(turret)->AddChild(rangeGO);
+        }
+        go = std::make_shared<GameObject>();
+
+        auto doorTransform = std::make_shared<cmp::Transform>();
+        doorTransform->SetPosition(-89,9.05,28);
+        doorTransform->SetRotation(0, 0, 0);
+        doorTransform->SetScale({ 1,1,5 });
+        go->AddComponent(doorTransform);
+
+        auto model = std::make_shared<cmp::Model>();
+        model->Create(
+            sceneInfo.resourceManager->GetMesh("Resources/models/doors/drzwi.obj"),
+            sceneInfo.resourceManager->GetMaterial("Resources/models/doors/drzwi.mtl")
+        );
+        // model->SetTintColor(1.0, 0.5, 0.0);
+        go->AddComponent(model);
+        go->AddComponent(sceneInfo.shader_l);
+        cutscene->shootingDoor = go;
+        world->FindNode("MAIN")->AddChild(go);
+        
     }
 }
 
@@ -668,6 +871,7 @@ void Scene::LoadLevelPuzzle1(const SceneInfo& sceneInfo)
         sceneInfo.shader_d,
         sceneInfo.lineShader,
         sceneInfo.displShader,
+        sceneInfo.particlesShader,
         sceneInfo.shadowParticlesShader,
         sceneInfo.collidersManager,
         sceneInfo.shadowsManager,

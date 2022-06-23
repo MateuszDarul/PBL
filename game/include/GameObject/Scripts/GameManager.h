@@ -13,7 +13,7 @@ private:
 	int energy;
 	std::shared_ptr<cmp::Text> energyText;
 public:
-
+	bool immortal = false;
 	void Start()
 	{
 		energy = 0;

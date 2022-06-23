@@ -33,7 +33,7 @@ bool ModelInstancesComponent::Create(uint32_t amount, Mesh* mesh, Material* mate
         }
     }
 
-
+    
 
     glGenVertexArrays(1, &this->VAO);
     glGenBuffers(1, &this->VBO);

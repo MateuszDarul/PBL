@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Components.h"
+#include "GameManager.h"
 
 
 
@@ -17,6 +18,7 @@ public:
 
     std::shared_ptr<GameObject> iconsGO[3];
     std::shared_ptr<GameObject> progressBar;
+    GameManager* gm;
 
     std::shared_ptr<cmp::SpotLight> flashlight;
 
@@ -48,20 +50,22 @@ public:
 bool manuallyTurnedOn = false;
     void Update(float dt)
     {
+        if (Input()->Keyboard()->OnPressed(KeyboardKey::T) && !gm->immortal)
+        {
+            isFlashlightOn = !isFlashlightOn;
+            manuallyTurnedOn = isFlashlightOn;
+        }
+
         if (lightSourcesInRange > 0) 
         {
             currentFlashlightCharge += 1.618f * dt;
             if (!manuallyTurnedOn) isFlashlightOn = false;
             
-            if (Input()->Keyboard()->OnPressed(KeyboardKey::T)) 
-            {
-                isFlashlightOn = !isFlashlightOn;
-                manuallyTurnedOn = isFlashlightOn;
-            }
+            
         }
         else if (!manuallyTurnedOn)
         {
-            isFlashlightOn = true;
+            //isFlashlightOn = true;
         }
 
         if (currentFlashlightCharge < 0.00001f)
@@ -70,12 +74,8 @@ bool manuallyTurnedOn = false;
             isFlashlightOn = false;
             manuallyTurnedOn = false;
         }
-        if (Input()->Keyboard()->OnPressed(KeyboardKey::R))
-        {
-            currentFlashlightCharge = maxFlashlightCharge;
-        }
 
-        if (isFlashlightOn)
+        if (isFlashlightOn && !gm->immortal)
         {
             currentFlashlightCharge -= dt;
 

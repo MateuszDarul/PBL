@@ -61,13 +61,6 @@ void main()
     else
     {
 	float light = 0;
-        for(int i=0; i<pointLightAmount; i++)
-        {
-            float intensity = GetPointLight(pointLight[i]);
-            if(intensity >= 0.1f && intensity > light)
-                light = intensity;
-        }
-
         for(int i=0; i<spotLightAmount; i++)
         {
             float intensity = GetSpotLight(spotLight[i]);
@@ -80,13 +73,6 @@ void main()
     FragColor = frag;
 }
 
-float GetPointLight(PointLight pLight)
-{
-    float distance = length(pLight.position - fragPos);
-    float attenuation = 1 - pow(distance * pLight.distance, 5.0);
-
-    return attenuation;
-}
 
 float GetSpotLight(SpotLight sLight)
 {

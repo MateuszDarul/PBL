@@ -46,10 +46,7 @@ public:
 	void SetMaxHealth(float health)
 	{
 		maxHealth = health;
-		if (this->health > maxHealth)
-		{
-			this->health = maxHealth;
-		}
+		this->health = health;
 	}
 	
 	float GetHealth()

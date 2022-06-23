@@ -35,6 +35,7 @@ public:
         std::shared_ptr<cmp::Shader> shader_d, 
         std::shared_ptr<cmp::Shader> shader_line,
         std::shared_ptr<cmp::Shader> shader_dis,
+        std::shared_ptr<cmp::Shader> shader_part,
         std::shared_ptr<cmp::Shader> shader_part_light,
         CollidersManager* collisionManager, 
         ShadowsManager* shadowsManager, 

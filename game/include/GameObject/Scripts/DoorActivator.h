@@ -9,6 +9,7 @@ public:
 
     //adjust these
     glm::vec3 openedOffset = { 0.0f, 6.0f, 0.0f };
+    glm::vec3 brokenOffset = { 0.0f,3.0f,0.0f };
     float doorSpeed = 7.0f;
 
     //set these in 'inspector'
@@ -83,6 +84,21 @@ public:
             }
 
             isActivated = true;
+        }
+    }
+
+    void BrokenActivate()
+    {
+        if (!isShutdown)
+        {
+            if (isPrimed) //on power on
+            {
+                isPrimed = false;
+
+                if (doorTransform) targetPosition += brokenOffset;
+                if (buttonModel) buttonModel->SetTintColor({ 0.5f, 0.0f, 0.0f,  1.0f });
+            }
+
         }
     }
 

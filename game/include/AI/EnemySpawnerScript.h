@@ -16,6 +16,7 @@ private:
 
     CollidersManager* collidersManager;
     std::shared_ptr<ShaderComponent> displShader;
+    std::shared_ptr<ShaderComponent> particleShader;
     Scene* scene;
     MultiToolController* multiToolScript;
     std::shared_ptr<GameObject> playerGO;
@@ -30,7 +31,8 @@ public:
     */
     EnemySpawnerScript(
         SceneNode* rootNode,
-        std::shared_ptr<ShaderComponent> shader, 
+        std::shared_ptr<ShaderComponent> shader,
+        std::shared_ptr<ShaderComponent> particleShader,
         CollidersManager* colManager, 
         Scene* scn, 
         MultiToolController* mtoolScript, 
@@ -39,6 +41,7 @@ public:
     {
         collidersManager = colManager;
         displShader = shader;
+        this->particleShader = particleShader;
         scene = scn;
         multiToolScript = mtoolScript;
         playerGO = p;

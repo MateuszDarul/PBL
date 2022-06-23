@@ -23,6 +23,7 @@ struct SceneInfo
     std::shared_ptr<cmp::Shader> shader_d;
     std::shared_ptr<cmp::Shader> lineShader;
     std::shared_ptr<cmp::Shader> displShader;
+    std::shared_ptr<cmp::Shader> particlesShader;
     std::shared_ptr<cmp::Shader> shadowParticlesShader;
     ResourceManager* resourceManager;
     CollidersManager* collidersManager;

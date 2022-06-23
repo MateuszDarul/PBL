@@ -14,6 +14,7 @@ bool MapLoader::Load(
     std::shared_ptr<cmp::Shader> shader_d,
     std::shared_ptr<cmp::Shader> shader_line,
     std::shared_ptr<cmp::Shader> shader_dis,
+    std::shared_ptr<cmp::Shader> shader_part,
     std::shared_ptr<cmp::Shader> shader_part_light,
     CollidersManager* collisionManager, 
     ShadowsManager* shadowsManager, 
@@ -610,6 +611,7 @@ bool MapLoader::Load(
             light->SetDamping(lightRange);
             light->SetLightColor({ 0.8f, 0.8f, 1.0f });
             shadowsManager->AddLight(lightGO.get());
+            lightGO->AddComponent(std::make_shared<cmp::Name>("generatorLight"+std::to_string(generatorCounter)));
 
             if (!isEnabled)
             {
@@ -675,7 +677,7 @@ bool MapLoader::Load(
             auto scriptHolder = std::make_shared<cmp::Scriptable>();
             gameObject->AddComponent(scriptHolder);
 
-            auto spawnerScript = new EnemySpawnerScript(root, shader_dis, collisionManager, scn, multiToolScript, p);
+            auto spawnerScript = new EnemySpawnerScript(root, shader_dis, shader_part, collisionManager, scn, multiToolScript, p);
 
             std::string ln;
             file >> std::dec >> ln;
