@@ -64,14 +64,14 @@ Scene::Scene()
     musicBuffer->SetVolume(0.11f);
 
 
-    // MusicBuffer* memoryLeak1 = new MusicBuffer("Resources/sounds/creepy1.wav");
-    // MusicBuffer* memoryLeak2 = new MusicBuffer("Resources/Music/rapid_turnaround.wav");
+    MusicBuffer* memoryLeak1 = new MusicBuffer("Resources/Music/action.wav");
+    MusicBuffer* memoryLeak2 = new MusicBuffer("Resources/Music/dramatic.wav");
     
-    // memoryLeak1->SetVolume(0.13f);
-    // memoryLeak2->SetVolume(0.16f);
+    memoryLeak1->SetVolume(0.13f);
+    memoryLeak2->SetVolume(0.16f);
     
-    // AudioManager::Enqueue(memoryLeak1);
-    // AudioManager::Enqueue(memoryLeak2);
+    AudioManager::Enqueue(memoryLeak1);
+    AudioManager::Enqueue(memoryLeak2);
     AudioManager::Enqueue(musicBuffer);
 
     /// *** SKYBOX
@@ -310,7 +310,7 @@ Scene::Scene()
 
         auto mutliToolDisplayHolder = std::make_shared<GameObject>();
         mutliToolDisplayHolder->AddComponent(std::make_shared<cmp::Transform>());
-        mutliToolDisplayHolder->GetComponent<cmp::Transform>()->SetPosition(-0.045, 0.04, 0.285);
+        mutliToolDisplayHolder->GetComponent<cmp::Transform>()->SetPosition(0.0016f, -0.003329f, 0.262514f);
         mutliToolDisplayHolder->GetComponent<cmp::Transform>()->SetRotation(-10, 0, 0);
         auto displayNode = multiToolNode->AddChild(mutliToolDisplayHolder);
         multiToolDisplayNode = displayNode.get();
@@ -760,7 +760,7 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
             sceneInfo.resourceManager->GetMesh("Resources/models/ny/przelacznikLaserowy/przelacznikLaserowy/przelacznikDetector.obj"),
             sceneInfo.resourceManager->GetMaterial("Resources/models/ny/przelacznikLaserowy/przelacznikLaserowy/przelacznikLaserowy.mtl")
         );
-        model->SetTintColor(0.51, 0.01, 0.01);
+        model->SetTintColor(0.11, 0.01, 0.01);
         go->AddComponent(model);
         go->AddComponent(sceneInfo.shader_d);
 
@@ -797,6 +797,47 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
 
 
     go->AddComponent(std::make_shared<cmp::Scriptable>());
+    
+    //--alarm gameobject
+    glm::vec3 alarmPos = { -83.0f, 7.5f, 0.5f };
+
+    auto alarmGO = std::make_shared<GameObject>();
+    alarmGO->AddComponent(std::make_shared<cmp::Name>("CutscenexdAlarmGO"));
+
+    alarmGO->AddComponent(std::make_shared<cmp::Transform>());
+    alarmGO->GetComponent<cmp::Transform>()->SetPosition(alarmPos);
+    alarmGO->GetComponent<cmp::Transform>()->SetRotation(0.0f, 0.0f, 180.0f);
+    alarmGO->GetComponent<cmp::Transform>()->SetScale(3.0f);
+
+    auto model = std::make_shared<cmp::Model>();
+    model->Create(
+        sceneInfo.resourceManager->GetMesh("Resources/models/ny/przelacznikLaserowy/przelacznikLaserowy/przelacznikDetector.obj"),
+        sceneInfo.resourceManager->GetMaterial("Resources/models/ny/przelacznikLaserowy/przelacznikLaserowy/przelacznikLaserowy.mtl")
+    );
+    model->SetTintColor(0.01, 0.01, 0.01);
+    alarmGO->AddComponent(model);
+    alarmGO->AddComponent(sceneInfo.shader_d);
+
+    alarmGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
+    alarmGO->GetComponent<cmp::FrustumCulling>()->Create(sceneInfo.resourceManager->GetMesh("Resources/models/ny/przelacznikLaserowy/przelacznikLaserowy/przelacznikDetector.obj"));
+
+    auto frameGO = std::make_shared<GameObject>();
+    frameGO->AddComponent(std::make_shared<cmp::Transform>());
+    frameGO->GetComponent<cmp::Transform>()->SetPosition(-.02, -.025, -.2);
+    frameGO->GetComponent<cmp::Transform>()->SetScale(0.2);
+    model = std::make_shared<cmp::Model>();
+    model->Create(
+        sceneInfo.resourceManager->GetMesh("Resources/models/Crate/Crate.obj"),
+        sceneInfo.resourceManager->GetMaterial("Resources/models/wall/wall.mtl")
+    );
+    model->SetTintColor(0.3, 0.3, 0.3);
+    frameGO->AddComponent(model);
+    frameGO->AddComponent(sceneInfo.shader_l);
+    frameGO->AddComponent(std::make_shared<cmp::FrustumCulling>());
+    frameGO->GetComponent<cmp::FrustumCulling>()->Create(sceneInfo.resourceManager->GetMesh("Resources/models/Crate/Crate.obj"));
+
+    levelNode->AddChild(alarmGO)->AddChild(frameGO);
+    //--
 
     auto cutscene = new Cutscenexd();
     cutscene->doorsToShut = cutsceneDoorActivator;
@@ -809,6 +850,7 @@ void Scene::LoadLevelTutorial(const SceneInfo& sceneInfo)
 
     levelNode->AddChild(go);
     
+
 
     //cutscene 2
 
@@ -875,7 +917,7 @@ void Scene::LoadLevel1(const SceneInfo& sceneInfo)
         sceneInfo.multiToolScript,
         sceneInfo.cameraGO);
 
-    sceneInfo.cameraGO->GetComponent<cmp::Camera>()->RestartMovement(-4, 4.5, 10);
+    sceneInfo.cameraGO->GetComponent<cmp::Camera>()->RestartMovement(-8, 4.5, 10);
 
     //restart picked blueprints
     sceneInfo.multiToolScript->Unlock(0);
@@ -1267,6 +1309,8 @@ void Scene::Update(float dt)
     if (Input()->Keyboard()->IsPressed(KeyboardKey::Left))  mtTransform->Rotate(-dt, 0, 0);
     if (Input()->Keyboard()->IsPressed(KeyboardKey::LBracket)) mtTransform->Move(-dt, 0, 0);
     if (Input()->Keyboard()->IsPressed(KeyboardKey::RBracket)) mtTransform->Move(dt, 0, 0);
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::O)) mtTransform->Move(0, 0, dt);
+    if (Input()->Keyboard()->IsPressed(KeyboardKey::P)) mtTransform->Move(0, 0, -dt);
 
     //printf("p %f %f \tr %f\n", mtTransform->GetPosition().x, mtTransform->GetPosition().y, mtTransform->GetRotation().x);
     /*auto displ = world->FindNode("mtDisplay")->GetGameObject()->GetComponent<cmp::Transform>();

@@ -112,7 +112,8 @@ public:
                         //else 
                         if (shouldInteract)
                         {
-                            shouldInteract = false;
+                            shouldInteract = false;                            
+                            
 
                             selectedMirror = mirror;
                             selectedMirror->SetEnabled(true);
@@ -148,6 +149,18 @@ public:
                     }
                 }
             }
+            //else
+            //{
+            //    auto nameCmp = hit.gameObject->GetComponent<cmp::Name>();
+            //
+            //    if (nameCmp) std::cout << nameCmp->Get() << " - interact\n";
+            //    if (auto bc = hit.gameObject->GetComponent<cmp::BoxCol>())
+            //    {
+            //        auto p = hit.gameObject->GetComponent <cmp::Transform>()->GetPosition();
+            //        std::cout << bc->GetLengths().x << " " << bc->GetLengths().y << " " << bc->GetLengths().z << "\n";
+            //        std::cout << p.x << " " << p.y << " " << p.z << "\n";
+            //    }
+            //}
         }
         if (showTooltip)
         {

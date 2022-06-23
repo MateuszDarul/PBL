@@ -329,10 +329,17 @@ bool MapLoader::Load(
             std::shared_ptr<BoxCollider> boxCollider = nullptr;
             std::shared_ptr<SphereCollider> sphereCollider = nullptr;
 
+            CollisionLayer layer = CollisionLayer::Default;
+            if (type >= 10)
+            {
+                layer = CollisionLayer::Ignore;
+                type -= 10;
+            }
+
             switch(type)
             {
             case 0: /// BOX
-                gameObject->AddComponent(std::make_shared<BoxCollider>(false, true));
+                gameObject->AddComponent(std::make_shared<BoxCollider>(false, true, layer));
                 boxCollider = gameObject->GetComponent<BoxCollider>();
                 {
                     glm::vec3 size;
@@ -347,7 +354,7 @@ bool MapLoader::Load(
             break;
 
             case 1: /// SPHERE
-                gameObject->AddComponent(std::make_shared<SphereCollider>(false, true));
+                gameObject->AddComponent(std::make_shared<SphereCollider>(false, true, layer));
                 sphereCollider = gameObject->GetComponent<SphereCollider>();
                 {
                     float size;
@@ -360,7 +367,7 @@ bool MapLoader::Load(
             break;
 
             case 2: /// SLOPE
-                gameObject->AddComponent(std::make_shared<SlopeCollider>(false, true));
+                gameObject->AddComponent(std::make_shared<SlopeCollider>(false, true, layer));
                 {
                     auto slopeCollider = gameObject->GetComponent<SlopeCollider>();
 
@@ -606,10 +613,16 @@ bool MapLoader::Load(
             gameObject->AddComponent(std::make_shared<cmp::Name>("bulb" + std::to_string(generatorCounter)));
 
             auto bulbModel = std::make_shared<cmp::Model>();
+            if(!isEnabled)
             bulbModel->Create(
                 resMan->GetMesh("Resources/models/Sphere/Sphere.obj"),
                 resMan->GetMaterial("Resources/models/wall/wall.mtl")
             );
+            else
+                bulbModel->Create(
+                    resMan->GetMesh("Resources/models/Cube/Cube.obj"),
+                    resMan->GetMaterial("Resources/models/multitool/icon.mtl")
+                );
             gameObject->AddComponent(bulbModel);
             gameObject->AddComponent(shader_d);
 
@@ -626,14 +639,20 @@ bool MapLoader::Load(
             //light->AddShader(shader_part_light);
             light->SetPosition(bulbPos);
             light->SetDamping(lightRange);
-            light->SetLightColor({ 0.8f, 0.8f, 1.0f });
-            shadowsManager->AddLight(lightGO.get());
 
             if (!isEnabled)
             {
                 bulbModel->SetTintColor(0.4f, 0.4f, 0.8f);
                 light->SetPosition({ 999, 999, 999 });
+                light->SetLightColor({ 0.8f, 0.8f, 1.0f });
             }
+            else
+            {
+                light->SetLightColor({ 1.0f, 0.9f, 0.85f });
+                bulbModel->SetTintColor(0.8f, 0.7f, 0.55f);
+            }
+
+            shadowsManager->AddLight(lightGO.get());
 
             gameObject->AddComponent(std::make_shared<cmp::Scriptable>());
 

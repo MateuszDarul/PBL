@@ -7,7 +7,7 @@
 
 void EnemySpawnerScript::Start() {
 
-    //SpawnEnemy(1);
+    SpawnEnemy(1);
 
 }
 

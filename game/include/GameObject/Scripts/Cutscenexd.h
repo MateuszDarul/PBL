@@ -23,6 +23,7 @@ private:
     std::shared_ptr<cmp::PointLight> lightCmp;
     Health* enemyHealth;
 
+    ModelComponent* alarmModel;
 
     bool hasStarted, hasFinished;
     
@@ -39,6 +40,8 @@ public:
         if (enemy) enemyHealth = enemy->GetComponent<cmp::Scriptable>()->Get<Health>();
         siren = new SoundPlayer("Resources/sounds/siren.wav");
         siren->SetVolume(0.2f);
+
+        alarmModel = gameObject->GetNode()->GetParent()->FindNode("CutscenexdAlarmGO")->GetGameObject()->GetComponent<cmp::Model>().get();
     }
 
     void Update(float dt)
@@ -75,6 +78,7 @@ public:
         printf("Finished cutscene\n");
 
         lightCmp->SetLightColor({0.2f, 0.75f, 0.2f}); 
+        alarmModel->SetTintColor(0.01, 0.51, 0.01);
     }
 
     void TriggerEnter(std::shared_ptr<ColliderComponent> other) override
@@ -99,6 +103,8 @@ public:
             lightCmp->SetDamping(20.0f);
 
             shadowManager->AddLight(alarmLightGO.get());
+
+            alarmModel->SetTintColor(0.51, 0.01, 0.01);
         }
     }
 
